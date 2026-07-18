@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Popovers
 import SwiftUI
 
 struct InsightsView: View {
@@ -83,16 +82,7 @@ struct InsightsView: View {
                         .foregroundColor(Color.PrimaryText.opacity(0.9))
                         .background(Color.Outline, in: RoundedRectangle(cornerRadius: 6))
                     }
-                    .popover(present: $showTimeMenu, attributes: {
-                        $0.position = .absolute(
-                            originAnchor: .bottomRight,
-                            popoverAnchor: .topRight
-                        )
-                        $0.rubberBandingMode = .none
-                        $0.sourceFrameInset = UIEdgeInsets(top: 0, left: 0, bottom: -10, right: 0)
-                        $0.presentation.animation = .easeInOut(duration: 0.2)
-                        $0.dismissal.animation = .easeInOut(duration: 0.3)
-                    }) {
+                    .popover(isPresented: $showTimeMenu) {
                         ChartTimePickerView(showMenu: $showTimeMenu)
                     }
                 }

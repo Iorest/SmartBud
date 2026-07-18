@@ -7,7 +7,7 @@
 
 import Combine
 import CoreHaptics
-import Popovers
+import Foundation
 import SwiftUI
 import UIKit
 
@@ -949,21 +949,9 @@ struct NewCategoryAlert: View {
                                     }
                                 }
                         }
-                        .popover(present: $showingColourPicker, attributes: {
-                            $0.position = .absolute(
-                                originAnchor: .topLeft,
-                                popoverAnchor: .bottomLeft
-                            )
-                            $0.rubberBandingMode = .none
-                            $0.sourceFrameInset = UIEdgeInsets(top: -10, left: 0, bottom: 0, right: 0)
-                            $0.presentation.animation = .easeInOut(duration: 0.2)
-                            $0.dismissal.animation = .easeInOut(duration: 0.3)
-                        }) {
+                        .popover(isPresented: $showingColourPicker) {
                             ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker)
                                 .environment(\.managedObjectContext, self.moc)
-
-                        } background: {
-                            Color.PrimaryBackground.opacity(0.3)
                         }
                     }
 //
@@ -1368,21 +1356,9 @@ struct EditCategoryAlert: View {
                                     }
                                 }
                         }
-                        .popover(present: $showingColourPicker, attributes: {
-                            $0.position = .absolute(
-                                originAnchor: .topLeft,
-                                popoverAnchor: .bottomLeft
-                            )
-                            $0.rubberBandingMode = .none
-                            $0.sourceFrameInset = UIEdgeInsets(top: -10, left: 0, bottom: 0, right: 0)
-                            $0.presentation.animation = .easeInOut(duration: 0.2)
-                            $0.dismissal.animation = .easeInOut(duration: 0.3)
-                        }) {
+                        .popover(isPresented: $showingColourPicker) {
                             ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, toEdit: toEdit)
                                 .environment(\.managedObjectContext, self.moc)
-
-                        } background: {
-                            Color.PrimaryBackground.opacity(0.3)
                         }
                     }
 

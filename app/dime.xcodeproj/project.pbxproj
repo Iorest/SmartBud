@@ -53,7 +53,6 @@
 		5327D2DD287C6B5F00F76ADF /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D4287C6B5E00F76ADF /* InsightsView.swift */; };
 		5327D2DE287C6B5F00F76ADF /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D5287C6B5E00F76ADF /* CustomTabBar.swift */; };
 		5327D2E0287C6B7D00F76ADF /* DeviceModels.json in Resources */ = {isa = PBXBuildFile; fileRef = 5327D2DF287C6B7C00F76ADF /* DeviceModels.json */; };
-		5327D2E6287C6CC300F76ADF /* Popovers in Frameworks */ = {isa = PBXBuildFile; productRef = 5327D2E5287C6CC300F76ADF /* Popovers */; };
 		532C58BC2A629C3900DA2C81 /* NewBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532C58BB2A629C3900DA2C81 /* NewBudgetView.swift */; };
 		533182D328A0D61D00DEBFA3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5327D294287C698900F76ADF /* Assets.xcassets */; };
 		53326B2C2ADC3C8D0027C693 /* TestDragToAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53326B2B2ADC3C8D0027C693 /* TestDragToAdd.swift */; };
@@ -348,7 +347,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5383D85E287D9A0100D1B9BA /* CloudKit.framework in Frameworks */,
-				5327D2E6287C6CC300F76ADF /* Popovers in Frameworks */,
 				536715ED28E1E9A3008461F2 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -708,9 +706,6 @@
 				5313EC7428ACE941000EAB0C /* PBXTargetDependency */,
 			);
 			name = dime;
-			packageProductDependencies = (
-				5327D2E5287C6CC300F76ADF /* Popovers */,
-			);
 			productName = dime;
 			productReference = 5327D283287C697400F76ADF /* dime.app */;
 			productType = "com.apple.product-type.application";
@@ -767,9 +762,6 @@
 				"zh-Hant",
 			);
 			mainGroup = 5327D27A287C697400F76ADF;
-			packageReferences = (
-				5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */,
-			);
 			productRefGroup = 5327D284287C697400F76ADF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1495,25 +1487,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/aheze/Popovers";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		5327D2E5287C6CC300F76ADF /* Popovers */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */;
-			productName = Popovers;
-		};
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		53BC2A3F2A8B21920019E4A8 /* MainModel.xcdatamodeld */ = {

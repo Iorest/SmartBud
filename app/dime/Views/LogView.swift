@@ -7,7 +7,6 @@
 
 import CoreData
 import Foundation
-import Popovers
 import SwiftUI
 
 struct LogView: View {
@@ -164,16 +163,7 @@ struct LogView: View {
                                 }
                         }
                         .accessibilityLabel(Text("Filter"))
-                        .popover(present: $showFilter, attributes: {
-                            $0.position = .absolute(
-                                originAnchor: .bottomRight,
-                                popoverAnchor: .topRight
-                            )
-                            $0.rubberBandingMode = .none
-                            $0.sourceFrameInset = UIEdgeInsets(top: 0, left: 0, bottom: -10, right: 0)
-                            $0.presentation.animation = .easeInOut(duration: 0.2)
-                            $0.dismissal.animation = .easeInOut(duration: 0.3)
-                        }) {
+                        .popover(isPresented: $showFilter) {
                             FilterPickerView(filterType: $filter, showMenu: $showFilter)
                         }
                     }
@@ -518,16 +508,7 @@ struct LogInsightsView: View {
                             .foregroundColor(Color.PrimaryText.opacity(9))
                             .overlay(Capsule().stroke(Color.Outline, lineWidth: 1.3))
                     }
-                    .popover(present: $showMenu1, attributes: {
-                        $0.position = .absolute(
-                            originAnchor: .bottom,
-                            popoverAnchor: .top
-                        )
-                        $0.rubberBandingMode = .none
-                        $0.sourceFrameInset = UIEdgeInsets(top: 0, left: 0, bottom: -10, right: 0)
-                        $0.presentation.animation = .easeInOut(duration: 0.2)
-                        $0.dismissal.animation = .easeInOut(duration: 0.3)
-                    }) {
+                    .popover(isPresented: $showMenu1) {
                         TimePickerView(showMenu: $showMenu1, timeframe: $timeframe)
                     }
                 }
