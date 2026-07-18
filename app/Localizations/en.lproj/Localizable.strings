@@ -307,3 +307,51 @@
 "left" = "left";
 "SELECT BUDGET" = "SELECT BUDGET";
 "SELECT BUDGET IN WIDGET OPTIONS" = "SELECT BUDGET IN WIDGET OPTIONS";
+
+// Additional keys for hardcoded strings found in source code
+
+"APPEARANCE" = "APPEARANCE";
+"What's New" = "What's New";
+"Close" = "Close";
+
+// Face ID / App Lock
+"App Locked" = "App Locked";
+"Unlock App" = "Unlock App";
+"Please re-enable Face ID access in the Settings app to unlock application." = "Please re-enable Face ID access in the Settings app to unlock application.";
+
+// Image Save / Log Delete
+"Image Saved" = "Image Saved";
+"Log Deleted" = "Log Deleted";
+"Check it out in Photos" = "Check it out in Photos";
+"Tap to Undo" = "Tap to Undo";
+
+// Haptics
+"Haptic Feedback" = "Haptic Feedback";
+"The 'Excessive' mode makes the entire numpad haptic." = "The 'Excessive' mode makes the entire numpad haptic.";
+
+// Upcoming
+"Upcoming Logs" = "Upcoming Logs";
+"Display on Log Page" = "Display on Log Page";
+"Limit to 14-Day Outlook" = "Limit to 14-Day Outlook";
+
+// App Icon
+"App Icon" = "App Icon";
+
+// Start of Month
+"Start of Month" = "Start of Month";
+"of month" = "of month";
+
+// CSV Export
+"Date,Note,Amount,Category,Type\n" = "Date,Note,Amount,Category,Type\n";
+
+// Accessibility
+"Add New Transaction" = "Add New Transaction";
+"Search" = "Search";
+"Filter" = "Filter";
+"remove filter" = "remove filter";
+"previous day" = "previous day";
+"next day" = "next day";
+"previous week" = "previous week";
+"next week" = "next week";
+"previous month" = "previous month";
+"next month" = "next month";

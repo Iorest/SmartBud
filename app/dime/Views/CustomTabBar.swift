@@ -69,7 +69,7 @@ struct CustomTabBar: View {
                     }
                 }
             }
-            .accessibilityLabel("Add New Transaction")
+            .accessibilityLabel(String(localized: "Add New Transaction"))
 
             TabButton(image: "Budget", zoomed: isZoomed, currentTab: $currentTab)
 

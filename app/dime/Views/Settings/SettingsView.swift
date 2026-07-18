@@ -450,7 +450,9 @@ struct SettingsView: View {
 
           VStack(spacing: 5) {
             HStack(spacing: 3) {
-              Text("Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))")
+              let appVersion = UIApplication.appVersion ?? ""
+              let buildNumber = UIApplication.buildNumber ?? ""
+              Text(String(localized: "Version \(appVersion) (\(buildNumber))"))
                 .font(.system(.footnote, design: .rounded).weight(.medium))
 
                 //                                .font(.system(size: 14, weight: .medium, design: .rounded))
@@ -564,7 +566,7 @@ struct SettingsView: View {
 
     let fileName = "export.csv"
     let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    var csvText = "Date,Note,Amount,Category,Type\n"
+    var csvText = String(localized: "Date,Note,Amount,Category,Type\n")
 
     for transaction in transactions {
       var string = transaction.wrappedNote

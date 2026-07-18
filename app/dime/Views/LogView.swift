@@ -114,7 +114,7 @@ struct LogView: View {
                                         .opacity(progress)
                                 }
                         }
-                        .accessibilityLabel("Search")
+                        .accessibilityLabel(Text("Search"))
 
                         Spacer()
 
@@ -165,7 +165,7 @@ struct LogView: View {
 //                                    }
                                 }
                         }
-                        .accessibilityLabel("Filter")
+                        .accessibilityLabel(Text("Filter"))
                         .popover(present: $showFilter, attributes: {
                             $0.position = .absolute(
                                 originAnchor: .bottomRight,
@@ -336,7 +336,7 @@ struct LogView: View {
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .foregroundColor(Color.PrimaryText.opacity(0.7))
             }
-            .accessibilityLabel("remove filter")
+            .accessibilityLabel(Text("remove filter"))
         }
         .padding(4)
         .padding(.horizontal, 6)
@@ -2016,7 +2016,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: -1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel("previous day")
+            .accessibilityLabel(Text("previous day"))
 
             Spacer()
 
@@ -2033,7 +2033,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: 1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel("next day")
+            .accessibilityLabel(Text("next day"))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2099,7 +2099,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: -7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel("previous week")
+            .accessibilityLabel(Text("previous week"))
 
             Spacer()
 
@@ -2114,7 +2114,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: 7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel("next week")
+            .accessibilityLabel(Text("next week"))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2175,7 +2175,7 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: -1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel("previous month")
+            .accessibilityLabel(Text("previous month"))
 
             Spacer()
 
@@ -2190,7 +2190,7 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: 1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel("next month")
+            .accessibilityLabel(Text("next month"))
         }
         .frame(maxWidth: .infinity)
         .onAppear {

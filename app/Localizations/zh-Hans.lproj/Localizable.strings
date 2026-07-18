@@ -1,0 +1,354 @@
+/* 
+  Localizable.strings (Simplified Chinese)
+  dime
+*/
+
+// welcome sheet
+
+"dime_name" = "Dime";
+"welcome_header_1" = "追踪你的财务";
+"welcome_subtitle_1" = "以简单、直观的方式添加新条目";
+"welcome_header_2" = "分析你的支出";
+"welcome_subtitle_2" = "从不同时间段的消费中获取洞察";
+"welcome_header_3" = "坚持预算";
+"welcome_subtitle_3" = "设置分类和时间目标来限制支出";
+"Get Started" = "开始使用";
+
+// categories
+
+"Categories" = "类别";
+"no_income_categories" = "未找到收入类别，点击\"新建\"按钮添加";
+"no_expense_categories" = "未找到支出类别，点击\"新建\"按钮添加";
+"Suggestions Hidden" = "建议已隐藏";
+"Successfully Edited" = "编辑成功";
+"INCOME CATEGORIES" = "收入类别";
+"EXPENSE CATEGORIES" = "支出类别";
+"SUGGESTED" = "推荐";
+"Income Category" = "收入类别";
+"Expense Category" = "支出类别";
+"New" = "新建";
+"Expense" = "支出";
+"Income" = "收入";
+"Delete" = "删除";
+"Cancel" = "取消";
+"Delete '%@'?" = "删除\"%@\"?";
+"This action cannot be undone, and all %@ transactions would be deleted." = "此操作不可撤销，所有 %@ 交易将被删除。";
+"Category Name" = "类别名称";
+"Missing Name" = "缺少名称";
+"Missing Emoji" = "缺少表情符号";
+"Incomplete Entry" = "条目不完整";
+"Missing Information" = "缺少信息";
+"This action cannot be undone." = "此操作不可撤销。";
+"Duplicate Found" = "发现重复";
+"Please Edit Accordingly" = "请相应修改";
+"Please Change Emoji" = "请更换表情符号";
+"Please Change Name" = "请更换名称";
+"Food" = "餐饮";
+"Transport" = "交通";
+"Rent" = "房租";
+"Subscriptions" = "订阅服务";
+"Groceries" = "杂货";
+"Family" = "家庭";
+"Utilities" = "水电";
+"Fashion" = "服饰";
+"Healthcare" = "医疗";
+"Pets" = "宠物";
+"Sneakers" = "球鞋";
+"Gifts" = "礼物";
+"Paycheck" = "工资";
+"Allowance" = "零花钱";
+"Part-Time" = "兼职";
+"Investments" = "投资";
+"Tips" = "小费";
+"Successfully Added" = "添加成功";
+
+// new transaction page
+"Today, %@" = "今天，%@";
+"Add Note" = "添加备注";
+"Category" = "类别";
+"none" = "无";
+"daily" = "每天";
+"weekly" = "每周";
+"monthly" = "每月";
+"custom" = "自定义";
+"Custom Interval" = "自定义间隔";
+"Repeats every" = "重复周期";
+"days" = "天";
+"weeks" = "周";
+"months" = "个月";
+"Edit" = "编辑";
+"Delete Expense?" = "删除支出？";
+"Missing Amount" = "缺少金额";
+"Missing Category" = "缺少类别";
+"transaction-view-income-picker" = "收入";
+
+// log view
+"Your Log is Empty" = "暂无记录";
+"Press the plus button to add your first entry" = "点击加号按钮添加第一笔记录";
+"Search entry by note" = "按备注搜索记录";
+"all entries" = "全部记录";
+"by type" = "按类型";
+"by day" = "按天";
+"by week" = "按周";
+"by month" = "按月";
+"by category" = "按类别";
+"recurring" = "周期重复";
+"filter-tag-type" = "按类型";
+"filter-tag-day" = "按天";
+"filter-tag-category" = "按类别";
+"filter-tag-week" = "按周";
+"filter-tag-month" = "按月";
+"filter-tag-recurring" = "周期";
+"filter-picker-income" = "收入";
+"filter-tag-upcoming" = "即将到来";
+"Total Spent" = "总支出";
+"Total Income" = "总收入";
+"Net Total" = "净收入";
+"Net total" = "净收入";
+"Spent" = "已支出";
+"Earned" = "已收入";
+"today" = "今天";
+"this week" = "本周";
+"this month" = "本月";
+"this year" = "本年";
+"No entries found." = "未找到记录。";
+"Try a different search query!" = "试试其他搜索词！";
+"yesterday" = "昨天";
+
+
+// insights
+"Insights" = "洞察分析";
+"Analyse Your Expenditure" = "分析你的支出";
+"As transactions start piling up" = "当交易逐渐增多时";
+"Expenses" = "支出";
+"SPENT/DAY" = "支出/天";
+"INCOME/DAY" = "收入/天";
+"SPENT/MTH" = "支出/月";
+"INCOME/MTH" = "收入/月";
+"AVG/DAY" = "日均";
+"AVG/MTH" = "月均";
+"That's all, buddy." = "就这些啦。";
+"Into the unknown." = "进入未知领域。";
+"week" = "周";
+"month" = "月";
+"year" = "年";
+"Jan" = "1月";
+"Apr" = "4月";
+"Jul" = "7月";
+"Oct" = "10月";
+
+// budgets
+"Budgets" = "预算";
+"Budget Your Finances" = "预算管理";
+"Link budgets to categories and set appropriate expenditure goals" = "将预算关联到类别，设定合理的支出目标";
+"No Budgets Found" = "未找到预算";
+"Add your first budget today!" = "今天就来添加第一个预算吧！";
+"category budget" = "分类预算";
+"overall budget" = "总预算";
+"new" = "新建";
+"New Budget" = "新建预算";
+"Overall Budget" = "总预算";
+"Select a category" = "选择一个类别";
+"Begin by linking this budget to an existing category." = "首先将此预算关联到一个已有的类别。";
+"Choose a time frame" = "选择时间范围";
+"The budget will periodically refresh according to your preference." = "预算将根据你的偏好定期刷新。";
+"Continue" = "继续";
+"Pick a start date" = "选择开始日期";
+"Daily" = "每日";
+"Weekly" = "每周";
+"Monthly" = "每月";
+"Yearly" = "每年";
+"Which day of the %@ do you want your budget to start from?" = "你希望预算从%@的哪一天开始？";
+"weekNewBudget" = "周";
+"monthNewBudget" = "月";
+"yearNewBudget" = "年";
+"Sunday" = "星期日";
+"Monday" = "星期一";
+"Tuesday" = "星期二";
+"Wednesday" = "星期三";
+"Thursday" = "星期四";
+"Friday" = "星期五";
+"Saturday" = "星期六";
+"Start of month" = "月初";
+"%@ of month" = "%@日";
+"Set budget amount" = "设定预算金额";
+"Feel free to edit this in the future." = "之后可以随时修改。";
+"%@ SPENT" = "%@ 已支出";
+"left %@" = "剩余 %@";
+"over %@" = "超出 %@";
+"left today" = "今日剩余";
+"left on %@" = "%@ 剩余";
+"over today" = "今日超出";
+"over on %@" = "%@ 超出";
+"left this week" = "本周剩余";
+"over this week" = "本周超出";
+"left each day" = "每日剩余";
+"left this month" = "本月剩余";
+"over this month" = "本月超出";
+"left this year" = "本年剩余";
+"over this year" = "本年超出";
+"%lldd left" = "剩余 %lld 天";
+"%lldh left" = "剩余 %lld 小时";
+"%@ • %@ spent" = "%@ · %@ 已支出";
+"Back" = "返回";
+"Delete the '%@' budget?" = "删除\"%@\"预算？";
+"OVERALL SPENT: %@" = "总支出：%@";
+"Delete your overall budget?" = "删除总预算？";
+
+// Settings
+"Settings" = "设置";
+"GENERAL" = "通用";
+"DATA" = "数据";
+"OTHERS" = "其他";
+"Appearance" = "外观";
+"Start of Week" = "一周起始";
+"Notifications" = "通知";
+"Currency" = "货币";
+"Number Entry" = "数字输入";
+"Authentication" = "安全认证";
+"Income Tracking" = "收入追踪";
+"Display Cents" = "显示小数";
+"iCloud Sync" = "iCloud 同步";
+"Export Data" = "导出数据";
+"Erase Data" = "清除数据";
+"Animated Charts" = "图表动画";
+"Feature Lab" = "实验功能";
+"Tip Jar" = "打赏支持";
+"Report Bug" = "报告问题";
+"Rate on App Store" = "在 App Store 评分";
+"Share with Friends" = "分享给好友";
+"Follow Dime on Twitter" = "在 Twitter 关注 Dime";
+"Follow Rafael on Instagram" = "在 Instagram 关注 Rafael";
+"Light" = "浅色";
+"Dark" = "深色";
+"System" = "跟随系统";
+"Mornings" = "早晨";
+"Evenings" = "傍晚";
+"Custom" = "自定义";
+"Off" = "关闭";
+"On" = "开启";
+"Type 1" = "类型 1";
+"Type 2" = "类型 2";
+"Close and reload app for change to take effect." = "关闭并重新打开应用以使更改生效。";
+"Enable Notifications" = "启用通知";
+"Every morning (8:00 AM)" = "每天早上（上午 8:00）";
+"Every evening (8:00 PM)" = "每天傍晚（晚上 8:00）";
+"Custom Time" = "自定义时间";
+"Currencies" = "货币";
+"Number Entry Method" = "数字输入方式";
+"\"Pre-dotted\"" = "\"预加小数点\"";
+"If you're too lazy to add a decimal point, I gotchu covered." = "懒得自己加小数点？我来帮你。";
+"\"Cent-less\"" = "\"无小数\"";
+"If your transactions usually amount to whole numbers - this one is for you." = "如果你的交易通常是整数——这个模式适合你。";
+"Enable Sync" = "启用同步";
+"Permanently Delete Everythin'" = "永久删除所有数据";
+"This action would delete all existing transactions, categories, and budgets, and cannot be undone." = "此操作将删除所有现有的交易、类别和预算，且不可撤销。";
+"Danger Zone" = "危险区域";
+"This action genuinely cannot be undone. Long press to confirm." = "此操作确实无法撤销。长按以确认。";
+"Delete Literally Everything" = "删除所有数据";
+"Back Out" = "退出";
+"Celebrate Expenses" = "庆祝支出";
+"Show Line Graph" = "显示折线图";
+"Budget Rows" = "预算行";
+"Experimental features - proceed with caution." = "实验性功能——请谨慎使用。";
+"Replace Time Label" = "替换时间标签";
+"Swaps the time label of each transaction with its category name. However, if you do not manually input a note for each transaction - in which case the note is the category name by default - duplicate text will appear." = "将每笔交易的时间标签替换为类别名称。但如果未手动为每笔交易输入备注（默认备注为类别名称），则会出现重复文本。";
+"Keep the streak going!" = "保持记录不间断！";
+"Remember to input your expenses today." = "记得今天记录支出哦。";
+"Loading" = "加载中";
+"Unable to load tip options, please try again later 🥲" = "无法加载打赏选项，请稍后再试 🥲";
+"Hey! Dime was built by a solo student developer, and is intended to be completely free-of-charge, with no paywalls or ads. If you enjoy using Dime and want to support development, please consider a small tip." = "你好！Dime 由一名学生独立开发，完全免费，无付费墙或广告。如果你喜欢使用 Dime 并想支持开发，请考虑小额打赏。";
+"Tip failed to go through, please try again!" = "打赏失败，请重试！";
+"Thanks a million, %@ Rafael" = "万分感谢，%@ Rafael";
+"Have a great day ahead!" = "祝你拥有美好的一天！";
+"Version %@ (%@)" = "版本 %@（%@）";
+"Made with ❤️ by %@ from 🇸🇬" = "由 %@ 🇸🇬 用 ❤️ 制作";
+"☕ Coffee-Sized Tip" = "☕ 咖啡级打赏";
+"🌮 Taco-Sized Tip" = "🌮 卷饼级打赏";
+"🍕 Pizza-Sized Tip" = "🍕 披萨级打赏";
+
+// Widgets
+
+// Labels
+"Recent Transactions" = "最近交易";
+"View your latest expenses." = "查看最近的支出。";
+"Analyse your expenditure breakdowns over various time periods." = "分析不同时间段的支出分布。";
+"Monitor how you are sticking to your overall budgets." = "监控总预算的执行情况。";
+"Budget" = "预算";
+"Monitor how you are sticking to your budgets." = "监控各项预算的执行情况。";
+"New Expense" = "新增支出";
+"A convenient button to log new purchases." = "便捷按钮，快速记录新消费。";
+
+"%lld%% spent" = "%lld%% 已支出";
+"NO RECENT EXPENSES" = "最近无支出";
+"RECENT EXPENSES" = "最近支出";
+"in %@" = "在 %@ 中";
+"net" = "净额";
+"earned" = "收入";
+"spent" = "支出";
+"Time Period" = "时间范围";
+"NO TRANSACTIONS\n%@" = "无交易\n%@";
+"THIS WEEK" = "本周";
+"THIS MONTH" = "本月";
+"THIS YEAR" = "本年";
+"EARNED " = "收入 ";
+"SPENT " = "支出 ";
+"ADD OVERALL BUDGET" = "添加总预算";
+"Percent Spent" = "支出占比";
+"Create your overall budget in the app" = "在应用中创建总预算";
+"ADD BUDGET" = "添加预算";
+"over" = "超出";
+"SPENT: %@" = "支出：%@";
+"Select budget in widget options" = "在小组件选项中选取预算";
+"Budget no longer exists - please select new budget from widget options." = "预算已不存在——请在小组件选项中选取新预算。";
+"left" = "剩余";
+"SELECT BUDGET" = "选取预算";
+"SELECT BUDGET IN WIDGET OPTIONS" = "在小组件选项中选取预算";
+
+// Additional keys for hardcoded strings found in source code
+
+"APPEARANCE" = "外观";
+"What's New" = "新功能";
+"Close" = "关闭";
+
+// Face ID / App Lock
+"App Locked" = "应用已锁定";
+"Unlock App" = "解锁应用";
+"Please re-enable Face ID access in the Settings app to unlock application." = "请在系统设置中重新启用面容 ID 以解锁应用。";
+
+// Image Save / Log Delete
+"Image Saved" = "图片已保存";
+"Log Deleted" = "记录已删除";
+"Check it out in Photos" = "可在相册中查看";
+"Tap to Undo" = "点击撤销";
+
+// Haptics
+"Haptic Feedback" = "触觉反馈";
+"The 'Excessive' mode makes the entire numpad haptic." = "\"过度\"模式使整个数字键盘具有触觉反馈。";
+
+// Upcoming
+"Upcoming Logs" = "即将到来的记录";
+"Display on Log Page" = "在记录页显示";
+"Limit to 14-Day Outlook" = "限制 14 天预览";
+
+// App Icon
+"App Icon" = "应用图标";
+
+// Start of Month
+"Start of Month" = "月初";
+"of month" = "日";
+
+// CSV Export
+"Date,Note,Amount,Category,Type\n" = "日期,备注,金额,类别,类型\n";
+
+// Accessibility
+"Add New Transaction" = "添加新交易";
+"Search" = "搜索";
+"Filter" = "筛选";
+"remove filter" = "移除筛选";
+"previous day" = "前一天";
+"next day" = "后一天";
+"previous week" = "上一周";
+"next week" = "下一周";
+"previous month" = "上一月";
+"next month" = "下一月";
