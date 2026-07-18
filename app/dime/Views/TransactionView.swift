@@ -46,7 +46,7 @@ struct TransactionView: View {
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -803,7 +803,7 @@ struct TransactionView: View {
                     .padding(.horizontal, 17)
                     .padding(.bottom, bottomEdge == 0 ? 12 : bottomEdge - 3)
                 }
-                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea(.all)
                 .background(BackgroundBlurView())
             }
             .overlay {
@@ -823,7 +823,7 @@ struct TransactionView: View {
                         .padding(.vertical, 8)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 13))
                         .padding(17)
-                        .onChange(of: dateString) { _ in
+                        .onChange(of: dateString) { _, _ in
 
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 showingDatePicker = false
@@ -848,19 +848,19 @@ struct TransactionView: View {
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
         .background(Color.PrimaryBackground)
-        .edgesIgnoringSafeArea(.all)
-        .onChange(of: showToast) { newValue in
+        .ignoresSafeArea(.all)
+        .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
                 }
             }
         }
-        .onChange(of: income) { _ in
+        .onChange(of: income) { _, _ in
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             category = nil
         }
-        .onChange(of: isDragging) { _ in
+        .onChange(of: isDragging) { _, _ in
             if !isDragging {
                 if income {
                     withAnimation(.easeInOut(duration: 0.3)) {
@@ -905,7 +905,7 @@ struct TransactionView: View {
                     repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker)
             }
         }
-        .onChange(of: dynamicTypeSize) { _ in
+        .onChange(of: dynamicTypeSize) { _, _ in
             if income {
                 swipingOffset = capsuleWidth
             }
@@ -1432,7 +1432,7 @@ struct NoteView: View {
             RoundedRectangle(cornerRadius: 11.5, style: .continuous)
                 .stroke(Color.Outline, lineWidth: 1.5)
         )
-        .onChange(of: textFocused) { newValue in
+        .onChange(of: textFocused) { _, newValue in
             focused = newValue
         }
     }
@@ -1571,7 +1571,7 @@ struct RecurringPickerView: View {
                     showPicker = true
                 }
             }
-            .onChange(of: showPicker) { newValue in
+            .onChange(of: showPicker) { _, newValue in
                 // holdingType != repeatType || holdingCoefficient != repeatCoefficient
                 if !newValue {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

@@ -141,7 +141,6 @@ struct CategoryListView: View {
     @Binding var income: Bool
     var mode: CategoryViewMode
 
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var systemColorScheme
@@ -317,7 +316,7 @@ struct CategoryListView: View {
                                         .offset(y: 0.8)
                                 }
                                 .onTapGesture {
-                                    self.presentationMode.wrappedValue.dismiss()
+                                    dismiss()
                                 }
                         } else {
                             Circle()
@@ -575,7 +574,7 @@ struct CategoryListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.PrimaryBackground)
         .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: toDelete) { _ in
+        .onChange(of: toDelete) { _, _ in
             if toDelete != nil {
                 deleteMode = true
             }
@@ -666,7 +665,7 @@ struct CategoryListView: View {
                 .padding(.horizontal, 17)
                 .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
             }
-            .edgesIgnoringSafeArea(.all)
+            .ignoresSafeArea(.all)
             .background(BackgroundBlurView())
         }
         .sheet(item: $toEdit, onDismiss: {
@@ -679,14 +678,14 @@ struct CategoryListView: View {
                 EditCategoryAlert(toEdit: category, showRootToast: $showToast, rootToastTitle: $toastTitle, rootToastImage: $toastImage, positive: $positive, bottomSpacers: true)
             }
         }
-        .onChange(of: showToast) { newValue in
+        .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
                 }
             }
         }
-        .onChange(of: showSuggestions) { newValue in
+        .onChange(of: showSuggestions) { _, newValue in
             if !newValue {
                 toastTitle = "Suggestions Hidden"
                 toastImage = "eye.slash"
@@ -1005,19 +1004,19 @@ struct NewCategoryAlert: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.PrimaryBackground)
         .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: expenseCategories.count) { _ in
+        .onChange(of: expenseCategories.count) { _, _ in
             if expenseCategories.count == 24 {
                 dismiss()
             }
         }
-        .onChange(of: showToast) { newValue in
+        .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
                 }
             }
         }
-        .onChange(of: customSelectedColor) { _ in
+        .onChange(of: customSelectedColor) { _, _ in
             selectedColour = customSelectedColor.toHex() ?? "#FFFFFF"
         }
         .colorPickerSheet(isPresented: $showNativePicker, selection: $customSelectedColor, supportsAlpha: false, title: "")
@@ -1393,7 +1392,7 @@ struct EditCategoryAlert: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Color.PrimaryBackground)
         .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: showToast) { newValue in
+        .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
@@ -1405,17 +1404,17 @@ struct EditCategoryAlert: View {
         }) { category in
             DeleteCategoryAlert(toDelete: category, deleted: $deleteMode)
         }
-        .onChange(of: expenseCategories.count) { _ in
+        .onChange(of: expenseCategories.count) { _, _ in
             if expenseCategories.count == 24 {
                 dismiss()
             }
         }
-        .onChange(of: customSelectedColor) { _ in
+        .onChange(of: customSelectedColor) { _, _ in
             print("changed")
             selectedColour = customSelectedColor.toHex() ?? "#FFFFFF"
         }
         .colorPickerSheet(isPresented: $showNativePicker, selection: $customSelectedColor, supportsAlpha: false, title: "")
-        .onChange(of: deleteMode) { _ in
+        .onChange(of: deleteMode) { _, _ in
             dismiss()
         }
         .onAppear {
@@ -1602,7 +1601,7 @@ struct DeleteCategoryAlert: View {
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
         }
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea(.all)
         .background(BackgroundBlurView())
     }
 }

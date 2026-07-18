@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsGoofyView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   @AppStorage("confetti", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var confetti:
     Bool = false
@@ -41,7 +41,7 @@ struct SettingsGoofyView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }

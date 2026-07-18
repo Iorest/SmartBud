@@ -132,7 +132,7 @@ struct HomeView: View {
             dataController.save()
             transactionManager.toDelete = nil
         })
-        .onChange(of: transactionManager.showPopup) { newValue in
+        .onChange(of: transactionManager.showPopup) { _, newValue in
             withAnimation {
                 showPopup = newValue
             }
@@ -143,7 +143,7 @@ struct HomeView: View {
             TransactionView(toEdit: transaction)
         }
         .confettiOverlay(isActive: $showConfetti)
-        .onChange(of: counter) { _ in showConfetti = true }
+        .onChange(of: counter) { _, _ in showConfetti = true }
         .onAppear {
             if appLockVM.isAppLockEnabled && fromURL1 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

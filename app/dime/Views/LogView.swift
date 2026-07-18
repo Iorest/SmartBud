@@ -23,7 +23,7 @@ struct LogView: View {
 
     var topEdge: CGFloat
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -278,7 +278,7 @@ struct LogView: View {
                     dataController.updateRecurringTransactions()
                 }
             }
-            .onChange(of: launchSearch) { _ in
+            .onChange(of: launchSearch) { _, _ in
                 searchMode = true
             }
             .onAppear {
@@ -336,18 +336,15 @@ struct LogView: View {
     }
 }
 
-struct NumberView: AnimatableModifier {
-    var number: Double
-    var dynamicTypeSize: DynamicTypeSize
+struct NumberView: View {
+    let number: Double
+    let dynamicTypeSize: DynamicTypeSize
     let netTotal: Bool
     let positive: Bool
+    let showCents: Bool
+    let currencySymbol: String
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
-
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
-    var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
-    }
+    @State private var displayNumber: Double = 0
 
     var fontSize: CGFloat {
         switch dynamicTypeSize {
@@ -369,26 +366,25 @@ struct NumberView: AnimatableModifier {
             return 50
         }
     }
-    var animatableData: Double {
-        get { number }
-        set { number = newValue }
-    }
 
-    func body(content _: Content) -> some View {
+    var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 2) {
-            Group {
-                Text(netTotal ? (positive ? "+\(currencySymbol)" : "-\(currencySymbol)") : currencySymbol)
-                    .font(.system(.largeTitle, design: .rounded))
-                    .foregroundColor(Color.SubtitleText) +
-
-                Text("\(number, specifier: showCents  ? "%.2f" : "%.0f")")
-                    .font(.system(size: fontSize, weight: .regular, design: .rounded))
-                    .foregroundColor(Color.PrimaryText)
-            }
+            Text(netTotal ? (positive ? "+\(currencySymbol)" : "-\(currencySymbol)") : currencySymbol)
+                .font(.system(.largeTitle, design: .rounded))
+                .foregroundColor(Color.SubtitleText)
+            Text(displayNumber, format: .number.precision(.fractionLength(showCents ? 2 : 0)))
+                .font(.system(size: fontSize, weight: .regular, design: .rounded))
+                .foregroundColor(Color.PrimaryText)
+                .contentTransition(.numericText(value: displayNumber))
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
-
+        .onAppear { displayNumber = number }
+        .onChange(of: number) { _, newValue in
+            withAnimation(.smooth(duration: 0.6)) {
+                displayNumber = newValue
+            }
+        }
     }
 }
 
@@ -513,8 +509,7 @@ struct LogInsightsView: View {
                     }
                 }
 
-                EmptyView()
-                    .modifier(NumberView(number: amount, dynamicTypeSize: _dynamicTypeSize.wrappedValue, netTotal: insightsType == 1, positive: netTotal.positive))
+                NumberView(number: amount, dynamicTypeSize: _dynamicTypeSize.wrappedValue, netTotal: insightsType == 1, positive: netTotal.positive, showCents: showCents, currencySymbol: currencySymbol)
             }
             .padding(7)
             .contentShape(Rectangle())
@@ -939,7 +934,7 @@ struct ListView: View {
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1078,7 +1073,7 @@ struct FutureListView: View {
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1325,12 +1320,12 @@ struct SingleTransactionView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("\(transaction.wrappedNote), \(currencySymbol)\(String(format: "%.2f", transaction.wrappedAmount)), Transaction Category: \(transaction.category?.wrappedName ?? "Unknown"), Transaction made at \(timeConverterAccessibilityLabel(date: transaction.wrappedDate))")
         }
-        .onChange(of: deletePopup) { _ in
+        .onChange(of: deletePopup) { _, _ in
             if deletePopup {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
             }
         }
-        .onChange(of: deleteConfirm) { _ in
+        .onChange(of: deleteConfirm) { _, _ in
             if deleteConfirm {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             }
@@ -1393,14 +1388,14 @@ struct SingleTransactionView: View {
                     }
                 }
         )
-        .onChange(of: isDragging) { _ in
+        .onChange(of: isDragging) { _, _ in
             if !isDragging && !deleted {
                 withAnimation(.easeInOut(duration: 0.3)) {
                     offset = 0
                 }
             }
         }
-        .onChange(of: transactionManager.toDelete) { newValue in
+        .onChange(of: transactionManager.toDelete) { _, newValue in
             if newValue == nil {
                 deleted = false
                 offset = 0
@@ -1687,7 +1682,7 @@ struct FilteredDateView: View {
 
     var date: Date
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1888,7 +1883,7 @@ struct CategoryStepperView: View {
                 categoryFilter = categories[0]
             }
         }
-        .onChange(of: income) { _ in
+        .onChange(of: income) { _, _ in
             if categories.isEmpty {
                 categoryFilter = nil
             } else {

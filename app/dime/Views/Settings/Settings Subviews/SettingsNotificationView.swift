@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsNotificationsView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   @AppStorage("showNotifications", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var showNotifications: Bool = false
@@ -30,7 +30,7 @@ struct SettingsNotificationsView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -189,7 +189,7 @@ struct SettingsNotificationsView: View {
         }
         .padding(.horizontal, 15)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
-        .onChange(of: option) { newValue in
+        .onChange(of: option) { _, newValue in
           UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
             option, forKey: "notificationOption")
 
@@ -204,7 +204,7 @@ struct SettingsNotificationsView: View {
 
           newNotification()
         }
-        .onChange(of: customTime) { _ in
+        .onChange(of: customTime) { _, _ in
           let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
           UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(

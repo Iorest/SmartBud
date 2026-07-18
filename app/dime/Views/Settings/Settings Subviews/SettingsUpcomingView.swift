@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsUpcomingView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
   @State private var showFuture: Bool = true
 
   @State private var showSoon: Bool = false
@@ -25,7 +25,7 @@ struct SettingsUpcomingView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -54,7 +54,7 @@ struct SettingsUpcomingView: View {
           .onTapGesture {
             showFuture.toggle()
           }
-          .onChange(of: showFuture) { newValue in
+          .onChange(of: showFuture) { _, newValue in
             UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
               newValue, forKey: "showUpcomingTransactions")
 
@@ -89,7 +89,7 @@ struct SettingsUpcomingView: View {
           .onTapGesture {
             showSoon.toggle()
           }
-          .onChange(of: showSoon) { newValue in
+          .onChange(of: showSoon) { _, newValue in
             UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
               newValue, forKey: "showUpcomingTransactionsWhenUpcoming")
           }

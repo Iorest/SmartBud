@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsCloudView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
   @State private var iCloudStorage: Bool = false
   @Namespace var animation
 
@@ -23,7 +23,7 @@ struct SettingsCloudView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -52,7 +52,7 @@ struct SettingsCloudView: View {
           .onTapGesture {
             iCloudStorage.toggle()
           }
-          .onChange(of: iCloudStorage) { newValue in
+          .onChange(of: iCloudStorage) { _, newValue in
             NSUbiquitousKeyValueStore.default.set(newValue, forKey: "icloud_sync")
           }
         }

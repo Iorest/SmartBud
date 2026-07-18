@@ -10,8 +10,8 @@ import SwiftUI
 
 struct SettingsCurrencyView: View {
   @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
-  var currencyCode: String = Locale.current.currencyCode!
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  var currencyCode: String = Locale.current.currency?.identifier ?? "USD"
+  @Environment(\.dismiss) var dismiss
   @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
   let currencies = Currency.allCurrencies
@@ -26,7 +26,7 @@ struct SettingsCurrencyView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -68,7 +68,7 @@ struct SettingsCurrencyView: View {
                 NSUbiquitousKeyValueStore.default.set(currency.code, forKey: "currency")
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                  self.presentationMode.wrappedValue.dismiss()
+                  dismiss()
                 }
               }
               .padding(.vertical, 9)

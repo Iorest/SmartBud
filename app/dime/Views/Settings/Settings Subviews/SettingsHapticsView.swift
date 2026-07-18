@@ -11,7 +11,7 @@ import SwiftUI
 struct SettingsHapticsView: View {
     @AppStorage("haptics", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var hapticType: Int = 1
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss) var dismiss
 
     let options = ["None", "Subtle", "Excessive"]
 
@@ -30,7 +30,7 @@ struct SettingsHapticsView: View {
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
                     Button {
-                        self.presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     } label: {
                         SettingsBackButton()
                     }
@@ -85,7 +85,7 @@ struct SettingsHapticsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .modifier(SettingsSubviewModifier())
-        .onChange(of: hapticType) { newValue in
+        .onChange(of: hapticType) { _, newValue in
             if newValue == 2 {
                 UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
 

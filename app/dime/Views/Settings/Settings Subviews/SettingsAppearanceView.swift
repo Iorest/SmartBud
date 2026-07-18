@@ -11,7 +11,7 @@ import SwiftUI
 struct SettingsAppearanceView: View {
   @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var colourScheme: Int = 0
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   let options = ["System", "Light", "Dark"]
 
@@ -25,7 +25,7 @@ struct SettingsAppearanceView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -56,7 +56,7 @@ struct SettingsAppearanceView: View {
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-              self.presentationMode.wrappedValue.dismiss()
+              dismiss()
             }
           }
           .padding(.vertical, 9)

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsEraseView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   @State var showAlert = false
 
@@ -21,7 +21,7 @@ struct SettingsEraseView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -140,7 +140,7 @@ struct DeleteAllAlert: View {
               self.completedLongPress.toggle()
             }
         )
-        .onChange(of: completedLongPress) { _ in
+        .onChange(of: completedLongPress) { _, _ in
           if completedLongPress {
             let impactMed = UIImpactFeedbackGenerator(style: .heavy)
             impactMed.impactOccurred()
@@ -194,7 +194,7 @@ struct DeleteAllAlert: View {
       .padding(.horizontal, 17)
       .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
     }
-    .edgesIgnoringSafeArea(.all)
+    .ignoresSafeArea(.all)
     .background(BackgroundBlurView())
     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }

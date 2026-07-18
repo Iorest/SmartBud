@@ -18,7 +18,7 @@ struct AppIconBundle: Hashable {
 struct SettingsAppIconView: View {
   @AppStorage("activeIcon", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var activeIcon: String = "AppIcon"
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   let options: [AppIconBundle] = [
     AppIconBundle(
@@ -47,7 +47,7 @@ struct SettingsAppIconView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -104,7 +104,7 @@ struct SettingsAppIconView: View {
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
-      .onChange(of: activeIcon) { newValue in
+      .onChange(of: activeIcon) { _, newValue in
         UIApplication.shared.setAlternateIconName(newValue)
       }
     }

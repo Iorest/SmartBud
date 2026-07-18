@@ -13,7 +13,7 @@ struct SettingsWeekStartView: View {
   var firstWeekday: Int = 1
   @AppStorage("firstDayOfMonth", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var firstDayOfMonth: Int = 1
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   let options = ["Sunday", "Monday"]
 
@@ -54,7 +54,7 @@ struct SettingsWeekStartView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }
@@ -93,7 +93,7 @@ struct SettingsWeekStartView: View {
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-              self.presentationMode.wrappedValue.dismiss()
+              dismiss()
             }
           }
           .padding(.vertical, 9)
@@ -143,7 +143,7 @@ struct SettingsWeekStartView: View {
                 }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                  self.presentationMode.wrappedValue.dismiss()
+                  dismiss()
                 }
               }
               .padding(.vertical, 9)

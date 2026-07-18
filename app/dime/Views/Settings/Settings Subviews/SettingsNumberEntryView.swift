@@ -11,10 +11,10 @@ import SwiftUI
 struct SettingsNumberEntryView: View {
   @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var numberEntryType: Int = 1
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
   @Environment(\.colorScheme) var colorScheme
   @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency:
-    String = Locale.current.currencyCode!
+    String = Locale.current.currency?.identifier ?? "USD"
   private var currencySymbol: String {
     return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
   }
@@ -42,7 +42,7 @@ struct SettingsNumberEntryView: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
-            self.presentationMode.wrappedValue.dismiss()
+            dismiss()
           } label: {
             SettingsBackButton()
           }

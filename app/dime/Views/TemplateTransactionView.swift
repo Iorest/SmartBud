@@ -70,7 +70,7 @@ struct TemplateTransactionView: View {
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -523,7 +523,7 @@ struct TemplateTransactionView: View {
                     .padding(.horizontal, 17)
                     .padding(.bottom, bottomEdge == 0 ? 12 : bottomEdge - 3)
                 }
-                .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea(.all)
                 .background(BackgroundBlurView())
             }
         }
@@ -531,8 +531,8 @@ struct TemplateTransactionView: View {
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
         .background(Color.PrimaryBackground)
-        .edgesIgnoringSafeArea(.all)
-        .onChange(of: showToast) { newValue in
+        .ignoresSafeArea(.all)
+        .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     showToast = false
@@ -801,7 +801,7 @@ struct CategoryRowPickerView: View {
                                         }
                                     }
                                 }
-                                .onChange(of: income) { newValue in
+                                .onChange(of: income) { _, newValue in
                                     if newValue {
                                         if let firstCategory = incomeCategories.first {
                                             value.scrollTo(firstCategory.id, anchor: .leading)
@@ -900,7 +900,7 @@ struct CategoryRowPickerView: View {
 }
 
 struct SettingsQuickAddWidgetView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack(spacing: 10) {
@@ -910,7 +910,7 @@ struct SettingsQuickAddWidgetView: View {
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
                     Button {
-                        self.presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     } label: {
                         Circle()
                             .fill(Color.SecondaryBackground)
@@ -938,7 +938,7 @@ struct SettingsQuickAddWidgetView: View {
 struct SettingsQuickAddWidgetDraggingView: View {
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
