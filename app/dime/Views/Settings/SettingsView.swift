@@ -103,7 +103,7 @@ struct SettingsView: View {
     Bool = true
 
   @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency:
-    String = Locale.current.currencyCode!
+    String = Locale.current.currency?.identifier ?? "USD"
 
   @AppStorage("incomeTracking", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var incomeTracking: Bool = true
@@ -233,13 +233,13 @@ struct SettingsView: View {
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
-          .onChange(of: currency) { _ in
+          .onChange(of: currency) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
-          .onChange(of: firstWeekday) { _ in
+          .onChange(of: firstWeekday) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
-          .onChange(of: showCents) { _ in
+          .onChange(of: showCents) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
 
@@ -295,13 +295,13 @@ struct SettingsView: View {
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
-          .onChange(of: currency) { _ in
+          .onChange(of: currency) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
-          .onChange(of: firstWeekday) { _ in
+          .onChange(of: firstWeekday) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
-          .onChange(of: showCents) { _ in
+          .onChange(of: showCents) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
 
@@ -724,7 +724,7 @@ struct TipJarAlert: View {
 
             ProductView(
               products: unlockManager.loadedProducts.sorted {
-                $0.price.doubleValue < $1.price.doubleValue
+                $0.price < $1.price
               }
             )
             .padding(.bottom, 20)
@@ -750,7 +750,7 @@ struct TipJarAlert: View {
       )
       .offset(y: offset)
       .confettiOverlay(isActive: $showConfetti)
-      .onChange(of: counter) { _ in showConfetti = true }
+      .onChange(of: counter) { _, _ in showConfetti = true }
       .gesture(
         DragGesture()
           .onChanged { gesture in
@@ -779,31 +779,31 @@ struct TipJarAlert: View {
       )
       .padding(.horizontal, 17)
       .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
-      .onChange(of: unlockManager.purchaseCount) { _ in
+      .onChange(of: unlockManager.purchaseCount) { _, _ in
         counter += 1
       }
     }
-    .edgesIgnoringSafeArea(.all)
+    .ignoresSafeArea(.all)
     .background(BackgroundBlurView())
   }
 }
 
 struct ProductView: View {
   @EnvironmentObject var unlockManager: UnlockManager
-  let products: [SKProduct]
+  let products: [Product]
 
   var body: some View {
     VStack {
-      ForEach(products, id: \.self) { product in
+      ForEach(products, id: \.id) { product in
         HStack {
-          Text(getText(product.productIdentifier))
+          Text(getText(product.id))
 
           Spacer()
 
           Button {
             unlock(product)
           } label: {
-            Text(product.localizedPrice)
+            Text(product.displayPrice)
               .monospacedDigit()
               .padding(6)
               .background(
@@ -816,11 +816,12 @@ struct ProductView: View {
     .foregroundColor(.PrimaryText)
     .font(.system(.body, design: .rounded).weight(.semibold))
     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-    //        .font(.system(size: 18, weight: .semibold, design: .rounded))
   }
 
-  func unlock(_ product: SKProduct) {
-    unlockManager.buy(product: product)
+  func unlock(_ product: Product) {
+    Task {
+      await unlockManager.buy(product: product)
+    }
   }
 
   func getText(_ string: String) -> String {
@@ -888,7 +889,7 @@ struct SettingsRowView: View {
 }
 
 struct SettingsCategoryView: View {
-  @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+  @Environment(\.dismiss) var dismiss
 
   var body: some View {
     CategoryView(mode: .settings, income: false)

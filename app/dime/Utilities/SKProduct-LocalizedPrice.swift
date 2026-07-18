@@ -7,11 +7,8 @@
 
 import StoreKit
 
-extension SKProduct {
+extension Product {
     var localizedPrice: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = priceLocale
-        return formatter.string(from: price)!
+        displayPrice
     }
 }
