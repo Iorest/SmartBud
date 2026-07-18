@@ -11,9 +11,9 @@ import SwiftUI
 
 @available(iOS 16.4, *)
 struct BudgetIntent: AppIntent {
-    static var title: LocalizedStringResource = "Get Budget Insights"
+    nonisolated(unsafe) static var title: LocalizedStringResource = "Get Budget Insights"
 
-    static var description =
+    nonisolated(unsafe) static var description =
         IntentDescription("Extract leftover amount for a particular budget")
 
     @Parameter(title: "Budget Type", requestValueDialog: IntentDialog("What budget type would you like to extract insights from?"))
@@ -82,7 +82,7 @@ extension ShortcutsBudgetsType: AppEnum {
         return TypeDisplayRepresentation(name: "Budget Type")
     }
 
-    static var caseDisplayRepresentations: [ShortcutsBudgetsType: DisplayRepresentation] = [
+    nonisolated(unsafe) static var caseDisplayRepresentations: [ShortcutsBudgetsType: DisplayRepresentation] = [
         .overall: DisplayRepresentation(title: "overall budget"),
         .category: DisplayRepresentation(title: "categorical budget")
     ]
@@ -94,7 +94,7 @@ struct ShortcutBudgetView: View {
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     var budgetType: String {
         switch type {

@@ -75,7 +75,7 @@ struct CustomRefreshView<Content: View>: View {
         .coordinateSpace(name: "SCROLL")
         .onAppear(perform: scrollDelegate.addGesture)
         .onDisappear(perform: scrollDelegate.removeGesture)
-        .onChange(of: scrollDelegate.isRefreshing) { _ in
+        .onChange(of: scrollDelegate.isRefreshing) { _, _ in
             if scrollDelegate.isRefreshing {
 //                scrollDelegate.vibrateAt25 = false
 //                scrollDelegate.vibrateAt50 = false
@@ -199,7 +199,7 @@ extension View {
 
 // A preference key used to store the minimum Y offset of a view
 struct RefreshOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    static let defaultValue: CGFloat = 0
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()

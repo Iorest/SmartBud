@@ -283,7 +283,7 @@ struct MainBudgetView: View {
         }
     }
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -596,7 +596,7 @@ struct SingleBudgetView: View {
         }
     }
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -731,12 +731,12 @@ struct SingleBudgetView: View {
                     .offset(x: offset)
                 }
                 .padding(.horizontal, 30)
-                .onChange(of: deletePopup) { _ in
+                .onChange(of: deletePopup) { _, _ in
                     if deletePopup {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
                 }
-                .onChange(of: deleteConfirm) { _ in
+                .onChange(of: deleteConfirm) { _, _ in
                     if deleteConfirm {
                         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     }
@@ -778,7 +778,7 @@ struct SingleBudgetView: View {
                             }
                         }
                 )
-                .onChange(of: isDragging) { _ in
+                .onChange(of: isDragging) { _, _ in
                     if !isDragging && !deleted {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             offset = 0
@@ -971,7 +971,7 @@ struct BudgetDollarView: View {
     var scale: Int
     var size: CGFloat
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1007,7 +1007,7 @@ struct DetailedBudgetDollarView: View {
     var amount: Double
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1035,7 +1035,7 @@ struct DetailedBudgetDifferenceDollarView: View {
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1061,7 +1061,6 @@ struct DeleteBudgetAlert: View {
     @Environment(\.managedObjectContext) var moc
     @EnvironmentObject var dataController: DataController
     @Environment(\.dismiss) var dismiss
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let toDelete: Budget
     @Environment(\.colorScheme) var systemColorScheme
 
@@ -1090,7 +1089,7 @@ struct DeleteBudgetAlert: View {
 
                 Button {
                     dismiss()
-                    self.presentationMode.wrappedValue.dismiss()
+                    dismiss()
 
                     withAnimation {
                         moc.delete(toDelete)
@@ -1137,7 +1136,7 @@ struct DeleteBudgetAlert: View {
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
         }
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea(.all)
         .background(BackgroundBlurView())
     }
 }
@@ -1222,14 +1221,14 @@ struct DeleteMainBudgetAlert: View {
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
         }
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea(.all)
         .background(BackgroundBlurView())
     }
 }
 
 struct DetailedBudgetView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var moc
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var dataController: DataController
     let budget: Budget
 
@@ -1243,7 +1242,7 @@ struct DetailedBudgetView: View {
         VStack(spacing: 15) {
             HStack {
                 Button {
-                    self.presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -1301,8 +1300,8 @@ struct DetailedBudgetView: View {
 }
 
 struct DetailedMainBudgetView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.managedObjectContext) var moc
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var dataController: DataController
     let budget: MainBudget
 
@@ -1314,7 +1313,7 @@ struct DetailedMainBudgetView: View {
         VStack(spacing: 15) {
             HStack {
                 Button {
-                    self.presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
@@ -1424,7 +1423,7 @@ struct TimeBudgetView: View {
         }
     }
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1674,7 +1673,7 @@ struct TimeBudgetView: View {
 struct FilteredCategoryDayBudgetView: View {
     @FetchRequest private var transactions: FetchedResults<Transaction>
     @Binding var totalSpent: Double
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -1709,7 +1708,7 @@ struct FilteredCategoryDayBudgetView: View {
                 totalSpent = holding
             }
         }
-        .onChange(of: date) { _ in
+        .onChange(of: date) { _, _ in
             DispatchQueue.main.async {
                 var holding = 0.0
                 transactions.forEach { transaction in
@@ -1788,7 +1787,7 @@ struct FilteredBudgetView: View {
                 totalSpent = holding
             }
         }
-        .onChange(of: date) { _ in
+        .onChange(of: date) { _, _ in
             DispatchQueue.main.async {
                 var holding = 0.0
                 transactions.forEach { day in
@@ -1918,7 +1917,7 @@ struct TimeMainBudgetView: View {
         }
     }
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
@@ -2383,12 +2382,11 @@ struct ArcedText: View {
     let radius: CGFloat
 
     @Environment(\.font) private var font
-    @Environment(\.foregroundColor) private var color
 
     var body: some View {
         Canvas { context, size in
             let resolvedFont = font ?? .footnote
-            let resolvedColor = color ?? .primary
+            let resolvedColor: Color = .primary
             let midX = size.width / 2
             let midY = size.height
             let center = CGPoint(x: midX, y: midY)

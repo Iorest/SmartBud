@@ -11,9 +11,9 @@ import SwiftUI
 
 @available(iOS 16.4, *)
 struct NewTransactionIntent: AppIntent {
-    static var title: LocalizedStringResource = "New Transaction"
+    nonisolated(unsafe) static var title: LocalizedStringResource = "New Transaction"
 
-    static var description =
+    nonisolated(unsafe) static var description =
         IntentDescription("Log new transactions in a blink")
 
     @Parameter(title: "Type", description: "Type of the transaction", requestValueDialog: IntentDialog("Would you like to log an income or expense?"))
@@ -174,7 +174,7 @@ extension TransactionType: AppEnum {
         return TypeDisplayRepresentation(name: "Type")
     }
 
-    static var caseDisplayRepresentations: [TransactionType: DisplayRepresentation] = [
+    nonisolated(unsafe) static var caseDisplayRepresentations: [TransactionType: DisplayRepresentation] = [
         .income: DisplayRepresentation(title: "income",
                                        image: .init(systemName: "plus.square.fill")),
         .expense: DisplayRepresentation(title: "expense",
@@ -192,7 +192,7 @@ extension RepeatType: AppEnum {
         return TypeDisplayRepresentation(name: "Frequency")
     }
 
-    static var caseDisplayRepresentations: [RepeatType: DisplayRepresentation] = [
+    nonisolated(unsafe) static var caseDisplayRepresentations: [RepeatType: DisplayRepresentation] = [
         .daily: DisplayRepresentation(title: "Daily"),
         .weekly: DisplayRepresentation(title: "Weekly"),
         .monthly: DisplayRepresentation(title: "Monthly")
@@ -204,7 +204,7 @@ struct ShortcutTransactionView: View {
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currencyCode!
+    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     var transactionAmountString: String {
         let numberFormatter = NumberFormatter()

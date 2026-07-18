@@ -123,9 +123,9 @@ import Foundation
 
 @available(iOS 16, *)
 struct IncomeCategoryEntity: AppEntity, Identifiable {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
+    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
     typealias DefaultQueryType = IncomeCategoryQuery
-    static var defaultQuery: IncomeCategoryQuery = .init()
+    nonisolated(unsafe) static var defaultQuery: IncomeCategoryQuery = .init()
 
     var id: UUID
 
@@ -199,9 +199,9 @@ struct IncomeCategoryQuery: EntityStringQuery {
 
 @available(iOS 16, *)
 struct ExpenseCategoryEntity: AppEntity, Identifiable {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
+    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
     typealias DefaultQueryType = ExpenseCategoryQuery
-    static var defaultQuery: ExpenseCategoryQuery = .init()
+    nonisolated(unsafe) static var defaultQuery: ExpenseCategoryQuery = .init()
 
     var id: UUID
 
@@ -274,9 +274,9 @@ struct ExpenseCategoryQuery: EntityStringQuery {
 
 @available(iOS 16, *)
 struct BudgetEntity: AppEntity, Identifiable {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Budget")
+    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Budget")
     typealias DefaultQueryType = BudgetQuery
-    static var defaultQuery: BudgetQuery = .init()
+    nonisolated(unsafe) static var defaultQuery: BudgetQuery = .init()
 
     var id: UUID
 
