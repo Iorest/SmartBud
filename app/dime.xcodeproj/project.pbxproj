@@ -139,7 +139,6 @@
 		53D6BDDD2AF73E4300F5728E /* SettingsBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D6BDDC2AF73E4300F5728E /* SettingsBackButton.swift */; };
 		53D6BDDF2AF73EF100F5728E /* SettingsHapticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D6BDDE2AF73EF100F5728E /* SettingsHapticsView.swift */; };
 		53D6BDE12AF73FAB00F5728E /* SettingsSubviewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D6BDE02AF73FAB00F5728E /* SettingsSubviewModifier.swift */; };
-		53DCFAA12A498FBF0063FCDE /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = 53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */; };
 		53E832E52B0A2CAF000CBBA0 /* InsightsSummaryBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E832E42B0A2CAF000CBBA0 /* InsightsSummaryBlock.swift */; };
 		53E832E72B0B067B000CBBA0 /* TransactionCategoryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E832E62B0B067B000CBBA0 /* TransactionCategoryPicker.swift */; };
 		53EB930E28A65A570026BE28 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B5287C6AFB00F76ADF /* Color.swift */; };
@@ -349,7 +348,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5383D85E287D9A0100D1B9BA /* CloudKit.framework in Frameworks */,
-				53DCFAA12A498FBF0063FCDE /* CloudKitSyncMonitor in Frameworks */,
 				5327D2E6287C6CC300F76ADF /* Popovers in Frameworks */,
 				536715ED28E1E9A3008461F2 /* StoreKit.framework in Frameworks */,
 			);
@@ -712,7 +710,6 @@
 			name = dime;
 			packageProductDependencies = (
 				5327D2E5287C6CC300F76ADF /* Popovers */,
-				53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */,
 			);
 			productName = dime;
 			productReference = 5327D283287C697400F76ADF /* dime.app */;
@@ -772,7 +769,6 @@
 			mainGroup = 5327D27A287C697400F76ADF;
 			packageReferences = (
 				5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */,
-				53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
 			);
 			productRefGroup = 5327D284287C697400F76ADF /* Products */;
 			projectDirPath = "";
@@ -1509,14 +1505,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1524,11 +1512,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */;
 			productName = Popovers;
-		};
-		53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
-			productName = CloudKitSyncMonitor;
 		};
 /* End XCSwiftPackageProductDependency section */
 
