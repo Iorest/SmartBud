@@ -91,7 +91,6 @@
 		53A4147928B6625D008C30E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147828B6625D008C30E7 /* AppDelegate.swift */; };
 		53A4147B28B66265008C30E7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147A28B66265008C30E7 /* SceneDelegate.swift */; };
 		53A4147D28B7C70D008C30E7 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147C28B7C70D008C30E7 /* AppVersion.swift */; };
-		53A4148028B7DA4C008C30E7 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 53A4147F28B7DA4C008C30E7 /* ConfettiSwiftUI */; };
 		53A4148328B8DD8B008C30E7 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5313EC5F28ACE941000EAB0C /* IntentHandler.swift */; };
 		53A839BA28D33840006F227C /* UnlockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A839B928D33840006F227C /* UnlockManager.swift */; };
 		53A839BD28D35738006F227C /* SKProduct-LocalizedPrice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A839BC28D35738006F227C /* SKProduct-LocalizedPrice.swift */; };
@@ -349,7 +348,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53A4148028B7DA4C008C30E7 /* ConfettiSwiftUI in Frameworks */,
 				5383D85E287D9A0100D1B9BA /* CloudKit.framework in Frameworks */,
 				53DCFAA12A498FBF0063FCDE /* CloudKitSyncMonitor in Frameworks */,
 				5327D2E6287C6CC300F76ADF /* Popovers in Frameworks */,
@@ -714,7 +712,6 @@
 			name = dime;
 			packageProductDependencies = (
 				5327D2E5287C6CC300F76ADF /* Popovers */,
-				53A4147F28B7DA4C008C30E7 /* ConfettiSwiftUI */,
 				53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */,
 			);
 			productName = dime;
@@ -775,7 +772,6 @@
 			mainGroup = 5327D27A287C697400F76ADF;
 			packageReferences = (
 				5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */,
-				53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 				53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
 			);
 			productRefGroup = 5327D284287C697400F76ADF /* Products */;
@@ -1513,14 +1509,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor.git";
@@ -1536,11 +1524,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */;
 			productName = Popovers;
-		};
-		53A4147F28B7DA4C008C30E7 /* ConfettiSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
-			productName = ConfettiSwiftUI;
 		};
 		53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */ = {
 			isa = XCSwiftPackageProductDependency;

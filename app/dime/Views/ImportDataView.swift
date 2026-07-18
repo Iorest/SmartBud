@@ -5,7 +5,6 @@
 //  Created by Rafael Soh on 21/8/23.
 //
 
-import ConfettiSwiftUI
 import Foundation
 import SwiftUI
 import UIKit
@@ -83,6 +82,7 @@ struct ImportDataView: View {
     @State var processingState = ProcessingState.loading
     @State var errorMessage = "Invalid dates in date column."
     @State var confettiNumber = 0
+    @State private var showConfetti = false
 
     var numberOfLinkedCategories: Int {
         uniqueCategories.filter { $0.category != nil }.count
@@ -823,7 +823,8 @@ struct ImportDataView: View {
                 }
             }
         }
-        .confettiCannon(counter: $confettiNumber, num: 50, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+        .confettiOverlay(isActive: $showConfetti)
+        .onChange(of: confettiNumber) { _ in showConfetti = true }
     }
 
     func validateDoubles(strings: [String]) -> Bool {

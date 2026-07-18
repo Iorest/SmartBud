@@ -6,7 +6,6 @@
 //
 
 import Combine
-import ConfettiSwiftUI
 import Foundation
 import StoreKit
 import SwiftUI
@@ -616,6 +615,7 @@ struct TipJarAlert: View {
 
   @State var opacity = 0.0
   @State var counter = 0
+  @State private var showConfetti = false
 
   var bottomCaption: String {
     if unlockManager.failedTransaction {
@@ -749,10 +749,8 @@ struct TipJarAlert: View {
           systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
       )
       .offset(y: offset)
-      .confettiCannon(
-        counter: $counter, num: 50, openingAngle: Angle(degrees: 0),
-        closingAngle: Angle(degrees: 360), radius: 200
-      )
+      .confettiOverlay(isActive: $showConfetti)
+      .onChange(of: counter) { _ in showConfetti = true }
       .gesture(
         DragGesture()
           .onChanged { gesture in

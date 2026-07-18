@@ -5,7 +5,6 @@
 //  Created by Rafael Soh on 20/5/22.
 //
 
-import ConfettiSwiftUI
 import Foundation
 import SwiftUI
 
@@ -48,6 +47,7 @@ struct HomeView: View {
     @State var launchSearch: Bool = false
 
     @State var counter = 0
+    @State private var showConfetti = false
 
     @EnvironmentObject var tabBarManager: TabBarManager
 
@@ -142,7 +142,8 @@ struct HomeView: View {
         }) { transaction in
             TransactionView(toEdit: transaction)
         }
-        .confettiCannon(counter: $counter, num: 50, openingAngle: Angle(degrees: 0), closingAngle: Angle(degrees: 360), radius: 200)
+        .confettiOverlay(isActive: $showConfetti)
+        .onChange(of: counter) { _ in showConfetti = true }
         .onAppear {
             if appLockVM.isAppLockEnabled && fromURL1 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
