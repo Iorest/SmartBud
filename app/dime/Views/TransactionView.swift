@@ -87,6 +87,126 @@ struct TransactionView: View {
     let repeatOverlays = ["D", "W", "M"]
     let numberArray = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
+    var repeatChar: String {
+        repeatOverlays[max(0, repeatType - 1)]
+    }
+
+    func formattedAmount(_ amount: Double) -> String {
+        "\(currencySymbol)\(Int(round(amount)))"
+    }
+
+    func chipColor(_ hex: String) -> Color {
+        Color(hex: hex)
+    }
+
+    @ViewBuilder
+    var repeatIconWithOverlay: some View {
+        Image(systemName: "repeat")
+            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .overlay(alignment: .topTrailing) {
+                repeatOverlayText
+            }
+            .foregroundColor(Color.IncomeGreen)
+            .padding(7)
+            .background(Color.IncomeGreen.opacity(0.23), in: Circle())
+            .contentShape(Circle())
+    }
+
+    var repeatOverlayText: some View {
+        Text(repeatChar)
+            .font(.system(size: 6, weight: .black, design: .rounded))
+            .foregroundColor(Color.IncomeGreen)
+            .frame(width: 10, alignment: .leading)
+            .offset(x: 5.7, y: 1.5)
+    }
+
+    @ViewBuilder
+    func suggestedTransactionLabel(_ transaction: Transaction) -> some View {
+        HStack(spacing: 3) {
+            Text(transaction.wrappedNote)
+                .foregroundStyle(Color.PrimaryText)
+                .lineLimit(1)
+                .padding(.vertical, 3.5)
+                .padding(.horizontal, 7)
+
+            suggestedAmountChip(transaction)
+        }
+        .font(.system(.body, design: .rounded).weight(.semibold))
+        .padding(5)
+        .background(
+            Color.SecondaryBackground,
+            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+    }
+
+    @ViewBuilder
+    func suggestedAmountChip(_ transaction: Transaction) -> some View {
+        let color = chipColor(transaction.wrappedColour)
+        Text(formattedAmount(transaction.wrappedAmount))
+            .lineLimit(1)
+            .foregroundStyle(color)
+            .padding(.vertical, 3.5)
+            .padding(.horizontal, 5)
+            .background(
+                color.opacity(0.23),
+                in: RoundedRectangle(cornerRadius: 6.5, style: .continuous))
+    }
+
+    @ViewBuilder
+    var dateDisplayText: some View {
+        let dateStr = getDateString(date: date)
+        if isDateToday(date: date) {
+            Text("Today, \(dateStr)")
+                .lineLimit(1)
+        } else {
+            Text(dateStr)
+                .lineLimit(1)
+        }
+    }
+
+    @ViewBuilder
+    func deleteButtonLabel(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.system(size: 20, weight: .semibold, design: .rounded))
+            .foregroundColor(.white)
+            .frame(height: 45)
+            .frame(maxWidth: .infinity)
+            .background(
+                color, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+    }
+
+    @ViewBuilder
+    func cancelButtonLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 20, weight: .semibold, design: .rounded))
+            .foregroundColor(Color.PrimaryText.opacity(0.9))
+            .frame(height: 45)
+            .frame(maxWidth: .infinity)
+            .background(
+                Color.SecondaryBackground,
+                in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+    }
+
+    @ViewBuilder
+    var deleteConfirmationHeader: some View {
+        Group {
+            Text("Delete Expense?")
+                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .foregroundColor(.PrimaryText)
+
+            Text("This action cannot be undone.")
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundColor(.SubtitleText)
+                .padding(.bottom, 15)
+        }
+    }
+
+    var dateString: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMM yyyy"
+        return dateFormatter.string(from: date)
+    }
+
     var repeatButtonAccessibility: String {
         if repeatType == 1 {
             return "transaction recurs daily, button to edit recurring duration"
@@ -99,10 +219,82 @@ struct TransactionView: View {
         }
     }
 
-    var dateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d MMM yyyy"
-        return dateFormatter.string(from: date)
+    @ViewBuilder
+    var deleteConfirmationOverlay: some View {
+        ZStack(alignment: .bottom) {
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    deleteMode = false
+                    toDelete = nil
+                }
+
+            VStack(alignment: .leading, spacing: 1.5) {
+                deleteConfirmationHeader
+
+                Button {
+                    deleteMode = false
+
+                    withAnimation {
+                        if let itemToDelete = toDelete {
+                            moc.delete(itemToDelete)
+                        }
+                        dataController.save()
+                    }
+
+                    dismiss()
+
+                } label: {
+                    deleteButtonLabel("Delete", color: Color.AlertRed)
+                }
+                .padding(.bottom, 8)
+
+                Button {
+                    withAnimation(.easeOut(duration: 0.7)) {
+                        deleteMode = false
+                        toDelete = nil
+                    }
+
+                } label: {
+                    cancelButtonLabel("Cancel")
+                }
+            }
+            .padding(13)
+            .background(
+                RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(
+                    color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 13).stroke(
+                    systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
+            )
+            .offset(y: offset)
+            .gesture(
+                DragGesture()
+                    .onChanged { gesture in
+                        if gesture.translation.height < 0 {
+                            offset = gesture.translation.height / 3
+                        } else {
+                            offset = gesture.translation.height
+                        }
+                    }
+                    .onEnded { value in
+                        if value.translation.height > 20 {
+                            deleteMode = false
+                            toDelete = nil
+                        } else {
+                            withAnimation {
+                                offset = 0
+                            }
+                        }
+                    }
+            )
+            .padding(.horizontal, 17)
+            .padding(.bottom, bottomEdge == 0 ? 12 : bottomEdge - 3)
+        }
+        .ignoresSafeArea(.all)
+        .background(BackgroundBlurView())
     }
 
     var showTime: Bool {
@@ -336,21 +528,7 @@ struct TransactionView: View {
                             showRecurring = true
                         } label: {
                             if repeatType > 0 {
-                                Image(systemName: "repeat")
-                                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                                //                                    .font(.system(size: 16, weight: .semibold))
-                                    .overlay(alignment: .topTrailing) {
-                                        Text(repeatOverlays[repeatType - 1])
-                                            .font(.system(size: 6, weight: .black, design: .rounded))
-                                            .foregroundColor(Color.IncomeGreen)
-                                            .frame(width: 10, alignment: .leading)
-                                            .offset(x: 5.7, y: 1.5)
-                                    }
-                                    .foregroundColor(Color.IncomeGreen)
-                                    .padding(7)
-                                    .background(Color.IncomeGreen.opacity(0.23), in: Circle())
-                                    .contentShape(Circle())
+                                repeatIconWithOverlay
                             } else {
                                 Image(systemName: "repeat")
                                     .font(.system(size: 16, weight: .semibold))
@@ -449,27 +627,7 @@ struct TransactionView: View {
                                     }
                                     self.hideKeyboard()
                                 } label: {
-                                    HStack(spacing: 3) {
-                                        Text(transaction.wrappedNote)
-                                            .foregroundStyle(Color.PrimaryText)
-                                            .lineLimit(1)
-                                            .padding(.vertical, 3.5)
-                                            .padding(.horizontal, 7)
-
-                                        Text("\(currencySymbol)\(Int(round(transaction.wrappedAmount)))")
-                                            .lineLimit(1)
-                                            .foregroundStyle(Color(hex: transaction.wrappedColour))
-                                            .padding(.vertical, 3.5)
-                                            .padding(.horizontal, 5)
-                                            .background(
-                                                Color(hex: transaction.wrappedColour).opacity(0.23),
-                                                in: RoundedRectangle(cornerRadius: 6.5, style: .continuous))
-                                    }
-                                    .font(.system(.body, design: .rounded).weight(.semibold))
-                                    .padding(5)
-                                    .background(
-                                        Color.SecondaryBackground,
-                                        in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+                                    suggestedTransactionLabel(transaction)
                                 }
                             }
                         }
@@ -497,13 +655,7 @@ struct TransactionView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
                             Group {
-                                if isDateToday(date: date) {
-                                    Text("Today, \(getDateString(date: date))")
-                                        .lineLimit(1)
-                                } else {
-                                    Text(getDateString(date: date))
-                                        .lineLimit(1)
-                                }
+                                dateDisplayText
                             }
                             .font(.system(.body, design: .rounded).weight(.semibold))
 
@@ -711,100 +863,7 @@ struct TransactionView: View {
                 self.hideKeyboard()
             }
             .fullScreenCover(isPresented: $deleteMode) {
-                ZStack(alignment: .bottom) {
-                    Color.clear
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            deleteMode = false
-                            toDelete = nil
-                        }
-
-                    VStack(alignment: .leading, spacing: 1.5) {
-                        Text("Delete Expense?")
-                            .font(.system(size: 20, weight: .medium, design: .rounded))
-                            .foregroundColor(.PrimaryText)
-
-                        Text("This action cannot be undone.")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundColor(.SubtitleText)
-                            .padding(.bottom, 15)
-
-                        Button {
-                            deleteMode = false
-
-                            withAnimation {
-                                if let itemToDelete = toDelete {
-                                    moc.delete(itemToDelete)
-                                }
-                                dataController.save()
-                            }
-
-                            dismiss()
-
-                        } label: {
-                            Text("Delete")
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                                .foregroundColor(.white)
-                                .frame(height: 45)
-                                .frame(maxWidth: .infinity)
-                                .background(
-                                    Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                        }
-                        .padding(.bottom, 8)
-
-                        Button {
-                            withAnimation(.easeOut(duration: 0.7)) {
-                                deleteMode = false
-                                toDelete = nil
-                            }
-
-                        } label: {
-                            Text("Cancel")
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
-                                .foregroundColor(Color.PrimaryText.opacity(0.9))
-                                .frame(height: 45)
-                                .frame(maxWidth: .infinity)
-                                .background(
-                                    Color.SecondaryBackground,
-                                    in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                        }
-                    }
-                    .padding(13)
-                    .background(
-                        RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(
-                            color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 13).stroke(
-                            systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
-                    )
-                    .offset(y: offset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                if gesture.translation.height < 0 {
-                                    offset = gesture.translation.height / 3
-                                } else {
-                                    offset = gesture.translation.height
-                                }
-                            }
-                            .onEnded { value in
-                                if value.translation.height > 20 {
-                                    deleteMode = false
-                                    toDelete = nil
-                                } else {
-                                    withAnimation {
-                                        offset = 0
-                                    }
-                                }
-                            }
-                    )
-                    .padding(.horizontal, 17)
-                    .padding(.bottom, bottomEdge == 0 ? 12 : bottomEdge - 3)
-                }
-                .ignoresSafeArea(.all)
-                .background(BackgroundBlurView())
+                deleteConfirmationOverlay
             }
             .overlay {
                 ZStack(alignment: .bottom) {
