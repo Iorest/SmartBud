@@ -6,34 +6,52 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct dimeApp: App {
-    @StateObject var dataController: DataController
+    @StateObject var dataService: DataService
     @StateObject var unlockManager: UnlockManager
     @StateObject var appLockVM = AppLockViewModel()
     @StateObject var tabBarManager = TabBarManager()
+    @StateObject var homeVM: HomeViewModel
+    @StateObject var transactionVM: TransactionViewModel
+    @StateObject var categoryVM: CategoryViewModel
+    @StateObject var budgetVM: BudgetViewModel
+    @StateObject var insightsVM: InsightsViewModel
+    @StateObject var settingsVM: SettingsViewModel
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, dataController.container.viewContext)
+                .modelContainer(dataService.modelContainer)
+                .environmentObject(dataService)
                 .environmentObject(appLockVM)
-                .environmentObject(dataController)
                 .environmentObject(unlockManager)
                 .environmentObject(tabBarManager)
+                .environmentObject(homeVM)
+                .environmentObject(transactionVM)
+                .environmentObject(categoryVM)
+                .environmentObject(budgetVM)
+                .environmentObject(insightsVM)
+                .environmentObject(settingsVM)
         }
     }
 
     init() {
-        let dataController = DataController.shared
-//        let dataController = DataController()
-        let unlockManager = UnlockManager(dataController: dataController)
+        let dataService = DataService.instance
+        let unlockManager = UnlockManager()
 
-        _dataController = StateObject(wrappedValue: dataController)
+        _dataService = StateObject(wrappedValue: dataService)
         _unlockManager = StateObject(wrappedValue: unlockManager)
+        _homeVM = StateObject(wrappedValue: HomeViewModel.shared)
+        _transactionVM = StateObject(wrappedValue: TransactionViewModel())
+        _categoryVM = StateObject(wrappedValue: CategoryViewModel())
+        _budgetVM = StateObject(wrappedValue: BudgetViewModel())
+        _insightsVM = StateObject(wrappedValue: InsightsViewModel())
+        _settingsVM = StateObject(wrappedValue: SettingsViewModel())
 
         UITableView.appearance().backgroundColor = .clear
     }
