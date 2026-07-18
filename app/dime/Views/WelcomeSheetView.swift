@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct WelcomeSheetFeatureRow: Hashable {
     let icon: String
@@ -17,9 +18,8 @@ struct WelcomeSheetFeatureRow: Hashable {
 struct WelcomeSheetView: View {
     @Environment(\.dismiss) var dismiss
 
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.dateCreated)
-    ]) private var categories: FetchedResults<Category>
+    @Query(sort: [SortDescriptor(\CategoryModel.dateCreated)])
+    private var categories: [CategoryModel]
 
     @State var firstPage = true
     @State var visibleLines: Int = 0

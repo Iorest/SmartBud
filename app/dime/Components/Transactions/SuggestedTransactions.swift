@@ -11,10 +11,10 @@ struct SuggestedTransactions: View {
     @Binding var note: String
     @Binding var numbers: [Int]
     @Binding var numbers1: [String]
-    @Binding var category: Category?
+    @Binding var category: CategoryModel?
     @Binding var income: Bool
     var currencySymbol: String
-    var suggestedTransactions: [Transaction]
+    var suggestedTransactions: [TransactionModel]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {

@@ -11,7 +11,7 @@ import SwiftUI
 struct SingleDayPhotoView: View {
     let amountText: String
     let dateText: String
-    let transactions: [Transaction]
+    let transactions: [TransactionModel]
     let showCents: Bool
     let currencySymbol: String
     let currency: String
@@ -62,7 +62,7 @@ struct SingleDayPhotoView: View {
 }
 
 struct SingleTransactionPhotoView: View {
-    let transaction: Transaction
+    let transaction: TransactionModel
     let showCents: Bool
     let currencySymbol: String
     let currency: String

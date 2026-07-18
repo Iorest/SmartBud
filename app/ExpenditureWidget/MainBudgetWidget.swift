@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WidgetKit
+import SwiftData
 
 struct MainBudgetWidget: Widget {
     let kind: String = "MainBudgetWidget"
@@ -27,6 +28,15 @@ struct MainBudgetWidget: Widget {
 
 struct MainBudgetWidgetProvider: TimelineProvider {
     typealias Entry = MainBudgetWidgetEntry
+
+    nonisolated(unsafe) static let container: ModelContainer = {
+        let schema = Schema([
+            MainBudgetModel.self,
+            TransactionModel.self
+        ])
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        return try! ModelContainer(for: schema, configurations: [config])
+    }()
 
     func placeholder(in _: Context) -> MainBudgetWidgetEntry {
         let loaded = loadData()
@@ -52,10 +62,41 @@ struct MainBudgetWidgetProvider: TimelineProvider {
     }
 
     func loadData() -> (found: Bool, totalSpent: Double, budgetAmount: Double, percentage: Double, type: Int, startDate: Date) {
-//        let dataController = DataController()
-        let dataController = DataController.shared
+        let context = ModelContext(Self.container)
 
-        return dataController.fetchRequestForMainBudgetWidget()
+        let budgetDescriptor = FetchDescriptor<MainBudgetModel>()
+        guard let budget = try? context.fetch(budgetDescriptor).first else {
+            return (false, 0, 0, 0, 0, Date.now)
+        }
+
+        let budgetStartDate = budget.startDate
+        let now = Date.now
+
+        var descriptor = FetchDescriptor<TransactionModel>()
+        let allTransactions = (try? context.fetch(descriptor)) ?? []
+        let filtered = allTransactions.filter {
+            !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
+        }
+
+        var holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+
+        let percentageOfDays: Double
+        let calendar = Calendar.current
+
+        if budget.type == 1 {
+            let components = calendar.dateComponents([.minute], from: budget.startDate, to: now)
+            percentageOfDays = Double(components.minute ?? 0) / 1440
+        } else {
+            let components1 = calendar.dateComponents([.day], from: budget.startDate, to: budget.endDate)
+            let numberOfDays = components1.day!
+
+            let components2 = calendar.dateComponents([.day], from: budget.startDate, to: now)
+            let numberOfDaysPast = components2.day!
+
+            percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
+        }
+
+        return (true, holdingTotal, budget.amount, percentageOfDays, budget.type, budget.startDate)
     }
 }
 

@@ -144,7 +144,9 @@ struct SettingsView: View {
 
   @EnvironmentObject var tabBarManager: TabBarManager
 
-  @EnvironmentObject var dataController: DataController
+  @Environment(\.modelContext) var modelContext
+
+  @StateObject var settingsVM = SettingsViewModel.shared
 
   var body: some View {
     NavigationView {
@@ -560,8 +562,7 @@ struct SettingsView: View {
   }
 
   func exportData() {
-    let fetchRequest = dataController.fetchRequestForExport()
-    let transactions = dataController.results(for: fetchRequest)
+    let transactions = settingsVM.fetchAllTransactions()
 
     let fileName = "export.csv"
     let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)

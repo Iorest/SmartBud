@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct PickerStyle: ViewModifier {
     var colorScheme: ColorScheme
@@ -26,13 +27,12 @@ struct InstructionHeadings {
 }
 
 struct BrandNewBudgetView: View {
-    @FetchRequest private var categories: FetchedResults<Category>
+    @Query private var categories: [CategoryModel]
 
     @AppStorage("firstWeekday", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstWeekday: Int = 1
     @AppStorage("firstDayOfMonth", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstDayOfMonth: Int = 1
 
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var budgetVM: BudgetViewModel
 
     @Environment(\.dismiss) var dismiss
 
@@ -49,7 +49,7 @@ struct BrandNewBudgetView: View {
     var overallBudgetCreated: Bool
 
     // stage two (ignore if overall budget or editing)
-    @State var selectedCategory: Category?
+    @State var selectedCategory: CategoryModel?
     @State var showingCategoryView = false
 
     // stage 3
@@ -87,7 +87,7 @@ struct BrandNewBudgetView: View {
     @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
 
     @State private var price: Double = 0
-    @State private var category: Category?
+    @State private var category: CategoryModel?
     @State var isEditingDecimal = false
     @State var decimalValuesAssigned: AssignedDecimal = .none
     @State private var priceString: String = "0"
@@ -124,8 +124,8 @@ struct BrandNewBudgetView: View {
     }
 
     // editMode
-    let toEditBudget: Budget?
-    let toEditMainBudget: MainBudget?
+    let toEditBudget: BudgetModel?
+    let toEditMainBudget: MainBudgetModel?
     var editMode: Bool {
         toEditBudget != nil || toEditMainBudget != nil
     }
@@ -413,34 +413,11 @@ struct BrandNewBudgetView: View {
                             ScrollViewReader { value in
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(weekdays, id: \.self) { day in
-                                        HStack {
-                                            Text(LocalizedStringKey(day))
-                                            Spacer()
-
-                                            if chosenDayWeek == (weekdays.firstIndex(of: day)! + 1) {
-                                                Checkmark()
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .foregroundColor(Color.PrimaryText)
-                                        .font(.system(.title3, design: .rounded).weight(.medium))
-//                                        .font(.system(size: 20, weight: .medium, design: .rounded))
-                                        .padding(8)
-//                                        .frame(height: 40)
-                                        .background {
-                                            if chosenDayWeek == (weekdays.firstIndex(of: day)! + 1) {
-                                                RoundedRectangle(cornerRadius: 6)
-                                                    .fill(Color.SecondaryBackground)
-//                                                    .matchedGeometryEffect(id: "TAB3", in: animation)
-                                            }
-                                        }
-                                        .id(weekdays.firstIndex(of: day)! + 1)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                chosenDayWeek = (weekdays.firstIndex(of: day)! + 1)
-                                            }
-                                        }
+                                        WeekdayPickerRow(
+                                            day: day,
+                                            weekdays: weekdays,
+                                            chosenDayWeek: $chosenDayWeek
+                                        )
                                     }
                                 }
                                 .onAppear {
@@ -472,13 +449,7 @@ struct BrandNewBudgetView: View {
                                         .foregroundColor(Color.PrimaryText)
                                         .font(.system(.title3, design: .rounded).weight(.medium))
                                         .padding(8)
-                                        .background {
-                                            if chosenDayMonth == day {
-                                                RoundedRectangle(cornerRadius: 6)
-                                                    .fill(Color.SecondaryBackground)
-//                                                    .matchedGeometryEffect(id: "TAB3", in: animation)
-                                            }
-                                        }
+                                        .background(dayRowBackground(isSelected: chosenDayMonth == day))
                                         .contentShape(Rectangle())
                                         .id(day)
                                         .onTapGesture {
@@ -601,13 +572,13 @@ struct BrandNewBudgetView: View {
                         budgetTimeFrame = .day
                     case 2:
                         budgetTimeFrame = .week
-                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedBudget.startDate!).weekday!
+                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedBudget.startDate).weekday!
                     case 3:
                         budgetTimeFrame = .month
-                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedBudget.startDate!).day!
+                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedBudget.startDate).day!
                     case 4:
                         budgetTimeFrame = .year
-                        chosenDayYear = unwrappedEditedBudget.startDate!
+                        chosenDayYear = unwrappedEditedBudget.startDate
                     default:
                         budgetTimeFrame = .week
                     }
@@ -644,13 +615,13 @@ struct BrandNewBudgetView: View {
                         budgetTimeFrame = .day
                     case 2:
                         budgetTimeFrame = .week
-                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedMainBudget.startDate!).weekday!
+                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedMainBudget.startDate).weekday!
                     case 3:
                         budgetTimeFrame = .month
-                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedMainBudget.startDate!).day!
+                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedMainBudget.startDate).day!
                     case 4:
                         budgetTimeFrame = .year
-                        chosenDayYear = unwrappedEditedMainBudget.startDate!
+                        chosenDayYear = unwrappedEditedMainBudget.startDate
                     default:
                         budgetTimeFrame = .week
                     }
@@ -764,9 +735,9 @@ struct BrandNewBudgetView: View {
             unwrappedEditedBudget.category = selectedCategory
             unwrappedEditedBudget.startDate = startDate
             unwrappedEditedBudget.amount = price
-            unwrappedEditedBudget.type = Int16(budgetType)
+            unwrappedEditedBudget.type = budgetType
 
-            dataController.save()
+            budgetVM.save()
 
             dismiss()
 
@@ -776,9 +747,9 @@ struct BrandNewBudgetView: View {
         if let unwrappedEditedMainBudget = toEditMainBudget {
             unwrappedEditedMainBudget.startDate = startDate
             unwrappedEditedMainBudget.amount = price
-            unwrappedEditedMainBudget.type = Int16(budgetType)
+            unwrappedEditedMainBudget.type = budgetType
 
-            dataController.save()
+            budgetVM.save()
 
             dismiss()
 
@@ -786,32 +757,19 @@ struct BrandNewBudgetView: View {
         }
 
         if categoryBudget {
-            let newBudget = Budget(context: moc)
-
             if let unwrappedCategory = selectedCategory {
-                newBudget.category = unwrappedCategory
+                budgetVM.create(amount: price, startDate: startDate, type: budgetType, category: unwrappedCategory)
             }
-
-            newBudget.startDate = startDate
-            newBudget.amount = price
-            newBudget.dateCreated = Date.now
-            newBudget.type = Int16(budgetType)
-            newBudget.id = UUID()
         } else {
-            let newBudget = MainBudget(context: moc)
-            newBudget.startDate = startDate
-            newBudget.amount = price
-            newBudget.type = Int16(budgetType)
+            budgetVM.createMain(amount: price, startDate: startDate, type: budgetType)
         }
-
-        dataController.save()
 
         dismiss()
     }
 
-    func getRows() -> [[Category]] {
-        var rows: [[Category]] = []
-        var currentRow: [Category] = []
+    func getRows() -> [[CategoryModel]] {
+        var rows: [[CategoryModel]] = []
+        var currentRow: [CategoryModel] = []
 
         var totalWidth: CGFloat = 0
 
@@ -852,7 +810,7 @@ struct BrandNewBudgetView: View {
     }
 
     @ViewBuilder
-    func RowView(category: Category) -> some View {
+    func RowView(category: CategoryModel) -> some View {
         Button {
             if selectedCategory == category {
                 selectedCategory = nil
@@ -908,7 +866,7 @@ struct BrandNewBudgetView: View {
         }
     }
 
-    init(overallBudgetCreated: Bool, toEditBudget: Budget? = nil, toEditMainBudget: MainBudget? = nil) {
+    init(overallBudgetCreated: Bool, toEditBudget: BudgetModel? = nil, toEditMainBudget: MainBudgetModel? = nil) {
         if toEditBudget != nil {
             self.overallBudgetCreated = overallBudgetCreated
             _progress = State(initialValue: 3)
@@ -934,16 +892,22 @@ struct BrandNewBudgetView: View {
         self.toEditBudget = toEditBudget
         self.toEditMainBudget = toEditMainBudget
 
-        let budgetPredicate = NSPredicate(format: "%K == nil", #keyPath(Category.budget))
-        let incomePredicate = NSPredicate(format: "income = %d", false)
+        _categories = Query(filter: #Predicate<CategoryModel> { $0.budget == nil && $0.income == false }, sort: [SortDescriptor(\.order)])
+    }
 
-        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [budgetPredicate, incomePredicate])
+    @ViewBuilder
+    private func dayRowBackground(isSelected: Bool) -> some View {
+        if isSelected {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.SecondaryBackground)
+        }
+    }
+}
 
-//        self.toEdit = toEdit
-
-        _categories = FetchRequest<Category>(sortDescriptors: [
-            SortDescriptor(\.order)
-        ], predicate: andPredicate)
+struct CheckmarkView: View {
+    var body: some View {
+        Image(systemName: "checkmark")
+            .font(.system(.callout, design: .rounded).weight(.medium))
     }
 }
 
@@ -1003,5 +967,42 @@ struct RowProgressIndicator: View {
 //                .offset(x: CGFloat((progress - Int(initialProgess)) * 11))
 //                .foregroundColor(Color.DarkBackground)
 //        }
+    }
+}
+
+private struct WeekdayPickerRow: View {
+    let day: String
+    let weekdays: [String]
+    @Binding var chosenDayWeek: Int
+
+    private var index: Int { (weekdays.firstIndex(of: day) ?? 0) + 1 }
+    private var isSelected: Bool { chosenDayWeek == index }
+
+    var body: some View {
+        HStack {
+            Text(LocalizedStringKey(day))
+            Spacer()
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .font(.system(.callout, design: .rounded).weight(.medium))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundColor(Color.PrimaryText)
+        .font(.system(.title3, design: .rounded).weight(.medium))
+        .padding(8)
+        .background {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.SecondaryBackground)
+            }
+        }
+        .id(index)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            withAnimation(.easeIn(duration: 0.15)) {
+                chosenDayWeek = index
+            }
+        }
     }
 }

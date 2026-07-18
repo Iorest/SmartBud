@@ -30,10 +30,7 @@ struct GetInsightsIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some ReturnsValue<Double> & ShowsSnippetView & ProvidesDialog {
-        let dataController = DataController.shared
-//        let dataController = DataController()
-
-        let categories: [Category]
+        let categories: [CategoryModel]
         let optionalIncome: Bool?
         let typeInt: Int
 
@@ -45,7 +42,7 @@ struct GetInsightsIntent: AppIntent {
         case .income:
             if let unwrappedCategories = incomeCategories {
                 categories = unwrappedCategories.compactMap { category in
-                    try? dataController.findCategory(withId: category.id)
+                    CategoryViewModel.shared.findCategory(id: category.id)
                 }
             } else {
                 categories = []
@@ -56,7 +53,7 @@ struct GetInsightsIntent: AppIntent {
         case .spent:
             if let unwrappedCategories = expenseCategories {
                 categories = unwrappedCategories.compactMap { category in
-                    try? dataController.findCategory(withId: category.id)
+                    CategoryViewModel.shared.findCategory(id: category.id)
                 }
             } else {
                 categories = []
@@ -65,7 +62,7 @@ struct GetInsightsIntent: AppIntent {
             typeInt = 3
         }
 
-        let result = dataController.getShortcutInsights(type: typeInt, timeframe: timeframe.rawValue, optionalIncome: optionalIncome, categories: categories)
+        let result = InsightsViewModel.shared.getShortcutInsights(type: typeInt, timeframe: timeframe.rawValue, optionalIncome: optionalIncome, categories: categories)
 
         return .result(value: result, dialog: "Here you go!") {
             ShortcutInsightsView(amount: result, type: type, timeframe: timeframe)

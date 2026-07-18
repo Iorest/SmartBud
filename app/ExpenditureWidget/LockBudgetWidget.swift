@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WidgetKit
+import SwiftData
 
 struct LockBudgetWidget: Widget {
     let kind: String = "LockBudgetWidget"
@@ -38,6 +39,16 @@ struct LockBudgetWidgetProvider: IntentTimelineProvider {
 
     public typealias Entry = LockBudgetWidgetEntry
 
+    nonisolated(unsafe) static let container: ModelContainer = {
+        let schema = Schema([
+            TransactionModel.self,
+            BudgetModel.self,
+            CategoryModel.self
+        ])
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        return try! ModelContainer(for: schema, configurations: [config])
+    }()
+
     func placeholder(in _: Context) -> LockBudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
 
@@ -62,54 +73,67 @@ struct LockBudgetWidgetProvider: IntentTimelineProvider {
     }
 
     func loadData(budgetId: String) -> (total: Double, timeLeft: String, budget: HoldingBudget) {
-//        let dataController = DataController()
-        let dataController = DataController.shared
+        let context = ModelContext(Self.container)
 
-        if let objectIDURL = URL(string: budgetId) {
-            let managedObjectID = dataController.container.persistentStoreCoordinator.managedObjectID(forURIRepresentation: objectIDURL)!
-
-            let budget = dataController.container.viewContext.object(with: managedObjectID) as! Budget
-
-            let fetchRequest = dataController.fetchRequestForBudgetTransactions(budget: budget)
-
-            let transactions = dataController.results(for: fetchRequest)
-
-            var holdingTotal = 0.0
-
-            transactions.forEach { transaction in
-                holdingTotal += transaction.wrappedAmount
-            }
-
-            let returnBudget = HoldingBudget(type: Int(budget.type), emoji: budget.wrappedEmoji, name: budget.wrappedName, colour: budget.wrappedColour, budgetAmount: budget.amount)
-
-            let timeLeft: String
-
-            let calendar = Calendar.current
-
-            if budget.type == 1 {
-                let components = calendar.dateComponents([.hour], from: budget.startDate!, to: Date.now)
-
-                timeLeft = String(localized: "\(24 - components.hour!) hours left")
-            } else if budget.type == 2 {
-                let components = calendar.dateComponents([.day], from: budget.startDate!, to: Date.now)
-
-                timeLeft = String(localized: "\(7 - components.day!) days left")
-            } else {
-                let components1 = calendar.dateComponents([.day], from: budget.startDate!, to: budget.endDate)
-                let numberOfDays = components1.day!
-
-                let components2 = calendar.dateComponents([.day], from: budget.startDate!, to: Date.now)
-                let numberOfDaysPast = components2.day!
-
-                let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                timeLeft = String(localized: "\(daysLeftNumber) days left")
-            }
-
-            return (holdingTotal, timeLeft, returnBudget)
-        } else {
+        guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return (0, "", budget)
         }
+
+        let fetchId = uuid
+        var budgetDesc = FetchDescriptor<BudgetModel>()
+        budgetDesc.fetchLimit = 1
+        let allBudgets = (try? context.fetch(budgetDesc)) ?? []
+        guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
+            let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
+            return (0, "", budget)
+        }
+
+        let budgetStartDate = budgetModel.startDate
+        let budgetCategory = budgetModel.category
+        let now = Date.now
+        let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+        let filteredTxns = allTxns.filter {
+            !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
+        }
+
+        var holdingTotal = filteredTxns.reduce(0) { $0 + $1.wrappedAmount }
+
+        for transaction in filteredTxns {
+            if transaction.category?.id == budgetCategory?.id {
+                holdingTotal += transaction.wrappedAmount
+            }
+        }
+
+        let returnBudget = HoldingBudget(
+            type: budgetModel.type,
+            emoji: budgetModel.wrappedEmoji,
+            name: budgetModel.wrappedName,
+            colour: budgetModel.wrappedColour,
+            budgetAmount: budgetModel.amount
+        )
+
+        let timeLeft: String
+        let calendar = Calendar.current
+
+        if budgetModel.type == 1 {
+            let components = calendar.dateComponents([.hour], from: budgetModel.startDate, to: now)
+            timeLeft = String(localized: "\(24 - (components.hour ?? 0)) hours left")
+        } else if budgetModel.type == 2 {
+            let components = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
+            timeLeft = String(localized: "\(7 - (components.day ?? 0)) days left")
+        } else {
+            let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
+            let numberOfDays = components1.day ?? 0
+
+            let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
+            let numberOfDaysPast = components2.day ?? 0
+
+            let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
+            timeLeft = String(localized: "\(daysLeftNumber) days left")
+        }
+
+        return (holdingTotal, timeLeft, returnBudget)
     }
 }
 

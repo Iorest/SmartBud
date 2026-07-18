@@ -79,7 +79,6 @@ struct NewTransactionIntent: AppIntent {
                 throw $amount.needsValueError()
             }
 
-            let dataController = DataController.shared
             let repeatType: Int
 
             if !recurringTransaction {
@@ -97,9 +96,11 @@ struct NewTransactionIntent: AppIntent {
 
             if income == .expense {
                 if let unwrappedExpenseCategory = expenseCategory {
-                    let category = try dataController.findCategory(withId: unwrappedExpenseCategory.id)
+                    guard let category = CategoryViewModel.shared.findCategory(id: unwrappedExpenseCategory.id) else {
+                        throw $expenseCategory.needsValueError()
+                    }
 
-                    let transaction = dataController.newTransaction(note: note ?? "", category: category, income: false, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1, delay: false)
+                    let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: false, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
                     return .result(dialog: "Expense successfully logged.") {
                         ShortcutTransactionView(transaction: transaction)
@@ -109,9 +110,11 @@ struct NewTransactionIntent: AppIntent {
                 }
             } else {
                 if let unwrappedIncomeCategory = incomeCategory {
-                    let category = try dataController.findCategory(withId: unwrappedIncomeCategory.id)
+                    guard let category = CategoryViewModel.shared.findCategory(id: unwrappedIncomeCategory.id) else {
+                        throw $incomeCategory.needsValueError()
+                    }
 
-                    let transaction = dataController.newTransaction(note: note ?? "", category: category, income: true, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1, delay: false)
+                    let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: true, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
                     return .result(dialog: "Income successfully logged.") {
                         ShortcutTransactionView(transaction: transaction)
@@ -200,7 +203,7 @@ extension RepeatType: AppEnum {
 }
 
 struct ShortcutTransactionView: View {
-    let transaction: Transaction
+    let transaction: TransactionModel
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 

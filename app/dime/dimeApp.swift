@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct dimeApp: App {
-    @StateObject var dataService: DataService
+    @StateObject var dataRepository: DataRepository
     @StateObject var unlockManager: UnlockManager
     @StateObject var appLockVM = AppLockViewModel()
     @StateObject var tabBarManager = TabBarManager()
@@ -26,8 +26,7 @@ struct dimeApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(dataService.modelContainer)
-                .environmentObject(dataService)
+                .modelContainer(dataRepository.modelContainer)
                 .environmentObject(appLockVM)
                 .environmentObject(unlockManager)
                 .environmentObject(tabBarManager)
@@ -41,10 +40,10 @@ struct dimeApp: App {
     }
 
     init() {
-        let dataService = DataService.instance
+        let dataRepository = DataRepository.shared
         let unlockManager = UnlockManager()
 
-        _dataService = StateObject(wrappedValue: dataService)
+        _dataRepository = StateObject(wrappedValue: dataRepository)
         _unlockManager = StateObject(wrappedValue: unlockManager)
         _homeVM = StateObject(wrappedValue: HomeViewModel.shared)
         _transactionVM = StateObject(wrappedValue: TransactionViewModel())

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import WidgetKit
+import SwiftData
 
 struct InsightsWidget: Widget {
     let kind: String = "InsightsWidget"
@@ -26,6 +27,12 @@ struct InsightsProvider: IntentTimelineProvider {
     typealias Intent = InsightsWidgetConfigurationIntent
 
     public typealias Entry = InsightsWidgetEntry
+
+    nonisolated(unsafe) static let container: ModelContainer = {
+        let schema = Schema([TransactionModel.self, CategoryModel.self])
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        return try! ModelContainer(for: schema, configurations: [config])
+    }()
 
     func placeholder(in _: Context) -> InsightsWidgetEntry {
         let results = loadData(type: .week, income: true)
@@ -52,17 +59,36 @@ struct InsightsProvider: IntentTimelineProvider {
 
     func loadData(type: InsightsTimePeriod, income: Bool) -> (amount: Double, maximum: Double, average: Double, numberOfDays: Int, dates: [Date], dateDictionary: [Date: Double], categories: [HoldingCategory]) {
 //        let dataController = DataController()
-        let dataController = DataController.shared
-        let itemRequest = dataController.fetchRequestForWidgetInsights(type: type, income: income)
-        let categoryRequest = dataController.fetchRequestForCategories(income: income)
+        let context = ModelContext(Self.container)
+        let now = Date.now
+        var cal = Calendar(identifier: .gregorian)
+        cal.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+        cal.minimumDaysInFirstWeek = 4
 
-        let categories = dataController.results(for: categoryRequest)
-        let transactions = dataController.results(for: itemRequest.fetchRequest)
-        var iterativeDate = itemRequest.date
-
+        let startDate: Date
         switch type {
+        case .week:
+            let comps = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
+            startDate = cal.date(from: comps)!
+        case .month:
+            let sday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstDayOfMonth")
+            startDate = getStartOfMonth(startDay: sday)
+        case .year:
+            let comps = cal.dateComponents([.year], from: now)
+            startDate = cal.date(from: comps)!
         case .unknown:
             return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
+        }
+
+        let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+        let transactions = allTxns.filter {
+            $0.income == income && ($0.wrappedDate) >= startDate && ($0.wrappedDate) <= now
+        }
+        let allCats = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
+        let categories = allCats.filter { $0.income == income }
+        var iterativeDate = startDate
+
+        switch type {
         case .week:
             var dates = [Date]()
             var nextDate = iterativeDate
@@ -107,7 +133,7 @@ struct InsightsProvider: IntentTimelineProvider {
                 iterativeDate = nextDate
             }
 
-            let numberOfDaysPast = Calendar.current.dateComponents([.day], from: itemRequest.date, to: Date.now)
+            let numberOfDaysPast = Calendar.current.dateComponents([.day], from: startDate, to: Date.now)
 
             var holdingCat = [HoldingCategory]()
 
@@ -136,6 +162,8 @@ struct InsightsProvider: IntentTimelineProvider {
             })
 
             return (totalForWeek, maximum, totalForWeek / Double((numberOfDaysPast.day! + 1)), numberOfDays, dates, dictionary, holdingCat)
+        case .unknown:
+            return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
         case .month:
             var dates = [Date]()
             var nextDate = iterativeDate
@@ -177,7 +205,7 @@ struct InsightsProvider: IntentTimelineProvider {
                 iterativeDate = nextDate
             }
 
-            let numDays = Calendar.current.dateComponents([.day], from: itemRequest.date, to: Date.now)
+            let numDays = Calendar.current.dateComponents([.day], from: startDate, to: Date.now)
 
             var holdingCat = [HoldingCategory]()
 
@@ -247,7 +275,7 @@ struct InsightsProvider: IntentTimelineProvider {
                 iterativeDate = nextDate
             }
 
-            let numDays = Calendar.current.dateComponents([.month], from: itemRequest.date, to: Date.now)
+            let numDays = Calendar.current.dateComponents([.month], from: startDate, to: Date.now)
 
             var holdingCat = [HoldingCategory]()
 

@@ -28,32 +28,26 @@ struct BudgetIntent: AppIntent {
             throw $budget.needsValueError()
         }
 
-//        let dataController = DataController()
-
-        let dataController = DataController.shared
-
         var amount: Double = 0
-        var budgetType: Int16 = 0
+        var budgetType: Int = 0
 
         switch type {
         case .overall:
-            if let mainBudget = dataController.results(for: dataController.fetchRequestForMainBudget()).first {
-                amount = dataController.getBudgetLeftover(overallBudget: mainBudget)
-
+            if let mainBudget = BudgetViewModel.shared.getMainBudget() {
+                amount = BudgetViewModel.shared.leftoverOverall(mainBudget)
                 budgetType = mainBudget.type
             }
         case .category:
             if let unwrappedBudget = budget {
-                let categoryBudget = try dataController.findBudget(withId: unwrappedBudget.id)
-
-                amount = dataController.getBudgetLeftover(budget: categoryBudget)
-
-                budgetType = categoryBudget.type
+                if let categoryBudget = BudgetViewModel.shared.findBudget(id: unwrappedBudget.id) {
+                    amount = BudgetViewModel.shared.leftover(categoryBudget)
+                    budgetType = categoryBudget.type
+                }
             }
         }
 
         return .result(value: amount, dialog: "Here you go!") {
-            ShortcutBudgetView(amount: amount, type: Int(budgetType))
+            ShortcutBudgetView(amount: amount, type: budgetType)
         }
     }
 

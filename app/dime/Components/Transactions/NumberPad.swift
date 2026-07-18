@@ -14,7 +14,7 @@ enum AssignedDecimal {
 
 struct NumberPad: View {
     @Binding var price: Double
-    @Binding var category: Category?
+    @Binding var category: CategoryModel?
     @Binding var isEditingDecimal: Bool
     @Binding var decimalValuesAssigned: AssignedDecimal
     var showingNotePicker: Bool = false

@@ -13,7 +13,6 @@ struct SettingsUpcomingView: View {
   @State private var showFuture: Bool = true
 
   @State private var showSoon: Bool = false
-  @EnvironmentObject var dataController: DataController
 
   @Namespace var animation
 
@@ -111,7 +110,7 @@ struct SettingsUpcomingView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
 
       ScrollView(showsIndicators: false) {
-        FutureListView(dataController: dataController, filterMode: false, limitedMode: false)
+        FutureListView(filterMode: false, limitedMode: false)
           .padding(.bottom, 70)
       }
     }

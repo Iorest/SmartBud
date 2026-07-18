@@ -1,0 +1,8 @@
+Target dependency graph (4 targets)
+Target 'dime' in project 'dime'
+➜ Explicit dependency on target 'ExpenditureWidgetExtension' in project 'dime'
+➜ Explicit dependency on target 'BudgetIntentUI' in project 'dime'
+➜ Explicit dependency on target 'BudgetIntent' in project 'dime'
+Target 'BudgetIntent' in project 'dime' (no dependencies)
+Target 'BudgetIntentUI' in project 'dime' (no dependencies)
+Target 'ExpenditureWidgetExtension' in project 'dime' (no dependencies)

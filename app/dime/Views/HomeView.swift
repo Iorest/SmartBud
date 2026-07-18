@@ -18,8 +18,8 @@ enum DeletionType {
 }
 
 class OverallTransactionManager: ObservableObject {
-    @Published var toEdit: Transaction?
-    @Published var toDelete: Transaction?
+    @Published var toEdit: TransactionModel?
+    @Published var toDelete: TransactionModel?
     @Published var showToast: Bool = false
     @Published var showPopup: Bool = false
     @Published var future: Bool = false
@@ -30,8 +30,7 @@ struct HomeView: View {
 
     @StateObject var toastPresenter = OverallToastPresenter()
     @StateObject var transactionManager = OverallTransactionManager()
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var transactionVM: TransactionViewModel
 
     @State var currentTab = "Log"
 
@@ -67,10 +66,6 @@ struct HomeView: View {
                     .ignoresSafeArea(.all)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .tag("Log")
-
-                InsightsView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .tag("Insights")
 
                 BudgetView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -125,11 +120,11 @@ struct HomeView: View {
             AlertToast(displayMode: .hud, type: .systemImage("arrow.uturn.backward.circle.fill", Color.AlertRed), title: String(localized: "Log Deleted"), subTitle: String(localized: "Tap to Undo"))
         }, onTap: {
             withAnimation(.easeInOut(duration: 0.5)) {
-                moc.rollback()
+                transactionVM.rollback()
             }
             transactionManager.toDelete = nil
         }, completion: {
-            dataController.save()
+            transactionVM.commitPendingChanges()
             transactionManager.toDelete = nil
         })
         .onChange(of: transactionManager.showPopup) { _, newValue in

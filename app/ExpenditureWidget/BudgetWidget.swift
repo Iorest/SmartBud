@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WidgetKit
+import SwiftData
 
 struct BudgetWidget: Widget {
     let kind: String = "BudgetWidget"
@@ -25,6 +26,16 @@ struct BudgetWidgetProvider: IntentTimelineProvider {
     typealias Intent = BudgetWidgetConfigurationIntent
 
     public typealias Entry = BudgetWidgetEntry
+
+    nonisolated(unsafe) static let container: ModelContainer = {
+        let schema = Schema([
+            TransactionModel.self,
+            BudgetModel.self,
+            CategoryModel.self
+        ])
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        return try! ModelContainer(for: schema, configurations: [config])
+    }()
 
     func placeholder(in _: Context) -> BudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
@@ -50,48 +61,60 @@ struct BudgetWidgetProvider: IntentTimelineProvider {
     }
 
     func loadData(budgetId: String) -> (total: Double, percentage: Double, budget: HoldingBudget) {
-//        let dataController = DataController()
-        let dataController = DataController.shared
+        let context = ModelContext(Self.container)
 
-        if let objectIDURL = URL(string: budgetId) {
-            let managedObjectID = dataController.container.persistentStoreCoordinator.managedObjectID(forURIRepresentation: objectIDURL)!
-
-            let budget = dataController.container.viewContext.object(with: managedObjectID) as! Budget
-
-            let fetchRequest = dataController.fetchRequestForBudgetTransactions(budget: budget)
-
-            let transactions = dataController.results(for: fetchRequest)
-
-            var holdingTotal = 0.0
-
-            transactions.forEach { transaction in
-                holdingTotal += transaction.wrappedAmount
-            }
-
-            let returnBudget = HoldingBudget(type: Int(budget.type), emoji: budget.wrappedEmoji, name: budget.wrappedName, colour: budget.wrappedColour, budgetAmount: budget.amount)
-
-            let percentageOfDays: Double
-
-            let calendar = Calendar.current
-
-            if budget.type == 1 {
-                let components = calendar.dateComponents([.minute], from: budget.startDate!, to: Date.now)
-                percentageOfDays = Double(components.minute!) / 1440
-            } else {
-                let components1 = calendar.dateComponents([.day], from: budget.startDate!, to: budget.endDate)
-                let numberOfDays = components1.day!
-
-                let components2 = calendar.dateComponents([.day], from: budget.startDate!, to: Date.now)
-                let numberOfDaysPast = components2.day!
-
-                percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
-            }
-
-            return (holdingTotal, percentageOfDays, returnBudget)
-        } else {
+        guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return (0, 0, budget)
         }
+
+        let fetchId = uuid
+        var budgetDesc = FetchDescriptor<BudgetModel>()
+        budgetDesc.fetchLimit = 1
+
+        let allBudgets = (try? context.fetch(budgetDesc)) ?? []
+        guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
+            let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
+            return (0, 0, budget)
+        }
+
+        let budgetStartDate = budgetModel.startDate
+        let budgetCategory = budgetModel.category
+        let now = Date.now
+
+        var txnDesc = FetchDescriptor<TransactionModel>()
+        let allTransactions = (try? context.fetch(txnDesc)) ?? []
+        let filtered = allTransactions.filter {
+            !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
+        }
+
+        var holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+
+        let returnBudget = HoldingBudget(
+            type: budgetModel.type,
+            emoji: budgetModel.wrappedEmoji,
+            name: budgetModel.wrappedName,
+            colour: budgetModel.wrappedColour,
+            budgetAmount: budgetModel.amount
+        )
+
+        let percentageOfDays: Double
+        let calendar = Calendar.current
+
+        if budgetModel.type == 1 {
+            let components = calendar.dateComponents([.minute], from: budgetModel.startDate, to: now)
+            percentageOfDays = Double(components.minute ?? 0) / 1440
+        } else {
+            let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
+            let numberOfDays = components1.day!
+
+            let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
+            let numberOfDaysPast = components2.day!
+
+            percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
+        }
+
+        return (holdingTotal, percentageOfDays, returnBudget)
     }
 }
 

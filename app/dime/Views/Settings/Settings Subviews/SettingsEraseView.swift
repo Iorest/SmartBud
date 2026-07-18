@@ -57,9 +57,10 @@ struct SettingsEraseView: View {
 }
 
 struct DeleteAllAlert: View {
-  @EnvironmentObject var dataController: DataController
+  @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) var dismiss
   @Environment(\.colorScheme) var systemColorScheme
+  @StateObject var settingsVM = SettingsViewModel.shared
 
   @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var bottomEdge: Double = 15
@@ -146,7 +147,7 @@ struct DeleteAllAlert: View {
             impactMed.impactOccurred()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-              dataController.deleteAll()
+              settingsVM.eraseAllData()
 
               dismiss()
             }

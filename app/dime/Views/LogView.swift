@@ -5,19 +5,14 @@
 //  Created by Rafael Soh on 19/5/22.
 //
 
-import CoreData
 import Foundation
+import SwiftData
 import SwiftUI
 
 struct LogView: View {
-    @State private var syncSucceeded = false
+    @Query private var transactions: [TransactionModel]
 
-    @State var updatedRecurring = false
-
-    @FetchRequest(sortDescriptors: []) private var transactions: FetchedResults<Transaction>
-
-    @EnvironmentObject var dataController: DataController
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject var transactionVM: TransactionViewModel
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
@@ -44,7 +39,7 @@ struct LogView: View {
     @State var filter = FilterType.all
 
     // filters
-    @State var categoryFilter: Category?
+    @State var categoryFilter: CategoryModel?
     @State var dateFilter = Date.now
     @State var weekFilter = Date.now
     @State var monthFilter = Date.now
@@ -254,28 +249,9 @@ struct LogView: View {
             .fullScreenCover(isPresented: $searchMode) {
                 SearchView()
             }
-            .onReceive(NotificationCenter.default.publisher(for: NSPersistentCloudKitContainer.eventChangedNotification)) { notification in
-                guard let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else { return }
-                if event.endDate != nil && event.succeeded && !updatedRecurring {
-                    dataController.updateRecurringTransactions()
-                    syncSucceeded = true
-                    updatedRecurring = true
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                        updatedRecurring = false
-                    }
-                }
-            }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                if syncSucceeded && !updatedRecurring {
-                    dataController.updateRecurringTransactions()
-                    updatedRecurring = true
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                        updatedRecurring = false
-                    }
-                } else if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-                    dataController.updateRecurringTransactions()
+                if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
+                    transactionVM.updateAllRecurring()
                 }
             }
             .onChange(of: launchSearch) { _, _ in
@@ -283,7 +259,7 @@ struct LogView: View {
             }
             .onAppear {
                 if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-                    dataController.updateRecurringTransactions()
+                    transactionVM.updateAllRecurring()
                 }
             }
 //            .animation(.spring(duration: 0.5), value: released)
@@ -389,7 +365,7 @@ struct NumberView: View {
 }
 
 struct LogInsightsView: View {
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var insightsVM: InsightsViewModel
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     @Binding var navBarText: String
@@ -406,7 +382,7 @@ struct LogInsightsView: View {
     @AppStorage("logViewLineGraph", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var lineGraph: Bool = false
 
     var netTotal: (value: Double, positive: Bool) {
-        dataController.getLogViewTotalNet(type: timeframe)
+        insightsVM.getLogViewTotalNet(type: timeframe)
     }
 
     var range: Int {
@@ -440,20 +416,20 @@ struct LogInsightsView: View {
     }
 
     var totalSpent: Double {
-        return dataController.getLogViewTotalSpent(type: timeframe)
+        return insightsVM.getLogViewTotalSpent(type: timeframe)
     }
 
     var totalIncome: Double {
-        return dataController.getLogViewTotalIncome(type: timeframe)
+        return insightsVM.getLogViewTotalIncome(type: timeframe)
     }
 
     var lineGraphData: [LineGraphDataPoint] {
         if insightsType == 1 {
-            return dataController.getLineGraphDataNet(type: timeframe)
+            return insightsVM.getLogLineGraphDataNet(type: timeframe)
         } else if insightsType == 2 {
-            return dataController.getLineGraphData(income: true, type: timeframe)
+            return insightsVM.getLogLineGraphData(income: true, type: timeframe)
         } else {
-            return dataController.getLineGraphData(income: false, type: timeframe)
+            return insightsVM.getLogLineGraphData(income: false, type: timeframe)
         }
     }
 
@@ -677,7 +653,7 @@ struct SearchView: View {
 }
 
 struct FilteredSearchView: View {
-    @SectionedFetchRequest<Date?, Transaction> private var transactions: SectionedFetchResults<Date?, Transaction>
+    @Query private var transactions: [TransactionModel]
 
     var searchQuery: String
 
@@ -704,32 +680,31 @@ struct FilteredSearchView: View {
                 .padding(.top, 80)
             }
 
-            ListView(transactions: _transactions)
+            ListView(transactions: transactions)
         }
         .frame(maxHeight: .infinity)
     }
 
     init(searchQuery: String) {
-        let beginPredicate = NSPredicate(format: "%K BEGINSWITH[cd] %@", #keyPath(Transaction.note), searchQuery)
-        let containPredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(Transaction.note), searchQuery)
-        let containPredicate1 = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(Transaction.category.name), searchQuery)
-
-        let compound: NSCompoundPredicate
-
-        // allow searching by amount too
-        if let amount = Double(searchQuery) {
-            let amountPredicate = NSPredicate(format: "amount == %@", NSNumber(value: amount))
-            compound = NSCompoundPredicate(orPredicateWithSubpredicates: [beginPredicate, containPredicate, containPredicate1, amountPredicate])
-        } else {
-            compound = NSCompoundPredicate(orPredicateWithSubpredicates: [beginPredicate, containPredicate, containPredicate1])
-        }
-
-        _transactions = SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-            SortDescriptor(\.day, order: .reverse),
-            SortDescriptor(\.date, order: .reverse)
-        ], predicate: compound)
-
         self.searchQuery = searchQuery
+        let q = searchQuery
+        // allow searching by amount too
+        if let amountValue = Double(searchQuery) {
+            _transactions = Query(filter: #Predicate<TransactionModel> {
+                ($0.note ?? "").localizedStandardContains(q) ||
+                    $0.amount == amountValue
+            }, sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse)
+            ])
+        } else {
+            _transactions = Query(filter: #Predicate<TransactionModel> {
+                ($0.note ?? "").localizedStandardContains(q)
+            }, sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse)
+            ])
+        }
     }
 }
 
@@ -883,7 +858,7 @@ struct FilterPickerView: View {
 
 struct TransactionsList: View {
     var filter: FilterType
-    var category: Category?
+    var category: CategoryModel?
     var date: Date
     var week: Date
     var month: Date
@@ -892,24 +867,18 @@ struct TransactionsList: View {
     @AppStorage("showUpcomingTransactions", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showUpcoming: Bool = true
     @AppStorage("showUpcomingTransactionsWhenUpcoming", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showSoon: Bool = false
 
-    @EnvironmentObject var dataController: DataController
-
-    @SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-        SortDescriptor(\.day, order: .reverse),
-        SortDescriptor(\.date, order: .reverse),
-        SortDescriptor(\.note)
-    ], predicate: NSPredicate(format: "%K <= %@", #keyPath(Transaction.date), Date.now as CVarArg)) private var transactions: SectionedFetchResults<Date?, Transaction>
+    @Query private var transactions: [TransactionModel]
 
     var body: some View {
         VStack {
             if (filter == .all && showUpcoming) || filter == .upcoming {
-                FutureListView(dataController: dataController, filterMode: filter == .upcoming, limitedMode: showSoon)
+                FutureListView(filterMode: filter == .upcoming, limitedMode: showSoon)
                     .padding(.top, 10)
             }
 
             switch filter {
             case .all:
-                ListView(transactions: _transactions)
+                ListView(transactions: transactions)
             case .category:
                 FilteredCategoryView(category: category)
             case .day:
@@ -927,10 +896,29 @@ struct TransactionsList: View {
             }
         }
     }
+
+    init(filter: FilterType, category: CategoryModel?, date: Date, week: Date, month: Date, income: Bool) {
+        self.filter = filter
+        self.category = category
+        self.date = date
+        self.week = week
+        self.month = month
+        self.income = income
+        let now = Date.now
+        let past = Date.distantPast
+        _transactions = Query(
+            filter: #Predicate<TransactionModel> { ($0.date ?? past) <= now },
+            sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse),
+                SortDescriptor(\TransactionModel.note)
+            ]
+        )
+    }
 }
 
 struct ListView: View {
-    @SectionedFetchRequest<Date?, Transaction> var transactions: SectionedFetchResults<Date?, Transaction>
+    var transactions: [TransactionModel]
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
@@ -946,11 +934,18 @@ struct ListView: View {
 
     @EnvironmentObject var toastPresenter: OverallToastPresenter
 
+    var groupedByDay: [(day: Date, transactions: [TransactionModel])] {
+        let grouped = Dictionary(grouping: transactions) { $0.day ?? Date.now }
+        return grouped.keys.sorted(by: >).map { day in
+            (day, grouped[day]!.sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) })
+        }
+    }
+
     var body: some View {
         LazyVStack(spacing: 0) {
-            ForEach(transactions) { day in
-                let filtered = filterOutDupes(day: day)
-                let dateText = dateConverter(date: day.id ?? Date.now).uppercased()
+            ForEach(groupedByDay, id: \.day) { day in
+                let filtered = filterOutDupes(dayTransactions: day.transactions)
+                let dateText = dateConverter(date: day.day).uppercased()
 
                 VStack(spacing: 0) {
                     VStack(spacing: 4) {
@@ -966,7 +961,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundColor(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("\(currencySymbol)\(String(format: "%.2f", filtered.string)) was spent \(dateConverterAccessibilityLabel(date: day.id ?? Date.now))")
+                        .accessibilityLabel("\(currencySymbol)\(String(format: "%.2f", filtered.string)) was spent \(dateConverterAccessibilityLabel(date: day.day))")
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -999,9 +994,10 @@ struct ListView: View {
         }
     }
 
-    func filterOutDupes(day: SectionedFetchResults<Date?, Transaction>.Element) -> (transactions: [Transaction], string: String) {
-        var seen = [Transaction]()
-        let filtered = day.filter { entity -> Bool in
+    func filterOutDupes(dayTransactions: [TransactionModel]) -> (transactions: [TransactionModel], string: String) {
+        var seen = [TransactionModel]()
+        let filtered = dayTransactions.filter { entity -> Bool in
+
             if seen.contains(where: { $0.id == entity.id }) {
                 return false
             } else {
@@ -1035,13 +1031,11 @@ struct ListView: View {
 }
 
 struct FutureListView: View {
-    @EnvironmentObject var dataController: DataController
-
-    @FetchRequest private var fetchedResults: FetchedResults<Transaction>
+    @Query private var fetchedResults: [TransactionModel]
     var filterMode: Bool
     var limitedMode: Bool
 
-    var transactions: [Transaction] {
+    var transactions: [TransactionModel] {
         if limitedMode {
             let calendar = Calendar.current
 
@@ -1144,13 +1138,12 @@ struct FutureListView: View {
         }
     }
 
-    init(dataController _: DataController, filterMode: Bool, limitedMode: Bool) {
-        let recurringPredicate = NSPredicate(format: "%K > %i", #keyPath(Transaction.recurringType), 0)
-        let futurePredicate = NSPredicate(format: "%K > %@", #keyPath(Transaction.date), Date.now as CVarArg)
-
-        let andPredicate = NSCompoundPredicate(type: .or, subpredicates: [recurringPredicate, futurePredicate])
-
-        _fetchedResults = FetchRequest<Transaction>(sortDescriptors: [], predicate: andPredicate)
+    init(filterMode: Bool, limitedMode: Bool) {
+        let now = Date.now
+        let past = Date.distantPast
+        _fetchedResults = Query(filter: #Predicate<TransactionModel> {
+            $0.recurringType > 0 || (($0.date ?? past) > now)
+        })
 
         self.filterMode = filterMode
         self.limitedMode = limitedMode
@@ -1158,7 +1151,7 @@ struct FutureListView: View {
 }
 
 struct SingleTransactionView: View {
-    let transaction: Transaction
+    let transaction: TransactionModel
     let showCents: Bool
     let currencySymbol: String
     let currency: String
@@ -1168,8 +1161,7 @@ struct SingleTransactionView: View {
 
     @State var refreshID = UUID()
 
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var transactionVM: TransactionViewModel
     @EnvironmentObject var transactionManager: OverallTransactionManager
 
     // delete mode
@@ -1291,7 +1283,7 @@ struct SingleTransactionView: View {
                 if transaction.recurringType > 0 {
                     Button {
                         transaction.recurringType = 0
-                        dataController.save()
+                        transactionVM.save()
                     } label: {
                         Label("Stop Recurring", systemImage: "xmark")
                     }
@@ -1354,13 +1346,13 @@ struct SingleTransactionView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 withAnimation(.easeInOut(duration: 0.5)) {
                                     transaction.recurringType = 0
-                                    dataController.save()
+                                    transactionVM.save()
                                 }
                             }
                         } else {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 withAnimation {
-                                    moc.delete(transaction)
+                                    transactionVM.stageDelete(transaction)
                                     transactionManager.showToast = true
                                     transactionManager.toDelete = transaction
 //                                    transactionManager.future = future
@@ -1474,8 +1466,7 @@ struct EmojiLogView: View {
 }
 
 struct DeleteTransactionAlert: View {
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var transactionVM: TransactionViewModel
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var transactionManager: OverallTransactionManager
 
@@ -1517,12 +1508,11 @@ struct DeleteTransactionAlert: View {
                     if stopRecurring {
                         withAnimation(.easeInOut(duration: 0.5)) {
                             unwrappedToDelete.recurringType = 0
-                            dataController.save()
+                            transactionVM.save()
                         }
                     } else {
                         withAnimation(.easeInOut(duration: 0.5)) {
-                            //                            moc.delete(toDelete)
-                            moc.delete(unwrappedToDelete)
+                            transactionVM.stageDelete(unwrappedToDelete)
                             transactionManager.showToast = true
                         }
                     }
@@ -1581,95 +1571,104 @@ struct BackgroundBlurView: UIViewRepresentable {
 }
 
 struct FilteredRecurringView: View {
-    @SectionedFetchRequest<Date?, Transaction> private var transactions: SectionedFetchResults<Date?, Transaction>
+    @Query private var transactions: [TransactionModel]
+
+    var displayedTransactions: [TransactionModel] {
+        let now = Date.now
+        return transactions.filter { $0.onceRecurring && ($0.date ?? .distantPast) <= now }
+    }
 
     var body: some View {
         VStack(spacing: 30) {
-            if transactions.count == 0 {
+            if displayedTransactions.count == 0 {
                 NoResultsView(fullscreen: true)
             }
 
-            ListView(transactions: _transactions)
+            ListView(transactions: displayedTransactions)
         }
         .frame(maxHeight: .infinity)
     }
 
     init() {
-        let recurringPredicate = NSPredicate(format: "%K = %d", #keyPath(Transaction.onceRecurring), true)
-        let datePredicate = NSPredicate(format: "%K <= %@", #keyPath(Transaction.date), Date.now as CVarArg)
-
-        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [recurringPredicate, datePredicate])
-
-        _transactions = SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-            SortDescriptor(\.day, order: .reverse),
-            SortDescriptor(\.date, order: .reverse),
-            SortDescriptor(\.note, order: .reverse)
-        ], predicate: andPredicate)
+        _transactions = Query(
+            filter: #Predicate<TransactionModel> { $0.onceRecurring == true },
+            sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse),
+                SortDescriptor(\TransactionModel.note, order: .reverse)
+            ]
+        )
     }
 }
 
 struct FilteredTypeView: View {
-    @SectionedFetchRequest<Date?, Transaction> private var transactions: SectionedFetchResults<Date?, Transaction>
+    @Query private var transactions: [TransactionModel]
 
     var income: Bool
 
+    var displayedTransactions: [TransactionModel] {
+        let now = Date.now
+        return transactions.filter { $0.income == income && ($0.date ?? .distantPast) <= now }
+    }
+
     var body: some View {
         VStack(spacing: 30) {
-            if transactions.count == 0 {
+            if displayedTransactions.count == 0 {
                 NoResultsView(fullscreen: true)
             }
 
-            ListView(transactions: _transactions)
+            ListView(transactions: displayedTransactions)
         }
         .frame(maxHeight: .infinity)
     }
 
     init(income: Bool) {
-        let incomePredicate = NSPredicate(format: "income = %d", income)
-        let datePredicate = NSPredicate(format: "%K <= %@", #keyPath(Transaction.date), Date.now as CVarArg)
-
-        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [incomePredicate, datePredicate])
-
-        _transactions = SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-            SortDescriptor(\.day, order: .reverse),
-            SortDescriptor(\.date, order: .reverse)
-        ], predicate: andPredicate)
-
         self.income = income
+        _transactions = Query(
+            filter: #Predicate<TransactionModel> { $0.income == income },
+            sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse)
+            ]
+        )
     }
 }
 
 struct FilteredCategoryView: View {
-    @SectionedFetchRequest<Date?, Transaction> private var transactions: SectionedFetchResults<Date?, Transaction>
+    @Query private var transactions: [TransactionModel]
 
-    var category: Category?
+    var category: CategoryModel?
+
+    var displayedTransactions: [TransactionModel] {
+        let now = Date.now
+        return transactions.filter { ($0.date ?? .distantPast) <= now }
+    }
 
     var body: some View {
         VStack(spacing: 30) {
-            if transactions.count == 0 || category == nil {
+            if displayedTransactions.count == 0 || category == nil {
                 NoResultsView(fullscreen: true)
             } else {
-                ListView(transactions: _transactions)
+                ListView(transactions: displayedTransactions)
             }
         }
         .frame(maxHeight: .infinity)
     }
 
-    init(category: Category?) {
+    init(category: CategoryModel?) {
         if let unwrappedCategory = category {
-            let categoryPredicate = NSPredicate(format: "%K == %@", #keyPath(Transaction.category), unwrappedCategory)
-            let datePredicate = NSPredicate(format: "%K <= %@", #keyPath(Transaction.date), Date.now as CVarArg)
-
-            let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [categoryPredicate, datePredicate])
-
-            _transactions = SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-                SortDescriptor(\.day, order: .reverse),
-                SortDescriptor(\.date, order: .reverse)
-            ], predicate: andPredicate)
+            let categoryId = unwrappedCategory.id
+            _transactions = Query(
+                filter: #Predicate<TransactionModel> { $0.category?.id == categoryId },
+                sort: [
+                    SortDescriptor(\TransactionModel.day, order: .reverse),
+                    SortDescriptor(\TransactionModel.date, order: .reverse)
+                ]
+            )
         } else {
-            _transactions = SectionedFetchRequest<Date?, Transaction>(sectionIdentifier: \.day, sortDescriptors: [
-                SortDescriptor(\.day, order: .reverse),
-                SortDescriptor(\.date, order: .reverse)
+            _transactions = Query(sort: [
+                SortDescriptor(\TransactionModel.day, order: .reverse),
+                SortDescriptor(\TransactionModel.date, order: .reverse)
             ])
         }
 
@@ -1678,7 +1677,7 @@ struct FilteredCategoryView: View {
 }
 
 struct FilteredDateView: View {
-    @FetchRequest private var transactions: FetchedResults<Transaction>
+    @Query private var transactions: [TransactionModel]
 
     var date: Date
 
@@ -1690,16 +1689,21 @@ struct FilteredDateView: View {
     @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
-    
+
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var showExpenseOrIncomeSign: Bool = true
 
+    var displayedTransactions: [TransactionModel] {
+        let now = Date.now
+        return transactions.filter { $0.day == date && ($0.date ?? .distantPast) <= now }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            if transactions.count == 0 {
+            if displayedTransactions.count == 0 {
                 NoResultsView(fullscreen: true)
             }
-            ForEach(transactions) { transaction in
+            ForEach(displayedTransactions) { transaction in
                 SingleTransactionView(transaction: transaction, showCents: showCents, currencySymbol: currencySymbol, currency: currency, swapTimeLabel: swapTimeLabel, future: false, showExpenseOrIncomeSign: showExpenseOrIncomeSign)
             }
         }
@@ -1707,16 +1711,12 @@ struct FilteredDateView: View {
     }
 
     init(date: Date) {
-        let datePredicate = NSPredicate(format: "%K == %@", #keyPath(Transaction.day), date as CVarArg)
-        let futurePredicate = NSPredicate(format: "%K <= %@", #keyPath(Transaction.date), Date.now as CVarArg)
-
-        let andPredicate = NSCompoundPredicate(type: .and, subpredicates: [futurePredicate, datePredicate])
-
-        _transactions = FetchRequest<Transaction>(sortDescriptors: [
-            SortDescriptor(\.date, order: .reverse)
-        ], predicate: andPredicate)
-
         self.date = date
+        let past = Date.distantPast
+        _transactions = Query(
+            filter: #Predicate<TransactionModel> { ($0.day ?? past) == date },
+            sort: [SortDescriptor(\TransactionModel.date, order: .reverse)]
+        )
     }
 }
 
@@ -1772,10 +1772,15 @@ struct NoResultsView: View {
 }
 
 struct CategoryStepperView: View {
-    @Binding var categoryFilter: Category?
-    @EnvironmentObject var dataController: DataController
+    @Binding var categoryFilter: CategoryModel?
     @State var income = false
-    @State var categories = [Category]()
+
+    @Query(filter: #Predicate<CategoryModel> { $0.income == false }, sort: [SortDescriptor(\CategoryModel.order)]) private var expenseCategories: [CategoryModel]
+    @Query(filter: #Predicate<CategoryModel> { $0.income == true }, sort: [SortDescriptor(\CategoryModel.order)]) private var incomeCategories: [CategoryModel]
+
+    var categories: [CategoryModel] {
+        income ? incomeCategories : expenseCategories
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -1792,15 +1797,11 @@ struct CategoryStepperView: View {
                     .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let fetchRequest = dataController.fetchRequestForCategories(income: false)
-                        let holding = dataController.results(for: fetchRequest)
-
-                        if holding.isEmpty {
+                        if expenseCategories.isEmpty {
                             return
                         } else {
                             income = false
-                            categories = holding
-                            categoryFilter = categories[0]
+                            categoryFilter = expenseCategories[0]
                         }
                     }
             } else {
@@ -1816,15 +1817,11 @@ struct CategoryStepperView: View {
                     .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let fetchRequest = dataController.fetchRequestForCategories(income: true)
-                        let holding = dataController.results(for: fetchRequest)
-
-                        if holding.isEmpty {
+                        if incomeCategories.isEmpty {
                             return
                         } else {
                             income = true
-                            categories = holding
-                            categoryFilter = categories[0]
+                            categoryFilter = incomeCategories[0]
                         }
                     }
             }
@@ -1874,9 +1871,6 @@ struct CategoryStepperView: View {
         .frame(maxWidth: .infinity)
         .frame(height: 30)
         .onAppear {
-            let fetchRequest = dataController.fetchRequestForCategories(income: income)
-            categories = dataController.results(for: fetchRequest)
-
             if categories.isEmpty {
                 categoryFilter = nil
             } else {
@@ -1892,7 +1886,7 @@ struct CategoryStepperView: View {
         }
     }
 
-    func getBackground(category: Category) -> Color {
+    func getBackground(category: CategoryModel) -> Color {
         if category == categoryFilter {
             return Color(hex: category.wrappedColour).opacity(0.3)
         } else {
@@ -1900,7 +1894,7 @@ struct CategoryStepperView: View {
         }
     }
 
-    init(categoryFilter: Binding<Category?>?) {
+    init(categoryFilter: Binding<CategoryModel?>?) {
         _categoryFilter = categoryFilter ?? Binding.constant(nil)
     }
 }
@@ -1964,9 +1958,7 @@ struct IncomeFilterToggleView: View {
 }
 
 struct DateStepperView: View {
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.day)
-    ]) private var transactions: FetchedResults<Transaction>
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
 
     @Binding var date: Date
     var endDate: Date {
@@ -2021,13 +2013,9 @@ struct DateStepperView: View {
 }
 
 struct WeekStepperView: View {
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.day)
-    ]) private var transactions: FetchedResults<Transaction>
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
 
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.day, order: .reverse)
-    ], predicate: NSPredicate(format: "%K < %@", #keyPath(Transaction.date), Date.now as CVarArg)) private var transactionsReversed: FetchedResults<Transaction>
+    @Query private var transactionsReversed: [TransactionModel]
 
     @Binding var showingDate: Date
     var endDate: Date {
@@ -2110,16 +2098,22 @@ struct WeekStepperView: View {
             showingDate = startDate
         }
     }
+
+    init(showingDate: Binding<Date>) {
+        self._showingDate = showingDate
+        let now = Date.now
+        let future = Date.distantFuture
+        _transactionsReversed = Query(
+            filter: #Predicate<TransactionModel> { ($0.date ?? future) < now },
+            sort: [SortDescriptor(\TransactionModel.day, order: .reverse)]
+        )
+    }
 }
 
 struct MonthStepperView: View {
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.day)
-    ]) private var transactions: FetchedResults<Transaction>
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
 
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.day, order: .reverse)
-    ], predicate: NSPredicate(format: "%K < %@", #keyPath(Transaction.date), Date.now as CVarArg)) private var transactionsReversed: FetchedResults<Transaction>
+    @Query private var transactionsReversed: [TransactionModel]
 
     @Binding var showingDate: Date
     var endDate: Date {
@@ -2183,6 +2177,16 @@ struct MonthStepperView: View {
             showingDate = startDate
         }
     }
+
+    init(showingDate: Binding<Date>) {
+        self._showingDate = showingDate
+        let now = Date.now
+        let future = Date.distantFuture
+        _transactionsReversed = Query(
+            filter: #Predicate<TransactionModel> { ($0.date ?? future) < now },
+            sort: [SortDescriptor(\TransactionModel.day, order: .reverse)]
+        )
+    }
 }
 
 func dateConverter(date: Date) -> String {
@@ -2238,7 +2242,7 @@ func timeConverterAccessibilityLabel(date: Date) -> String {
     return dateFormatter.string(from: date)
 }
 
-func dayTotal(dayTransaction: [Transaction]) -> Double {
+func dayTotal(dayTransaction: [TransactionModel]) -> Double {
     var total = 0.0
 
     dayTransaction.forEach { transaction in

@@ -9,7 +9,6 @@ import WidgetKit
 
 struct ContentView: View {
     @EnvironmentObject var appLockVM: AppLockViewModel
-    @EnvironmentObject var dataController: DataController
 
     @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
     @Environment(\.scenePhase) var scenePhase
@@ -31,8 +30,6 @@ struct ContentView: View {
 
     @AppStorage("topEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedTopEdge: Double = 30
     @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedBottomEdge: Double = 15
-
-    // updateSheetShowing
 
     @AppStorage("previousVersion", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var previousVersionString: String = "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"
 
@@ -59,9 +56,6 @@ struct ContentView: View {
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {
-//            UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(false, forKey: "newTransactionAdded")
-//            WidgetCenter.shared.reloadTimelines(ofKind: "TemplateTransactions")
-
             if appLockVM.isAppLockEnabled {
                 appLockVM.appLockValidation()
             }
@@ -77,6 +71,8 @@ struct ContentView: View {
                 showIntro = true
                 firstLaunch = false
                 showUpdateSheet = false
+                dataMigration1 = false
+                dataMigration2 = false
 
                 defaults.set(1, forKey: "firstWeekday")
                 defaults.set(1, forKey: "haptics")
@@ -103,37 +99,9 @@ struct ContentView: View {
                 }
             }
 
-            if dataMigration1 {
-                let categoryFetch = dataController.fetchRequestForCategoriesMigration(income: false)
-                let categories = dataController.results(for: categoryFetch)
-
-                categories.forEach { category in
-                    category.order = Int64(categories.firstIndex(of: category) ?? 0)
-                }
-
-                dataController.save()
-
-                dataMigration1 = false
-            }
-
-            if dataMigration2 {
-                let categoryFetch = dataController.fetchRequestForCategoriesMigration()
-                let categories = dataController.results(for: categoryFetch)
-
-                categories.forEach { category in
-                    if category.income {
-                        category.colour = "#76FBB1"
-                    } else {
-                        if Double(category.wrappedColour) != nil {
-                            category.colour = Color.colourMigrationDictionary[category.wrappedColour] ?? "#FFFFFF"
-                        }
-                    }
-                }
-
-                dataController.save()
-
-                dataMigration2 = false
-            }
+            // Skip CoreData-specific migrations - SwiftData models don't need them
+            dataMigration1 = false
+            dataMigration2 = false
 
             if showUpdateSheet {
                 showUpdate = true

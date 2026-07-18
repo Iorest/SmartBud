@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WidgetKit
+import SwiftData
 
 struct RecentExpenditureWidget: Widget {
     let kind: String = "ExpenditureWidget"
@@ -45,6 +46,15 @@ struct Provider: IntentTimelineProvider {
 
     public typealias Entry = RecentWidgetEntry
 
+    nonisolated(unsafe) static let container: ModelContainer = {
+        let schema = Schema([
+            TransactionModel.self,
+            CategoryModel.self
+        ])
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        return try! ModelContainer(for: schema, configurations: [config])
+    }()
+
     func placeholder(in _: Context) -> RecentWidgetEntry {
         RecentWidgetEntry(date: Date(), amount: loadAmount(type: .week, insightsType: .net), transactions: loadTransactions(type: .week, count: 9), duration: .week, type: .net)
     }
@@ -63,58 +73,88 @@ struct Provider: IntentTimelineProvider {
     }
 
     func loadAmount(type: TimePeriod, insightsType: InsightsType) -> Double {
-//        let dataController = DataController()
-        let dataController = DataController.shared
+        let context = ModelContext(Self.container)
+        let now = Date.now
+        let calendar = Calendar(identifier: .gregorian)
 
-        let timeframe: Int
+        let startDate: Date
 
         switch type {
         case .day:
-            timeframe = 1
+            startDate = calendar.startOfDay(for: now)
         case .week:
-            timeframe = 2
+            var cal = calendar
+            cal.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+            cal.minimumDaysInFirstWeek = 4
+            let dateComponents = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
+            startDate = cal.date(from: dateComponents)!
         case .month:
-            timeframe = 3
+            let dateComponents = calendar.dateComponents([.month, .year], from: now)
+            startDate = calendar.date(from: dateComponents)!
         case .year:
-            timeframe = 4
+            let dateComponents = calendar.dateComponents([.year], from: now)
+            startDate = calendar.date(from: dateComponents)!
         default:
-            timeframe = 0
+            return 0
         }
+
+        let capStart = startDate
 
         switch insightsType {
         case .net:
-            let (amount, positive) = dataController.getLogViewTotalNet(type: timeframe)
-
-            if positive {
-                return amount
-            } else {
-                return -amount
+            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
+            var total = 0.0
+            for t in filtered {
+                total += t.income ? t.amount : -t.amount
             }
+            return total
 
         case .income:
-            return dataController.getLogViewTotalIncome(type: timeframe)
+            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let filtered = allTxns.filter { $0.income && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
+            return filtered.reduce(0) { $0 + $1.amount }
+
         case .expense:
-            return dataController.getLogViewTotalSpent(type: timeframe)
+            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let filtered = allTxns.filter { !$0.income && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
+            return filtered.reduce(0) { $0 + $1.amount }
+
         default:
             return 0
         }
     }
 
     func loadTransactions(type: TimePeriod, count: Int) -> [HoldingTransaction] {
-//        let dataController = DataController()
-        let dataController = DataController.shared
-        let itemRequest = dataController.fetchRequestForRecentTransactionsWithCount(type: type, count: count)
-        let holding = dataController.results(for: itemRequest)
+        let context = ModelContext(Self.container)
+        let now = Date.now
 
-        var sending = [HoldingTransaction]()
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+        calendar.minimumDaysInFirstWeek = 4
 
-        holding.forEach { transaction in
-            let t = HoldingTransaction(colour: transaction.category?.wrappedColour ?? "", note: transaction.wrappedNote, amount: transaction.wrappedAmount, income: transaction.income)
-
-            sending.append(t)
+        let startDate: Date
+        switch type {
+        case .day: startDate = calendar.startOfDay(for: now)
+        case .week:
+            let dc = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
+            startDate = calendar.date(from: dc)!
+        case .month:
+            let dc = calendar.dateComponents([.month, .year], from: now)
+            startDate = calendar.date(from: dc)!
+        case .year:
+            let dc = calendar.dateComponents([.year], from: now)
+            startDate = calendar.date(from: dc)!
+        default: return []
         }
 
-        return sending
+        let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>(sortBy: [SortDescriptor(\TransactionModel.date, order: .reverse)]))) ?? []
+        let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
+        let limited = Array(filtered.prefix(count))
+
+        return limited.map { t in
+            HoldingTransaction(colour: t.wrappedColour, note: t.wrappedNote, amount: t.wrappedAmount, income: t.income)
+        }
     }
 }
 

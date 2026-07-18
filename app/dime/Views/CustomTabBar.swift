@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct CustomTabBar: View {
     @EnvironmentObject var appLockVM: AppLockViewModel
@@ -17,7 +18,7 @@ struct CustomTabBar: View {
 
     @State var checkingFace: Bool = false
 
-    @FetchRequest(sortDescriptors: []) private var transactions: FetchedResults<Transaction>
+    @Query private var transactions: [TransactionModel]
 
     @State var count = 0
     @Binding var counter: Int
@@ -31,6 +32,14 @@ struct CustomTabBar: View {
 
     private var isZoomed: Bool {
         UIScreen.main.scale != UIScreen.main.nativeScale
+    }
+
+    init(currentTab: Binding<String>, topEdge: CGFloat, bottomEdge: CGFloat, counter: Binding<Int>, launchAdd: Bool) {
+        self._currentTab = currentTab
+        self.topEdge = topEdge
+        self.bottomEdge = bottomEdge
+        self._counter = counter
+        self.launchAdd = launchAdd
     }
 
     var body: some View {
@@ -138,7 +147,6 @@ struct BouncyButton: ButtonStyle {
     public func makeBody(configuration: Self.Configuration) -> some View {
         return configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1)
-//            .scaleEffect(configuration.isPressed ? 1.3 : 1)
             .animation(.easeOut(duration: duration), value: configuration.isPressed)
     }
 }

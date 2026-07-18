@@ -23,7 +23,7 @@ struct CategoryView: View {
 
     @State var newCategory = false
 
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", false)) private var expenseCategories: FetchedResults<Category>
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
     @State var showToast = false
     @State var toastTitle = ""
@@ -31,7 +31,7 @@ struct CategoryView: View {
     @State var positive = false
 
     var disabled: Bool {
-        income == false && expenseCategories.count >= 24
+        income == false && categoryVM.expenseCategories.count >= 24
     }
 
     var body: some View {
@@ -134,6 +134,9 @@ struct CategoryView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard, edges: .all)
         .background(Color.PrimaryBackground)
+        .onAppear {
+            categoryVM.load()
+        }
     }
 }
 
@@ -142,9 +145,8 @@ struct CategoryListView: View {
     var mode: CategoryViewMode
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
     @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
 
@@ -153,21 +155,25 @@ struct CategoryListView: View {
 
     @State private var offset: CGFloat = 0
 
-    @FetchRequest private var categories: FetchedResults<Category>
+    var categories: [CategoryModel] {
+        income ? categoryVM.incomeCategories : categoryVM.expenseCategories
+    }
 
     @State var isEditing = false
 
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)]) private var allCategories: FetchedResults<Category>
+    var allCategories: [CategoryModel] {
+        categoryVM.incomeCategories + categoryVM.expenseCategories
+    }
 
     // delete mode
     @State private var deleteMode = false
-    @State private var toDelete: Category?
+    @State private var toDelete: CategoryModel?
     var alertMessage: String {
         "Delete '" + (toDelete?.wrappedName ?? "") + "'?"
     }
 
     // edit mode
-    @State private var toEdit: Category?
+    @State private var toEdit: CategoryModel?
 
     // toasts
     @Binding var showToast: Bool
@@ -603,10 +609,8 @@ struct CategoryListView: View {
                     Button {
                         withAnimation {
                             if let gonnaDelete = toDelete {
-                                moc.delete(gonnaDelete)
+                                categoryVM.delete(gonnaDelete)
                             }
-
-                            dataController.save()
                         }
 
                         toDelete = nil
@@ -696,43 +700,10 @@ struct CategoryListView: View {
     }
 
     private func moveItem(at sets: IndexSet, destination: Int) {
-        let itemToMove = sets.first!
-
-        if itemToMove < destination {
-            var startIndex = itemToMove + 1
-            let endIndex = destination - 1
-            var startOrder = categories[itemToMove].order
-            while startIndex <= endIndex {
-                categories[startIndex].order = startOrder
-                startOrder = startOrder + 1
-                startIndex = startIndex + 1
-            }
-            categories[itemToMove].order = startOrder
-        } else if destination < itemToMove {
-            var startIndex = destination
-            let endIndex = itemToMove - 1
-            var startOrder = categories[destination].order + 1
-            let newOrder = categories[destination].order
-            while startIndex <= endIndex {
-                categories[startIndex].order = startOrder
-                startOrder = startOrder + 1
-                startIndex = startIndex + 1
-            }
-            categories[itemToMove].order = newOrder
-        }
-
-        do {
-            dataController.save()
-        } catch {
-            print(error.localizedDescription)
-        }
+        categoryVM.reorder(from: sets, to: destination, income: income)
     }
 
     init(income: Binding<Bool>, mode: CategoryViewMode, showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
-        _categories = FetchRequest<Category>(sortDescriptors: [
-            SortDescriptor(\.order)
-        ], predicate: NSPredicate(format: "income = %d", income.wrappedValue))
-
         _income = income
         _showToast = showToast
         _toastTitle = toastTitle
@@ -748,16 +719,15 @@ struct NewCategoryAlert: View {
     let bottomSpacers: Bool
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
     @Namespace var animation
 
     // existing categories
 
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", false)) private var expenseCategories: FetchedResults<Category>
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", true)) private var incomeCategories: FetchedResults<Category>
+    var expenseCategories: [CategoryModel] { categoryVM.expenseCategories }
+    var incomeCategories: [CategoryModel] { categoryVM.incomeCategories }
     @State private var availableColours: [String] = Color.colorArray
 
     // state
@@ -949,8 +919,7 @@ struct NewCategoryAlert: View {
                                 }
                         }
                         .popover(isPresented: $showingColourPicker) {
-                            ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker)
-                                .environment(\.managedObjectContext, self.moc)
+                            ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, expenseCategories: expenseCategories)
                         }
                     }
 //
@@ -1042,7 +1011,7 @@ struct NewCategoryAlert: View {
     }
 
     func verification() {
-        let results = dataController.categoryCheck(name: newName, emoji: newEmoji, income: income)
+        let results = categoryVM.validate(name: newName, emoji: newEmoji, income: income)
 
         outcome = results.error
 
@@ -1091,30 +1060,12 @@ struct NewCategoryAlert: View {
             generator.notificationOccurred(.success)
 
             if income {
-                let category = Category(context: moc)
-                category.name = newName.trimmingCharacters(in: .whitespaces).capitalized
-                category.emoji = newEmoji
-                category.dateCreated = Date.now
-                category.id = UUID()
-                category.colour = "IncomeGreen"
-                category.order = results.order
-                category.income = true
-                dataController.save()
+                _ = categoryVM.create(name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: "IncomeGreen", income: true, order: results.order)
 
                 newName = ""
                 newEmoji = ""
             } else {
-                let category = Category(context: moc)
-                category.name = newName.trimmingCharacters(in: .whitespaces).capitalized
-                category.emoji = newEmoji
-                category.dateCreated = Date.now
-                category.id = UUID()
-                category.income = false
-
-                category.colour = selectedColour
-                category.order = results.order
-
-                dataController.save()
+                _ = categoryVM.create(name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour, income: false, order: results.order)
 
                 newName = ""
                 newEmoji = ""
@@ -1197,7 +1148,7 @@ struct NewCategoryAlert: View {
 }
 
 struct EditCategoryAlert: View {
-    let toEdit: Category
+    let toEdit: CategoryModel
     @Binding var showRootToast: Bool
     @Binding var rootToastTitle: String
     @Binding var rootToastImage: String
@@ -1206,15 +1157,14 @@ struct EditCategoryAlert: View {
     let bottomSpacers: Bool
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
     @Namespace var animation
 
     // existing categories
 
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", false)) private var expenseCategories: FetchedResults<Category>
+    var expenseCategories: [CategoryModel] { categoryVM.expenseCategories }
 
     // state
     @State private var newName = ""
@@ -1236,7 +1186,7 @@ struct EditCategoryAlert: View {
 
     // delete mode
     @State private var deleteMode = false
-    @State private var toDelete: Category?
+    @State private var toDelete: CategoryModel?
     var alertMessage: String {
         "Delete '" + (toDelete?.wrappedName ?? "") + "'?"
     }
@@ -1356,8 +1306,7 @@ struct EditCategoryAlert: View {
                                 }
                         }
                         .popover(isPresented: $showingColourPicker) {
-                            ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, toEdit: toEdit)
-                                .environment(\.managedObjectContext, self.moc)
+                            ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, expenseCategories: expenseCategories, toEdit: toEdit)
                         }
                     }
 
@@ -1425,7 +1374,7 @@ struct EditCategoryAlert: View {
     }
 
     func verification() {
-        let results = dataController.categoryCheckEdit(name: newName, emoji: newEmoji, toEdit: toEdit)
+        let results = categoryVM.validateEdit(name: newName, emoji: newEmoji, exclude: toEdit)
 
         outcome = results.error
 
@@ -1470,16 +1419,9 @@ struct EditCategoryAlert: View {
             generator.notificationOccurred(.success)
 
             if toEdit.income {
-                toEdit.name = newName.trimmingCharacters(in: .whitespaces).capitalized
-                toEdit.emoji = newEmoji
-
-                dataController.save()
+                categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: toEdit.colour)
             } else {
-                toEdit.name = newName.trimmingCharacters(in: .whitespaces).capitalized
-                toEdit.emoji = newEmoji
-                toEdit.colour = selectedColour
-
-                dataController.save()
+                categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour)
             }
 
             rootToastTitle = "Edited \(newName)"
@@ -1495,10 +1437,9 @@ struct EditCategoryAlert: View {
 }
 
 struct DeleteCategoryAlert: View {
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var categoryVM: CategoryViewModel
     @Environment(\.dismiss) var dismiss
-    let toDelete: Category
+    let toDelete: CategoryModel
     @Binding var deleted: Bool
     @Environment(\.colorScheme) var systemColorScheme
 
@@ -1536,8 +1477,7 @@ struct DeleteCategoryAlert: View {
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         withAnimation {
-                            moc.delete(toDelete)
-                            dataController.save()
+                            categoryVM.delete(toDelete)
                         }
                     }
 
@@ -1608,10 +1548,11 @@ struct DeleteCategoryAlert: View {
 
 struct SuggestedCategoriesView: View {
     let income: Bool
-    @FetchRequest private var categories: FetchedResults<Category>
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    var categories: [CategoryModel] {
+        income ? categoryVM.incomeCategories : categoryVM.expenseCategories
+    }
 
     var nameArray: [String] {
         var emptyArray = [String]()
@@ -1690,7 +1631,7 @@ struct SuggestedCategoriesView: View {
                     .onTapGesture {
                         // double check
 
-                        let (outcome, _) = dataController.categoryCheck(name: category.name, emoji: category.emoji, income: income)
+                        let (_, outcome, order) = categoryVM.validate(name: category.name, emoji: category.emoji, income: income)
 
                         if outcome != .none {
                             return
@@ -1700,15 +1641,7 @@ struct SuggestedCategoriesView: View {
                         impactMed.impactOccurred()
 
                         if !income {
-                            let suggestedCategory = Category(context: moc)
-                            suggestedCategory.name = NSLocalizedString(category.name, comment: "category name")
-                            suggestedCategory.emoji = category.emoji
-                            suggestedCategory.dateCreated = Date.now
-                            suggestedCategory.id = UUID()
-                            suggestedCategory.colour = selectedColour
-                            suggestedCategory.order = (categories.last?.order ?? 0) + 1
-                            suggestedCategory.income = false
-                            dataController.save()
+                            _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: selectedColour, income: false, order: order)
 
                             availableColours = Color.colorArray
                             categories.forEach { category in
@@ -1723,15 +1656,7 @@ struct SuggestedCategoriesView: View {
                                 selectedColour = availableColours[0]
                             }
                         } else {
-                            let suggestedCategory = Category(context: moc)
-                            suggestedCategory.name = NSLocalizedString(category.name, comment: "category name")
-                            suggestedCategory.emoji = category.emoji
-                            suggestedCategory.dateCreated = Date.now
-                            suggestedCategory.id = UUID()
-                            suggestedCategory.colour = "#76FBB0"
-                            suggestedCategory.order = (categories.last?.order ?? 0) + 1
-                            suggestedCategory.income = true
-                            dataController.save()
+                            _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: "#76FBB0", income: true, order: order)
                         }
                     }
                 }
@@ -1755,10 +1680,6 @@ struct SuggestedCategoriesView: View {
     }
 
     init(income: Bool) {
-        _categories = FetchRequest<Category>(sortDescriptors: [
-            SortDescriptor(\.order)
-        ], predicate: NSPredicate(format: "income = %d", income))
-
         self.income = income
     }
 }
@@ -1951,7 +1872,7 @@ struct ColourPickerView: View {
         .overlay(RoundedRectangle(cornerRadius: 9).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 
-    init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>, toEdit: Category? = nil) {
+    init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>, expenseCategories: [CategoryModel], toEdit: CategoryModel? = nil) {
         _selectedColour = selectedColor
         _showMenu = showMenu
         _showNativePicker = showNativePicker
@@ -1963,11 +1884,7 @@ struct ColourPickerView: View {
 
         var selectedColours = [String]()
 
-        let dataController = DataController.shared
-
-        let categories = dataController.getAllCategories(income: false)
-
-        categories.forEach { category in
+        expenseCategories.forEach { category in
             selectedColours.append(category.wrappedColour)
         }
 

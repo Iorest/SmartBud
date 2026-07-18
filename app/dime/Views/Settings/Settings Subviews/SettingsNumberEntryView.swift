@@ -20,7 +20,7 @@ struct SettingsNumberEntryView: View {
   }
 
   @State private var price: Double = 0
-  @State private var category: Category?
+  @State private var category: CategoryModel?
   @State var isEditingDecimal = false
   @State var decimalValuesAssigned: AssignedDecimal = .none
   @State private var priceString: String = "0"
@@ -50,16 +50,15 @@ struct SettingsNumberEntryView: View {
 
       HStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { option in
+          let isSelected = numberEntryType == (option + 1)
           Text(LocalizedStringKey(options[option]))
             .font(.system(.body, design: .rounded).weight(.semibold))
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            .foregroundColor(
-              numberEntryType == (option + 1) ? Color.PrimaryText : Color.SubtitleText
-            )
+            .foregroundColor(isSelected ? Color.PrimaryText : Color.SubtitleText)
             .padding(6)
             .padding(.horizontal, 8)
             .background {
-              if numberEntryType == (option + 1) {
+              if isSelected {
                 Capsule()
                   .fill(Color.SecondaryBackground)
                   .matchedGeometryEffect(id: "TAB1", in: animation)

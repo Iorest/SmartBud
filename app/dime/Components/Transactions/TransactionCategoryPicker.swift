@@ -7,12 +7,13 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct NewCategoryPickerView: View {
-    @Binding var category: Category?
+    @Binding var category: CategoryModel?
     @Binding var showPicker: Bool
     @Binding var showingCategoryView: Bool
-    @FetchRequest private var categories: FetchedResults<Category>
+    @Query var categories: [CategoryModel]
     @Environment(\.colorScheme) var colorScheme
 
     let layout = [
@@ -81,14 +82,6 @@ struct NewCategoryPickerView: View {
                 RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(Color.SecondaryBackground).shadow(
                     color: colorScheme == .light ? Color.Outline  : Color.clear, radius: 6)
             )
-//            .background(
-//                Color.SecondaryBackground,
-//                in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
-//            )
-//            .overlay {
-//                RoundedRectangle(cornerRadius: 11.5, style: .continuous)
-//                    .strokeBorder(Color.Outline, style: StrokeStyle(lineWidth: 2, dash: [10]))
-//            }
             .contentShape(Rectangle())
             .onTapGesture {
                 let impactMed = UIImpactFeedbackGenerator(style: .light)
@@ -102,13 +95,11 @@ struct NewCategoryPickerView: View {
     }
 
     init(
-        category: Binding<Category?>?, showPicker: Binding<Bool>, showSheet: Binding<Bool>,
+        category: Binding<CategoryModel?>?, showPicker: Binding<Bool>, showSheet: Binding<Bool>,
         income: Bool
     ) {
-        _categories = FetchRequest<Category>(
-            sortDescriptors: [
-                SortDescriptor(\.order, order: .reverse)
-            ], predicate: NSPredicate(format: "income = %d", income))
+        let incomeValue = income
+        _categories = Query(filter: #Predicate<CategoryModel> { $0.income == incomeValue }, sort: [SortDescriptor(\CategoryModel.order, order: .reverse)])
 
         _category = category ?? Binding.constant(nil)
         _showPicker = showPicker

@@ -4,9 +4,8 @@ import SwiftData
 @MainActor
 final class HomeViewModel: ObservableObject {
     static let shared = HomeViewModel()
-    private let repository = DataService.instance
+    private let repo = DataRepository.shared
 
-    // Period type: 1=day, 2=week, 3=month, 4=year
     @Published var periodType: Int = 3
     @Published var totalSpent: Double = 0
     @Published var totalIncome: Double = 0
@@ -14,17 +13,29 @@ final class HomeViewModel: ObservableObject {
     @Published var netPositive: Bool = true
     @Published var recentTransactions: [TransactionModel] = []
 
-    func refreshData() {
-        totalSpent = repository.getTotalSpent(type: periodType)
-        totalIncome = repository.getTotalIncome(type: periodType)
-        let net = repository.getTotalNet(type: periodType)
-        netValue = net.value
-        netPositive = net.positive
-        recentTransactions = Array(repository.fetchAllTransactions().prefix(10))
+    func refresh() {
+        let txns = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
+        let filtered = filterByPeriod(txns, type: periodType)
+        totalSpent = filtered.filter { !$0.income }.reduce(0) { $0 + $1.amount }
+        totalIncome = filtered.filter(\.income).reduce(0) { $0 + $1.amount }
+        let net = totalIncome - totalSpent
+        netValue = abs(net)
+        netPositive = net >= 0
+        recentTransactions = Array(txns.prefix(10))
     }
 
-    func setPeriodType(_ type: Int) {
-        periodType = type
-        refreshData()
+    func setPeriod(_ type: Int) { periodType = type; refresh() }
+
+    private func filterByPeriod(_ txns: [TransactionModel], type: Int) -> [TransactionModel] {
+        let cal = Calendar.current
+        let now = Date.now
+        let start: Date
+        switch type {
+        case 1: start = cal.startOfDay(for: now)
+        case 2: start = cal.date(byAdding: .day, value: -7, to: now)!
+        case 3: start = cal.date(byAdding: .month, value: -1, to: now)!
+        default: start = cal.date(byAdding: .year, value: -1, to: now)!
+        }
+        return txns.filter { ($0.date ?? .distantPast) >= start }
     }
 }

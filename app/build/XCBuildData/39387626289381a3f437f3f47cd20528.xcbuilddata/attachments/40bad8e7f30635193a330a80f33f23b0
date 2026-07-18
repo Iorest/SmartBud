@@ -1,0 +1,216 @@
+{
+  "" : {
+    "const-values" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary.swiftconstvalues",
+    "dependencies" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary.d",
+    "diagnostics" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary.dia",
+    "emit-module-dependencies" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary-emit-module.dia",
+    "pch" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidgetExtension-primary.swiftdeps"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/BudgetIntent/IntentHandler.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/IntentHandler.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/IntentHandler.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/IntentHandler.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/BudgetWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/ExpenditureWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ExpenditureWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/InsightsWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/LockBudgetWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/LockBudgetWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/LockBudgetWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/LockBudgetWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/MainBudgetWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudgetWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudgetWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudgetWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/NewExpenseWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/NewExpenseWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/NewExpenseWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/NewExpenseWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/RecentTransactionsWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentTransactionsWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentTransactionsWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentTransactionsWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/ExpenditureWidget/TemplateTransactionWidget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransactionWidget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransactionWidget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransactionWidget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Budget+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataClass.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataClass.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataClass.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Budget+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataProperties.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataProperties.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Budget+CoreDataProperties.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Category+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataClass.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataClass.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataClass.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Category+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataProperties.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataProperties.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Category+CoreDataProperties.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/MainBudget+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataClass.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataClass.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataClass.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/MainBudget+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataProperties.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataProperties.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainBudget+CoreDataProperties.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/MainModel+CoreDataModel.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainModel+CoreDataModel.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainModel+CoreDataModel.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/MainModel+CoreDataModel.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/TemplateTransaction+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataClass.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataClass.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataClass.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/TemplateTransaction+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataProperties.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataProperties.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TemplateTransaction+CoreDataProperties.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Transaction+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataClass.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataClass.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataClass.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/CoreDataGenerated/MainModel/Transaction+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataProperties.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataProperties.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Transaction+CoreDataProperties.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/BudgetWidgetConfigurationIntent.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidgetConfigurationIntent.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidgetConfigurationIntent.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/BudgetWidgetConfigurationIntent.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/Income.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Income.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Income.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Income.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/InsightsTimePeriod.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsTimePeriod.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsTimePeriod.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsTimePeriod.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/InsightsType.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsType.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsType.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsType.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/InsightsWidgetConfigurationIntent.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidgetConfigurationIntent.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidgetConfigurationIntent.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/InsightsWidgetConfigurationIntent.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/RecentWidgetConfigurationIntent.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentWidgetConfigurationIntent.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentWidgetConfigurationIntent.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/RecentWidgetConfigurationIntent.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/TimePeriod.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TimePeriod.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TimePeriod.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TimePeriod.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/DerivedSources/IntentDefinitionGenerated/WidgetConfiguration/WidgetBudget.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/WidgetBudget.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/WidgetBudget.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/WidgetBudget.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Data/DataController.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DataController.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DataController.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DataController.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Data/Helper.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Helper.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Helper.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Helper.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Models/CategoryCreationErrors.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/CategoryCreationErrors.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/CategoryCreationErrors.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/CategoryCreationErrors.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Models/Currency.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Currency.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Currency.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Currency.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Models/Line.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Line.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Line.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Line.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Shortcuts/ShortcutsEntities.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ShortcutsEntities.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ShortcutsEntities.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/ShortcutsEntities.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Utilities/Color.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Color.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Color.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Color.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Utilities/FontExtension.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/FontExtension.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/FontExtension.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/FontExtension.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Utilities/StringExtension.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/StringExtension.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/StringExtension.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/StringExtension.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Views/Shapes/DonutSemicircle.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DonutSemicircle.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DonutSemicircle.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/DonutSemicircle.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Views/Shapes/Ring.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Ring.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Ring.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/Ring.o"
+  },
+  "/Users/alvin/Workspace/open.source/dimeApp/app/dime/Views/TestView.swift" : {
+    "index-unit-output-path" : "/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TestView.o",
+    "llvm-bc" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TestView.bc",
+    "object" : "/Users/alvin/Workspace/open.source/dimeApp/app/build/dime.build/Release-iphonesimulator/ExpenditureWidgetExtension.build/Objects-normal/x86_64/TestView.o"
+  }
+}

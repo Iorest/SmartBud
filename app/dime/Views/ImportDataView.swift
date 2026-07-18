@@ -22,7 +22,7 @@ enum ProcessingState {
 struct MatchedCategory: Hashable {
     let excelValue: String
     var income: Bool
-    var category: Category?
+    var category: CategoryModel?
 
     mutating func toggleIncome() {
         income = !income
@@ -38,7 +38,8 @@ extension Sequence where Iterator.Element: Hashable {
 
 struct ImportDataView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var categoryVM: CategoryViewModel
+    @EnvironmentObject var transactionVM: TransactionViewModel
 
     @State private var exportSample = false
     @State private var importing = false
@@ -127,12 +128,12 @@ struct ImportDataView: View {
 
     let pointers = ["Ensure that the values in the 'Amount' column do not contain any currency symbols.", "All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am.", "Remove all commas in the 'Note' and 'Category' columns as they would disrupt the parsing of your file."]
 
-    var incomeCategories: [Category] {
-        dataController.getAllCategories(income: true)
+    var incomeCategories: [CategoryModel] {
+        categoryVM.incomeCategories
     }
 
-    var expenseCategories: [Category] {
-        dataController.getAllCategories(income: false)
+    var expenseCategories: [CategoryModel] {
+        categoryVM.expenseCategories
     }
 
     var body: some View {
@@ -768,6 +769,9 @@ struct ImportDataView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard)
         .background(Color.PrimaryBackground)
+        .onAppear {
+            categoryVM.load()
+        }
         .fileImporter(
             isPresented: $importing,
             allowedContentTypes: [.commaSeparatedText]
@@ -900,14 +904,14 @@ struct ImportDataView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormatString
 
-        let categoryDictionary: [String: Category] = Dictionary(uniqueKeysWithValues: uniqueCategories.map { ($0.excelValue, $0.category!) })
+        let categoryDictionary: [String: CategoryModel] = Dictionary(uniqueKeysWithValues: uniqueCategories.map { ($0.excelValue, $0.category!) })
 
         rows.forEach { row in
 //            let rowCategory = categoryDictionary[row[categoryColumnIndex]]
             if let transactionDate = dateFormatter.date(from: row[dateColumnIndex]) {
                 if let rowCategory = categoryDictionary[row[categoryColumnIndex]] {
                     if let transactionAmount = Double(row[amountColumnIndex]) {
-                        _ = dataController.newTransaction(note: row[noteColumnIndex], category: rowCategory, income: rowCategory.income, amount: abs(transactionAmount), date: transactionDate, repeatType: 0, repeatCoefficient: 1, delay: false)
+                        transactionVM.create(note: row[noteColumnIndex], category: rowCategory, income: rowCategory.income, amount: abs(transactionAmount), date: transactionDate, repeatType: 0, repeatCoefficient: 1)
                     } else {
                         processingState = .error
                         errorMessage = "Invalid values in amount column."
@@ -924,8 +928,6 @@ struct ImportDataView: View {
                 return
             }
         }
-
-        dataController.save()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation {
@@ -1001,9 +1003,9 @@ struct ActivityViewController: UIViewControllerRepresentable {
 }
 
 struct MatchCategoryStepperView: View {
-    @Binding var category: Category?
+    @Binding var category: CategoryModel?
     @Binding var pageIndex: Int
-    var categories: [Category]
+    var categories: [CategoryModel]
     var maxIndex: Int
 //
 //    @Environment(\.dynamicTypeSize) var dynamicTypeSize
@@ -1078,9 +1080,9 @@ struct MatchCategoryStepperView: View {
 //        .background(Color.PrimaryBackground, in: )
     }
 
-    func getRows() -> [[Category]] {
-        var rows: [[Category]] = []
-        var currentRow: [Category] = []
+    func getRows() -> [[CategoryModel]] {
+        var rows: [[CategoryModel]] = []
+        var currentRow: [CategoryModel] = []
 
         var totalWidth: CGFloat = 0
 
@@ -1119,7 +1121,7 @@ struct MatchCategoryStepperView: View {
     }
 
     @ViewBuilder
-    func RowView(categoryInput: Category) -> some View {
+    func RowView(categoryInput: CategoryModel) -> some View {
         Button {
             withAnimation {
                 category = categoryInput
@@ -1161,7 +1163,7 @@ struct MatchCategoryStepperView: View {
         .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
     }
 
-    init(category: Binding<Category?>?, categories: [Category], pageIndex: Binding<Int>, maxIndex: Int) {
+    init(category: Binding<CategoryModel?>?, categories: [CategoryModel], pageIndex: Binding<Int>, maxIndex: Int) {
         _category = category ?? Binding.constant(nil)
         _pageIndex = pageIndex
         self.categories = categories

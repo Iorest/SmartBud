@@ -24,7 +24,6 @@ final class UnlockManager: ObservableObject {
     @Published var purchaseCount: Int
     @Published var failedTransaction = false
 
-    private let dataController: DataController
     var loadedProducts = [Product]()
 
     private let productIDs = [
@@ -33,9 +32,8 @@ final class UnlockManager: ObservableObject {
         "com.rafaelsoh.dime.largetip",
     ]
 
-    init(dataController: DataController) {
-        self.dataController = dataController
-        purchaseCount = dataController.tipCounter
+    init() {
+        purchaseCount = UserDefaults(suiteName: "group.com.rafaelsoh.dime")?.integer(forKey: "tipCounter") ?? 0
 
         Task {
             await loadProducts()
@@ -57,7 +55,7 @@ final class UnlockManager: ObservableObject {
             switch result {
             case .success:
                 purchaseCount += 1
-                dataController.tipCounter = purchaseCount
+                UserDefaults(suiteName: "group.com.rafaelsoh.dime")?.set(purchaseCount, forKey: "tipCounter")
             case .userCancelled, .pending:
                 break
             @unknown default:

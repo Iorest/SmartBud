@@ -11,8 +11,8 @@ import SwiftUI
 import WidgetKit
 
 struct TemplateTransactionView: View {
-    @Environment(\.managedObjectContext) var moc
-    @EnvironmentObject var dataController: DataController
+    @EnvironmentObject var transactionVM: TransactionViewModel
+    @EnvironmentObject var categoryVM: CategoryViewModel
     @Environment(\.dismiss) var dismiss
 
     @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
@@ -22,7 +22,7 @@ struct TemplateTransactionView: View {
     @AppStorage("topEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var topEdge: Double = 30
 
     @State private var note = ""
-    @State var category: Category?
+    @State var category: CategoryModel?
     @State private var repeatType = 0
     @State private var repeatCoefficient = 1
     @State private var showRecurring = false
@@ -87,11 +87,11 @@ struct TemplateTransactionView: View {
     @AppStorage("firstTransactionViewLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstLaunch: Bool = true
 
     // edit mode
-    let toEdit: TemplateTransaction?
+    let toEdit: TemplateTransactionModel?
 
     // delete mode
 
-    @State var toDelete: TemplateTransaction?
+    @State var toDelete: TemplateTransactionModel?
     @State var deleteMode = false
 
     @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
@@ -464,9 +464,8 @@ struct TemplateTransactionView: View {
 
                             withAnimation {
                                 if let itemToDelete = toDelete {
-                                    moc.delete(itemToDelete)
+                                    transactionVM.deleteTemplate(itemToDelete)
                                 }
-                                dataController.save()
                             }
 
                             dismiss()
@@ -540,6 +539,7 @@ struct TemplateTransactionView: View {
             }
         }
         .onAppear {
+            categoryVM.load()
             DispatchQueue.main.async {
                 if let transaction = toEdit {
                     let string = String(format: "%.2f", transaction.wrappedAmount)
@@ -672,35 +672,30 @@ struct TemplateTransactionView: View {
             editedTransaction.amount = transactionValue
             editedTransaction.income = income
 
-            editedTransaction.recurringType = Int16(repeatType)
-            editedTransaction.recurringCoefficient = Int16(repeatCoefficient)
+            editedTransaction.recurringType = repeatType
+            editedTransaction.recurringCoefficient = repeatCoefficient
 
-            dataController.save()
+            transactionVM.save()
 
             dismiss()
 
         } else {
-            let transaction = TemplateTransaction(context: moc)
+            let resolvedNote: String
             if note.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-                transaction.note = category?.wrappedName ?? ""
+                resolvedNote = category?.wrappedName ?? ""
             } else {
-                transaction.note = note.trimmingCharacters(in: .whitespaces)
+                resolvedNote = note.trimmingCharacters(in: .whitespaces)
             }
 
-            transaction.income = income
-
-            if let unwrappedCategory = category {
-                transaction.category = unwrappedCategory
-            }
-
-            transaction.amount = transactionValue
-            transaction.id = UUID()
-            transaction.order = Int16(order)
-
-            transaction.recurringType = Int16(repeatType)
-            transaction.recurringCoefficient = Int16(repeatCoefficient)
-
-            dataController.save()
+            transactionVM.createOrUpdateTemplate(
+                order: order,
+                note: resolvedNote,
+                category: category,
+                income: income,
+                amount: transactionValue,
+                repeatType: repeatType,
+                repeatCoefficient: repeatCoefficient
+            )
 
             dismiss()
         }
@@ -710,9 +705,7 @@ struct TemplateTransactionView: View {
 
     init(order: Int) {
 
-        let dataController = DataController.shared
-
-        let toEdit = dataController.getTemplateTransaction(order: order)
+        let toEdit = TransactionViewModel.shared.getTemplate(order)
 
         if let transaction = toEdit {
             _note = State(initialValue: transaction.wrappedNote)
@@ -727,8 +720,8 @@ struct TemplateTransactionView: View {
 
             _income = State(initialValue: transaction.income)
 
-            _repeatType = State(initialValue: Int(transaction.recurringType))
-            _repeatCoefficient = State(initialValue: Int(transaction.recurringCoefficient))
+            _repeatType = State(initialValue: transaction.recurringType)
+            _repeatCoefficient = State(initialValue: transaction.recurringCoefficient)
 
             print("IM HERE")
         }
@@ -739,18 +732,17 @@ struct TemplateTransactionView: View {
 }
 
 struct CategoryRowPickerView: View {
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", false)) private var expenseCategories: FetchedResults<Category>
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.order)], predicate: NSPredicate(format: "income = %d", true)) private var incomeCategories: FetchedResults<Category>
+    @EnvironmentObject var categoryVM: CategoryViewModel
 
-    @Binding var selectedCategory: Category?
+    @Binding var selectedCategory: CategoryModel?
     @State var showCategorySheet = false
     let income: Bool
 
     var empty: Bool {
         if income {
-            return incomeCategories.isEmpty
+            return categoryVM.incomeCategories.isEmpty
         } else {
-            return expenseCategories.isEmpty
+            return categoryVM.expenseCategories.isEmpty
         }
     }
 
@@ -774,7 +766,7 @@ struct CategoryRowPickerView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             ScrollViewReader { value in
                                 HStack(spacing: 8) {
-                                    ForEach(income ? incomeCategories : expenseCategories, id: \.self) { item in
+                                    ForEach(income ? categoryVM.incomeCategories : categoryVM.expenseCategories, id: \.self) { item in
                                         HStack(spacing: 5) {
                                             Text(item.wrappedEmoji)
                                                 .font(.system(size: 13))
@@ -803,11 +795,11 @@ struct CategoryRowPickerView: View {
                                 }
                                 .onChange(of: income) { _, newValue in
                                     if newValue {
-                                        if let firstCategory = incomeCategories.first {
+                                        if let firstCategory = categoryVM.incomeCategories.first {
                                             value.scrollTo(firstCategory.id, anchor: .leading)
                                         }
                                     } else {
-                                        if let firstCategory = expenseCategories.first {
+                                        if let firstCategory = categoryVM.expenseCategories.first {
                                             value.scrollTo(firstCategory.id, anchor: .leading)
                                         }
                                     }
@@ -873,7 +865,7 @@ struct CategoryRowPickerView: View {
         }
     }
 
-    func getBackground(category: Category) -> Color {
+    func getBackground(category: CategoryModel) -> Color {
         if category.income {
             if category == selectedCategory {
                 return Color.IncomeGreen.opacity(0.3)
@@ -889,7 +881,7 @@ struct CategoryRowPickerView: View {
         }
     }
 
-    init(category: Binding<Category?>?, income: Bool) {
+    init(category: Binding<CategoryModel?>?, income: Bool) {
         _selectedCategory = category ?? Binding.constant(nil)
 //        self.categories = categories
 //        let dataController = DataController.shared
@@ -949,10 +941,6 @@ struct SettingsQuickAddWidgetDraggingView: View {
     @State var lastSelectedIndex: Int = 0
 
     @State var refreshID = UUID()
-
-    @FetchRequest(sortDescriptors: [
-        SortDescriptor(\.order)
-    ]) private var transactions: FetchedResults<TemplateTransaction>
 
     let columns = Array(repeating: GridItem(.fixed(100), spacing: 15), count: 2)
 
@@ -1036,7 +1024,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
 }
 
 struct SingleTemplateButton: View {
-    let transaction: TemplateTransaction
+    let transaction: TemplateTransactionModel
     let showCents: Bool
     let currencySymbol: String
     var dollarOffset: CGFloat {
@@ -1113,21 +1101,21 @@ struct SingleTemplateButton: View {
     }
 }
 
+@MainActor
 struct Grid: Identifiable {
     var id: UUID
     var index: Int
-    var transaction: TemplateTransaction?
+    var transaction: TemplateTransactionModel?
 
     init(index: Int) {
         id = UUID()
 
-        let dataController = DataController.shared
-
-        transaction = dataController.getTemplateTransaction(order: index)
+        transaction = TransactionViewModel.shared.getTemplate(index)
         self.index = index
     }
 }
 
+@MainActor
 class GridViewModel: ObservableObject {
     @Published var currentGrid: Grid?
     @Published var dragging = false
@@ -1151,17 +1139,16 @@ class GridViewModel: ObservableObject {
     }
 
     func updateIndices() {
-//        let dataController = DataController()
-        let dataController = DataController.shared
         for (index, element) in gridItems.enumerated() {
             if let transaction = element.transaction {
-                transaction.order = Int16(index)
+                transaction.order = index
             }
         }
-        dataController.save()
+        TransactionViewModel.shared.save()
     }
 }
 
+@MainActor
 struct DropViewDelegate: DropDelegate {
     var grid: Grid
     var gridData: GridViewModel
