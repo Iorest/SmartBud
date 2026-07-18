@@ -12,8 +12,7 @@ struct SettingsSubviewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .navigationBarBackButtonHidden(true)
-            .navigationBarTitle("")
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color.PrimaryBackground)

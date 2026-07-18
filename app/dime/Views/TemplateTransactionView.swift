@@ -30,9 +30,9 @@ struct TemplateTransactionView: View {
 
     var transactionTypeString: String {
         if income {
-            return "Income"
+            return String(localized: "Income")
         } else {
-            return "Expense"
+            return String(localized: "Expense")
         }
     }
 
@@ -82,8 +82,6 @@ struct TemplateTransactionView: View {
     @State var toastTitle = ""
     @State var toastImage = ""
 
-    @ObservedObject var keyboardHeightHelper = KeyboardHeightHelper()
-
     @AppStorage("firstTransactionViewLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstLaunch: Bool = true
 
     // edit mode
@@ -110,7 +108,7 @@ struct TemplateTransactionView: View {
 
     var downsize: (big: CGFloat, small: CGFloat) {
         let amountText: String
-        let size = UIScreen.main.bounds.width - 105
+        let size = ScreenSize.width - 105
 
         if numberEntryType == 2 {
             amountText = amount
@@ -131,13 +129,13 @@ struct TemplateTransactionView: View {
 
     var repeatButtonAccessibility: String {
         if repeatType == 1 {
-            return "transaction recurs daily, button to edit recurring duration"
+            return String(localized: "transaction recurs daily, button to edit recurring duration")
         } else if repeatType == 2 {
-            return "transaction recurs weekly, button to edit recurring duration"
+            return String(localized: "transaction recurs weekly, button to edit recurring duration")
         } else if repeatType == 3 {
-            return "transaction recurs monthly, button to edit recurring duration"
+            return String(localized: "transaction recurs monthly, button to edit recurring duration")
         } else {
-            return "button to make transaction recurring"
+            return String(localized: "button to make transaction recurring")
         }
     }
 
@@ -919,8 +917,7 @@ struct SettingsQuickAddWidgetView: View {
             SettingsQuickAddWidgetDraggingView()
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarTitle("")
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.PrimaryBackground)

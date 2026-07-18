@@ -28,7 +28,7 @@ struct InsightsProvider: IntentTimelineProvider {
 
     public typealias Entry = InsightsWidgetEntry
 
-    nonisolated(unsafe) static let container: ModelContainer = {
+    static let container: ModelContainer = {
         let schema = Schema([TransactionModel.self, CategoryModel.self])
         let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
         return try! ModelContainer(for: schema, configurations: [config])
@@ -386,7 +386,7 @@ struct InsightsWidgetEntryView: View {
                 HStack(spacing: 0) {
                     VStack(spacing: 8) {
                         VStack(alignment: .leading, spacing: -1) {
-                            Text(verbText + subtitleText)
+                            Text("\(verbText)\(subtitleText)")
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -531,7 +531,7 @@ struct InsightsWidgetEntryView: View {
                 HStack(spacing: 0) {
                     VStack(spacing: 8) {
                         VStack(alignment: .leading, spacing: -1) {
-                            Text(verbText + subtitleText)
+                            Text("\(verbText)\(subtitleText)")
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -794,16 +794,13 @@ struct InsightsWidgetDollarView: View {
 
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
-            Group {
-                Text(currencySymbol)
-                    .font(.system(.subheadline, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.SubtitleText) +
+            Text(currencySymbol)
+                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .foregroundColor(Color.SubtitleText)
 
-                Text(dollarText)
-                    .font(.system(.title3, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.PrimaryText)
-            }
-
+            Text(dollarText)
+                .font(.system(.title3, design: .rounded).weight(.medium))
+                .foregroundColor(Color.PrimaryText)
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)

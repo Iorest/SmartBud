@@ -10,19 +10,19 @@ import Foundation
 
 @available(iOS 16, *)
 struct IncomeCategoryEntity: AppEntity, Identifiable {
-    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Category"))
     typealias DefaultQueryType = IncomeCategoryQuery
-    nonisolated(unsafe) static var defaultQuery: IncomeCategoryQuery = .init()
+    static let defaultQuery: IncomeCategoryQuery = .init()
 
     var id: UUID
 
-    @Property(title: "Name")
+    @Property(title: LocalizedStringResource("Name"))
     var name: String
 
-    @Property(title: "Emoji")
+    @Property(title: LocalizedStringResource("Emoji"))
     var emoji: String
 
-    @Property(title: "Income")
+    @Property(title: LocalizedStringResource("Income"))
     var income: Bool
 
     var displayRepresentation: DisplayRepresentation {
@@ -74,19 +74,19 @@ struct IncomeCategoryQuery: EntityStringQuery {
 
 @available(iOS 16, *)
 struct ExpenseCategoryEntity: AppEntity, Identifiable {
-    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Category")
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Category"))
     typealias DefaultQueryType = ExpenseCategoryQuery
-    nonisolated(unsafe) static var defaultQuery: ExpenseCategoryQuery = .init()
+    static let defaultQuery: ExpenseCategoryQuery = .init()
 
     var id: UUID
 
-    @Property(title: "Name")
+    @Property(title: LocalizedStringResource("Name"))
     var name: String
 
-    @Property(title: "Emoji")
+    @Property(title: LocalizedStringResource("Emoji"))
     var emoji: String
 
-    @Property(title: "Income")
+    @Property(title: LocalizedStringResource("Income"))
     var income: Bool
 
     var displayRepresentation: DisplayRepresentation {
@@ -138,16 +138,16 @@ struct ExpenseCategoryQuery: EntityStringQuery {
 
 @available(iOS 16, *)
 struct BudgetEntity: AppEntity, Identifiable {
-    nonisolated(unsafe) static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "Budget")
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Budget"))
     typealias DefaultQueryType = BudgetQuery
-    nonisolated(unsafe) static var defaultQuery: BudgetQuery = .init()
+    static let defaultQuery: BudgetQuery = .init()
 
     var id: UUID
 
-    @Property(title: "Name")
+    @Property(title: LocalizedStringResource("Name"))
     var name: String
 
-    @Property(title: "Emoji")
+    @Property(title: LocalizedStringResource("Emoji"))
     var emoji: String
 
     var displayRepresentation: DisplayRepresentation {

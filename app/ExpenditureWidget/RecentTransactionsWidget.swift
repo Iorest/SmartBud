@@ -12,24 +12,12 @@ import SwiftData
 struct RecentExpenditureWidget: Widget {
     let kind: String = "ExpenditureWidget"
 
-    private var supportedFamilies: [WidgetFamily] {
-        if #available(iOSApplicationExtension 17, *) {
-            return [
-                .accessoryRectangular,
-                .accessoryInline,
-                .systemSmall,
-                .systemLarge
-            ]
-        } else if #available(iOSApplicationExtension 16, *) {
-            return [
-                .accessoryRectangular,
-                .accessoryInline,
-                .systemSmall
-            ]
-        } else {
-            return [.systemSmall]
-        }
-    }
+    private let supportedFamilies: [WidgetFamily] = [
+        .accessoryRectangular,
+        .accessoryInline,
+        .systemSmall,
+        .systemLarge
+    ]
 
     var body: some WidgetConfiguration {
         IntentConfiguration(kind: kind, intent: RecentWidgetConfigurationIntent.self, provider: Provider()) { entry in
@@ -46,7 +34,7 @@ struct Provider: IntentTimelineProvider {
 
     public typealias Entry = RecentWidgetEntry
 
-    nonisolated(unsafe) static let container: ModelContainer = {
+    static let container: ModelContainer = {
         let schema = Schema([
             TransactionModel.self,
             CategoryModel.self
@@ -97,8 +85,6 @@ struct Provider: IntentTimelineProvider {
         default:
             return 0
         }
-
-        let capStart = startDate
 
         switch insightsType {
         case .net:
@@ -304,7 +290,7 @@ struct ExpenditureWidgetEntryView: View {
                 GeometryReader { proxy in
                     VStack(spacing: 0) {
                         VStack(spacing: 0) {
-                            Text((typeText + " " + inlineSubtitleText).uppercased())
+                            Text("\(typeText) \(inlineSubtitleText)".uppercased())
                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -400,7 +386,7 @@ struct ExpenditureWidgetEntryView: View {
                 GeometryReader { proxy in
                     VStack(spacing: 0) {
                         VStack(spacing: 0) {
-                            Text((typeText + " " + inlineSubtitleText).uppercased())
+                            Text("\(typeText) \(inlineSubtitleText)".uppercased())
                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -498,7 +484,7 @@ struct ExpenditureWidgetEntryView: View {
                 GeometryReader { _ in
                     VStack(spacing: 0) {
                         VStack(spacing: 0) {
-                            Text((typeText + " " + inlineSubtitleText).uppercased())
+                            Text("\(typeText) \(inlineSubtitleText)".uppercased())
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -651,16 +637,13 @@ struct RecentTransactionsDollarView: View {
 
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
-            Group {
-                Text(net ? "\(amount < 0 ? "-" : (amount == 0 ? "" : "+"))\(currencySymbol)" : currencySymbol)
-                    .font(.system(bigger ? .title3 : .subheadline, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.SubtitleText) +
+            Text(net ? "\(amount < 0 ? "-" : (amount == 0 ? "" : "+"))\(currencySymbol)" : currencySymbol)
+                .font(.system(bigger ? .title3 : .subheadline, design: .rounded).weight(.medium))
+                .foregroundColor(Color.SubtitleText)
 
-                Text("\(actualAmount, specifier: showCents && actualAmount < 100  ? "%.2f" : "%.0f")")
-                    .font(.system(bigger ? .title : .title3, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.PrimaryText)
-            }
-
+            Text("\(actualAmount, specifier: showCents && actualAmount < 100  ? "%.2f" : "%.0f")")
+                .font(.system(bigger ? .title : .title3, design: .rounded).weight(.medium))
+                .foregroundColor(Color.PrimaryText)
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)

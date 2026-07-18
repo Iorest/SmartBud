@@ -27,7 +27,7 @@ struct BudgetWidgetProvider: IntentTimelineProvider {
 
     public typealias Entry = BudgetWidgetEntry
 
-    nonisolated(unsafe) static let container: ModelContainer = {
+    static let container: ModelContainer = {
         let schema = Schema([
             TransactionModel.self,
             BudgetModel.self,
@@ -82,13 +82,13 @@ struct BudgetWidgetProvider: IntentTimelineProvider {
         let budgetCategory = budgetModel.category
         let now = Date.now
 
-        var txnDesc = FetchDescriptor<TransactionModel>()
+        let txnDesc = FetchDescriptor<TransactionModel>()
         let allTransactions = (try? context.fetch(txnDesc)) ?? []
         let filtered = allTransactions.filter {
             !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
         }
 
-        var holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+        let holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,

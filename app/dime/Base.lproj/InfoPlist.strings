@@ -1,0 +1,4 @@
+/* Localized Info.plist keys for SmartBud */
+/* CFBundleDisplayName is the user-facing app name shown on the home screen */
+
+"CFBundleDisplayName" = "SmartBud";

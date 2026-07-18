@@ -27,17 +27,23 @@ struct SettingsView: View {
     }
   }
 
+  @AppStorage("appLanguage", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  var appLanguage: String = ""
+  var appLanguageString: String {
+    settingsVM.displayName(for: appLanguage)
+  }
+
   @AppStorage("activeIcon", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var activeIcon: String = "AppIcon"
   var appIconString: String {
     if activeIcon == "AppIcon1" {
-      return "v2.0"
+      return String(localized: "v2.0")
     } else if activeIcon == "AppIcon2" {
-      return "Unicorn"
+      return String(localized: "Unicorn")
     } else if activeIcon == "AppIcon3" {
-      return "v1.5"
+      return String(localized: "v1.5")
     } else {
-      return "O.G."
+      return String(localized: "O.G.")
     }
   }
 
@@ -165,6 +171,26 @@ struct SettingsView: View {
 
         ScrollView(showsIndicators: false) {
           VStack(spacing: 5) {
+            Text("PRO")
+              .font(.system(.footnote, design: .rounded).weight(.semibold))
+              .foregroundColor(Color.SubtitleText)
+              .padding(.horizontal, 10)
+              .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(spacing: 13) {
+              NavigationLink(destination: SettingsProView()) {
+                SettingsRowView(
+                  systemImage: "crown.fill", title: "智账 Pro", colour: 200,
+                  optionalText: nil)
+              }
+            }
+            .padding(10)
+            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+          }
+          .padding(.horizontal, 20)
+          .padding(.bottom, 25)
+
+          VStack(spacing: 5) {
             Text("GENERAL")
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
@@ -265,6 +291,12 @@ struct SettingsView: View {
                 SettingsRowView(
                   systemImage: "app.badge.fill", title: "App Icon", colour: 101,
                   optionalText: appIconString)
+              }
+
+              NavigationLink(destination: SettingsLanguageView()) {
+                SettingsRowView(
+                  systemImage: "globe", title: "Language", colour: 132,
+                  optionalText: appLanguageString)
               }
 
               ToggleRow(
@@ -419,29 +451,6 @@ struct SettingsView: View {
                 SettingsRowView(systemImage: "star.fill", title: "Rate on App Store", colour: 126)
               }
 
-              Button {
-                shareSheet(url: "https://apps.apple.com/app/id1635280255")
-              } label: {
-                SettingsRowView(systemImage: "shareplay", title: "Share with Friends", colour: 127)
-              }
-
-              Button {
-                if let url = URL(string: "https://www.x.com/budgetwithdime") {
-                  UIApplication.shared.open(url)
-                }
-              } label: {
-                SettingsRowView(systemImage: "bird.fill", title: "Follow Dime on X", colour: 128)
-                  .frame(maxWidth: .infinity)
-              }
-
-              Button {
-                if let url = URL(string: "https://www.x.com/rarfell") {
-                  UIApplication.shared.open(url)
-                }
-              } label: {
-                SettingsRowView(
-                  systemImage: "camera.fill", title: "Follow Rafael on X", colour: 129)
-              }
             }
             .padding(10)
             .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
@@ -453,7 +462,7 @@ struct SettingsView: View {
             HStack(spacing: 3) {
               let appVersion = UIApplication.appVersion ?? ""
               let buildNumber = UIApplication.buildNumber ?? ""
-              Text(String(localized: "Version \(appVersion) (\(buildNumber))"))
+              Text(String(format: String(localized: "Version %@ (%@)"), appVersion, buildNumber))
                 .font(.system(.footnote, design: .rounded).weight(.medium))
 
                 //                                .font(.system(size: 14, weight: .medium, design: .rounded))
@@ -473,7 +482,11 @@ struct SettingsView: View {
                 }
             }
 
-            Text("Made with ❤️ by \(makeAttributedString()) from 🇸🇬")
+            Text(
+              AttributedString(String(localized: "Made with ❤️ by "))
+                + makeAttributedString()
+                + AttributedString(String(localized: " from 🇸🇬"))
+            )
               .font(.system(.footnote, design: .rounded).weight(.medium))
 
               .foregroundColor(Color.SubtitleText)
@@ -485,8 +498,6 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
       }
-      .navigationBarTitle("")
-      .navigationBarHidden(true)
       .background(Color.PrimaryBackground)
       .fullScreenCover(isPresented: $showTipJarMenu) {
         TipJarAlert()
@@ -513,7 +524,7 @@ struct SettingsView: View {
         )
         .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
 
-      Text(text)
+      Text(String(localized: String.LocalizationValue(text)))
         .font(.system(.body, design: .rounded).weight(.medium))
         .lineLimit(1)
         .foregroundColor(Color.PrimaryText)
@@ -573,9 +584,9 @@ struct SettingsView: View {
       let type: String
 
       if transaction.income {
-        type = "Income"
+        type = String(localized: "Income")
       } else {
-        type = "Expense"
+        type = String(localized: "Expense")
       }
 
       string.removeAll(where: { $0 == "," })
@@ -620,11 +631,11 @@ struct TipJarAlert: View {
 
   var bottomCaption: String {
     if unlockManager.failedTransaction {
-      return "Tip failed to go through, please try again!"
+      return String(localized: "Tip failed to go through, please try again!")
     } else if unlockManager.purchaseCount > 0 {
-      return "Thanks a million, \(Image(systemName: "heart.fill")) Rafael"
+      return String(localized: "Thanks a million, Rafael")
     } else {
-      return "Have a great day ahead!"
+      return String(localized: "Have a great day ahead!")
     }
   }
 
@@ -860,7 +871,7 @@ struct SettingsRowView: View {
         )
         .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
 
-      Text(LocalizedStringKey(title))
+      Text(String(localized: String.LocalizationValue(title)))
         .font(.system(.body, design: .rounded).weight(.medium))
 
         //                .font(.system(size: 17, weight: .medium, design: .rounded))
@@ -893,10 +904,9 @@ struct SettingsCategoryView: View {
   @Environment(\.dismiss) var dismiss
 
   var body: some View {
-    CategoryView(mode: .settings, income: false)
+      CategoryView(mode: .settings, income: false)
       .navigationBarBackButtonHidden(true)
-      .navigationBarTitle("")
-      .navigationBarHidden(true)
+      .toolbar(.hidden, for: .navigationBar)
       .background(Color.PrimaryBackground)
   }
 }

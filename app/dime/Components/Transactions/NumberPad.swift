@@ -56,7 +56,7 @@ struct NumberPad: View {
                         Button {
                             isEditingDecimal = true
                         } label: {
-                            Text(".")
+                            Text(Locale.current.decimalSeparator ?? ".")
                                 .font(.system(size: 34, weight: .regular, design: .rounded))
                                 .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                 .background(Color.SecondaryBackground)
@@ -293,11 +293,10 @@ struct NumberPadTextView: View {
     }
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 0) {
-            Group {
-                Text(currencySymbol)
-                    .font(.system(.largeTitle, design: .rounded))
-                    .foregroundColor(Color.SubtitleText)
+        HStack(alignment: .lastTextBaseline, spacing: 1) {
+            Text(currencySymbol)
+                .font(.system(.largeTitle, design: .rounded))
+                .foregroundColor(Color.SubtitleText)
 
 //                ForEach(displayNumbers, id: \.self) { number in
 //                    Text(number)
@@ -306,11 +305,10 @@ struct NumberPadTextView: View {
 //                        .transition(AnyTransition.opacity.combined(with: .scale).combined(with: .move(edge: .trailing)))
 //                }
 
-                + Text(amount)
-                    .font(.system(size: largerFontSize, weight: .regular, design: .rounded))
-                    .foregroundColor(Color.PrimaryText)
+            Text(amount)
+                .font(.system(size: largerFontSize, weight: .regular, design: .rounded))
+                .foregroundColor(Color.PrimaryText)
 
-            }
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)

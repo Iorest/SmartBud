@@ -11,15 +11,15 @@ import SwiftUI
 
 @available(iOS 16.4, *)
 struct BudgetIntent: AppIntent {
-    nonisolated(unsafe) static var title: LocalizedStringResource = "Get Budget Insights"
+    static let title: LocalizedStringResource = "Get Budget Insights"
 
-    nonisolated(unsafe) static var description =
-        IntentDescription("Extract leftover amount for a particular budget")
+    static let description =
+        IntentDescription(LocalizedStringResource("Extract leftover amount for a particular budget"))
 
-    @Parameter(title: "Budget Type", requestValueDialog: IntentDialog("What budget type would you like to extract insights from?"))
+    @Parameter(title: LocalizedStringResource("Budget Type"), requestValueDialog: IntentDialog(LocalizedStringResource("What budget type would you like to extract insights from?")))
     var type: ShortcutsBudgetsType
 
-    @Parameter(title: "Category Budget", requestValueDialog: IntentDialog("Select a categorical budget."))
+    @Parameter(title: LocalizedStringResource("Category Budget"), requestValueDialog: IntentDialog(LocalizedStringResource("Select a categorical budget.")))
     var budget: BudgetEntity?
 
     @MainActor
@@ -46,7 +46,7 @@ struct BudgetIntent: AppIntent {
             }
         }
 
-        return .result(value: amount, dialog: "Here you go!") {
+        return .result(value: amount, dialog: IntentDialog(stringLiteral: String(localized: "Here you go!"))) {
             ShortcutBudgetView(amount: amount, type: budgetType)
         }
     }
@@ -54,13 +54,13 @@ struct BudgetIntent: AppIntent {
     static var parameterSummary: some ParameterSummary {
         Switch(\BudgetIntent.$type) {
             Case(ShortcutsBudgetsType.category) {
-                Summary("Calculate leftover amount for the \(\.$budget) \(\.$type)")
+                Summary("Calculate leftover amount for the \(\.$budget) \(\.$type)", table: "Localizable")
             }
             Case(ShortcutsBudgetsType.overall) {
-                Summary("Calculate leftover amount for the \(\.$type)")
+                Summary("Calculate leftover amount for the \(\.$type)", table: "Localizable")
             }
             DefaultCase {
-                Summary("Calculate leftover amount for the \(\.$type)")
+                Summary("Calculate leftover amount for the \(\.$type)", table: "Localizable")
             }
         }
     }
@@ -73,12 +73,12 @@ enum ShortcutsBudgetsType: String {
 @available(iOS 16, *)
 extension ShortcutsBudgetsType: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        return TypeDisplayRepresentation(name: "Budget Type")
+        return TypeDisplayRepresentation(name: LocalizedStringResource("Budget Type"))
     }
 
-    nonisolated(unsafe) static var caseDisplayRepresentations: [ShortcutsBudgetsType: DisplayRepresentation] = [
-        .overall: DisplayRepresentation(title: "overall budget"),
-        .category: DisplayRepresentation(title: "categorical budget")
+    static let caseDisplayRepresentations: [ShortcutsBudgetsType: DisplayRepresentation] = [
+        .overall: DisplayRepresentation(title: LocalizedStringResource("overall budget")),
+        .category: DisplayRepresentation(title: LocalizedStringResource("categorical budget"))
     ]
 }
 

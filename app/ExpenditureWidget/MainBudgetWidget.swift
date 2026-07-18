@@ -29,7 +29,7 @@ struct MainBudgetWidget: Widget {
 struct MainBudgetWidgetProvider: TimelineProvider {
     typealias Entry = MainBudgetWidgetEntry
 
-    nonisolated(unsafe) static let container: ModelContainer = {
+    static let container: ModelContainer = {
         let schema = Schema([
             MainBudgetModel.self,
             TransactionModel.self
@@ -72,13 +72,13 @@ struct MainBudgetWidgetProvider: TimelineProvider {
         let budgetStartDate = budget.startDate
         let now = Date.now
 
-        var descriptor = FetchDescriptor<TransactionModel>()
+        let descriptor = FetchDescriptor<TransactionModel>()
         let allTransactions = (try? context.fetch(descriptor)) ?? []
         let filtered = allTransactions.filter {
             !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
         }
 
-        var holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+        let holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
 
         let percentageOfDays: Double
         let calendar = Calendar.current

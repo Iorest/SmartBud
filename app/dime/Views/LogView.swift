@@ -68,13 +68,13 @@ struct LogView: View {
                     .padding(.bottom, 20)
                     .accessibility(hidden: true)
 
-                Text("Your Log is Empty")
+                Text(String(localized: "Your Log is Empty"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
 //                    .font(.system(size: 23.5, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color.PrimaryText.opacity(0.8))
 
-                Text("Press the plus button\nto add your first entry")
+                Text(String(localized: "Press the plus button\nto add your first entry"))
                     .font(.system(.body, design: .rounded).weight(.medium))
 //                    .font(.system(size: 18, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -106,7 +106,7 @@ struct LogView: View {
                                         .opacity(progress)
                                 }
                         }
-                        .accessibilityLabel(Text("Search"))
+                        .accessibilityLabel(Text(String(localized: "Search")))
 
                         Spacer()
 
@@ -157,7 +157,7 @@ struct LogView: View {
 //                                    }
                                 }
                         }
-                        .accessibilityLabel(Text("Filter"))
+                        .accessibilityLabel(Text(String(localized: "Filter")))
                         .popover(isPresented: $showFilter) {
                             FilterPickerView(filterType: $filter, showMenu: $showFilter)
                         }
@@ -302,7 +302,7 @@ struct LogView: View {
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .foregroundColor(Color.PrimaryText.opacity(0.7))
             }
-            .accessibilityLabel(Text("remove filter"))
+            .accessibilityLabel(Text(String(localized: "remove filter")))
         }
         .padding(4)
         .padding(.horizontal, 6)
@@ -374,106 +374,27 @@ struct LogInsightsView: View {
     let currencySymbol: String
 
     @State var showMenu1 = false
-    let subtitleText = ["today", "this week", "this month", "this year", "all time"]
 
     @AppStorage("logInsightsTimeFrame", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var timeframe = 2
     @AppStorage("logInsightsType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var insightsType = 1
 
     @AppStorage("logViewLineGraph", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var lineGraph: Bool = false
 
-    var netTotal: (value: Double, positive: Bool) {
-        insightsVM.getLogViewTotalNet(type: timeframe)
-    }
-
-    var range: Int {
-        var calendar = Calendar(identifier: .gregorian)
-
-        calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")?.integer(forKey: "firstWeekday") ?? 0
-        calendar.minimumDaysInFirstWeek = 4
-
-        if timeframe == 3 {
-            let dateComponents = calendar.dateComponents([.month, .year], from: Date.now)
-
-            let thisMonth = calendar.date(from: dateComponents) ?? Date.now
-            let numberOfDays = calendar.dateComponents([.day], from: thisMonth, to: Date.now)
-
-            return (numberOfDays.day ?? 0) + 1
-        } else if timeframe == 4 {
-            let dateComponents = calendar.dateComponents([.year], from: Date.now)
-
-            let thisYear = calendar.date(from: dateComponents) ?? Date.now
-
-            let numberOfMonths = calendar.dateComponents([.month], from: thisYear, to: Date.now)
-
-            return (numberOfMonths.month ?? 0) + 1
-        } else {
-            let dateComponents = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: Date.now)
-            let thisWeek = calendar.date(from: dateComponents) ?? Date.now
-            let numberOfDays = calendar.dateComponents([.day], from: thisWeek, to: Date.now)
-
-            return (numberOfDays.day ?? 0) + 1
-        }
-    }
-
-    var totalSpent: Double {
-        return insightsVM.getLogViewTotalSpent(type: timeframe)
-    }
-
-    var totalIncome: Double {
-        return insightsVM.getLogViewTotalIncome(type: timeframe)
-    }
-
-    var lineGraphData: [LineGraphDataPoint] {
-        if insightsType == 1 {
-            return insightsVM.getLogLineGraphDataNet(type: timeframe)
-        } else if insightsType == 2 {
-            return insightsVM.getLogLineGraphData(income: true, type: timeframe)
-        } else {
-            return insightsVM.getLogLineGraphData(income: false, type: timeframe)
-        }
-    }
-
-    var lineGraphGreen: Bool {
-        if insightsType == 1 {
-            return (lineGraphData.first?.amount ?? 0.0) < (lineGraphData.last?.amount ?? 0.0)
-        } else if insightsType == 2 {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    var amount: Double {
-        if insightsType == 1 {
-            return netTotal.value
-        } else if insightsType == 2 {
-            return totalIncome
-        } else {
-            return totalSpent
-        }
-    }
-
-    var headingText: String {
-        if insightsType == 1 {
-            return "Net total"
-        } else if insightsType == 2 {
-            return "Earned"
-        } else {
-            return "Spent"
-        }
+    private var data: InsightsViewModel.LogInsightsData {
+        insightsVM.logInsightsData(timeframe: timeframe, insightsType: insightsType)
     }
 
     var body: some View {
         VStack(spacing: -3) {
             VStack(spacing: 2) {
                 HStack(spacing: 4) {
-                    Text(LocalizedStringKey(headingText))
+                    Text(data.headingText)
                         .font(.system(.body, design: .rounded).weight(.medium))
                         .foregroundColor(Color.PrimaryText.opacity(0.9))
                     Button {
                         showMenu1 = true
                     } label: {
-                        Text(LocalizedStringKey(subtitleText[timeframe - 1]))
+                        Text(data.rangeLabel)
                             .padding(2)
                             .padding(.horizontal, 6)
                             .font(.system(.body, design: .rounded).weight(.medium))
@@ -485,7 +406,7 @@ struct LogInsightsView: View {
                     }
                 }
 
-                NumberView(number: amount, dynamicTypeSize: _dynamicTypeSize.wrappedValue, netTotal: insightsType == 1, positive: netTotal.positive, showCents: showCents, currencySymbol: currencySymbol)
+                NumberView(number: data.amount, dynamicTypeSize: _dynamicTypeSize.wrappedValue, netTotal: insightsType == 1, positive: data.netPositive, showCents: showCents, currencySymbol: currencySymbol)
             }
             .padding(7)
             .contentShape(Rectangle())
@@ -494,7 +415,7 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 3
                     } label: {
-                        Label("Total Spent", systemImage: "minus")
+                        Label(String(localized: "Total Spent"), systemImage: "minus")
                     }
                 }
 
@@ -502,7 +423,7 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 2
                     } label: {
-                        Label("Total Income", systemImage: "plus")
+                        Label(String(localized: "Total Income"), systemImage: "plus")
                     }
                 }
 
@@ -510,29 +431,16 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 1
                     } label: {
-                        Label("Net Total", systemImage: "alternatingcurrent")
+                        Label(String(localized: "Net Total"), systemImage: "alternatingcurrent")
                     }
                 }
             }
 
-            if totalSpent != 0 && totalIncome != 0 && insightsType == 1 {
+            if data.totalSpent != 0 && data.totalIncome != 0 && insightsType == 1 {
                 HStack {
-//                    if showCents {
-//                        Text("+\(totalIncome, specifier: "%.2f")")
-//                            .font(.system(size: 18, weight: .medium, design: .rounded))
-//                            .foregroundColor(Color.IncomeGreen)
-//                            .lineLimit(1)
-//                    } else {
-//                        Text("+\(Int(floor(totalIncome)))")
-//                            .font(.system(size: 18, weight: .medium, design: .rounded))
-//                            .foregroundColor(Color.IncomeGreen)
-//                            .lineLimit(1)
-//                    }
-
-                    Text("+\(formatNumber(showCents: showCents, number: totalIncome))")
+                    Text(data.formattedIncome)
                         .font(.system(.title2, design: .rounded).weight(.medium))
                         .minimumScaleFactor(0.5)
-//                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(Color.IncomeGreen)
                         .lineLimit(1)
 
@@ -541,30 +449,17 @@ struct LogInsightsView: View {
                         .frame(width: 1.7, height: 15)
                         .foregroundColor(Color.Outline)
 
-                    Text("-\(formatNumber(showCents: showCents, number: totalSpent))")
+                    Text(data.formattedSpent)
                         .font(.system(.title2, design: .rounded).weight(.medium))
                         .minimumScaleFactor(0.5)
-//                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(Color.AlertRed)
                         .lineLimit(1)
-
-//                    if showCents {
-//                        Text("-\(totalSpent, specifier: "%.2f")")
-//                            .font(.system(size: 18, weight: .medium, design: .rounded))
-//                            .foregroundColor(Color.AlertRed)
-//                            .lineLimit(1)
-//                    } else {
-//                        Text("-\(Int(floor(totalSpent)))")
-//                            .font(.system(size: 18, weight: .medium, design: .rounded))
-//                            .foregroundColor(Color.AlertRed)
-//                            .lineLimit(1)
-//                    }
                 }
                 .padding(.bottom, 13)
             }
 
             if lineGraph {
-                LineGraph(data: lineGraphData, green: lineGraphGreen, type: timeframe, range: range)
+                LineGraph(data: data.lineGraphData, green: data.lineGraphGreen, type: timeframe, range: data.range)
                     .frame(height: 25)
                     .padding(.horizontal, 60)
                     .padding(.top, 16)
@@ -573,14 +468,6 @@ struct LogInsightsView: View {
         .padding([.bottom, .horizontal], 20)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .frame(height: lineGraph ? 240 : 170)
-    }
-
-    func formatNumber(showCents: Bool, number: Double) -> String {
-        if showCents {
-            return String(format: "%.2f", number)
-        } else {
-            return String(format: "%d", Int(floor(number)))
-        }
     }
 }
 
@@ -600,7 +487,7 @@ struct SearchView: View {
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundColor(Color.DarkIcon.opacity(0.8))
                         .accessibility(hidden: true)
-                    TextField("Search entry by note", text: $searchQuery)
+                    TextField(String(localized: "Search entry by note"), text: $searchQuery)
                         .focused($searchFocused)
                         .font(.system(.body, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -627,7 +514,7 @@ struct SearchView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text("Cancel")
+                    Text(String(localized: "Cancel"))
                         .foregroundColor(Color.PrimaryText)
                         .font(.system(.body, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -664,12 +551,12 @@ struct FilteredSearchView: View {
                     Text("📭️")
                         .font(.system(size: 50))
                         .padding(.bottom, 15)
-                    Text("No entries found.")
+                    Text(String(localized: "No entries found."))
                         .font(.system(.title3, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(Color.PrimaryText)
-                    Text("Try a different search query!")
+                    Text(String(localized: "Try a different search query!"))
                         .font(.system(.subheadline, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 14, weight: .regular, design: .rounded))
@@ -961,7 +848,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundColor(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("\(currencySymbol)\(String(format: "%.2f", filtered.string)) was spent \(dateConverterAccessibilityLabel(date: day.day))")
+                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, String(format: "%.2f", filtered.string), dateConverterAccessibilityLabel(date: day.day)))
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -985,7 +872,7 @@ struct ListView: View {
 
                             self.toastPresenter.showToast.toggle()
                         } label: {
-                            Label("Save as Photo", systemImage: "square.and.arrow.up")
+                            Label(String(localized: "Save as Photo"), systemImage: "square.and.arrow.up")
                         }
                     }
                 }
@@ -1110,7 +997,7 @@ struct FutureListView: View {
             VStack(spacing: 0) {
                 VStack(spacing: 4) {
                     HStack {
-                        Text("UPCOMING")
+                        Text(String(localized: "UPCOMING"))
                         Spacer()
 
                         Text(totalString)
@@ -1174,11 +1061,11 @@ struct SingleTransactionView: View {
     @State private var offset: CGFloat = 0
     @State private var deleted: Bool = false
     var deletePopup: Bool {
-        return abs(offset) > UIScreen.main.bounds.width * 0.2
+        return abs(offset) > ScreenSize.width * 0.2
     }
 
     var deleteConfirm: Bool {
-        return abs(offset) > UIScreen.main.bounds.width * 0.42
+        return abs(offset) > ScreenSize.width * 0.42
     }
 
     @GestureState var isDragging = false
@@ -1282,17 +1169,16 @@ struct SingleTransactionView: View {
             .contextMenu {
                 if transaction.recurringType > 0 {
                     Button {
-                        transaction.recurringType = 0
-                        transactionVM.save()
+                        transactionVM.stopRecurring(transaction)
                     } label: {
-                        Label("Stop Recurring", systemImage: "xmark")
+                        Label(String(localized: "Stop Recurring"), systemImage: "xmark")
                     }
                 }
 
                 Button {
                     transactionManager.toEdit = transaction
                 } label: {
-                    Label("Edit", systemImage: "pencil")
+                    Label(String(localized: "Edit"), systemImage: "pencil")
                 }
 
                 if !(future && transaction.wrappedDate < Date.now && transaction.recurringType > 0) {
@@ -1304,13 +1190,13 @@ struct SingleTransactionView: View {
 //                        toDelete = transaction
 //                        deleteMode = true
                     } label: {
-                        Label("Delete", systemImage: "xmark.bin")
+                        Label(String(localized: "Delete"), systemImage: "xmark.bin")
                     }
                 }
             }
             .offset(x: offset)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(transaction.wrappedNote), \(currencySymbol)\(String(format: "%.2f", transaction.wrappedAmount)), Transaction Category: \(transaction.category?.wrappedName ?? "Unknown"), Transaction made at \(timeConverterAccessibilityLabel(date: transaction.wrappedDate))")
+            .accessibilityLabel(String(format: String(localized: "%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, String(format: "%.2f", transaction.wrappedAmount), transaction.category?.wrappedName ?? String(localized: "Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
         }
         .onChange(of: deletePopup) { _, _ in
             if deletePopup {
@@ -1339,14 +1225,13 @@ struct SingleTransactionView: View {
                     if deleteConfirm {
                         deleted = true
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            offset -= UIScreen.main.bounds.width
+                            offset -= ScreenSize.width
                         }
 
                         if future, transaction.wrappedDate < Date.now, transaction.recurringType > 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 withAnimation(.easeInOut(duration: 0.5)) {
-                                    transaction.recurringType = 0
-                                    transactionVM.save()
+                                    transactionVM.stopRecurring(transaction)
                                 }
                             }
                         } else {
@@ -1487,14 +1372,14 @@ struct DeleteTransactionAlert: View {
     var body: some View {
         if let unwrappedToDelete = transactionManager.toDelete {
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(stopRecurring ? "Stop Recurring?" : "Delete '\(unwrappedToDelete.wrappedNote)'?")
+                Text(stopRecurring ? String(localized: "Stop Recurring?") : String(format: String(localized: "Delete '%@'?"), unwrappedToDelete.wrappedNote))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 25, weight: .medium, design: .rounded))
                     .foregroundColor(.PrimaryText)
-                    .accessibilityLabel("Delete \(unwrappedToDelete.wrappedNote) transaction confirmation. This action cannot be undone.")
+                    .accessibilityLabel(String(format: String(localized: "Delete %@ transaction confirmation. This action cannot be undone."), unwrappedToDelete.wrappedNote))
 
-                Text(stopRecurring ? "The transaction will no longer be automatically logged." : "This action cannot be undone.")
+                Text(String(localized: stopRecurring ? "The transaction will no longer be automatically logged." : "This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
@@ -1507,8 +1392,7 @@ struct DeleteTransactionAlert: View {
 
                     if stopRecurring {
                         withAnimation(.easeInOut(duration: 0.5)) {
-                            unwrappedToDelete.recurringType = 0
-                            transactionVM.save()
+                            transactionVM.stopRecurring(unwrappedToDelete)
                         }
                     } else {
                         withAnimation(.easeInOut(duration: 0.5)) {
@@ -1517,14 +1401,14 @@ struct DeleteTransactionAlert: View {
                         }
                     }
                 } label: {
-                    DeleteButton(text: stopRecurring ? "Confirm" : "Delete", red: true)
+                    DeleteButton(text: String(localized: stopRecurring ? "Confirm" : "Delete"), red: true)
                 }
                 .padding(.bottom, 8)
 
                 Button {
                     transactionManager.showPopup = false
                 } label: {
-                    DeleteButton(text: "Cancel", red: false)
+                    DeleteButton(text: String(localized: "Cancel"), red: false)
                 }
             }
             .padding(13)
@@ -1734,7 +1618,7 @@ struct NoResultsView: View {
 //                    .font(.system(size: 38, weight: .regular, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
 
-                Text("No entries found.")
+                Text(String(localized: "No entries found."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 21, weight: .medium, design: .rounded))
@@ -1743,7 +1627,7 @@ struct NoResultsView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .center)
-            .frame(height: UIScreen.main.bounds.height * 0.7)
+            .frame(height: ScreenSize.height * 0.7)
             .opacity(0.7)
         } else {
             VStack(spacing: 12) {
@@ -1758,7 +1642,7 @@ struct NoResultsView: View {
                     .font(.system(size: 38, weight: .regular, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
 
-                Text("No entries found.")
+                Text(String(localized: "No entries found."))
                     .font(.system(size: 21, weight: .medium, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
 
@@ -1906,7 +1790,7 @@ struct IncomeFilterToggleView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text("Expense")
+            Text(String(localized: "Expense"))
 //                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -1986,7 +1870,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: -1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("previous day"))
+            .accessibilityLabel(Text(String(localized: "previous day")))
 
             Spacer()
 
@@ -1994,7 +1878,7 @@ struct DateStepperView: View {
                 .font(.system(.title3, design: .rounded).weight(.bold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .accessibilityLabel("showing transactions on \(dateString)")
+                .accessibilityLabel(String(format: String(localized: "showing transactions on %@"), dateString))
 
             Spacer()
 
@@ -2003,7 +1887,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: 1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("next day"))
+            .accessibilityLabel(Text(String(localized: "next day")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2055,7 +1939,7 @@ struct WeekStepperView: View {
         let endComponents = DateComponents(day: 7, second: -1)
         let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
 
-        return "showing transactions from " + dateFormatter.string(from: showingDate) + " to " + dateFormatter.string(from: endWeekDate)
+        return String(format: String(localized: "showing transactions from %@ to %@"), dateFormatter.string(from: showingDate), dateFormatter.string(from: endWeekDate))
     }
 
     var body: some View {
@@ -2065,7 +1949,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: -7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("previous week"))
+            .accessibilityLabel(Text(String(localized: "previous week")))
 
             Spacer()
 
@@ -2080,7 +1964,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: 7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("next week"))
+            .accessibilityLabel(Text(String(localized: "next week")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2147,13 +2031,13 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: -1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("previous month"))
+            .accessibilityLabel(Text(String(localized: "previous month")))
 
             Spacer()
 
             Text(dateString)
                 .font(.system(.title3, design: .rounded).weight(.bold))
-                .accessibilityLabel("showing transactions in \(dateString)")
+                .accessibilityLabel(String(format: String(localized: "showing transactions in %@"), dateString))
 
             Spacer()
 
@@ -2162,7 +2046,7 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: 1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text("next month"))
+            .accessibilityLabel(Text(String(localized: "next month")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2222,15 +2106,15 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
     let calendar = Calendar.current
 
     if calendar.isDateInToday(date) {
-        return "today"
+        return String(localized: "today")
     } else if calendar.isDateInYesterday(date) {
-        return "yesterday"
+        return String(localized: "yesterday")
     } else {
         let dateFormatter = DateFormatter()
 
         dateFormatter.dateFormat = "EEE, d MMM yyyy"
 
-        return "on " + dateFormatter.string(from: date)
+        return String(format: String(localized: "on %@"), dateFormatter.string(from: date))
     }
 }
 

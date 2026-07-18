@@ -11,21 +11,21 @@ import SwiftUI
 
 @available(iOS 16.4, *)
 struct GetInsightsIntent: AppIntent {
-    nonisolated(unsafe) static var title: LocalizedStringResource = "Get Insights"
+    static let title: LocalizedStringResource = "Get Insights"
 
-    nonisolated(unsafe) static var description =
-        IntentDescription("Extracts your total expenditure or income for a particular time period")
+    static let description =
+        IntentDescription(LocalizedStringResource("Extracts your total expenditure or income for a particular time period"))
 
-    @Parameter(title: "Type", description: "Type of Data", requestValueDialog: IntentDialog("Which of the following would you like to extract?"))
+    @Parameter(title: LocalizedStringResource("Type"), description: LocalizedStringResource("Type of Data"), requestValueDialog: IntentDialog(LocalizedStringResource("Which of the following would you like to extract?")))
     var type: ShortcutsInsightsType
 
-    @Parameter(title: "Time Frame", description: "Time Frame of Data", requestValueDialog: IntentDialog("Over what time frame would you like to consider?"))
+    @Parameter(title: LocalizedStringResource("Time Frame"), description: LocalizedStringResource("Time Frame of Data"), requestValueDialog: IntentDialog(LocalizedStringResource("Over what time frame would you like to consider?")))
     var timeframe: ShortcutsInsightsTimeFrame
 
-    @Parameter(title: "Category Filters", description: "Additional Category Filters", requestValueDialog: IntentDialog("Which additional category filters do you want to impose?"))
+    @Parameter(title: LocalizedStringResource("Category Filters"), description: LocalizedStringResource("Additional Category Filters"), requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?")))
     var incomeCategories: [IncomeCategoryEntity]?
 
-    @Parameter(title: "Category Filters", description: "Additional Category Filters", requestValueDialog: IntentDialog("Which additional category filters do you want to impose?"))
+    @Parameter(title: LocalizedStringResource("Category Filters"), description: LocalizedStringResource("Additional Category Filters"), requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?")))
     var expenseCategories: [ExpenseCategoryEntity]?
 
     @MainActor
@@ -64,7 +64,7 @@ struct GetInsightsIntent: AppIntent {
 
         let result = InsightsViewModel.shared.getShortcutInsights(type: typeInt, timeframe: timeframe.rawValue, optionalIncome: optionalIncome, categories: categories)
 
-        return .result(value: result, dialog: "Here you go!") {
+        return .result(value: result, dialog: IntentDialog(stringLiteral: String(localized: "Here you go!"))) {
             ShortcutInsightsView(amount: result, type: type, timeframe: timeframe)
         }
     }
@@ -72,20 +72,20 @@ struct GetInsightsIntent: AppIntent {
     static var parameterSummary: some ParameterSummary {
         Switch(\GetInsightsIntent.$type) {
             Case(ShortcutsInsightsType.net) {
-                Summary("Calculate \(\.$type) for \(\.$timeframe)")
+                Summary("Calculate \(\.$type) for \(\.$timeframe)", table: "Localizable")
             }
             Case(ShortcutsInsightsType.income) {
-                Summary("Calculate \(\.$type) for \(\.$timeframe)") {
+                Summary("Calculate \(\.$type) for \(\.$timeframe)", table: "Localizable") {
                     \.$incomeCategories
                 }
             }
             Case(ShortcutsInsightsType.spent) {
-                Summary("Calculate \(\.$type) for \(\.$timeframe)") {
+                Summary("Calculate \(\.$type) for \(\.$timeframe)", table: "Localizable") {
                     \.$expenseCategories
                 }
             }
             DefaultCase {
-                Summary("Calculate \(\.$type) for \(\.$timeframe)")
+                Summary("Calculate \(\.$type) for \(\.$timeframe)", table: "Localizable")
             }
         }
     }
@@ -102,15 +102,15 @@ enum ShortcutsInsightsTimeFrame: Int {
 @available(iOS 16, *)
 extension ShortcutsInsightsTimeFrame: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        return TypeDisplayRepresentation(name: "Time Frame")
+        return TypeDisplayRepresentation(name: LocalizedStringResource("Time Frame"))
     }
 
-    nonisolated(unsafe) static var caseDisplayRepresentations: [ShortcutsInsightsTimeFrame: DisplayRepresentation] = [
-        .day: DisplayRepresentation(title: "today"),
-        .week: DisplayRepresentation(title: "this week"),
-        .month: DisplayRepresentation(title: "this month"),
-        .year: DisplayRepresentation(title: "this year"),
-        .all: DisplayRepresentation(title: "all time")
+    static let caseDisplayRepresentations: [ShortcutsInsightsTimeFrame: DisplayRepresentation] = [
+        .day: DisplayRepresentation(title: LocalizedStringResource("today")),
+        .week: DisplayRepresentation(title: LocalizedStringResource("this week")),
+        .month: DisplayRepresentation(title: LocalizedStringResource("this month")),
+        .year: DisplayRepresentation(title: LocalizedStringResource("this year")),
+        .all: DisplayRepresentation(title: LocalizedStringResource("all time"))
     ]
 }
 
@@ -121,13 +121,13 @@ enum ShortcutsInsightsType: String {
 @available(iOS 16, *)
 extension ShortcutsInsightsType: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        return TypeDisplayRepresentation(name: "Insights Type")
+        return TypeDisplayRepresentation(name: LocalizedStringResource("Insights Type"))
     }
 
-    nonisolated(unsafe) static var caseDisplayRepresentations: [ShortcutsInsightsType: DisplayRepresentation] = [
-        .net: DisplayRepresentation(title: "net total"),
-        .income: DisplayRepresentation(title: "total income"),
-        .spent: DisplayRepresentation(title: "total expenditure")
+    static let caseDisplayRepresentations: [ShortcutsInsightsType: DisplayRepresentation] = [
+        .net: DisplayRepresentation(title: LocalizedStringResource("net total")),
+        .income: DisplayRepresentation(title: LocalizedStringResource("total income")),
+        .spent: DisplayRepresentation(title: LocalizedStringResource("total expenditure"))
     ]
 }
 
@@ -140,7 +140,7 @@ struct ShortcutInsightsView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
-    var leftText: String {
+    var leftText: String.LocalizationValue {
         switch type {
         case .net:
             return "Net total"
@@ -151,7 +151,7 @@ struct ShortcutInsightsView: View {
         }
     }
 
-    var rightText: String {
+    var rightText: String.LocalizationValue {
         switch timeframe {
         case .day:
             return "today"
@@ -182,7 +182,7 @@ struct ShortcutInsightsView: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(leftText + " " + rightText)
+            Text("\(leftText) \(rightText)")
                 .font(.system(size: 17, weight: .medium, design: .rounded))
                 .foregroundColor(Color.SubtitleText)
 

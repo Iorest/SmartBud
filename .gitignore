@@ -1,6 +1,6 @@
 ## User settings
 xcuserdata/
-
+app/build/
 ## Xcode 8 and earlier
 *.xcscmblueprint
 *.xccheckout

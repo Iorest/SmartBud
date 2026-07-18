@@ -2,11 +2,13 @@
 //  InsightsView.swift
 //  dime
 //
-//  Insights / analytics screen. Backed by `InsightsViewModel` and the
-//  existing `LineGraph` Canvas-based view. Renders:
-//    - a time-frame picker (1 week, 1 month, 1 year, all time)
-//    - a summary block (income / expenses / net / average)
-//    - the net-balance line graph with drag-to-inspect
+//  Insights / analytics screen. Backed by `InsightsViewModel` and rendered
+//  with the redesigned layout that matches the GitHub reference "Good Ol'
+//  Charts" design: period picker chip, a single row combining the date range
+//  with the period average, income/expenses cards, `BarGraph`,
+//  `CategoryBreakdownView`, and today / yesterday transaction sections.
+//  The legacy `Filtered*InsightsView` stubs are kept at the bottom because
+//  `LogView` still references them.
 //
 
 import SwiftUI
@@ -46,102 +48,373 @@ struct InsightsView: View {
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     private var showCents: Bool = true
 
-    @State private var period: InsightsPeriod = .month
+    @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                periodPicker
+            VStack(alignment: .leading, spacing: 0) {
+                header
+                dateRangeRow
                 summaryCards
-                lineGraphCard
+                    .padding(.bottom, 13)
+                barChartSection
+                    .padding(.bottom, 18)
+                categoryBreakdownSection
+                    .padding(.bottom, 18)
+                if !insightsVM.todayTransactions.isEmpty {
+                    todaySection
+                }
+                if !insightsVM.yesterdayTransactions.isEmpty {
+                    yesterdaySection
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.bottom, 40)
         }
         .background(Color.PrimaryBackground.ignoresSafeArea())
-        .navigationTitle(Text("Insights", comment: "Insights screen title"))
-        .navigationBarTitleDisplayMode(.large)
         .onAppear {
-            insightsVM.setPeriod(period.rawValue)
+            insightsVM.setPeriod(period)
+            insightsVM.refreshAll()
         }
         .onChange(of: period) { _, newValue in
-            insightsVM.setPeriod(newValue.rawValue)
+            insightsVM.setPeriod(newValue)
+            insightsVM.refreshAll()
         }
     }
 
-    // MARK: Subviews
+    // MARK: - Header
 
-    private var periodPicker: some View {
-        Picker("Period", selection: $period) {
-            ForEach(InsightsPeriod.allCases) { p in
-                Text(p.localizedTitle).tag(p)
+    private var header: some View {
+        HStack(alignment: .center) {
+            Text("Insights", comment: "Insights screen title")
+                .font(.system(.title, design: .rounded).weight(.bold))
+                .foregroundColor(Color.PrimaryText)
+            Spacer()
+            periodPickerChip
+        }
+        .padding(.horizontal, 30)
+        .padding(.top, 20)
+        .padding(.bottom, 20)
+    }
+
+    private var periodPickerChip: some View {
+        Menu {
+            Button {
+                period = 1
+            } label: {
+                if period == 1 {
+                    Label("week", systemImage: "checkmark")
+                } else {
+                    Text("week")
+                }
             }
+            Button {
+                period = 2
+            } label: {
+                if period == 2 {
+                    Label("month", systemImage: "checkmark")
+                } else {
+                    Text("month")
+                }
+            }
+            Button {
+                period = 3
+            } label: {
+                if period == 3 {
+                    Label("year", systemImage: "checkmark")
+                } else {
+                    Text("year")
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(periodTitle)
+                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .foregroundColor(Color.PrimaryText)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Color.SubtitleText)
+            }
+            .padding(.vertical, 3)
+            .padding(.horizontal, 8)
+            .background(Color.Outline, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
-        .pickerStyle(.segmented)
+        .fixedSize()
     }
+
+    // MARK: - Date range row
+
+    /// One row: left = date range + net total; right = "AVG/DAY" or "AVG/MONTH" + amount.
+    private var dateRangeRow: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(insightsVM.periodDateRangeText.isEmpty ? "—" : insightsVM.periodDateRangeText)
+                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .foregroundColor(Color.SubtitleText)
+
+                InsightsDollarView(
+                    amount: insightsVM.periodTotalNet,
+                    currencySymbol: insightsVM.currencySymbol,
+                    showCents: insightsVM.showCents,
+                    net: insightsVM.periodNetPositive,
+                    color: insightsVM.periodNetPositive ? Color.IncomeGreen : Color.AlertRed
+                )
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(period == 3
+                     ? String(localized: "AVG/MONTH", comment: "Insights avg per month")
+                     : String(localized: "AVG/DAY", comment: "Insights avg per day"))
+                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .foregroundColor(Color.SubtitleText)
+
+                InsightsDollarView(
+                    amount: insightsVM.periodAverage,
+                    currencySymbol: insightsVM.currencySymbol,
+                    showCents: insightsVM.showCents,
+                    net: nil,
+                    color: Color.PrimaryText
+                )
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding(.horizontal, 30)
+        .padding(.bottom, 18)
+    }
+
+    // MARK: - Summary cards
 
     private var summaryCards: some View {
-        let s = insightsVM.summary
-        return HStack(spacing: 10) {
-            InsightsSummaryBlockView(
-                income: false,
-                amountString: format(spent: s.spent),
-                showOverlay: false,
-                action: {}
-            )
+        HStack(spacing: 11) {
             InsightsSummaryBlockView(
                 income: true,
-                amountString: format(spent: s.income),
+                amountString: format(insightsVM.periodTotalIncome),
+                showOverlay: false,
+                action: {}
+            )
+            InsightsSummaryBlockView(
+                income: false,
+                amountString: format(insightsVM.periodTotalSpent),
                 showOverlay: false,
                 action: {}
             )
         }
+        .padding(.horizontal, 30)
     }
 
-    private var lineGraphCard: some View {
-        let s = insightsVM.summary
-        let data = insightsVM.lineGraphData
-        let green = s.positive
+    // MARK: - Bar chart
 
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(s.positive
-                     ? String(localized: "Net total", comment: "Insights net total label")
-                     : String(localized: "Net spent", comment: "Insights net spent label"))
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.SubtitleText)
+    private var barChartSection: some View {
+        BarGraph(
+            data: insightsVM.barChartData,
+            average: insightsVM.periodAverage,
+            income: false,
+            period: period
+        )
+        .frame(height: 200)
+        .padding(.horizontal, 30)
+    }
 
-                Spacer()
+    // MARK: - Category breakdown
 
-                Text(format(spent: s.net))
-                    .font(.system(.title2, design: .rounded).weight(.medium))
-                    .foregroundColor(green ? Color.IncomeGreen : Color.AlertRed)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+    private var categoryBreakdownSection: some View {
+        CategoryBreakdownView(
+            categories: insightsVM.categoryBreakdown,
+            currencySymbol: insightsVM.currencySymbol,
+            showCents: insightsVM.showCents
+        )
+        .padding(.horizontal, 30)
+    }
+
+    // MARK: - Today / Yesterday
+
+    private var todaySection: some View {
+        VStack(spacing: 0) {
+            sectionHeader(
+                title: String(localized: "TODAY", comment: "Insights today section header"),
+                amount: insightsVM.todayTotal
+            )
+            .padding(.horizontal, 20)
+            .padding(.bottom, 6)
+
+            VStack(spacing: 0) {
+                ForEach(insightsVM.todayTransactions, id: \.id) { transaction in
+                    InsightsTransactionRow(
+                        transaction: transaction,
+                        currencySymbol: insightsVM.currencySymbol,
+                        showCents: insightsVM.showCents
+                    )
+                }
             }
-
-            if data.isEmpty {
-                Text("No data yet", comment: "Insights empty state")
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundColor(Color.SubtitleText)
-                    .frame(maxWidth: .infinity, minHeight: 120)
-            } else {
-                LineGraph(data: data, green: green, type: period.rawValue, range: 1)
-                    .frame(height: 180)
-            }
+            .padding(.horizontal, 20)
         }
-        .padding(14)
-        .background(Color.TertiaryBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    // MARK: Helpers
+    private var yesterdaySection: some View {
+        VStack(spacing: 0) {
+            sectionHeader(
+                title: String(localized: "YESTERDAY", comment: "Insights yesterday section header"),
+                amount: insightsVM.yesterdayTotal
+            )
+            .padding(.horizontal, 20)
+            .padding(.top, 14)
+            .padding(.bottom, 6)
 
-    private func format(spent amount: Double) -> String {
+            VStack(spacing: 0) {
+                ForEach(insightsVM.yesterdayTransactions, id: \.id) { transaction in
+                    InsightsTransactionRow(
+                        transaction: transaction,
+                        currencySymbol: insightsVM.currencySymbol,
+                        showCents: insightsVM.showCents
+                    )
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+    }
+
+    private func sectionHeader(title: String, amount: Double) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .font(.system(.footnote, design: .rounded).weight(.semibold))
+                .foregroundColor(Color.SubtitleText)
+            Spacer()
+            Text(sectionAmountString(amount))
+                .font(.system(.body, design: .rounded).weight(.semibold))
+                .foregroundColor(Color.PrimaryText)
+                .lineLimit(1)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private var periodTitle: String {
+        switch period {
+        case 1: return String(localized: "week", comment: "Period picker: week")
+        case 3: return String(localized: "year", comment: "Period picker: year")
+        default: return String(localized: "month", comment: "Period picker: month")
+        }
+    }
+
+    private func format(_ amount: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = currency
         formatter.maximumFractionDigits = showCents ? 2 : 0
-        return formatter.string(from: NSNumber(value: abs(amount))) ?? "$0"
+        return formatter.string(from: NSNumber(value: abs(amount))) ?? "0"
+    }
+
+    private func sectionAmountString(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currency
+        formatter.maximumFractionDigits = showCents ? 2 : 0
+        let sign = amount >= 0 ? "+" : "-"
+        return "\(sign)\(formatter.string(from: NSNumber(value: abs(amount))) ?? "0")"
+    }
+
+    private func sectionAmountColor(_ amount: Double) -> Color {
+        if amount > 0 { return Color.IncomeGreen }
+        if amount < 0 { return Color.AlertRed }
+        return Color.PrimaryText
+    }
+}
+
+// MARK: - InsightsDollarView
+//
+// A composite "+$" + value pair used by the date-range header. `net` forces
+// a leading sign; `color` tints the value portion.
+
+private struct InsightsDollarView: View {
+    let amount: Double
+    let currencySymbol: String
+    let showCents: Bool
+    let net: Bool?
+    let color: Color
+
+    private var symbol: String {
+        if let netPositive = net {
+            return netPositive ? "+\(currencySymbol)" : "-\(currencySymbol)"
+        }
+        return currencySymbol
+    }
+
+    private var formattedAmount: String {
+        let cents = showCents && amount < 100
+        if cents {
+            return String(format: "%.2f", amount)
+        } else {
+            return String(format: "%.0f", amount)
+        }
+    }
+
+    var body: some View {
+        HStack(alignment: .lastTextBaseline, spacing: 1.3) {
+            Text(symbol)
+                .font(.system(.title3, design: .rounded).weight(.medium))
+                .foregroundColor(Color.SubtitleText)
+            Text(formattedAmount)
+                .font(.system(.title, design: .rounded).weight(.medium))
+                .foregroundColor(color)
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+    }
+}
+
+// MARK: - InsightsTransactionRow
+//
+// A read-only transaction row used inside the Insights today/yesterday
+// sections. Reuses the existing `EmojiLogView` for the category chip.
+
+private struct InsightsTransactionRow: View {
+    let transaction: TransactionModel
+    let currencySymbol: String
+    let showCents: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            EmojiLogView(
+                emoji: (transaction.category?.wrappedEmoji ?? ""),
+                colour: (transaction.category?.wrappedColour ?? "#FFFFFF"),
+                future: false
+            )
+            .fixedSize(horizontal: true, vertical: true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(transaction.wrappedNote.isEmpty ? (transaction.category?.wrappedName ?? "") : transaction.wrappedNote)
+                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .foregroundColor(Color.PrimaryText)
+                    .lineLimit(1)
+                Text(timeLabel(transaction.wrappedDate))
+                    .font(.system(.subheadline, design: .rounded).weight(.medium))
+                    .foregroundColor(Color.SubtitleText)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(amountString)
+                .font(.system(.title3, design: .rounded).weight(.medium))
+                .foregroundColor(transaction.income ? Color.IncomeGreen : Color.PrimaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 8)
+    }
+
+    private var amountString: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencySymbol == "$" ? "USD" : currencySymbol
+        formatter.maximumFractionDigits = showCents ? 2 : 0
+        let base = formatter.string(from: NSNumber(value: abs(transaction.amount))) ?? "0"
+        return transaction.income ? "+\(base)" : "-\(base)"
+    }
+
+    private func timeLabel(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "j:mm", options: 0, locale: .current) ?? "h:mm a"
+        return formatter.string(from: date)
     }
 }
 

@@ -120,7 +120,9 @@ struct SettingsWeekStartView: View {
             ForEach(1..<29) { day in
 
               HStack {
-                Text("\(getOrdinal(day)) of month")
+                Text(
+                  String(format: String(localized: "%@ of month"), getOrdinal(day))
+                )
                   .font(.system(.body, design: .rounded))
                   .foregroundColor(Color.PrimaryText)
 

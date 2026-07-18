@@ -35,6 +35,8 @@ struct ContentView: View {
 
     @AppStorage("showUpdateSheet", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showUpdateSheet: Bool = true
 
+    @AppStorage("appLanguage", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var appLanguage: String = ""
+
     var body: some View {
         GeometryReader { proxy in
             let topEdge = proxy.safeAreaInsets.top
@@ -43,6 +45,7 @@ struct ContentView: View {
             HomeView(topEdge: topEdge, bottomEdge: bottomEdge == 0 ? 15 : bottomEdge)
                 .ignoresSafeArea(.all, edges: .bottom)
                 .preferredColorScheme(colourScheme == 1 ? .light : colourScheme == 2 ? .dark : nil)
+                .environment(\.locale, appLanguage.isEmpty ? Locale.current : Locale(identifier: appLanguage))
                 .fullScreenCover(isPresented: $showIntro) {
                     WelcomeSheetView()
                 }
@@ -58,6 +61,20 @@ struct ContentView: View {
         .onAppear {
             if appLockVM.isAppLockEnabled {
                 appLockVM.appLockValidation()
+            }
+
+            // First-run language bootstrap: if the user hasn't picked yet
+            // (appLanguage == "" = "follow system"), and the system is
+            // Chinese, snap to a concrete zh-Hans / zh-Hant so the Settings
+            // row shows a real choice ("简体中文" / "繁體中文") instead of
+            // the abstract "System" placeholder. Users can still revert to
+            // "System" from the language picker.
+            if appLanguage.isEmpty {
+                let langCode = Locale.current.language.languageCode?.identifier
+                let scriptCode = Locale.current.language.script?.identifier
+                if langCode == "zh" {
+                    appLanguage = (scriptCode == "Hant") ? "zh-Hant" : "zh-Hans"
+                }
             }
 
             let defaults =

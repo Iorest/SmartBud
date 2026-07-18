@@ -8,6 +8,9 @@
 import Combine
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @available(iOS 13, macOS 11, *)
 private struct AnimatedCheckmark: View {
@@ -324,7 +327,7 @@ public struct AlertToast: View {
             .padding()
             .frame(maxWidth: 400, alignment: .leading)
             .alertBackground(style?.backgroundColor ?? nil)
-            .cornerRadius(10)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .padding([.horizontal, .bottom])
         }
     }
@@ -456,7 +459,7 @@ public struct AlertToast: View {
         .padding()
         .withFrame(type != .regular && type != .loading)
         .alertBackground(style?.backgroundColor ?? nil)
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     /// Body init determine by `displayMode`
@@ -499,7 +502,7 @@ public struct AlertToastModifier: ViewModifier {
 
     private var screen: CGRect {
         #if os(iOS)
-            return UIScreen.main.bounds
+            return ScreenSize.bounds
         #else
             return NSScreen.main?.frame ?? .zero
         #endif
@@ -756,12 +759,8 @@ public extension View {
     }
 
     @ViewBuilder fileprivate func valueChanged<T: Equatable>(value: T, onChange: @escaping (T) -> Void) -> some View {
-        if #available(iOS 14.0, *) {
-            self.onChange(of: value, perform: onChange)
-        } else {
-            onReceive(Just(value)) { value in
-                onChange(value)
-            }
+        self.onChange(of: value) { _, newValue in
+            onChange(newValue)
         }
     }
 }

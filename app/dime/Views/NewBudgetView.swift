@@ -42,7 +42,7 @@ struct BrandNewBudgetView: View {
     var initialProgress: Double
 
     @State var showToast: Bool = false
-    @State var toastMessage: String = "Missing Category"
+    @State var toastMessage: String = String(localized: "Missing Category")
 
     // stage one (ignore if editing), overall budget or category budget
     @State var categoryBudget: Bool = false
@@ -114,7 +114,7 @@ struct BrandNewBudgetView: View {
 
         numberFormatter.maximumFractionDigits = 0
 
-        return "~" + (numberFormatter.string(from: NSNumber(value: average)) ?? "$0") + " /day"
+        return "~\(numberFormatter.string(from: NSNumber(value: average)) ?? "$0") \(String(localized: "/day"))"
     }
 
     // height of pickers
@@ -142,11 +142,30 @@ struct BrandNewBudgetView: View {
 
     var instructions: [InstructionHeadings] {
         [
-            InstructionHeadings(title: "Indicate budget type", subtitle: "The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only."),
-            InstructionHeadings(title: "Select a category", subtitle: "Begin by linking this budget to an existing category."),
-            InstructionHeadings(title: "Choose a time frame", subtitle: "The budget will periodically refresh according to your preference."),
-            InstructionHeadings(title: "Pick a start date", subtitle: "Which day of the \(timeFrameString) do you want your budget to start from?"),
-            InstructionHeadings(title: "Set budget amount", subtitle: "Try your best to stay under this limit! Also, feel free to change this in the future.")
+            InstructionHeadings(
+                title: String(localized: "Indicate budget type"),
+                subtitle: String(
+                    localized:
+                        "The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only.")),
+            InstructionHeadings(
+                title: String(localized: "Select a category"),
+                subtitle: String(localized: "Begin by linking this budget to an existing category.")),
+            InstructionHeadings(
+                title: String(localized: "Choose a time frame"),
+                subtitle: String(
+                    localized: "The budget will periodically refresh according to your preference.")),
+            InstructionHeadings(
+                title: String(localized: "Pick a start date"),
+                subtitle: String(
+                    format: String(
+                        localized:
+                            "Which day of the %@ do you want your budget to start from?"),
+                    timeFrameString)),
+            InstructionHeadings(
+                title: String(localized: "Set budget amount"),
+                subtitle: String(
+                    localized:
+                        "Try your best to stay under this limit! Also, feel free to change this in the future."))
         ]
     }
 
@@ -436,7 +455,12 @@ struct BrandNewBudgetView: View {
                                             if Int(day) == 1 {
                                                 Text("Start of month")
                                             } else {
-                                                Text("\(getOrdinal(day)) of month")
+                                                Text(
+                                                    String(
+                                                        format: String(
+                                                            localized: "%@ of month"),
+                                                        getOrdinal(day))
+                                                )
                                             }
 
                                             Spacer()
@@ -514,7 +538,7 @@ struct BrandNewBudgetView: View {
                 Button {
                     if progress == 2 && selectedCategory == nil {
                         showToast = true
-                        toastMessage = "Missing Category"
+                        toastMessage = String(localized: "Missing Category")
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
                         return
                     }
@@ -680,64 +704,39 @@ struct BrandNewBudgetView: View {
         if price == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             showToast = true
-            toastMessage = "Missing Amount"
+            toastMessage = String(localized: "Missing Amount")
             return
         }
 
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
 
         let budgetType = getBudgetTypeInteger(budgetTimeFrame)
-        let today = Calendar.current.startOfDay(for: Date.now)
-        var startDate: Date
-
-        switch budgetTimeFrame {
-        case .day:
-            startDate = today
-        case .week:
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.firstWeekday = 1
-            calendar.minimumDaysInFirstWeek = 4
-
-            let dateComponents = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: today)
-
-            let sunday = calendar.date(from: dateComponents)!
-
-            let holdingDate = calendar.date(byAdding: .day, value: chosenDayWeek - 1, to: sunday)!
-
-            if holdingDate > today {
-                let newHoldingDate = calendar.date(byAdding: .day, value: -7, to: holdingDate)!
-
-                startDate = newHoldingDate
-            } else {
-                startDate = holdingDate
+        let timeFrameInt: Int = {
+            switch budgetTimeFrame {
+            case .day: return 0
+            case .week: return 1
+            case .month: return 2
+            case .year: return 3
             }
-        case .month:
-            let calendar = Calendar.current
-
-            let dateComponents = calendar.dateComponents([.month, .year], from: today)
-
-            let startOfMonth = calendar.date(from: dateComponents)!
-
-            let holdingDate = calendar.date(byAdding: .day, value: chosenDayMonth - 1, to: startOfMonth)!
-
-            if holdingDate > today {
-                let newHoldingDate = calendar.date(byAdding: .month, value: -1, to: holdingDate)!
-
-                startDate = newHoldingDate
-            } else {
-                startDate = holdingDate
-            }
-        case .year:
-            startDate = Calendar.current.startOfDay(for: chosenDayYear)
-        }
+        }()
+        let startDate = budgetVM.computeStartDate(
+            timeFrameRaw: timeFrameInt,
+            chosenDayWeek: chosenDayWeek,
+            chosenDayMonth: chosenDayMonth,
+            chosenDayYear: chosenDayYear
+        )
 
         if let unwrappedEditedBudget = toEditBudget {
-            unwrappedEditedBudget.category = selectedCategory
-            unwrappedEditedBudget.startDate = startDate
-            unwrappedEditedBudget.amount = price
-            unwrappedEditedBudget.type = budgetType
-
-            budgetVM.save()
+            let category = selectedCategory ?? unwrappedEditedBudget.category
+            if let category {
+                budgetVM.update(
+                    unwrappedEditedBudget,
+                    amount: price,
+                    startDate: startDate,
+                    type: budgetType,
+                    category: category
+                )
+            }
 
             dismiss()
 
@@ -745,11 +744,12 @@ struct BrandNewBudgetView: View {
         }
 
         if let unwrappedEditedMainBudget = toEditMainBudget {
-            unwrappedEditedMainBudget.startDate = startDate
-            unwrappedEditedMainBudget.amount = price
-            unwrappedEditedMainBudget.type = budgetType
-
-            budgetVM.save()
+            budgetVM.updateMain(
+                unwrappedEditedMainBudget,
+                amount: price,
+                startDate: startDate,
+                type: budgetType
+            )
 
             dismiss()
 
@@ -758,10 +758,10 @@ struct BrandNewBudgetView: View {
 
         if categoryBudget {
             if let unwrappedCategory = selectedCategory {
-                budgetVM.create(amount: price, startDate: startDate, type: budgetType, category: unwrappedCategory)
+                _ = budgetVM.create(amount: price, startDate: startDate, type: budgetType, category: unwrappedCategory)
             }
         } else {
-            budgetVM.createMain(amount: price, startDate: startDate, type: budgetType)
+            _ = budgetVM.createMain(amount: price, startDate: startDate, type: budgetType)
         }
 
         dismiss()
@@ -773,7 +773,7 @@ struct BrandNewBudgetView: View {
 
         var totalWidth: CGFloat = 0
 
-        let screenWidth: CGFloat = UIScreen.main.bounds.width - 50
+        let screenWidth: CGFloat = ScreenSize.width - 50
 
         categories.forEach { category in
 

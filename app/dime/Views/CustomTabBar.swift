@@ -28,10 +28,8 @@ struct CustomTabBar: View {
     @AppStorage("confetti", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var confetti: Bool = false
     @AppStorage("firstTransactionViewLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstLaunch: Bool = true
 
-    @State var animate = false
-
     private var isZoomed: Bool {
-        UIScreen.main.scale != UIScreen.main.nativeScale
+        false
     }
 
     init(currentTab: Binding<String>, topEdge: CGFloat, bottomEdge: CGFloat, counter: Binding<Int>, launchAdd: Bool) {
@@ -48,46 +46,39 @@ struct CustomTabBar: View {
 
             TabButton(image: "Insights", zoomed: isZoomed, currentTab: $currentTab)
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 28, style: .continuous).fill(Color.DarkBackground.opacity(0.6))
-                    .frame(width: 95, height: 68)
-                    .opacity(self.animate ? 0 : 1)
-                    .scaleEffect(self.animate ? 1 : 0.4)
+            Button {
+                let impactMed = UIImpactFeedbackGenerator(style: .light)
+                impactMed.impactOccurred()
 
-                RoundedRectangle(cornerRadius: 20.5, style: .continuous).fill(Color.DarkBackground.opacity(0.8))
-                    .frame(width: 80, height: 53)
-                    .opacity(self.animate ? 0 : 1)
-                    .scaleEffect(self.animate ? 1 : 0.6)
+                addTransaction = true
 
-                Button {
-                    let impactMed = UIImpactFeedbackGenerator(style: .light)
-                    impactMed.impactOccurred()
-
-                    addTransaction = true
-
-                } label: {
-                    Image(systemName: "plus")
-                }
-                .buttonStyle(MyButtonStyle())
-                .padding(15)
+            } label: {
+                Image(systemName: "plus")
             }
-            .onAppear {
-                if transactions.isEmpty {
-                    withAnimation(.easeInOut(duration: 1.9).repeatForever(autoreverses: false)) {
-                        self.animate.toggle()
-                    }
-                }
-            }
+            .buttonStyle(MyButtonStyle())
+            .offset(y: -12)
             .accessibilityLabel(String(localized: "Add New Transaction"))
 
             TabButton(image: "Budget", zoomed: isZoomed, currentTab: $currentTab)
 
             TabButton(image: "Settings", zoomed: isZoomed, currentTab: $currentTab)
         }
-        .padding(.horizontal, 15)
-        .padding(.bottom, bottomEdge - 10)
+        .padding(.horizontal, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
         .frame(maxWidth: .infinity)
-        .background(Color.PrimaryBackground)
+        .background {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(.ultraThinMaterial)
+        }
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color.primary.opacity(0.12))
+                .frame(height: 0.5)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .padding(.horizontal, 10)
+        .padding(.bottom, bottomEdge - 10)
         .fullScreenCover(isPresented: $addTransaction, onDismiss: {
             if confetti {
                 if count != transactions.count {
@@ -110,13 +101,6 @@ struct CustomTabBar: View {
                 count = transactions.count
             }
         }
-        .onChange(of: transactions.count) { _, _ in
-            if !transactions.isEmpty {
-                self.animate = false
-            } else {
-                self.animate = true
-            }
-        }
         .onOpenURL { url in
             guard
                 url.host == "newExpense"
@@ -133,10 +117,16 @@ struct CustomTabBar: View {
 struct MyButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .font(.system(size: 20, weight: .bold))
-            .foregroundColor(Color.LightIcon)
-            .frame(width: 65, height: 38)
-            .background(configuration.isPressed ? Color.SubtitleText : Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .font(.system(size: 26, weight: .bold))
+            .foregroundColor(.white)
+            .frame(width: 58, height: 58)
+            .background(
+                Circle()
+                    .fill(Color(red: 0.0, green: 0.48, blue: 1.0))
+            )
+            .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 3)
+            .scaleEffect(configuration.isPressed ? 0.92 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

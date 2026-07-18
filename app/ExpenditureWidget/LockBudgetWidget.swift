@@ -12,17 +12,11 @@ import SwiftData
 struct LockBudgetWidget: Widget {
     let kind: String = "LockBudgetWidget"
 
-    private var supportedFamilies: [WidgetFamily] {
-        if #available(iOSApplicationExtension 16, *) {
-            return [
-                .accessoryCircular,
-                .accessoryRectangular,
-                .accessoryInline
-            ]
-        } else {
-            return [WidgetFamily]()
-        }
-    }
+    private let supportedFamilies: [WidgetFamily] = [
+        .accessoryCircular,
+        .accessoryRectangular,
+        .accessoryInline
+    ]
 
     var body: some WidgetConfiguration {
         IntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: LockBudgetWidgetProvider()) { entry in
@@ -39,7 +33,7 @@ struct LockBudgetWidgetProvider: IntentTimelineProvider {
 
     public typealias Entry = LockBudgetWidgetEntry
 
-    nonisolated(unsafe) static let container: ModelContainer = {
+    static let container: ModelContainer = {
         let schema = Schema([
             TransactionModel.self,
             BudgetModel.self,
@@ -97,13 +91,7 @@ struct LockBudgetWidgetProvider: IntentTimelineProvider {
             !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
         }
 
-        var holdingTotal = filteredTxns.reduce(0) { $0 + $1.wrappedAmount }
-
-        for transaction in filteredTxns {
-            if transaction.category?.id == budgetCategory?.id {
-                holdingTotal += transaction.wrappedAmount
-            }
-        }
+        let holdingTotal = filteredTxns.reduce(0) { $0 + $1.wrappedAmount }
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,
@@ -226,9 +214,7 @@ struct LockBudgetWidgetEntryView: View {
             } else {
                 if entry.configuration.budget == nil {
                     ZStack {
-                        if #available(iOS 16.0, *) {
-                            AccessoryWidgetBackground()
-                        }
+                        AccessoryWidgetBackground()
 
                         VStack {
                             Text("SELECT BUDGET")
@@ -238,17 +224,13 @@ struct LockBudgetWidgetEntryView: View {
                         }
                     }
                 } else {
-                    if #available(iOS 16.0, *) {
-                        Gauge(value: percent < 1 ? percent : 1) {
-                            Text(entry.budget.emoji)
-                        } currentValueLabel: {
-                            Text("\(Int(round(percent * 100)))%")
-                        }
-                        .gaugeStyle(AccessoryCircularGaugeStyle())
-                        .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
-                    } else {
-                        EmptyView()
+                    Gauge(value: percent < 1 ? percent : 1) {
+                        Text(entry.budget.emoji)
+                    } currentValueLabel: {
+                        Text("\(Int(round(percent * 100)))%")
                     }
+                    .gaugeStyle(AccessoryCircularGaugeStyle())
+                    .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
                 }
             }
 
@@ -320,21 +302,19 @@ struct LockBudgetWidgetEntryView: View {
                                 .font(.system(size: 14, weight: .regular, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
-                            if #available(iOS 16.0, *) {
-                                Gauge(value: percent, in: 0 ... 1) {
-                                    Text("Percent Spent")
-                                } currentValueLabel: {
-                                    EmptyView()
-                                } minimumValueLabel: {
-                                    Text("\(entry.totalSpent, specifier: (showCents && entry.totalSpent < 100) ? "%.2f" : "%.0f")")
-                                        .font(.system(size: 10, weight: .regular, design: .rounded))
-                                } maximumValueLabel: {
-                                    Text("\(entry.budget.budgetAmount, specifier: (showCents && entry.budget.budgetAmount < 100) ? "%.2f" : "%.0f")")
-                                        .font(.system(size: 10, weight: .regular, design: .rounded))
-                                }
-                                .frame(height: 5)
-                                .gaugeStyle(.accessoryLinear)
+                            Gauge(value: percent, in: 0 ... 1) {
+                                Text("Percent Spent")
+                            } currentValueLabel: {
+                                EmptyView()
+                            } minimumValueLabel: {
+                                Text("\(entry.totalSpent, specifier: (showCents && entry.totalSpent < 100) ? "%.2f" : "%.0f")")
+                                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                            } maximumValueLabel: {
+                                Text("\(entry.budget.budgetAmount, specifier: (showCents && entry.budget.budgetAmount < 100) ? "%.2f" : "%.0f")")
+                                    .font(.system(size: 10, weight: .regular, design: .rounded))
                             }
+                            .frame(height: 5)
+                            .gaugeStyle(.accessoryLinear)
                         }
                         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                     }

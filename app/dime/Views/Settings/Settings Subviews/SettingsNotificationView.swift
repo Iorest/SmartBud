@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct SettingsNotificationsView: View {
   @Environment(\.dismiss) var dismiss
 
@@ -63,26 +64,28 @@ struct SettingsNotificationsView: View {
                 showNotifications.toggle()
               }
             } else {
-              center.getNotificationSettings { settings in
-                if settings.authorizationStatus == .notDetermined {
-                  center.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-                    if success {
+              Task { @MainActor in
+                let status = await center.notificationSettings().authorizationStatus
+                if status == .notDetermined {
+                  do {
+                    let granted = try await center.requestAuthorization(options: [.alert, .badge, .sound])
+                    if granted {
                       withAnimation(.easeInOut(duration: 0.2)) {
                         showNotifications.toggle()
                         newNotification()
                       }
-                    } else if let error = error {
-                      print(error.localizedDescription)
+                    } else {
                       notificationsEnabled = false
                     }
+                  } catch {
+                    print(error.localizedDescription)
+                    notificationsEnabled = false
                   }
-                } else if settings.authorizationStatus == .denied {
+                } else if status == .denied {
                   notificationsEnabled = false
 
-                  DispatchQueue.main.async {
-                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                      UIApplication.shared.open(settingsURL)
-                    }
+                  if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    await UIApplication.shared.open(settingsURL)
                   }
 
                 } else {
@@ -190,45 +193,48 @@ struct SettingsNotificationsView: View {
         .padding(.horizontal, 15)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
         .onChange(of: option) { _, newValue in
-          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
+          defaults.set(
             option, forKey: "notificationOption")
 
           if newValue == 3 {
             let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
-            UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+            defaults.set(
               components.hour!, forKey: "customHour")
-            UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+            defaults.set(
               components.minute!, forKey: "customMinute")
           }
 
           newNotification()
         }
         .onChange(of: customTime) { _, _ in
+          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
           let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
-          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+          defaults.set(
             components.hour!, forKey: "customHour")
-          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+          defaults.set(
             components.minute!, forKey: "customMinute")
 
           newNotification()
         }
         .onAppear {
-          if UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(
+          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
+          if defaults.object(
             forKey: "notificationOption") != nil {
-            option = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+            option = defaults.integer(
               forKey: "notificationOption")
           }
 
-          if UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(forKey: "customHour")
+          if defaults.object(forKey: "customHour")
             != nil
-            && UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(forKey: "customMinute")
+            && defaults.object(forKey: "customMinute")
               != nil {
             var components = DateComponents()
-            components.hour = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+            components.hour = defaults.integer(
               forKey: "customHour")
-            components.minute = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+            components.minute = defaults.integer(
               forKey: "customMinute")
             customTime = Calendar.current.date(from: components)!
           }
@@ -239,6 +245,7 @@ struct SettingsNotificationsView: View {
   }
 }
 
+@MainActor
 func newNotification() {
   UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 

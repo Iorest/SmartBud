@@ -109,24 +109,62 @@ struct ImportDataView: View {
     }
 
     let instructions: [InstructionHeadings] = [
-        InstructionHeadings(title: "Import transactions", subtitle: "Begin by adding a CSV file with 4 columns: amount, note, date, and category."),
-        InstructionHeadings(title: "Assign category column", subtitle: "Select a column from your import that corresponds to the categories of your transactions."),
-        InstructionHeadings(title: "Assign note column", subtitle: "Select a column from your import that corresponds to the notes/subtitles of your transactions."),
-        InstructionHeadings(title: "Assign date column", subtitle: "Select a column from your import that corresponds to the dates of your transactions."),
-        InstructionHeadings(title: "Assign amount column", subtitle: "Select a column from your import that corresponds to the values of your transactions."),
-        InstructionHeadings(title: "Indicate date format", subtitle: "Referencing this article, state the format of the dates in the assigned column."),
-        InstructionHeadings(title: "Link categories", subtitle: "Match values found in the 'Category' column to the corresponding categories in Dime."),
-        InstructionHeadings(title: "Processing import", subtitle: "Please wait while we process your new transactions.")
+        InstructionHeadings(
+            title: String(localized: "Import transactions"),
+            subtitle: String(
+                localized:
+                    "Begin by adding a CSV file with 4 columns: amount, note, date, and category.")),
+        InstructionHeadings(
+            title: String(localized: "Assign category column"),
+            subtitle: String(
+                localized:
+                    "Select a column from your import that corresponds to the categories of your transactions.")),
+        InstructionHeadings(
+            title: String(localized: "Assign note column"),
+            subtitle: String(
+                localized:
+                    "Select a column from your import that corresponds to the notes/subtitles of your transactions.")),
+        InstructionHeadings(
+            title: String(localized: "Assign date column"),
+            subtitle: String(
+                localized:
+                    "Select a column from your import that corresponds to the dates of your transactions.")),
+        InstructionHeadings(
+            title: String(localized: "Assign amount column"),
+            subtitle: String(
+                localized:
+                    "Select a column from your import that corresponds to the values of your transactions.")),
+        InstructionHeadings(
+            title: String(localized: "Indicate date format"),
+            subtitle: String(localized: "Referencing this article, state the format of the dates in the assigned column.")),
+        InstructionHeadings(
+            title: String(localized: "Link categories"),
+            subtitle: String(
+                localized:
+                    "Match values found in the 'Category' column to the corresponding categories in Dime.")),
+        InstructionHeadings(
+            title: String(localized: "Processing import"),
+            subtitle: String(localized: "Please wait while we process your new transactions."))
     ]
 
     let labels: [ColumnLabel] = [
-        ColumnLabel(image: "square.grid.2x2.fill", label: "Category"),
-        ColumnLabel(image: "doc.plaintext.fill", label: "Note"),
-        ColumnLabel(image: "calendar", label: "Date"),
-        ColumnLabel(image: "dollarsign.circle.fill", label: "Amount")
+        ColumnLabel(image: "square.grid.2x2.fill", label: String(localized: "Category")),
+        ColumnLabel(image: "doc.plaintext.fill", label: String(localized: "Note")),
+        ColumnLabel(image: "calendar", label: String(localized: "Date")),
+        ColumnLabel(image: "dollarsign.circle.fill", label: String(localized: "Amount"))
     ]
 
-    let pointers = ["Ensure that the values in the 'Amount' column do not contain any currency symbols.", "All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am.", "Remove all commas in the 'Note' and 'Category' columns as they would disrupt the parsing of your file."]
+    let pointers = [
+        String(
+            localized:
+                "Ensure that the values in the 'Amount' column do not contain any currency symbols."),
+        String(
+            localized:
+                "All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am."),
+        String(
+            localized:
+                "Remove all commas in the 'Note' and 'Category' columns as they would disrupt the parsing of your file.")
+    ]
 
     var incomeCategories: [CategoryModel] {
         categoryVM.incomeCategories
@@ -287,7 +325,14 @@ struct ImportDataView: View {
                         }
                         .frame(maxWidth: .infinity)
 
-                        Text("Referencing \(makeAttributedString()), state the format of the dates in the assigned column.")
+                        Text(
+                            AttributedString(String(localized: "Referencing "))
+                                + makeAttributedString()
+                                + AttributedString(
+                                    String(
+                                        localized:
+                                            ", state the format of the dates in the assigned column."))
+                        )
                             .foregroundColor(.SubtitleText)
                             .font(.system(.body, design: .rounded).weight(.medium))
 
@@ -324,7 +369,7 @@ struct ImportDataView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .frame(height: UIScreen.main.bounds.size.height / (dynamicTypeSize > .xLarge ? 5.3 : 5.8), alignment: .top)
+                .frame(height: ScreenSize.height / (dynamicTypeSize > .xLarge ? 5.3 : 5.8), alignment: .top)
                 .padding(.bottom, 10)
 
                 if progress == 1 {
@@ -532,7 +577,7 @@ struct ImportDataView: View {
                     }
                 } else if progress == 7 {
                     VStack(spacing: 10) {
-                        Text("\(numberOfLinkedCategories)/^[\(uniqueCategories.count) category](inflect: true) linked")
+                        Text(String(format: String(localized: "%lld/^[%lld category](inflect: true) linked"), numberOfLinkedCategories, uniqueCategories.count))
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
 //                            .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -904,7 +949,12 @@ struct ImportDataView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormatString
 
-        let categoryDictionary: [String: CategoryModel] = Dictionary(uniqueKeysWithValues: uniqueCategories.map { ($0.excelValue, $0.category!) })
+        let categoryDictionary: [String: CategoryModel] = Dictionary(
+            uniqueCategories.compactMap { entry in
+                entry.category.map { (entry.excelValue, $0) }
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
 
         rows.forEach { row in
 //            let rowCategory = categoryDictionary[row[categoryColumnIndex]]
@@ -1086,7 +1136,7 @@ struct MatchCategoryStepperView: View {
 
         var totalWidth: CGFloat = 0
 
-        let screenWidth: CGFloat = UIScreen.main.bounds.width - 80
+        let screenWidth: CGFloat = ScreenSize.width - 80
 
         categories.forEach { category in
 

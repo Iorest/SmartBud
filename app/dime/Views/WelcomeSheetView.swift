@@ -33,27 +33,28 @@ struct WelcomeSheetView: View {
     ]
 
     var body: some View {
-        VStack {
-            if firstPage {
-                VStack(spacing: 50) {
-                    VStack(spacing: 2) {
-                        Image("AppIcon1_EG")
-                            .resizable()
-                            .frame(width: 70, height: 70)
-                            .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                            .padding(.bottom, 20)
+        GeometryReader { proxy in
+            VStack {
+                if firstPage {
+                    VStack(spacing: 50) {
+                        VStack(spacing: 2) {
+                            Image("AppIcon1_EG")
+                                .resizable()
+                                .frame(width: 70, height: 70)
+                                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                .padding(.bottom, 20)
 
-                        Text("dime_name")
-                            .font(.system(size: 30, weight: .medium, design: .rounded))
-                            .foregroundColor(Color.PrimaryText)
+                            Text("dime_name")
+                                .font(.system(size: 30, weight: .medium, design: .rounded))
+                                .foregroundColor(Color.PrimaryText)
 
-                        Text("Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
-                            .padding(.bottom, 15)
-                    }
-                    .frame(height: UIScreen.main.bounds.height / 3.4, alignment: .bottom)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                            Text(String(localized: "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"))
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundColor(Color.SubtitleText)
+                                .padding(.bottom, 15)
+                        }
+                        .frame(height: proxy.size.height / 3.4, alignment: .bottom)
+                        .frame(maxWidth: .infinity, alignment: .center)
 
                     VStack(alignment: .leading, spacing: 22) {
                         ForEach(welcomeFeatures.indices, id: \.self) { rowIndex in
@@ -113,5 +114,6 @@ struct WelcomeSheetView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.PrimaryBackground)
+        }
     }
 }

@@ -161,10 +161,6 @@ extension Color {
         return Color("GreyIcon")
     }
 
-    static var BudgetRed: Color {
-        return Color("BudgetRed")
-    }
-
     static var Alert: Color {
         return Color("Alert")
     }

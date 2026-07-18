@@ -33,9 +33,9 @@ struct TransactionView: View {
 
     var transactionTypeString: String {
         if income {
-            return "Income"
+            return String(localized: "Income")
         } else {
-            return "Expense"
+            return String(localized: "Expense")
         }
     }
 
@@ -60,8 +60,6 @@ struct TransactionView: View {
     @State var categoryButtonBackgroundColor = Color.clear
     @State var categoryButtonOutlineColor = Color.Outline
     @State var shake: Bool = false
-
-    @ObservedObject var keyboardHeightHelper = KeyboardHeightHelper()
 
     @AppStorage(
         "firstTransactionViewLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
@@ -152,7 +150,7 @@ struct TransactionView: View {
     var dateDisplayText: some View {
         let dateStr = getDateString(date: date)
         if isDateToday(date: date) {
-            Text("Today, \(dateStr)")
+            Text(String(format: String(localized: "Today, %@"), dateStr))
                 .lineLimit(1)
         } else {
             Text(dateStr)
@@ -186,11 +184,11 @@ struct TransactionView: View {
     @ViewBuilder
     var deleteConfirmationHeader: some View {
         Group {
-            Text("Delete Expense?")
+            Text(String(localized: "Delete Expense?"))
                 .font(.system(size: 20, weight: .medium, design: .rounded))
                 .foregroundColor(.PrimaryText)
 
-            Text("This action cannot be undone.")
+            Text(String(localized: "This action cannot be undone."))
                 .font(.system(size: 16, weight: .medium, design: .rounded))
                 .foregroundColor(.SubtitleText)
                 .padding(.bottom, 15)
@@ -441,7 +439,7 @@ struct TransactionView: View {
                 showingDatePicker = false
             }
 
-            DatePicker("Date", selection: $date)
+            DatePicker(String(localized: "Date"), selection: $date)
                 .datePickerStyle(.graphical)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
@@ -527,7 +525,7 @@ struct TransactionView: View {
             Group {
                 if showCategoryPicker {
                     HStack(spacing: 10) {
-                        Text("Close")
+                        Text(String(localized: "Close"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .lineLimit(1)
                     }
@@ -586,7 +584,7 @@ struct TransactionView: View {
             Image(systemName: "plus")
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
-            Text("Category")
+            Text(String(localized: "Category"))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .lineLimit(1)
         }
@@ -624,7 +622,7 @@ struct TransactionView: View {
                     .font(.system(.subheadline, design: .rounded).weight(.semibold))
             }
 
-            Text("Category")
+            Text(String(localized: "Category"))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .lineLimit(1)
         }
@@ -645,7 +643,7 @@ struct TransactionView: View {
 
     @ViewBuilder
     var expenseToggleButton: some View {
-        Text("Expense")
+        Text(String(localized: "Expense"))
             .font(.system(.body, design: .rounded).weight(.semibold))
             .lineLimit(1)
             .foregroundColor(income == false ? Color.PrimaryText : Color.SubtitleText)
@@ -664,7 +662,7 @@ struct TransactionView: View {
 
     @ViewBuilder
     var incomeToggleButton: some View {
-        Text("transaction-view-income-picker")
+        Text(String(localized: "transaction-view-income-picker"))
             .font(.system(.body, design: .rounded).weight(.semibold))
             .lineLimit(1)
             .foregroundColor(income == true ? Color.PrimaryText : Color.SubtitleText)
@@ -689,13 +687,13 @@ struct TransactionView: View {
 
     var repeatButtonAccessibility: String {
         if repeatType == 1 {
-            return "transaction recurs daily, button to edit recurring duration"
+            return String(localized: "transaction recurs daily, button to edit recurring duration")
         } else if repeatType == 2 {
-            return "transaction recurs weekly, button to edit recurring duration"
+            return String(localized: "transaction recurs weekly, button to edit recurring duration")
         } else if repeatType == 3 {
-            return "transaction recurs monthly, button to edit recurring duration"
+            return String(localized: "transaction recurs monthly, button to edit recurring duration")
         } else {
-            return "button to make transaction recurring"
+            return String(localized: "button to make transaction recurring")
         }
     }
 
@@ -725,7 +723,7 @@ struct TransactionView: View {
                     dismiss()
 
                 } label: {
-                    deleteButtonLabel("Delete", color: Color.AlertRed)
+                    deleteButtonLabel(String(localized: "Delete"), color: Color.AlertRed)
                 }
                 .padding(.bottom, 8)
 
@@ -736,7 +734,7 @@ struct TransactionView: View {
                     }
 
                 } label: {
-                    cancelButtonLabel("Cancel")
+                    cancelButtonLabel(String(localized: "Cancel"))
                 }
             }
             .padding(13)
@@ -796,9 +794,9 @@ struct TransactionView: View {
         let screenWidth: CGFloat
 
         if boldText {
-            screenWidth = (UIScreen.main.bounds.width - 200)
+            screenWidth = (ScreenSize.width - 200)
         } else {
-            screenWidth = (UIScreen.main.bounds.width - 150)
+            screenWidth = (ScreenSize.width - 150)
         }
 
         if (dateSize.width + categorySize.width + timeSize.width) > screenWidth {
@@ -1061,7 +1059,7 @@ struct TransactionView: View {
 
         if price == 0 && category == nil {
             toastImage = "questionmark.app"
-            toastTitle = "Incomplete Entry"
+            toastTitle = String(localized: "Incomplete Entry")
             showToast = true
             toggleFieldColors()
 
@@ -1070,13 +1068,13 @@ struct TransactionView: View {
             return
         } else if price == 0 {
             toastImage = "centsign.circle"
-            toastTitle = "Missing Amount"
+            toastTitle = String(localized: "Missing Amount")
             showToast = true
             generator.notificationOccurred(.error)
             return
         } else if category == nil {
             toastImage = "tray"
-            toastTitle = "Missing Category"
+            toastTitle = String(localized: "Missing Category")
             showToast = true
 
             toggleFieldColors()
@@ -1088,46 +1086,24 @@ struct TransactionView: View {
         generator.notificationOccurred(.success)
 
         if let editedTransaction = toEdit {
-            if note.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-                editedTransaction.note = category!.wrappedName
+            let trimmedNote = note.trimmingCharacters(in: .whitespaces)
+            let finalNote: String
+            if let category {
+                finalNote = trimmedNote.isEmpty ? category.wrappedName : trimmedNote
             } else {
-                editedTransaction.note = note.trimmingCharacters(in: .whitespaces)
+                finalNote = trimmedNote
             }
 
-            if let unwrappedCategory = category {
-                editedTransaction.category = unwrappedCategory
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    editedTransaction.amount = price
-                    editedTransaction.date = date
-                    editedTransaction.income = income
-
-                    let calendar = Calendar(identifier: .gregorian)
-
-                    editedTransaction.day =
-                    calendar.date(bySettingHour: 0, minute: 0, second: 0, of: date) ?? Date.now
-
-                    let dateComponents = calendar.dateComponents([.month, .year], from: date)
-
-                    editedTransaction.month = calendar.date(from: dateComponents) ?? Date.now
-
-                    if repeatType > 0 {
-                        editedTransaction.onceRecurring = true
-                        editedTransaction.recurringType = repeatType
-                        editedTransaction.recurringCoefficient = repeatCoefficient
-
-                        transactionVM.processRecurring(editedTransaction)
-                    } else {
-                        editedTransaction.onceRecurring = false
-                        editedTransaction.recurringType = repeatType
-                        editedTransaction.recurringCoefficient = repeatCoefficient
-                    }
-
-                    transactionVM.save()
-                }
-            }
+            transactionVM.update(
+                editedTransaction,
+                note: finalNote,
+                category: category,
+                income: income,
+                amount: price,
+                date: date,
+                repeatType: repeatType,
+                repeatCoefficient: repeatCoefficient
+            )
 
             dismiss()
 
@@ -1244,14 +1220,14 @@ struct NoteView: View {
                     .foregroundColor(Color.PrimaryText)
 
                 if note.isEmpty {
-                    Text("Add Note")
+                    Text(String(localized: "Add Note"))
                         .foregroundColor(Color.SubtitleText)
                 }
             }
             .font(.system(.body, design: .rounded).weight(.semibold))
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             //            .font(.system(size: 16, weight: .semibold, design: .rounded))
-            .frame(width: min(noteWidth, UIScreen.main.bounds.width / 1.5), alignment: .center)
+            .frame(width: min(noteWidth, ScreenSize.width / 1.5), alignment: .center)
         }
         .onTapGesture {
             textFocused = true
@@ -1351,14 +1327,14 @@ struct RecurringPickerView: View {
 
             HStack {
                 if repeatCoefficient == 1 {
-                    Text("custom")
+                    Text(String(localized: "custom"))
                 } else {
                     if repeatType == 1 {
-                        Text(String(repeatCoefficient) + " " + String(localized: "\(repeatCoefficient) days"))
+                        Text("\(repeatCoefficient) \(String(localized: "days"))")
                     } else if repeatType == 2 {
-                        Text(String(repeatCoefficient) + " " + String(localized: "\(repeatCoefficient) weeks"))
+                        Text("\(repeatCoefficient) \(String(localized: "weeks"))")
                     } else if repeatType == 3 {
-                        Text(String(repeatCoefficient) + " " + String(localized: "\(repeatCoefficient) months"))
+                        Text("\(repeatCoefficient) \(String(localized: "months"))")
                     }
                 }
 
@@ -1460,7 +1436,7 @@ struct CustomRecurringView: View {
 
                 Spacer()
 
-                Text("Custom Interval")
+                Text(String(localized: "Custom Interval"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 //                    .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -1488,7 +1464,7 @@ struct CustomRecurringView: View {
             }
 
             HStack(spacing: 10) {
-                Text("Repeats every")
+                Text(String(localized: "Repeats every"))
                     .font(.system(size: 23, weight: .medium, design: .rounded))
                     .foregroundColor(Color.PrimaryText)
                     .padding(.trailing, 3)
@@ -1552,11 +1528,11 @@ struct CustomRecurringView: View {
 
                     Group {
                         if holdingType == 1 {
-                            Text("\(holdingCoefficient) days")
+                            Text(String(format: String(localized: "%lld days"), holdingCoefficient))
                         } else if holdingType == 2 {
-                            Text("\(holdingCoefficient) weeks")
+                            Text(String(format: String(localized: "%lld weeks"), holdingCoefficient))
                         } else if holdingType == 3 {
-                            Text("\(holdingCoefficient) months")
+                            Text(String(format: String(localized: "%lld months"), holdingCoefficient))
                         }
                     }
                     .font(.system(size: 23, weight: .medium, design: .rounded))

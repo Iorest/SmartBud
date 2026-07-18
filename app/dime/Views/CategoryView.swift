@@ -40,7 +40,7 @@ struct CategoryView: View {
 
             HStack {
                 HStack(spacing: 0) {
-                    Text("Expense")
+                    Text(String(localized: "Expense"))
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -63,7 +63,7 @@ struct CategoryView: View {
                             }
                         }
 
-                    Text("Income")
+                    Text(String(localized: "Income"))
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -98,7 +98,7 @@ struct CategoryView: View {
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
 
-                    Text("New")
+                    Text(String(localized: "New"))
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -114,7 +114,7 @@ struct CategoryView: View {
                     if disabled {
                         showToast = true
                         toastImage = "exclamationmark.triangle.fill"
-                        toastTitle = "Limit Exceeded"
+                        toastTitle = String(localized: "Limit Exceeded")
                         positive = false
                     } else {
                         newCategory = true
@@ -300,7 +300,7 @@ struct CategoryListView: View {
                     .frame(height: 35)
                     .frame(maxWidth: .infinity)
                     .overlay {
-                        Text("Categories")
+                        Text(String(localized: "Categories"))
                             .font(.system(.title3, design: .rounded).weight(.medium))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .medium, design: .rounded))
@@ -398,7 +398,7 @@ struct CategoryListView: View {
                     .frame(height: 35)
                     .frame(maxWidth: .infinity)
                     .overlay {
-                        Text("Categories")
+                        Text(String(localized: "Categories"))
                             .font(.system(.title3, design: .rounded).weight(mode == .settings ? .semibold : .medium))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: mode == .settings ? .semibold : .medium, design: .rounded))
@@ -421,9 +421,9 @@ struct CategoryListView: View {
 
                                     Group {
                                         if income {
-                                            Text("no_income_categories")
+                                            Text(LocalizedStringKey("no_income_categories"))
                                         } else {
-                                            Text("no_expense_categories")
+                                            Text(LocalizedStringKey("no_expense_categories"))
                                         }
                                     }
                                     .font(.system(.body, design: .rounded).weight(.medium))
@@ -497,7 +497,7 @@ struct CategoryListView: View {
                     .environment(\.editMode, .constant(self.isEditing ? EditMode.active : EditMode.inactive))
                 } else {
                     List {
-                        Section(header: Text("\(income ? "INCOME" : "EXPENSE") CATEGORIES").foregroundColor(Color.SubtitleText)) {
+                        Section(header: Text(income ? String(localized: "INCOME CATEGORIES") : String(localized: "EXPENSE CATEGORIES")).foregroundColor(Color.SubtitleText)) {
                             if categories.isEmpty {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
@@ -506,7 +506,8 @@ struct CategoryListView: View {
 //                                        .font(.system(size: 37, weight: .light))
                                         .foregroundColor(Color.SubtitleText)
 
-                                    Text("No \(income ? "income" : "expense") categories found,\nclick the 'New' button to add some.")
+                                    let emptyType = income ? "income" : "expense"
+                                    Text(String(format: String(localized: "No %@ categories found,\nclick the 'New' button to add some."), emptyType))
                                         .font(.system(.body, design: .rounded).weight(.medium))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                        .font(.system(size: 17, weight: .medium, design: .rounded))
@@ -597,11 +598,12 @@ struct CategoryListView: View {
                     }
 
                 VStack(alignment: .leading, spacing: 1.5) {
-                    Text("Delete '\(toDelete?.wrappedName ?? "")'?")
+                    let deleteName = toDelete?.wrappedName ?? ""
+                    Text(String(format: String(localized: "Delete '%@'?"), deleteName))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundColor(.PrimaryText)
 
-                    Text("This action cannot be undone, and all \(toDelete?.wrappedName ?? "") transactions would be deleted.")
+                    Text(String(format: String(localized: "This action cannot be undone, and all %@ transactions would be deleted."), deleteName))
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                         .foregroundColor(.SubtitleText)
                         .padding(.bottom, 15)
@@ -617,7 +619,7 @@ struct CategoryListView: View {
                         deleteMode = false
 
                     } label: {
-                        Text("Delete")
+                        Text(String(localized: "Delete"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
                             .frame(height: 45)
@@ -633,7 +635,7 @@ struct CategoryListView: View {
                         }
 
                     } label: {
-                        Text("Cancel")
+                        Text(String(localized: "Cancel"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
                             .foregroundColor(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
@@ -691,7 +693,7 @@ struct CategoryListView: View {
         }
         .onChange(of: showSuggestions) { _, newValue in
             if !newValue {
-                toastTitle = "Suggestions Hidden"
+                toastTitle = String(localized: "Suggestions Hidden")
                 toastImage = "eye.slash"
                 showToast = true
                 positive = true
@@ -787,20 +789,20 @@ struct NewCategoryAlert: View {
                         .frame(maxWidth: 200)
                     } else {
                         if expenseCategories.count == 24 {
-                            Text("Income Category")
+                            Text(String(localized: "Income Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else if budgetMode {
-                            Text("Expense Category")
+                            Text(String(localized: "Expense Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else {
                             HStack(spacing: 0) {
-                                Text("Expense")
+                                Text(String(localized: "Expense"))
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -823,7 +825,7 @@ struct NewCategoryAlert: View {
                                         }
                                     }
 
-                                Text("Income")
+                                Text(String(localized: "Income"))
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -941,7 +943,7 @@ struct NewCategoryAlert: View {
 //                                }
 //                        }
 //                    }
-                    NormalTextField(text: $newName, placeholder: "Category Name", action: verification)
+                    NormalTextField(text: $newName, placeholder: String(localized: "Category Name"), action: verification)
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
@@ -1021,28 +1023,28 @@ struct NewCategoryAlert: View {
 
             switch outcome {
             case .incomplete:
-                toastTitle = "Incomplete Entry"
+                toastTitle = String(localized: "Incomplete Entry")
                 toastImage = "questionmark.app"
             case .missingEmoji:
-                toastTitle = "Missing Emoji"
+                toastTitle = String(localized: "Missing Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .missingName:
-                toastTitle = "Missing Name"
+                toastTitle = String(localized: "Missing Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
             case .duplicate:
-                toastTitle = "Duplicate Found"
+                toastTitle = String(localized: "Duplicate Found")
                 toastImage = "externaldrive"
             case .duplicateEmoji:
-                toastTitle = "Duplicate Emoji"
+                toastTitle = String(localized: "Duplicate Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .duplicateName:
-                toastTitle = "Duplicate Name"
+                toastTitle = String(localized: "Duplicate Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
@@ -1054,7 +1056,7 @@ struct NewCategoryAlert: View {
             showToast = true
 
         } else {
-            toastTitle = "Added \(newName)"
+            toastTitle = String(format: String(localized: "Added %@"), newName)
 
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
@@ -1233,7 +1235,7 @@ struct EditCategoryAlert: View {
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
-                        Text(toEdit.income ? "Income" : "Expense")
+                        Text(LocalizedStringKey(toEdit.income ? "Income" : "Expense"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -1310,7 +1312,7 @@ struct EditCategoryAlert: View {
                         }
                     }
 
-                    NormalTextField(text: $newName, placeholder: "Category Name", action: verification)
+                    NormalTextField(text: $newName, placeholder: String(localized: "Category Name"), action: verification)
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
@@ -1384,28 +1386,28 @@ struct EditCategoryAlert: View {
 
             switch outcome {
             case .incomplete:
-                toastTitle = "Incomplete Entry"
+                toastTitle = String(localized: "Incomplete Entry")
                 toastImage = "questionmark.app"
             case .missingEmoji:
-                toastTitle = "Missing Emoji"
+                toastTitle = String(localized: "Missing Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .missingName:
-                toastTitle = "Missing Name"
+                toastTitle = String(localized: "Missing Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
             case .duplicate:
-                toastTitle = "Duplicate Found"
+                toastTitle = String(localized: "Duplicate Found")
                 toastImage = "externaldrive"
             case .duplicateEmoji:
-                toastTitle = "Duplicate Emoji"
+                toastTitle = String(localized: "Duplicate Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .duplicateName:
-                toastTitle = "Duplicate Name"
+                toastTitle = String(localized: "Duplicate Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
@@ -1424,7 +1426,7 @@ struct EditCategoryAlert: View {
                 categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour)
             }
 
-            rootToastTitle = "Edited \(newName)"
+            rootToastTitle = String(format: String(localized: "Edited %@"), newName)
             rootToastImage = "checkmark.circle.fill"
             positive = true
             showRootToast = true
@@ -1457,13 +1459,13 @@ struct DeleteCategoryAlert: View {
                 }
 
             VStack(alignment: .leading, spacing: 1.5) {
-                Text("Delete '\(toDelete.wrappedName)'?")
+                Text(String(format: String(localized: "Delete '%@'?"), toDelete.wrappedName))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundColor(.PrimaryText)
 
-                Text("This action cannot be undone.")
+                Text(String(localized: "This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -1482,7 +1484,7 @@ struct DeleteCategoryAlert: View {
                     }
 
                 } label: {
-                    Text("Delete")
+                    Text(String(localized: "Delete"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundColor(.white)
@@ -1498,7 +1500,7 @@ struct DeleteCategoryAlert: View {
                     }
 
                 } label: {
-                    Text("Cancel")
+                    Text(String(localized: "Cancel"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 20, weight: .semibold, design: .rounded))
@@ -1599,7 +1601,7 @@ struct SuggestedCategoriesView: View {
 
     var body: some View {
         if !suggestions.isEmpty {
-            Section(header: Text("SUGGESTED").foregroundColor(Color.SubtitleText)) {
+            Section(header: Text(String(localized: "SUGGESTED")).foregroundColor(Color.SubtitleText)) {
                 ForEach(suggestions, id: \.self) { category in
                     HStack(spacing: 8) {
                         Text(category.emoji)

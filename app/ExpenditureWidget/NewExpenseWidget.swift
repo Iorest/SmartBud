@@ -11,21 +11,12 @@ import WidgetKit
 struct NewExpenseWidget: Widget {
     let kind: String = "AddExpense"
 
-    private var supportedFamilies: [WidgetFamily] {
-        if #available(iOSApplicationExtension 16, *) {
-            return [
-                .accessoryCircular
-            ]
-        } else {
-            return [WidgetFamily]()
-        }
-    }
+    private let supportedFamilies: [WidgetFamily] = [.accessoryCircular]
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: NewExpenseProvider()) { entry in
             NewExpenseWidgetEntryView(entry: entry)
         }
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .configurationDisplayName("New Expense")
         .description("A convenient button to log new purchases.")
         .supportedFamilies(supportedFamilies)

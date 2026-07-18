@@ -20,6 +20,41 @@ final class TransactionViewModel: ObservableObject {
         return txn
     }
 
+    /// Edits an existing transaction in place. Computes `day` / `month` derived fields
+    /// from `date` and re-processes recurring transactions if `repeatType > 0`.
+    func update(_ txn: TransactionModel, note: String, category: CategoryModel?,
+                income: Bool, amount: Double, date: Date,
+                repeatType: Int, repeatCoefficient: Int) {
+        txn.note = note
+        txn.category = category
+        txn.amount = amount
+        txn.date = date
+        txn.income = income
+
+        let calendar = Calendar(identifier: .gregorian)
+        txn.day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: date) ?? Date.now
+        let dateComponents = calendar.dateComponents([.month, .year], from: date)
+        txn.month = calendar.date(from: dateComponents) ?? Date.now
+
+        if repeatType > 0 {
+            txn.onceRecurring = true
+            txn.recurringType = repeatType
+            txn.recurringCoefficient = repeatCoefficient
+            processRecurring(txn)
+        } else {
+            txn.onceRecurring = false
+            txn.recurringType = repeatType
+            txn.recurringCoefficient = repeatCoefficient
+        }
+        repo.save()
+    }
+
+    /// Marks a transaction as no longer recurring (idempotent).
+    func stopRecurring(_ txn: TransactionModel) {
+        txn.recurringType = 0
+        repo.save()
+    }
+
     // MARK: Recurring
 
     func updateAllRecurring() {

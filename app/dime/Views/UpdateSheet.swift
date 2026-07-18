@@ -63,7 +63,13 @@ struct UpdateAlert: View {
                     }
                     .foregroundColor(.PrimaryText)
 
-                    Text("Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? "")) · 18 Sep 2023")
+                    Text(
+                        String(
+                            format: String(
+                                localized: "Version %@ (%@) · 18 Sep 2023"),
+                            UIApplication.appVersion ?? "",
+                            UIApplication.buildNumber ?? "")
+                    )
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
 //                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundColor(.SubtitleText)
@@ -122,7 +128,11 @@ struct UpdateAlert: View {
                 }
                 .frame(height: 300)
 
-                Text("Special thanks to \(makeAttributedString()) for contributing")
+                Text(
+                    AttributedString(String(localized: "Special thanks to "))
+                        + makeAttributedString()
+                        + AttributedString(String(localized: " for contributing"))
+                )
                     .font(.system(.footnote, design: .rounded).weight(.medium))
                     .foregroundColor(Color.SubtitleText)
                     .frame(maxWidth: .infinity)

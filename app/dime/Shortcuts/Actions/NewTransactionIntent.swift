@@ -11,60 +11,31 @@ import SwiftUI
 
 @available(iOS 16.4, *)
 struct NewTransactionIntent: AppIntent {
-    nonisolated(unsafe) static var title: LocalizedStringResource = "New Transaction"
+    static let title: LocalizedStringResource = "New Transaction"
 
-    nonisolated(unsafe) static var description =
-        IntentDescription("Log new transactions in a blink")
+    static let description =
+        IntentDescription(LocalizedStringResource("Log new transactions in a blink"))
 
-    @Parameter(title: "Type", description: "Type of the transaction", requestValueDialog: IntentDialog("Would you like to log an income or expense?"))
+    @Parameter(title: LocalizedStringResource("Type"), description: LocalizedStringResource("Type of the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("Would you like to log an income or expense?")))
     var income: TransactionType
 
-    @Parameter(title: "Amount", description: "Value of the transaction", controlStyle: .field, inclusiveRange: (lowerBound: 0.01, upperBound: 100_000_000), requestValueDialog: IntentDialog("How much was transacted?"))
+    @Parameter(title: LocalizedStringResource("Amount"), description: LocalizedStringResource("Value of the transaction"), controlStyle: .field, inclusiveRange: (lowerBound: 0.01, upperBound: 100_000_000), requestValueDialog: IntentDialog(LocalizedStringResource("How much was transacted?")))
     var amount: Double
 
-    @Parameter(title: "Category", description: "Category associated with the transaction", requestValueDialog: IntentDialog("What category does it come under?"))
+    @Parameter(title: LocalizedStringResource("Category"), description: LocalizedStringResource("Category associated with the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?")))
     var incomeCategory: IncomeCategoryEntity?
 
-    @Parameter(title: "Category", description: "Category associated with the transaction", requestValueDialog: IntentDialog("What category does it come under?"))
+    @Parameter(title: LocalizedStringResource("Category"), description: LocalizedStringResource("Category associated with the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?")))
     var expenseCategory: ExpenseCategoryEntity?
 
-    @Parameter(title: "Note")
+    @Parameter(title: LocalizedStringResource("Note"))
     var note: String?
 
-    @Parameter(title: "Recurring Transaction", default: false)
+    @Parameter(title: LocalizedStringResource("Recurring Transaction"), default: false)
     var recurringTransaction: Bool
 
-    @Parameter(title: "Recurring Frequency", default: .weekly)
+    @Parameter(title: LocalizedStringResource("Recurring Frequency"), default: .weekly)
     var recurringType: RepeatType
-
-//    struct CategoryOptionsProvider: DynamicOptionsProvider {
-//
-//        func results() async throws -> ItemCollection<CategoryEntity> {
-//            let dataController = DataController()
-//
-//            let categories = dataController.getAllCategories().map { CategoryEntity(id: $0.id!, name: $0.wrappedName, emoji: $0.wrappedEmoji, income: $0.income)
-//            }
-//
-//            let incomeCategories = categories.filter { $0.income }
-//            let expenseCategories = categories.filter { !$0.income }
-//
-//            return ItemCollection {
-//                ItemSection(
-//                    "Income Categories",
-//                    items: incomeCategories.map {
-//                        IntentItem<CategoryEntity>.init($0)
-//                    }
-//                )
-//                ItemSection(
-//                    "Expense Categories",
-//                    items: expenseCategories.map {
-//                        IntentItem<CategoryEntity>.init($0)
-//                    }
-//                )
-//
-//            }
-//        }
-//    }
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
@@ -102,7 +73,7 @@ struct NewTransactionIntent: AppIntent {
 
                     let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: false, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
-                    return .result(dialog: "Expense successfully logged.") {
+                    return .result(dialog: IntentDialog(stringLiteral: String(localized: "Expense successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)
                     }
                 } else {
@@ -116,7 +87,7 @@ struct NewTransactionIntent: AppIntent {
 
                     let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: true, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
-                    return .result(dialog: "Income successfully logged.") {
+                    return .result(dialog: IntentDialog(stringLiteral: String(localized: "Income successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)
                     }
                 } else {
@@ -130,13 +101,13 @@ struct NewTransactionIntent: AppIntent {
         Switch(\NewTransactionIntent.$income) {
             Case(TransactionType.expense) {
                 When(\NewTransactionIntent.$recurringTransaction, .equalTo, true, {
-                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$expenseCategory)") {
+                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$expenseCategory)", table: "Localizable") {
                         \.$note
                         \.$recurringTransaction
                         \.$recurringType
                     }
                 }, otherwise: {
-                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$expenseCategory)") {
+                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$expenseCategory)", table: "Localizable") {
                         \.$note
                         \.$recurringTransaction
                     }
@@ -144,20 +115,20 @@ struct NewTransactionIntent: AppIntent {
             }
             Case(TransactionType.income) {
                 When(\NewTransactionIntent.$recurringTransaction, .equalTo, true, {
-                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$incomeCategory)") {
+                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$incomeCategory)", table: "Localizable") {
                         \.$note
                         \.$recurringTransaction
                         \.$recurringType
                     }
                 }, otherwise: {
-                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$incomeCategory)") {
+                    Summary("Log an \(\.$income) of \(\.$amount) under \(\.$incomeCategory)", table: "Localizable") {
                         \.$note
                         \.$recurringTransaction
                     }
                 })
             }
             DefaultCase {
-                Summary("Log an \(\.$income) of \(\.$amount)") {
+                Summary("Log an \(\.$income) of \(\.$amount)", table: "Localizable") {
                     \.$note
                 }
             }
@@ -174,13 +145,13 @@ enum TransactionType: String {
 @available(iOS 16, *)
 extension TransactionType: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        return TypeDisplayRepresentation(name: "Type")
+        return TypeDisplayRepresentation(name: LocalizedStringResource("Type"))
     }
 
-    nonisolated(unsafe) static var caseDisplayRepresentations: [TransactionType: DisplayRepresentation] = [
-        .income: DisplayRepresentation(title: "income",
+    static let caseDisplayRepresentations: [TransactionType: DisplayRepresentation] = [
+        .income: DisplayRepresentation(title: LocalizedStringResource("income"),
                                        image: .init(systemName: "plus.square.fill")),
-        .expense: DisplayRepresentation(title: "expense",
+        .expense: DisplayRepresentation(title: LocalizedStringResource("expense"),
                                         image: .init(systemName: "minus.square.fill"))
     ]
 }
@@ -192,13 +163,13 @@ enum RepeatType: String {
 @available(iOS 16, *)
 extension RepeatType: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        return TypeDisplayRepresentation(name: "Frequency")
+        return TypeDisplayRepresentation(name: LocalizedStringResource("Frequency"))
     }
 
-    nonisolated(unsafe) static var caseDisplayRepresentations: [RepeatType: DisplayRepresentation] = [
-        .daily: DisplayRepresentation(title: "Daily"),
-        .weekly: DisplayRepresentation(title: "Weekly"),
-        .monthly: DisplayRepresentation(title: "Monthly")
+    static let caseDisplayRepresentations: [RepeatType: DisplayRepresentation] = [
+        .daily: DisplayRepresentation(title: LocalizedStringResource("Daily")),
+        .weekly: DisplayRepresentation(title: LocalizedStringResource("Weekly")),
+        .monthly: DisplayRepresentation(title: LocalizedStringResource("Monthly"))
     ]
 }
 

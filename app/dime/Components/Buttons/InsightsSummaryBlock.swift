@@ -36,7 +36,7 @@ struct InsightsSummaryBlockView: View {
 
                 Text(amountString)
                     .font(.system(.title3, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundColor(color)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }

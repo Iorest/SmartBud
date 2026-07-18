@@ -67,6 +67,10 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .tag("Log")
 
+                InsightsView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .tag("Insights")
+
                 BudgetView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .tag("Budget")
