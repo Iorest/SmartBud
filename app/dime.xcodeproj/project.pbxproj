@@ -103,7 +103,6 @@
 		53B1D197288ED87000E28062 /* ExpenditureWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		53B1D1A2288EDABC00E28062 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2AC287C6AD200F76ADF /* DataController.swift */; };
 		53B1D1A5289383B100E28062 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B1D1A4289383B100E28062 /* FontExtension.swift */; };
-		53B1D1A8289A60D500E28062 /* CrookedText in Frameworks */ = {isa = PBXBuildFile; productRef = 53B1D1A7289A60D500E28062 /* CrookedText */; };
 		53B7D0D129701DB700F81002 /* MainBudgetWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B7D0D029701DB700F81002 /* MainBudgetWidget.swift */; };
 		53B7D0D229701DB800F81002 /* MainBudgetWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B7D0D029701DB700F81002 /* MainBudgetWidget.swift */; };
 		53B822AA2A6D50CC000FC7C9 /* NewTransactionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B822A92A6D50CC000FC7C9 /* NewTransactionIntent.swift */; };
@@ -355,7 +354,6 @@
 				53DCFAA12A498FBF0063FCDE /* CloudKitSyncMonitor in Frameworks */,
 				5327D2E6287C6CC300F76ADF /* Popovers in Frameworks */,
 				536715ED28E1E9A3008461F2 /* StoreKit.framework in Frameworks */,
-				53B1D1A8289A60D500E28062 /* CrookedText in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,7 +714,6 @@
 			name = dime;
 			packageProductDependencies = (
 				5327D2E5287C6CC300F76ADF /* Popovers */,
-				53B1D1A7289A60D500E28062 /* CrookedText */,
 				53A4147F28B7DA4C008C30E7 /* ConfettiSwiftUI */,
 				53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */,
 			);
@@ -778,7 +775,6 @@
 			mainGroup = 5327D27A287C697400F76ADF;
 			packageReferences = (
 				5327D2E4287C6CC300F76ADF /* XCRemoteSwiftPackageReference "Popovers" */,
-				53B1D1A6289A60D500E28062 /* XCRemoteSwiftPackageReference "CrookedText" */,
 				53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 				53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
 			);
@@ -1525,14 +1521,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		53B1D1A6289A60D500E28062 /* XCRemoteSwiftPackageReference "CrookedText" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duemunk/CrookedText";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.1;
-			};
-		};
 		53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor.git";
@@ -1553,11 +1541,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
 			productName = ConfettiSwiftUI;
-		};
-		53B1D1A7289A60D500E28062 /* CrookedText */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 53B1D1A6289A60D500E28062 /* XCRemoteSwiftPackageReference "CrookedText" */;
-			productName = CrookedText;
 		};
 		53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */ = {
 			isa = XCSwiftPackageProductDependency;

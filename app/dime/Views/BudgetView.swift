@@ -5,7 +5,6 @@
 //  Created by Rafael Soh on 20/5/22.
 //
 
-import CrookedText
 import Foundation
 import Popovers
 import SwiftUI
@@ -410,9 +409,8 @@ struct MainBudgetView: View {
                     }
                 }
 
-                CrookedText(text: String(localized: "OVERALL SPENT: \(percentString1)"), radius: width / 2 + 8)
+                ArcedText(text: String(localized: "OVERALL SPENT: \(percentString1)"), radius: width / 2 + 8)
                     .font(.system(.footnote, design: .rounded).weight(.medium))
-//                    .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
                     .frame(width: width, height: 10)
 
@@ -2377,5 +2375,38 @@ struct BudgetStepperView: View {
 
         self.startDate = startDate
         type = budgetType
+    }
+}
+
+// MARK: - Arced Text (replaces CrookedText)
+struct ArcedText: View {
+    let text: String
+    let radius: CGFloat
+
+    @Environment(\.font) private var font
+    @Environment(\.foregroundColor) private var color
+
+    var body: some View {
+        Canvas { context, size in
+            let resolvedFont = font ?? .footnote
+            let resolvedColor = color ?? .primary
+            let midX = size.width / 2
+            let midY = size.height
+            let center = CGPoint(x: midX, y: midY)
+            let charCount = text.count
+            let totalAngle: CGFloat = .pi / 2.5
+            let startAngle: CGFloat = .pi + totalAngle / 2
+            let spacing: CGFloat = charCount > 1 ? totalAngle / CGFloat(charCount - 1) : 0
+
+            for (index, character) in text.enumerated() {
+                let angle = startAngle + CGFloat(index) * spacing
+                let x = center.x + radius * cos(angle)
+                let y = center.y + radius * sin(angle)
+                let charText = Text(String(character)).font(resolvedFont).foregroundColor(resolvedColor)
+                let resolved = context.resolve(charText)
+                let charSize = resolved.measure(in: .zero)
+                context.draw(resolved, at: CGPoint(x: x - charSize.width / 2, y: y - charSize.height / 2))
+            }
+        }
     }
 }
