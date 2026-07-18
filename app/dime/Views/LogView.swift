@@ -5,15 +5,13 @@
 //  Created by Rafael Soh on 19/5/22.
 //
 
-import CloudKitSyncMonitor
 import CoreData
 import Foundation
-import SwiftUIIntrospect
 import Popovers
 import SwiftUI
 
 struct LogView: View {
-    @ObservedObject var syncMonitor = SyncMonitor.shared
+    @State private var syncSucceeded = false
 
     @State var updatedRecurring = false
 
@@ -266,9 +264,11 @@ struct LogView: View {
             .fullScreenCover(isPresented: $searchMode) {
                 SearchView()
             }
-            .onChange(of: syncMonitor.syncStateSummary) { newState in
-                if newState == .succeeded && !updatedRecurring {
+            .onReceive(NotificationCenter.default.publisher(for: NSPersistentCloudKitContainer.eventChangedNotification)) { notification in
+                guard let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else { return }
+                if event.endDate != nil && event.succeeded && !updatedRecurring {
                     dataController.updateRecurringTransactions()
+                    syncSucceeded = true
                     updatedRecurring = true
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
@@ -277,7 +277,7 @@ struct LogView: View {
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                if syncMonitor.syncStateSummary == .succeeded && !updatedRecurring {
+                if syncSucceeded && !updatedRecurring {
                     dataController.updateRecurringTransactions()
                     updatedRecurring = true
 
@@ -636,6 +636,7 @@ struct SearchView: View {
     @Environment(\.dismiss) var dismiss
 
     @State var searchQuery = ""
+    @FocusState private var searchFocused: Bool
 
     var body: some View {
         VStack(spacing: 18) {
@@ -648,9 +649,7 @@ struct SearchView: View {
                         .foregroundColor(Color.DarkIcon.opacity(0.8))
                         .accessibility(hidden: true)
                     TextField("Search entry by note", text: $searchQuery)
-                        .introspect(.textField, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18)) { textField in
-                            textField.becomeFirstResponder()
-                        }
+                        .focused($searchFocused)
                         .font(.system(.body, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 17, weight: .regular, design: .rounded))
@@ -695,6 +694,9 @@ struct SearchView: View {
         }
         .padding(15)
         .background(Color.PrimaryBackground)
+        .onAppear {
+            searchFocused = true
+        }
     }
 }
 

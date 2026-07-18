@@ -155,8 +155,6 @@
 		D63B204A2D8728C300CAFB20 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D63B20462D8728C300CAFB20 /* Localizable.strings */; };
 		D63B204B2D8728C300CAFB20 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = D63B20482D8728C300CAFB20 /* Localizable.stringsdict */; };
 		D63B20542D8728C300CAFB20 /* WidgetConfiguration.strings in Resources */ = {isa = PBXBuildFile; fileRef = D63B20532D8728C300CAFB20 /* WidgetConfiguration.strings */; };
-		D6A4DE202D61744400F7F751 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = D6A4DE1F2D61744400F7F751 /* SwiftUIIntrospect */; };
-		D6A4DE242D61744400F7F751 /* SwiftUIIntrospect-Static in Frameworks */ = {isa = PBXBuildFile; productRef = D6A4DE232D61744400F7F751 /* SwiftUIIntrospect-Static */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,16 +193,6 @@
 				5313EC7228ACE941000EAB0C /* BudgetIntentUI.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D6A4DE1B2D6153C200F7F751 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -362,8 +350,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6A4DE242D61744400F7F751 /* SwiftUIIntrospect-Static in Frameworks */,
-				D6A4DE202D61744400F7F751 /* SwiftUIIntrospect in Frameworks */,
 				53A4148028B7DA4C008C30E7 /* ConfettiSwiftUI in Frameworks */,
 				5383D85E287D9A0100D1B9BA /* CloudKit.framework in Frameworks */,
 				53DCFAA12A498FBF0063FCDE /* CloudKitSyncMonitor in Frameworks */,
@@ -719,7 +705,6 @@
 				5327D281287C697400F76ADF /* Resources */,
 				53B1D19B288ED87000E28062 /* Embed Foundation Extensions */,
 				AE22D66A2AE62F4700F0A4F9 /* Run Script */,
-				D6A4DE1B2D6153C200F7F751 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -734,8 +719,6 @@
 				53B1D1A7289A60D500E28062 /* CrookedText */,
 				53A4147F28B7DA4C008C30E7 /* ConfettiSwiftUI */,
 				53DCFAA02A498FBF0063FCDE /* CloudKitSyncMonitor */,
-				D6A4DE1F2D61744400F7F751 /* SwiftUIIntrospect */,
-				D6A4DE232D61744400F7F751 /* SwiftUIIntrospect-Static */,
 			);
 			productName = dime;
 			productReference = 5327D283287C697400F76ADF /* dime.app */;
@@ -798,7 +781,6 @@
 				53B1D1A6289A60D500E28062 /* XCRemoteSwiftPackageReference "CrookedText" */,
 				53A4147E28B7DA4C008C30E7 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 				53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
-				D6A4DE1E2D61744400F7F751 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = 5327D284287C697400F76ADF /* Products */;
 			projectDirPath = "";
@@ -1559,14 +1541,6 @@
 				minimumVersion = 1.2.1;
 			};
 		};
-		D6A4DE1E2D61744400F7F751 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1589,16 +1563,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 53DCFA9F2A498FBF0063FCDE /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
 			productName = CloudKitSyncMonitor;
-		};
-		D6A4DE1F2D61744400F7F751 /* SwiftUIIntrospect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D6A4DE1E2D61744400F7F751 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = SwiftUIIntrospect;
-		};
-		D6A4DE232D61744400F7F751 /* SwiftUIIntrospect-Static */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D6A4DE1E2D61744400F7F751 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = "SwiftUIIntrospect-Static";
 		};
 /* End XCSwiftPackageProductDependency section */
 
