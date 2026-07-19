@@ -15,16 +15,19 @@ final class DataRepository: ObservableObject {
     var modelContainer: ModelContainer { container }
 
     init() {
-        let groupID = "group.com.rafaelsoh.dime"
-        guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID) else {
-            fatalError("App Group not found")
-        }
-        // CloudKit-backed private database sync. Container is `iCloud.com.rafaelsoh.dime`,
-        // declared in `dime.entitlements`. Widget extensions read from the same App Group
-        // store via their own `ModelConfiguration(groupContainer:)` and see the synced data
-        // without needing direct CloudKit access.
+        // Aligned with widget extensions: they all read via
+        // `ModelConfiguration("MainModel", groupContainer: .identifier(...))`,
+        // which resolves to `<AppGroup>/MainModel.store`. Using the same
+        // `name:` + `groupContainer:` initializer here keeps both targets
+        // pointing at the same SQLite file, so `WidgetCenter.reloadAllTimelines()`
+        // refreshes actually show the latest data.
+        //
+        // CloudKit private-database sync is enabled on the main-app side only;
+        // the widget intentionally omits `cloudKitDatabase:` and just reads
+        // the locally-synced file.
         let config = ModelConfiguration(
-            url: url.appendingPathComponent("Main.swiftdata"),
+            "MainModel",
+            groupContainer: .identifier("group.com.rafaelsoh.dime"),
             cloudKitDatabase: .private("iCloud.com.rafaelsoh.dime")
         )
         do {
