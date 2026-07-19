@@ -1907,6 +1907,24 @@
         }
       }
     },
+    "Budget Widget": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预算小组件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預算小組件"
+          }
+        }
+      }
+    },
     "Budget Your Finances": {
       "localizations": {
         "zh-Hans": {
@@ -2541,6 +2559,42 @@
         }
       }
     },
+    "Configure your insights view.": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配置统计视图"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配置統計視圖"
+          }
+        }
+      }
+    },
+    "Configure your recent transactions view.": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配置最近交易视图"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配置最近交易視圖"
+          }
+        }
+      }
+    },
     "Confirm": {
       "extractionState": "manual",
       "localizations": {
@@ -2915,6 +2969,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "日期,備註,金額,類別,類型\n"
+          }
+        }
+      }
+    },
+    "Day": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
           }
         }
       }
@@ -4935,6 +5007,24 @@
         }
       }
     },
+    "Insights Widget": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "统计小组件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計小組件"
+          }
+        }
+      }
+    },
     "Into the unknown.": {
       "extractionState": "manual",
       "localizations": {
@@ -5684,6 +5774,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "監控總預算的執行情況。"
+          }
+        }
+      }
+    },
+    "Month": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
           }
         }
       }
@@ -6984,6 +7092,24 @@
         }
       }
     },
+    "Recent Widget": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近小组件"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近小組件"
+          }
+        }
+      }
+    },
     "Recurring Frequency": {
       "localizations": {
         "zh-Hans": {
@@ -7574,6 +7700,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "按備註搜尋記錄"
+          }
+        }
+      }
+    },
+    "Select a budget to monitor.": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择要监控的预算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇要監控的預算"
           }
         }
       }
@@ -8909,6 +9053,24 @@
         }
       }
     },
+    "Total Expenditure": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "总支出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "總支出"
+          }
+        }
+      }
+    },
     "Total Income": {
       "localizations": {
         "zh-Hans": {
@@ -9574,6 +9736,24 @@
         }
       }
     },
+    "Week": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週"
+          }
+        }
+      }
+    },
     "Weekly": {
       "localizations": {
         "zh-Hans": {
@@ -9762,6 +9942,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "昨天"
+          }
+        }
+      }
+    },
+    "Year": {
+      "comment": "App Intents widget configuration (iOS 17 WidgetConfigurationIntent)",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
           }
         }
       }
