@@ -8,11 +8,8 @@
 import Combine
 import Foundation
 import SwiftUI
-#if canImport(UIKit)
 import UIKit
-#endif
 
-@available(iOS 13, macOS 11, *)
 private struct AnimatedCheckmark: View {
     /// Checkmark color
     var color: Color = .black
@@ -46,7 +43,6 @@ private struct AnimatedCheckmark: View {
     }
 }
 
-@available(iOS 13, macOS 11, *)
 private struct AnimatedXmark: View {
     /// xmark color
     var color: Color = .black
@@ -85,23 +81,6 @@ private struct AnimatedXmark: View {
     }
 }
 
-#if os(macOS)
-    @available(macOS 11, *)
-    struct ActivityIndicator: NSViewRepresentable {
-        func makeNSView(context: NSViewRepresentableContext<ActivityIndicator>) -> NSProgressIndicator {
-            let nsView = NSProgressIndicator()
-
-            nsView.isIndeterminate = true
-            nsView.style = .spinning
-            nsView.startAnimation(context)
-
-            return nsView
-        }
-
-        func updateNSView(_: NSProgressIndicator, context _: NSViewRepresentableContext<ActivityIndicator>) {}
-    }
-#else
-    @available(iOS 13, *)
     struct ActivityIndicator: UIViewRepresentable {
         func makeUIView(context _: UIViewRepresentableContext<ActivityIndicator>) -> UIActivityIndicatorView {
             let progressView = UIActivityIndicatorView(style: .large)
@@ -112,30 +91,7 @@ private struct AnimatedXmark: View {
 
         func updateUIView(_: UIActivityIndicatorView, context _: UIViewRepresentableContext<ActivityIndicator>) {}
     }
-#endif
 
-#if os(macOS)
-    @available(macOS 11, *)
-    public struct BlurView: NSViewRepresentable {
-        public typealias NSViewType = NSVisualEffectView
-
-        public func makeNSView(context _: Context) -> NSVisualEffectView {
-            let effectView = NSVisualEffectView()
-            effectView.material = .hudWindow
-            effectView.blendingMode = .withinWindow
-            effectView.state = NSVisualEffectView.State.active
-            return effectView
-        }
-
-        public func updateNSView(_ nsView: NSVisualEffectView, context _: Context) {
-            nsView.material = .hudWindow
-            nsView.blendingMode = .withinWindow
-        }
-    }
-
-#else
-
-    @available(iOS 13, *)
     public struct BlurView: UIViewRepresentable {
         public typealias UIViewType = UIVisualEffectView
 
@@ -148,11 +104,8 @@ private struct AnimatedXmark: View {
         }
     }
 
-#endif
-
 // MARK: - Main View
 
-@available(iOS 13, macOS 11, *)
 public struct AlertToast: View {
     public enum BannerAnimation {
         case slide, pop
@@ -475,7 +428,6 @@ public struct AlertToast: View {
     }
 }
 
-@available(iOS 13, macOS 11, *)
 public struct AlertToastModifier: ViewModifier {
     /// Presentation `Binding<Bool>`
     @Binding var isPresenting: Bool
@@ -501,19 +453,11 @@ public struct AlertToastModifier: ViewModifier {
     @State private var alertRect: CGRect = .zero
 
     private var screen: CGRect {
-        #if os(iOS)
             return ScreenSize.bounds
-        #else
-            return NSScreen.main?.frame ?? .zero
-        #endif
     }
 
     private var offset: CGFloat {
-        #if os(iOS)
             return -hostRect.midY + alertRect.height
-        #else
-            return (-hostRect.midY + screen.midY) + alertRect.height
-        #endif
     }
 
     @ViewBuilder
@@ -664,7 +608,6 @@ public struct AlertToastModifier: ViewModifier {
 }
 
 /// Fileprivate View Modifier for dynamic frame when alert type is `.regular` / `.loading`
-@available(iOS 13, macOS 11, *)
 private struct WithFrameModifier: ViewModifier {
     var withFrame: Bool
 
@@ -683,7 +626,6 @@ private struct WithFrameModifier: ViewModifier {
 }
 
 /// Fileprivate View Modifier to change the alert background
-@available(iOS 13, macOS 11, *)
 private struct BackgroundModifier: ViewModifier {
     var color: Color?
 
@@ -700,7 +642,6 @@ private struct BackgroundModifier: ViewModifier {
 }
 
 /// Fileprivate View Modifier to change the text colors
-@available(iOS 13, macOS 11, *)
 private struct TextForegroundModifier: ViewModifier {
     var color: Color?
 
@@ -715,7 +656,6 @@ private struct TextForegroundModifier: ViewModifier {
     }
 }
 
-@available(iOS 13, macOS 11, *)
 private extension Image {
     func hudModifier() -> some View {
         renderingMode(.template)
@@ -725,7 +665,6 @@ private extension Image {
     }
 }
 
-// @available(iOS 13, macOS 11, *)
 public extension View {
     /// Return some view w/o frame depends on the condition.
     /// This view modifier function is set by default to:

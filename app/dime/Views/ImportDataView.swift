@@ -229,7 +229,6 @@ struct ImportDataView: View {
                 .frame(maxHeight: .infinity)
             } else {
                 HStack {
-                    if #available(iOS 17.0, *) {
                         Button {
                             if progress == 2 {
                                 withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
@@ -262,23 +261,6 @@ struct ImportDataView: View {
                                 .background(Color.SecondaryBackground, in: Circle())
                         }
                         .contentTransition(.symbolEffect(.replace.downUp.wholeSymbol))
-                    } else {
-                        Button {
-                            if progress > 1 {
-                                withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
-                                    progress -= 1
-                                }
-                            } else {
-                                dismiss()
-                            }
-                        } label: {
-                            Image(systemName: progress > 1 ? "chevron.left" : "xmark")
-                                .font(.system(.callout, design: .rounded).weight(.semibold))
-                                .foregroundColor(Color.SubtitleText)
-                                .padding(8)
-                                .background(Color.SecondaryBackground, in: Circle())
-                        }
-                    }
 
                     Spacer()
 
@@ -850,12 +832,8 @@ struct ImportDataView: View {
             }
         }
         .sheet(isPresented: $showingCategoryView) {
-            if #available(iOS 16.0, *) {
                 NewCategoryAlert(income: $income, bottomSpacers: false, budgetMode: false)
                     .presentationDetents([.height(270)])
-            } else {
-                NewCategoryAlert(income: $income, bottomSpacers: true, budgetMode: false)
-            }
         }
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in

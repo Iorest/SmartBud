@@ -9,7 +9,6 @@
 
 import AppIntents
 
-@available(iOS 17, *)
 enum TimePeriod: Int, AppEnum {
     case unknown = 0
     case day = 1
@@ -28,7 +27,6 @@ enum TimePeriod: Int, AppEnum {
     ]
 }
 
-@available(iOS 17, *)
 enum InsightsTimePeriod: Int, AppEnum {
     case unknown = 0
     case week = 1
@@ -45,7 +43,6 @@ enum InsightsTimePeriod: Int, AppEnum {
     ]
 }
 
-@available(iOS 17, *)
 enum InsightsType: Int, AppEnum {
     case unknown = 0
     case net = 1
@@ -62,7 +59,6 @@ enum InsightsType: Int, AppEnum {
     ]
 }
 
-@available(iOS 17, *)
 enum Income: Int, AppEnum {
     case unknown = 0
     case income = 1

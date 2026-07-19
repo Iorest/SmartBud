@@ -862,7 +862,6 @@ struct ListView: View {
                 }
                 .contentShape(RoundedRectangle(cornerRadius: 10))
                 .contextMenu {
-                    if #available(iOS 16.0, *) {
                         Button {
                             guard let image = ImageRenderer(content: SingleDayPhotoView(amountText: filtered.string, dateText: dateText, transactions: filtered.transactions, showCents: showCents, currencySymbol: currencySymbol, currency: currency, swapTimeLabel: swapTimeLabel, future: false)).uiImage else {
                                 return
@@ -874,7 +873,6 @@ struct ListView: View {
                         } label: {
                             Label(String(localized: "Save as Photo"), systemImage: "square.and.arrow.up")
                         }
-                    }
                 }
                 .padding(.bottom, 18)
             }

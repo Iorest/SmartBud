@@ -11,7 +11,6 @@
 import AppIntents
 import WidgetKit
 
-@available(iOS 17, *)
 struct BudgetWidgetConfigurationIntent: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "Budget Widget"
     static let description = IntentDescription("Select a budget to monitor.")
@@ -20,7 +19,6 @@ struct BudgetWidgetConfigurationIntent: WidgetConfigurationIntent {
     var budget: BudgetEntity?
 }
 
-@available(iOS 17, *)
 struct InsightsWidgetConfigurationIntent: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "Insights Widget"
     static let description = IntentDescription("Configure your insights view.")
@@ -32,7 +30,6 @@ struct InsightsWidgetConfigurationIntent: WidgetConfigurationIntent {
     var income: Income
 }
 
-@available(iOS 17, *)
 struct RecentWidgetConfigurationIntent: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "Recent Widget"
     static let description = IntentDescription("Configure your recent transactions view.")

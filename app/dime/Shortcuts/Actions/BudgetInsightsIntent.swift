@@ -9,7 +9,6 @@ import AppIntents
 import Foundation
 import SwiftUI
 
-@available(iOS 16.4, *)
 struct BudgetIntent: AppIntent {
     static let title: LocalizedStringResource = "Get Budget Insights"
 
@@ -70,7 +69,6 @@ enum ShortcutsBudgetsType: String {
     case overall, category
 }
 
-@available(iOS 16, *)
 extension ShortcutsBudgetsType: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
         return TypeDisplayRepresentation(name: LocalizedStringResource("Budget Type"))

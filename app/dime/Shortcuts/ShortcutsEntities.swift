@@ -8,7 +8,6 @@
 import AppIntents
 import Foundation
 
-@available(iOS 16, *)
 struct IncomeCategoryEntity: AppEntity, Identifiable {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Category"))
     typealias DefaultQueryType = IncomeCategoryQuery
@@ -37,7 +36,6 @@ struct IncomeCategoryEntity: AppEntity, Identifiable {
     }
 }
 
-@available(iOS 16, *)
 struct IncomeCategoryQuery: EntityStringQuery {
     func entities(matching query: String) async throws -> [IncomeCategoryEntity] {
         await MainActor.run {
@@ -72,7 +70,6 @@ struct IncomeCategoryQuery: EntityStringQuery {
     }
 }
 
-@available(iOS 16, *)
 struct ExpenseCategoryEntity: AppEntity, Identifiable {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Category"))
     typealias DefaultQueryType = ExpenseCategoryQuery
@@ -101,7 +98,6 @@ struct ExpenseCategoryEntity: AppEntity, Identifiable {
     }
 }
 
-@available(iOS 16, *)
 struct ExpenseCategoryQuery: EntityStringQuery {
     func entities(matching query: String) async throws -> [ExpenseCategoryEntity] {
         await MainActor.run {
@@ -136,7 +132,6 @@ struct ExpenseCategoryQuery: EntityStringQuery {
     }
 }
 
-@available(iOS 16, *)
 struct BudgetEntity: AppEntity, Identifiable {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: LocalizedStringResource("Budget"))
     typealias DefaultQueryType = BudgetQuery
@@ -161,7 +156,6 @@ struct BudgetEntity: AppEntity, Identifiable {
     }
 }
 
-@available(iOS 16, *)
 struct BudgetQuery: EntityStringQuery {
     func entities(matching query: String) async throws -> [BudgetEntity] {
         await MainActor.run {

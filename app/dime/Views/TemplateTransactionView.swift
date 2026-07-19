@@ -410,15 +410,10 @@ struct TemplateTransactionView: View {
                                 submit()
                             } label: {
                                 Group {
-                                    if #available(iOS 17.0, *) {
                                         Image(systemName: "checkmark")
                                             .font(.system(size: 30, weight: .semibold, design: .rounded))
                                             .symbolEffect(.bounce.up.byLayer, value: canSubmit)
 //                                            .symbolEffectsRemoved()
-                                    } else {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 30, weight: .semibold, design: .rounded))
-                                    }
                                 }
                                 .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                 .foregroundColor(Color.LightIcon)
@@ -563,12 +558,8 @@ struct TemplateTransactionView: View {
             CategoryView(mode: .transaction, income: income)
         }
         .sheet(isPresented: $showPicker) {
-            if #available(iOS 16.0, *) {
                 CustomRecurringView(repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker)
                     .presentationDetents([.height(230)])
-            } else {
-                CustomRecurringView(repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker)
-            }
         }
     }
 
