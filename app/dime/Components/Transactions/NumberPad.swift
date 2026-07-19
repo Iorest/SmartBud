@@ -2,293 +2,193 @@
 //  NumberPad.swift
 //  dime
 //
-//  Created by Yumi on 2023-10-29.
+//  iOS 26 rewrite of the numeric entry keypad. State now lives in
+//  `NumberPadViewModel` (@Observable) so layout can stay purely declarative.
+//
+//  iOS 26 / new-API notes:
+//  - `@Bindable` viewModel replaces the chain of `@Binding`s.
+//  - `frame(maxHeight: .infinity)` on each row replaces the old
+//    `proxy.size.height * 0.22` button-height math and the lost
+//    `.frame(width:height:)` on the VStack. The pad now always fills its
+//    parent (set by `.keyboardAwareHeight`).
+//  - `sensoryFeedback(_:trigger:)` replaces the old CHHapticEngine plumbing.
+//  - `GlassEffectContainer(spacing:)` batches the per-button `glassChip`
+//    effects for cheaper rendering (iOS 26 performance API).
+//  - `foregroundStyle` instead of `foregroundColor`.
 //
 
 import SwiftUI
-import CoreHaptics
 
 enum AssignedDecimal {
     case none, first, second
 }
 
 struct NumberPad: View {
-    @Binding var price: Double
-    @Binding var category: CategoryModel?
-    @Binding var isEditingDecimal: Bool
-    @Binding var decimalValuesAssigned: AssignedDecimal
+    @Bindable var vm: NumberPadViewModel
     var showingNotePicker: Bool = false
-    var submit: () -> Void
+    /// Selected category. Owned by the parent (it's a separate piece of
+    /// transaction-entry state); the pad only reads it to drive the
+    /// submit-button's bounce effect.
+    var category: CategoryModel? = nil
+    /// Submit action. Called when the user taps the checkmark. The pad also
+    /// calls `vm.submit()` first, which clears the state. Declared last so
+    /// the trailing-closure syntax reads naturally at the call site.
+    var submit: () -> Void = {}
 
-    @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
-    @AppStorage("haptics", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
-        var hapticType: Int = 1
+    private let numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    private let rowShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
 
-    var numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-
-    @State private var engine: CHHapticEngine?
-
+    /// Fires on every digit tap, with intensity driven by the user's
+    /// `haptics` preference (computed in the VM). Skipped entirely when
+    /// haptics are disabled, matching the old `if hapticType == 2` guard.
     var body: some View {
-        GeometryReader { proxy in
-            VStack(spacing: proxy.size.height * 0.04) {
-                ForEach(numPadNumbers, id: \.self) { array in
-                    HStack(spacing: proxy.size.width * 0.05) {
-                        ForEach(array, id: \.self) { singleNumber in
-                            NumberButton(number: singleNumber, size: proxy.size)
-                        }
-                    }
+        GlassEffectContainer(spacing: 8) {
+            VStack(spacing: 8) {
+                ForEach(numPadNumbers, id: \.self) { row in
+                    numberRow(row)
+                        .frame(maxHeight: .infinity)
                 }
-                HStack(spacing: proxy.size.width * 0.05) {
-                    if numberEntryType == 1 {
-                        Button {
-                            deleteLastDigit()
-                        } label: {
-                            Image("tag-cross")
-                                .resizable()
-                                .frame(width: 32, height: 32)
-                                .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
-                                .background(Color.DarkBackground)
-                                .foregroundColor(Color.LightIcon)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        }
-                        .buttonStyle(NumPadButton())
-                    } else {
-                        Button {
-                            isEditingDecimal = true
-                        } label: {
-                            Text(Locale.current.decimalSeparator ?? ".")
-                                .font(.system(size: 34, weight: .regular, design: .rounded))
-                                .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
-                                .background(Color.SecondaryBackground)
-                                .foregroundColor(Color.PrimaryText)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        }
-                        .buttonStyle(NumPadButton())
-                    }
-
-                    NumberButton(number: 0, size: proxy.size)
-
-                    Button {
-                        submit()
-                    } label: {
-                        Group {
-                            if #available(iOS 17.0, *) {
-                                Image(systemName: "checkmark.square.fill")
-                                    .font(.system(size: 30, weight: .medium, design: .rounded))
-                                    .symbolEffect(.bounce.up.byLayer, value: price != 0 && category != nil)
-                            } else {
-                                Image(systemName: "checkmark.square.fill")
-                                    .font(.system(size: 30, weight: .medium, design: .rounded))
-                            }
-                        }
-                        .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
-                        .foregroundColor(Color.LightIcon)
-                        .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                    }
-                    .buttonStyle(NumPadButton())
-                }
+                bottomRow
+                    .frame(maxHeight: .infinity)
             }
-            .frame(width: proxy.size.width, height: proxy.size.height)
         }
+        .frame(maxHeight: .infinity)
         .padding(.bottom, 15)
         .keyboardAwareHeight(showToolbar: showingNotePicker)
-        .onAppear(perform: prepareHaptics)
+        .modifier(DigitHapticModifier(
+            haptic: .impact(weight: .light, intensity: vm.digitHapticIntensity),
+            trigger: vm.price,
+            enabled: vm.hapticsEnabled
+        ))
+        .modifier(SuccessHapticModifier(
+            trigger: vm.submitTrigger,
+            enabled: vm.hapticsEnabled
+        ))
     }
 
-    func prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+    // MARK: - Rows
 
-        do {
-            engine = try CHHapticEngine()
-            try engine?.start()
-        } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
-        }
-    }
-
-    func hapticTap() {
-        // make sure that the device supports haptics
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-
-        let hapticDict = [
-            CHHapticPattern.Key.pattern: [
-                [CHHapticPattern.Key.event: [
-                    CHHapticPattern.Key.eventType: CHHapticEvent.EventType.hapticTransient,
-                    CHHapticPattern.Key.time: CHHapticTimeImmediate,
-                    CHHapticPattern.Key.eventDuration: 1.0]
-                ]
-            ]
-        ]
-
-        do {
-            let pattern = try CHHapticPattern(dictionary: hapticDict)
-
-            let player = try engine?.makePlayer(with: pattern)
-
-            engine?.notifyWhenPlayersFinished { _ in
-                return .stopEngine
-            }
-
-            try engine?.start()
-            try player?.start(atTime: 0)
-        } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
-        }
-
-//        
-//        var events = [CHHapticEvent]()
-//
-//        // create one intense, sharp tap
-//        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1)
-//        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1)
-//        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
-//        events.append(event)
-//
-//        // convert those events into a pattern and play it immediately
-//        do {
-//            let pattern = try CHHapticPattern(events: events, parameters: [])
-//            let player = try engine?.makePlayer(with: pattern)
-//            try player?.start(atTime: 0)
-//        } catch {
-//            print("Failed to play pattern: \(error.localizedDescription).")
-//        }
-    }
-
-    public func deleteLastDigit() {
-        if numberEntryType == 1 {
-            price = Double(Int(price * 10)) / 100
-        } else if !isEditingDecimal {
-            price = Double(Int(price / 10))
-        } else {
-            switch decimalValuesAssigned {
-                case .none:
-                    isEditingDecimal = false
-                    return
-                case .first:
-                    price = Double(Int(price))
-                    decimalValuesAssigned = .none
-                case .second:
-                    price = Double(Int(price * 10)) / 10
-                    decimalValuesAssigned = .first
+    @ViewBuilder
+    private func numberRow(_ row: [Int]) -> some View {
+        HStack(spacing: 8) {
+            ForEach(row, id: \.self) { digit in
+                digitButton(digit)
             }
         }
     }
 
     @ViewBuilder
-    private func NumberButton(number: Int, size: CGSize) -> some View {
-        var disabled: Bool {
-            price >= 100000000
-        }
-
-        Button {
-            if disabled {
-                return
-            }
-
-            if hapticType == 2 {
-                hapticTap()
-            }
-
-            if numberEntryType == 1 {
-                price *= 10
-                price += Double(number) / 100
+    private var bottomRow: some View {
+        HStack(spacing: 8) {
+            if vm.numberEntryType == 1 {
+                backspaceButton
             } else {
-                if isEditingDecimal {
-                    switch decimalValuesAssigned {
-                        case .none:
-                            price += Double(number) / 10
-                            decimalValuesAssigned = .first
-                        case .first:
-                            price += Double(number) / 100
-                            decimalValuesAssigned = .second
-                        case .second:
-                            return
-                    }
-                } else {
-                    price *= 10
-                    price += Double(number)
-                }
+                decimalButton
             }
+            digitButton(0)
+            checkmarkButton
+        }
+    }
+
+    // MARK: - Buttons
+
+    @ViewBuilder
+    private func digitButton(_ digit: Int) -> some View {
+        let disabled = vm.isInputDisabled
+        Button {
+            vm.tap(digit)
         } label: {
-            Text("\(number)")
-                .font(.system(size: 34, weight: .regular, design: .rounded))
-                .frame(width: size.width * 0.3, height: size.height * 0.22)
-                .background(Color.SecondaryBackground)
-                .foregroundColor(Color.PrimaryText)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            Text("\(digit)")
+                .font(.system(.title2, design: .rounded))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(Color.PrimaryText)
+                .background(rowShape.fill(.clear))
+                .glassChip(in: rowShape)
                 .opacity(disabled ? 0.6 : 1)
         }
         .disabled(disabled)
         .buttonStyle(NumPadButton())
+        .accessibilityLabel(Text("\(digit)"))
+    }
+
+    @ViewBuilder
+    private var backspaceButton: some View {
+        Button {
+            vm.deleteLast()
+        } label: {
+            Image("tag-cross")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 32, height: 32)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(Color.LightIcon)
+                .background(Color.DarkBackground, in: rowShape)
+        }
+        .buttonStyle(NumPadButton())
+        .accessibilityLabel(Text("Delete"))
+    }
+
+    @ViewBuilder
+    private var decimalButton: some View {
+        Button {
+            vm.enterDecimal()
+        } label: {
+            Text(Locale.current.decimalSeparator ?? ".")
+                .font(.system(.title2, design: .rounded))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(Color.PrimaryText)
+                .background(rowShape.fill(.clear))
+                .glassChip(in: rowShape)
+        }
+        .buttonStyle(NumPadButton())
+        .accessibilityLabel(Text("Decimal point"))
+    }
+
+    @ViewBuilder
+    private var checkmarkButton: some View {
+        Button {
+            vm.submit()
+            submit()
+        } label: {
+            Image(systemName: "checkmark.square.fill")
+                .font(.system(.title2, design: .rounded).weight(.medium))
+                .symbolEffect(.bounce.up.byLayer, value: vm.price != 0 && category != nil)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(Color.LightIcon)
+                .background(Color.DarkBackground, in: rowShape)
+        }
+        .buttonStyle(NumPadButton())
+        .accessibilityLabel(Text("Submit"))
     }
 }
 
-func splitDouble(_ num: Double) -> [String] {
-    let formatter = NumberFormatter()
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = 2
-    var str = formatter.string(from: NSNumber(value: num))!
+// MARK: - Amount display
 
-    if floor(num) == num {
-        str = String(format: "%.0f", num)
-    }
-
-    return str.map { String($0) }.filter { $0 != "." }
-}
-
+/// Big price text shown above the keypad. Reads its state from the shared
+/// `NumberPadViewModel` so it stays in lockstep with `NumberPad` without
+/// passing bindings around.
 struct NumberPadTextView: View {
-    @Binding var price: Double
-    @Binding var isEditingDecimal: Bool
-    @Binding var decimalValuesAssigned: AssignedDecimal
+    @Bindable var vm: NumberPadViewModel
+    /// Currency symbol displayed to the left of the amount. Owned by the
+    /// caller because it's purely a presentation concern.
+    var currencySymbol: String
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
-    var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
-    }
-//
-//    var displayNumbers: [String] {
-//        return splitDouble(price)
-//    }
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
-
-    public var amount: String {
-        if numberEntryType == 1 {
-            return String(format: "%.2f", price)
-        }
-        if isEditingDecimal {
-            switch decimalValuesAssigned {
-                case .none:
-                    return String(format: "%.0f", price) + "."
-                case .first:
-                    return String(format: "%.1f", price)
-                case .second:
-                    return String(format: "%.2f", price)
-            }
-        }
-        return String(format: "%.0f", price)
-    }
-
-    @Environment(\.dynamicTypeSize) var dynamicTypeSize
-
-    var largerFontSize: CGFloat {
+    /// iOS 26: `.font(.body.scaled(by:))` is the modern replacement for
+    /// `@ScaledMetric` when targeting iOS 26+. We still need raw points
+    /// because the amount display uses a single large size; the formula
+    /// below matches the old `largerFontSize` table.
+    private var fontSize: CGFloat {
         switch dynamicTypeSize {
-        case .xSmall:
-            return 46
-        case .small:
-            return 47
-        case .medium:
-            return 48
-        case .large:
-            return 50
-        case .xLarge:
-            return 56
-        case .xxLarge:
-            return 58
-        case .xxxLarge:
-            return 62
-        default:
-            return 50
+        case .xSmall: return 46
+        case .small: return 47
+        case .medium: return 48
+        case .large: return 50
+        case .xLarge: return 56
+        case .xxLarge: return 58
+        case .xxxLarge: return 62
+        default: return 50
         }
     }
 
@@ -296,64 +196,69 @@ struct NumberPadTextView: View {
         HStack(alignment: .lastTextBaseline, spacing: 1) {
             Text(currencySymbol)
                 .font(.system(.largeTitle, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
 
-//                ForEach(displayNumbers, id: \.self) { number in
-//                    Text(number)
-//                        .font(.system(size: largerFontSize, weight: .regular, design: .rounded))
-//                        .foregroundColor(Color.PrimaryText)
-//                        .transition(AnyTransition.opacity.combined(with: .scale).combined(with: .move(edge: .trailing)))
-//                }
-
-            Text(amount)
-                .font(.system(size: largerFontSize, weight: .regular, design: .rounded))
-                .foregroundColor(Color.PrimaryText)
-
+            Text(vm.amountString)
+                .font(.system(size: fontSize, weight: .regular, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
+                .contentTransition(.numericText())
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
-        .padding(.horizontal, numberEntryType == 2 ? 40 : 0)
+        .padding(.horizontal, vm.showsTrailingDelete ? 40 : 0)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .trailing) {
-            if numberEntryType == 2 {
-                DeleteButton()
+            if vm.showsTrailingDelete {
+                trailingDelete
             }
         }
-//        .animation(.snappy.delay(0.1), value: displayNumbers)
     }
 
     @ViewBuilder
-   func DeleteButton() -> some View {
-       Button {
-         deleteLastDigit()
-       } label: {
-         Image(systemName: "delete.left.fill")
-           .font(.system(size: 16, weight: .semibold))
-           .foregroundColor(Color.SubtitleText)
-           .padding(7)
-           .background(Color.SecondaryBackground, in: Circle())
-           .contentShape(Circle())
-       }
-       .disabled(price == 0 && !isEditingDecimal)
-   }
+    private var trailingDelete: some View {
+        Button {
+            vm.deleteLast()
+        } label: {
+            Image(systemName: "delete.left.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.SubtitleText)
+                .padding(7)
+                .background(Circle().fill(.clear))
+                .glassChip(in: Circle())
+                .contentShape(Circle())
+        }
+        .disabled(vm.price == 0 && !vm.isEditingDecimal)
+        .accessibilityLabel(Text("Delete"))
+    }
+}
 
-    public func deleteLastDigit() {
-        if numberEntryType == 1 {
-            price = Double(Int(price * 10)) / 100
-        } else if !isEditingDecimal {
-            price = Double(Int(price / 10))
+// MARK: - Conditional haptic modifiers
+
+/// Applies `sensoryFeedback` only when `enabled` is true. SwiftUI has no
+/// built-in "off switch" for `sensoryFeedback`, so we wrap it.
+private struct DigitHapticModifier: ViewModifier {
+    let haptic: SensoryFeedback
+    let trigger: Double
+    let enabled: Bool
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content.sensoryFeedback(haptic, trigger: trigger)
         } else {
-            switch decimalValuesAssigned {
-                case .none:
-                    isEditingDecimal = false
-                    return
-                case .first:
-                    price = Double(Int(price))
-                    decimalValuesAssigned = .none
-                case .second:
-                    price = Double(Int(price * 10)) / 10
-                    decimalValuesAssigned = .first
-            }
+            content
+        }
+    }
+}
+
+private struct SuccessHapticModifier: ViewModifier {
+    let trigger: Int
+    let enabled: Bool
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content.sensoryFeedback(.success, trigger: trigger)
+        } else {
+            content
         }
     }
 }

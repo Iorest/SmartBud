@@ -14,8 +14,9 @@ struct PickerStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(5)
-            .background(RoundedRectangle(cornerRadius: 9).fill(Color.PrimaryBackground).shadow(color: colorScheme == .light ? Color.Outline : Color.clear, radius: 6))
+            .background(RoundedRectangle(cornerRadius: 9).fill(.clear))
             .overlay(RoundedRectangle(cornerRadius: 9).stroke(colorScheme == .light ? Color.clear : Color.Outline.opacity(0.4), lineWidth: 1.3))
+            .glassCard(in: RoundedRectangle(cornerRadius: 9))
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 30)
     }
@@ -86,11 +87,7 @@ struct BrandNewBudgetView: View {
 
     @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
 
-    @State private var price: Double = 0
-    @State private var category: CategoryModel?
-    @State var isEditingDecimal = false
-    @State var decimalValuesAssigned: AssignedDecimal = .none
-    @State private var priceString: String = "0"
+    @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
@@ -105,11 +102,11 @@ struct BrandNewBudgetView: View {
         let average: Double
 
         if budgetTimeFrame == .week {
-            average = price / 7
+            average = padVM.price / 7
         } else if budgetTimeFrame == .month {
-            average = price / 30
+            average = padVM.price / 30
         } else {
-            average = price / 365
+            average = padVM.price / 365
         }
 
         numberFormatter.maximumFractionDigits = 0
@@ -504,17 +501,13 @@ struct BrandNewBudgetView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if progress == 5 {
                 VStack(spacing: 10) {
-                    NumberPadTextView(
-                      price: $price,
-                      isEditingDecimal: $isEditingDecimal,
-                      decimalValuesAssigned: $decimalValuesAssigned
-                    )
+                    NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
 
-                    if budgetTimeFrame != .day && price > 0 {
+                    if budgetTimeFrame != .day && padVM.price > 0 {
                         Text(amountPerDayString)
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 //                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                             .padding(4)
                             .padding(.horizontal, 7)
                             .background(Color.SecondaryBackground, in: Capsule())
@@ -522,12 +515,7 @@ struct BrandNewBudgetView: View {
 
                     Spacer()
 
-                    NumberPad(
-                      price: $price,
-                      category: $category,
-                      isEditingDecimal: $isEditingDecimal,
-                      decimalValuesAssigned: $decimalValuesAssigned
-                    ) {
+                    NumberPad(vm: padVM) {
                       submit()
                     }
                 }
@@ -586,8 +574,11 @@ struct BrandNewBudgetView: View {
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .onAppear {
+            // Sync the pad VM with the AppStorage flags on first appearance.
+            // Subsequent changes are picked up by the `onChange` below.
+            padVM.numberEntryType = numberEntryType
             DispatchQueue.main.async {
                 if let unwrappedEditedBudget = toEditBudget {
                     selectedCategory = unwrappedEditedBudget.category
@@ -607,11 +598,11 @@ struct BrandNewBudgetView: View {
                         budgetTimeFrame = .week
                     }
 
-                    price = unwrappedEditedBudget.amount
+                    padVM.price = unwrappedEditedBudget.amount
 
                     if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        isEditingDecimal = true
-                        decimalValuesAssigned = .second
+                        padVM.isEditingDecimal = true
+                        padVM.decimalValuesAssigned = .second
                     }
 //                    let string = String(format: "%.2f", unwrappedEditedBudget.amount)
 //
@@ -650,11 +641,11 @@ struct BrandNewBudgetView: View {
                         budgetTimeFrame = .week
                     }
 
-                    price = unwrappedEditedMainBudget.amount
+                    padVM.price = unwrappedEditedMainBudget.amount
 
                     if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        isEditingDecimal = true
-                        decimalValuesAssigned = .second
+                        padVM.isEditingDecimal = true
+                        padVM.decimalValuesAssigned = .second
                     }
 //                    let string = String(format: "%.2f", unwrappedEditedMainBudget.amount)
 //
@@ -685,6 +676,9 @@ struct BrandNewBudgetView: View {
             }
         }
         .animation(.easeOut(duration: 0.2), value: showToast)
+        .onChange(of: numberEntryType) { _, new in
+            padVM.numberEntryType = new
+        }
         .onChange(of: showToast) { _, newValue in
             if newValue {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -701,7 +695,8 @@ struct BrandNewBudgetView: View {
     }
 
     func submit() {
-        if price == 0 {
+        let amount = padVM.price
+        if amount == 0 {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             showToast = true
             toastMessage = String(localized: "Missing Amount")
@@ -731,13 +726,14 @@ struct BrandNewBudgetView: View {
             if let category {
                 budgetVM.update(
                     unwrappedEditedBudget,
-                    amount: price,
+                    amount: amount,
                     startDate: startDate,
                     type: budgetType,
                     category: category
                 )
             }
 
+            padVM.submit()
             dismiss()
 
             return
@@ -746,11 +742,12 @@ struct BrandNewBudgetView: View {
         if let unwrappedEditedMainBudget = toEditMainBudget {
             budgetVM.updateMain(
                 unwrappedEditedMainBudget,
-                amount: price,
+                amount: amount,
                 startDate: startDate,
                 type: budgetType
             )
 
+            padVM.submit()
             dismiss()
 
             return
@@ -758,12 +755,13 @@ struct BrandNewBudgetView: View {
 
         if categoryBudget {
             if let unwrappedCategory = selectedCategory {
-                _ = budgetVM.create(amount: price, startDate: startDate, type: budgetType, category: unwrappedCategory)
+                _ = budgetVM.create(amount: amount, startDate: startDate, type: budgetType, category: unwrappedCategory)
             }
         } else {
-            _ = budgetVM.createMain(amount: price, startDate: startDate, type: budgetType)
+            _ = budgetVM.createMain(amount: amount, startDate: startDate, type: budgetType)
         }
 
+        padVM.submit()
         dismiss()
     }
 

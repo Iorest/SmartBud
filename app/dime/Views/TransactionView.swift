@@ -358,13 +358,13 @@ struct TransactionView: View {
     var swipeAndNumberPadArea: some View {
         ZStack {
             // swipe to change between income and expense
-            Color.PrimaryBackground
+            Color.clear
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .simultaneousGesture(incomeExpenseSwipeGesture)
 
             // number display and note view
             VStack(spacing: 8) {
-                NumberPadTextView(price: $price, isEditingDecimal: $isEditingDecimal, decimalValuesAssigned: $decimalValuesAssigned)
+                NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
                 NoteView(note: $note, focused: $textFieldFocused)
             }
         }
@@ -380,8 +380,8 @@ struct TransactionView: View {
                         Button {
                             note = transaction.wrappedNote
                             withAnimation {
-                                if price == 0 {
-                                    price = transaction.wrappedAmount
+                                if padVM.price == 0 {
+                                    padVM.price = transaction.wrappedAmount
                                 }
                                 if category == nil {
                                     category = transaction.category
@@ -415,11 +415,9 @@ struct TransactionView: View {
             .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
         } else {
             NumberPad(
-                price: $price,
-                category: $category,
-                isEditingDecimal: $isEditingDecimal,
-                decimalValuesAssigned: $decimalValuesAssigned,
-                showingNotePicker: showingNotePicker
+                vm: padVM,
+                showingNotePicker: showingNotePicker,
+                category: category
             ) {
                 submit()
             }
@@ -443,7 +441,7 @@ struct TransactionView: View {
                 .datePickerStyle(.graphical)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 13))
+                .glassCard(in: RoundedRectangle(cornerRadius: 13))
                 .padding(17)
                 .onChange(of: dateString) { _, _ in
                     handleDateChanged()
@@ -738,10 +736,7 @@ struct TransactionView: View {
                 }
             }
             .padding(13)
-            .background(
-                RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(
-                    color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6)
-            )
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 13).stroke(
                     systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
@@ -885,12 +880,13 @@ struct TransactionView: View {
         }
     }
 
-    @State private var price: Double = 0
+    @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
     @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var numberEntryType: Int = 1
-    @State var isEditingDecimal = false
-    @State var decimalValuesAssigned: AssignedDecimal = .none
-    @State private var priceString: String = "0"
+
+    /// `currency` is declared at the top of the struct (line ~45) and re-read
+    /// here. We just need the `currencySymbol` derived from the existing
+    /// `currency` value to pass into `NumberPadTextView`.
 
     var body: some View {
         GeometryReader { proxy in
@@ -914,7 +910,7 @@ struct TransactionView: View {
             }
             .padding(17)
             .frame(width: proxy.size.width, height: proxy.size.height)
-            .background(Color.PrimaryBackground)
+            .background(Color.clear)
             .onTapGesture {
                 self.hideKeyboard()
             }
@@ -929,7 +925,7 @@ struct TransactionView: View {
         .animation(.easeOut(duration: 0.2), value: showToast)
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .ignoresSafeArea(.all)
         .onChange(of: showToast) { _, newValue in
             if newValue {
@@ -941,6 +937,9 @@ struct TransactionView: View {
         .onChange(of: income) { _, _ in
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             category = nil
+        }
+        .onChange(of: numberEntryType) { _, new in
+            padVM.numberEntryType = new
         }
         .onChange(of: isDragging) { _, _ in
             if !isDragging {
@@ -957,15 +956,19 @@ struct TransactionView: View {
         }
         .onAppear {
             categoryVM.load()
+            // Sync the pad's numberEntryType with the AppStorage flag at the
+            // moment the view first appears. Subsequent changes are picked up
+            // by the `.onChange(of: numberEntryType)` modifier above.
+            padVM.numberEntryType = numberEntryType
             DispatchQueue.main.async {
                 if let transaction = toEdit {
                     repeatType = Int(transaction.recurringType)
                     repeatCoefficient = Int(transaction.recurringCoefficient)
-                    price = transaction.wrappedAmount
+                    padVM.price = transaction.wrappedAmount
 
                     if transaction.wrappedAmount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        isEditingDecimal = true
-                        decimalValuesAssigned = .second
+                        padVM.isEditingDecimal = true
+                        padVM.decimalValuesAssigned = .second
                     }
 
                     if transaction.wrappedDate > Date.now {
@@ -1056,8 +1059,9 @@ struct TransactionView: View {
 
     func submit() {
         let generator = UINotificationFeedbackGenerator()
+        let amount = padVM.price
 
-        if price == 0 && category == nil {
+        if amount == 0 && category == nil {
             toastImage = "questionmark.app"
             toastTitle = String(localized: "Incomplete Entry")
             showToast = true
@@ -1066,7 +1070,7 @@ struct TransactionView: View {
             generator.notificationOccurred(.error)
 
             return
-        } else if price == 0 {
+        } else if amount == 0 {
             toastImage = "centsign.circle"
             toastTitle = String(localized: "Missing Amount")
             showToast = true
@@ -1099,7 +1103,7 @@ struct TransactionView: View {
                 note: finalNote,
                 category: category,
                 income: income,
-                amount: price,
+                amount: amount,
                 date: date,
                 repeatType: repeatType,
                 repeatCoefficient: repeatCoefficient
@@ -1115,12 +1119,17 @@ struct TransactionView: View {
                 ? (category?.wrappedName ?? "") : note.trimmingCharacters(in: .whitespaces),
             category: category,
             income: income,
-            amount: price,
+            amount: amount,
             date: date,
             repeatType: repeatType,
             repeatCoefficient: repeatCoefficient
         )
 
+        // Reset pad state (price / decimal / haptic trigger) for the next
+        // entry. The pad's submit button also clears the VM via `vm.submit()`,
+        // but we clear again here in case the user taps a different commit
+        // path (e.g. via the keyboard return key) before the pad re-renders.
+        padVM.submit()
         dismiss()
     }
 
