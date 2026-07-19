@@ -46,7 +46,7 @@ struct BudgetIntent: AppIntent {
             }
         }
 
-        return .result(value: amount, dialog: IntentDialog(stringLiteral: String(localized: "Here you go!"))) {
+        return .result(value: amount, dialog: IntentDialog(LocalizedStringResource("Here you go!"))) {
             ShortcutBudgetView(amount: amount, type: budgetType)
         }
     }
@@ -126,11 +126,11 @@ struct ShortcutBudgetView: View {
                 .lineLimit(1)
 
             if amount > 0 {
-                Text("left \(budgetType)")
+                Text(String(localized: "left \(budgetType)"))
                     .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
             } else {
-                Text("over \(budgetType)")
+                Text(String(localized: "over \(budgetType)"))
                     .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundColor(Color.SubtitleText)
             }

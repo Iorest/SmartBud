@@ -64,7 +64,7 @@ struct GetInsightsIntent: AppIntent {
 
         let result = InsightsViewModel.shared.getShortcutInsights(type: typeInt, timeframe: timeframe.rawValue, optionalIncome: optionalIncome, categories: categories)
 
-        return .result(value: result, dialog: IntentDialog(stringLiteral: String(localized: "Here you go!"))) {
+        return .result(value: result, dialog: IntentDialog(LocalizedStringResource("Here you go!"))) {
             ShortcutInsightsView(amount: result, type: type, timeframe: timeframe)
         }
     }

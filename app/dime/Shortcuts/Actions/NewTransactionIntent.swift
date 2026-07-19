@@ -73,7 +73,7 @@ struct NewTransactionIntent: AppIntent {
 
                     let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: false, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
-                    return .result(dialog: IntentDialog(stringLiteral: String(localized: "Expense successfully logged."))) {
+                    return .result(dialog: IntentDialog(LocalizedStringResource("Expense successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)
                     }
                 } else {
@@ -87,7 +87,7 @@ struct NewTransactionIntent: AppIntent {
 
                     let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: true, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
 
-                    return .result(dialog: IntentDialog(stringLiteral: String(localized: "Income successfully logged."))) {
+                    return .result(dialog: IntentDialog(LocalizedStringResource("Income successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)
                     }
                 } else {
