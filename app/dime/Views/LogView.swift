@@ -13,6 +13,7 @@ struct LogView: View {
     @Query private var transactions: [TransactionModel]
 
     @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
@@ -249,8 +250,9 @@ struct LogView: View {
             .fullScreenCover(isPresented: $searchMode) {
                 SearchView()
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
+            .onChange(of: scenePhase) { _, new in
+                if new == .active,
+                   !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
                     transactionVM.updateAllRecurring()
                 }
             }

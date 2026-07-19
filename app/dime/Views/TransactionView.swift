@@ -5,7 +5,6 @@
 //  Created by Rafael Soh on 14/5/22.
 //
 
-import Combine
 import Foundation
 import SwiftUI
 
@@ -1210,7 +1209,11 @@ struct NoteView: View {
 
             ZStack(alignment: .leading) {
                 TextField("", text: $note)
-                    .onReceive(Just(note)) { _ in limitText(characterLimit) }
+                    .onChange(of: note) { _, new in
+                        if new.count > characterLimit {
+                            note = String(new.prefix(characterLimit))
+                        }
+                    }
                     .focused($textFocused)
                     .foregroundStyle(Color.PrimaryText)
 
@@ -1237,14 +1240,7 @@ struct NoteView: View {
             focused = newValue
         }
     }
-
-    func limitText(_ upper: Int) {
-        if note.count > upper {
-            note = String(note.prefix(upper))
-        }
-    }
 }
-
 struct RecurringPickerView: View {
     @Namespace var animation
     @Binding var repeatType: Int

@@ -5,7 +5,6 @@
 //  Created by Rafael Soh on 10/5/22.
 //
 
-import Combine
 import CoreHaptics
 import Foundation
 import SwiftUI
@@ -786,13 +785,13 @@ struct NewCategoryAlert: View {
                 ZStack {
                     EmojiTextField(text: $newEmoji)
                         .focused($focusedField, equals: .emoji)
-                        .onReceive(Just(newEmoji), perform: { _ in
-                            if String(self.newEmoji.onlyEmoji().suffix(1)) != self.newEmoji.onlyEmoji().prefix(1) {
-                                self.newEmoji = String(self.newEmoji.onlyEmoji().suffix(1))
+                        .onChange(of: newEmoji) { _, new in
+                            if String(new.onlyEmoji().suffix(1)) != new.onlyEmoji().prefix(1) {
+                                newEmoji = String(new.onlyEmoji().suffix(1))
                             } else {
-                                self.newEmoji = String(self.newEmoji.onlyEmoji().prefix(1))
+                                newEmoji = String(new.onlyEmoji().prefix(1))
                             }
-                        })
+                        }
                         .font(.system(size: 160))
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)
@@ -1173,13 +1172,13 @@ struct EditCategoryAlert: View {
                 ZStack {
                     EmojiTextField(text: $newEmoji)
                         .focused($focusedField, equals: .emoji)
-                        .onReceive(Just(newEmoji), perform: { _ in
-                            if String(self.newEmoji.onlyEmoji().suffix(1)) != self.newEmoji.onlyEmoji().prefix(1) {
-                                self.newEmoji = String(self.newEmoji.onlyEmoji().suffix(1))
+                        .onChange(of: newEmoji) { _, new in
+                            if String(new.onlyEmoji().suffix(1)) != new.onlyEmoji().prefix(1) {
+                                newEmoji = String(new.onlyEmoji().suffix(1))
                             } else {
-                                self.newEmoji = String(self.newEmoji.onlyEmoji().prefix(1))
+                                newEmoji = String(new.onlyEmoji().prefix(1))
                             }
-                        })
+                        }
                         .font(.system(size: 160))
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)

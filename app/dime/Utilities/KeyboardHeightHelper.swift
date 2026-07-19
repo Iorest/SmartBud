@@ -4,31 +4,20 @@
 //
 //  Created by Rafael Soh on 16/5/22.
 //
+//  Tracks the soft-keyboard height via Foundation's `NotificationCenter`
+//  async sequence. Migrated off the legacy closure-based
+//  `NotificationCenter.publisher(for:)` (which required `import Combine`)
+//  to the iOS 15+ `notifications(named:)` AsyncSequence consumed inside
+//  a `.task` modifier — automatically cancelled when the view disappears.
+//
 
-import Combine
 import Foundation
 import SwiftUI
 import UIKit
 
-extension Publishers {
-    // 1.
-    static var keyboardHeight: AnyPublisher<CGFloat, Never> {
-        // 2.
-        let willShow = NotificationCenter.default.publisher(for: UIApplication.keyboardWillShowNotification)
-            .map { $0.keyboardHeight }
-
-        let willHide = NotificationCenter.default.publisher(for: UIApplication.keyboardWillHideNotification)
-            .map { _ in CGFloat(0) }
-
-        // 3.
-        return MergeMany(willShow, willHide)
-            .eraseToAnyPublisher()
-    }
-}
-
 extension Notification {
     var keyboardHeight: CGFloat {
-        return (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+        (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
     }
 }
 
@@ -56,28 +45,27 @@ struct KeyboardAwareModifier: ViewModifier {
     var showToolbar: Bool
     @State private var isKeyboardVisible = false
 
-    private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
-        Publishers.Merge(
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillShowNotification)
-                .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue }
-                .map { $0.cgRectValue.height },
-            NotificationCenter.default
-                .publisher(for: UIResponder.keyboardWillHideNotification)
-                .map { _ in CGFloat(0) }
-        ).eraseToAnyPublisher()
-    }
-
     func body(content: Content) -> some View {
         content
             .padding(.bottom, isKeyboardVisible ? max(0, savedKeyboardHeight) : 0)
             .animation(.easeOut(duration: 0.25), value: isKeyboardVisible)
-            .onReceive(keyboardHeightPublisher) { value in
-                if value > 200 {
-                    isKeyboardVisible = true
-                    savedKeyboardHeight = value - 20
-                } else {
-                    isKeyboardVisible = false
+            .task {
+                // Two parallel async loops: keyboardWillShow updates the visible
+                // height and persists it; keyboardWillHide zeros it. `.task`
+                // cancels both automatically when the modifier goes away.
+                async {
+                    for await note in NotificationCenter.default.notifications(named: UIResponder.keyboardWillShowNotification) {
+                        let height = note.keyboardHeight
+                        if height > 200 {
+                            isKeyboardVisible = true
+                            savedKeyboardHeight = height - 20
+                        }
+                    }
+                }
+                async {
+                    for await _ in NotificationCenter.default.notifications(named: UIResponder.keyboardWillHideNotification) {
+                        isKeyboardVisible = false
+                    }
                 }
             }
     }
