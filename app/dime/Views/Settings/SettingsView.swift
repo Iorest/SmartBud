@@ -167,7 +167,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-      NavigationView {
+      NavigationStack {
       VStack {
         HStack {
           Text("Settings")
