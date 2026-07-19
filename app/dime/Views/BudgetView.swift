@@ -35,10 +35,7 @@ struct BudgetView: View {
                     .foregroundColor(Color.SubtitleText.opacity(0.7))
             }
             .padding(.horizontal, 30)
-            .frame(height: 250, alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea(.all)
-            .background(Color.PrimaryBackground)
 
         } else {
             ActualBudgetView()
@@ -74,142 +71,146 @@ struct ActualBudgetView: View {
     @State var date = Date.now
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Budgets")
-                        .font(.system(.title, design: .rounded).weight(.semibold))
-//                        .font(.system(size: 25, weight: .semibold, design: .rounded))
-                        .accessibility(addTraits: .isHeader)
+        NavigationStack {
+            ZStack {
+                AppGlassBackground()
+                    .ignoresSafeArea(.all)
 
-                    Button {
-                        newBudget = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.SubtitleText)
-                            .padding(4)
-                            .background(Color.SecondaryBackground, in: Circle())
-                            .contentShape(Circle())
-                    }
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Budgets")
+                            .font(.system(.title, design: .rounded).weight(.semibold))
+//                            .font(.system(size: 25, weight: .semibold, design: .rounded))
+                            .accessibility(addTraits: .isHeader)
 
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 20)
-                .padding(.horizontal, 30)
-                .padding(.bottom, 20)
-
-                if !budgets.isEmpty || !mainBudget.isEmpty {
-                    ScrollView(showsIndicators: false) {
-                        VStack {
-                            if let first = mainBudget.first {
-                                NavigationLink(destination: DetailedMainBudgetView(budget: first)
-                                    .onAppear {
-                                        withAnimation(.easeOut.speed(2)) {
-                                            tabBarManager.navigationHideTab()
-                                        }
-                                    }
-                                    .onDisappear {
-                                        withAnimation(.easeOut.speed(2)) {
-                                            tabBarManager.navigationShowTab()
-                                        }
-                                    }
-
-                                ) {
-                                    if budgets.count == 0 {
-                                        MainBudgetView(budget: first, solo: true)
-                                            .padding(.horizontal, 25)
-                                            .padding(.bottom, 15)
-                                    } else {
-                                        MainBudgetView(budget: first, solo: false)
-                                            .padding(.horizontal, 25)
-                                            .padding(.bottom, 15)
-                                    }
-                                }
-                            }
-
-                            if budgetRows {
-                                VStack(spacing: 10) {
-                                    ForEach(budgets, id: \.self) { budget in
-                                        NavigationLink(destination: DetailedBudgetView(budget: budget)
-                                            .onAppear {
-                                                withAnimation(.easeOut.speed(2)) {
-                                                    tabBarManager.navigationHideTab()
-                                                }
-                                            }
-                                            .onDisappear {
-                                                withAnimation(.easeOut.speed(2)) {
-                                                    tabBarManager.navigationShowTab()
-                                                }
-                                            }
-
-                                        ) {
-                                            SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
-                                        }
-                                    }
-                                }
-
-                            } else {
-                                LazyVGrid(columns: layout, spacing: 15) {
-                                    ForEach(budgets, id: \.self) { budget in
-                                        NavigationLink(destination: DetailedBudgetView(budget: budget)
-                                            .onAppear {
-                                                withAnimation(.easeOut.speed(2)) {
-                                                    tabBarManager.navigationHideTab()
-                                                }
-                                            }
-                                            .onDisappear {
-                                                withAnimation(.easeOut.speed(2)) {
-                                                    tabBarManager.navigationShowTab()
-                                                }
-                                            }
-
-                                        ) {
-                                            SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 25)
-                                .padding(5)
-                            }
+                        Button {
+                            newBudget = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+//                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color.SubtitleText)
+                                .padding(4)
+                                .glassChip(in: Circle())
+                                .contentShape(Circle())
                         }
-                        .padding(.bottom, 70)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    VStack(spacing: 5) {
-                        Spacer()
-                        Text("🙈")
-                            .font(.system(.largeTitle, design: .rounded))
-//                            .font(.system(size: 45))
-                            .padding(.bottom, 9)
 
-                        Text("No Budgets Found")
-                            .font(.system(.title2, design: .rounded).weight(.medium))
-//                            .font(.system(size: 23.5, weight: .medium, design: .rounded))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color.PrimaryText.opacity(0.8))
-
-                        Text("Add your first budget today!")
-                            .font(.system(.body, design: .rounded).weight(.medium))
-//                            .font(.system(size: 18, weight: .medium, design: .rounded))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(Color.SubtitleText.opacity(0.7))
-
-                        Spacer()
                         Spacer()
                     }
-                    .padding(20)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 20)
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 20)
+
+                    if !budgets.isEmpty || !mainBudget.isEmpty {
+                        ScrollView(showsIndicators: false) {
+                            VStack {
+                                if let first = mainBudget.first {
+                                    NavigationLink(destination: DetailedMainBudgetView(budget: first)
+                                        .onAppear {
+                                            withAnimation(.easeOut.speed(2)) {
+                                                tabBarManager.navigationHideTab()
+                                            }
+                                        }
+                                        .onDisappear {
+                                            withAnimation(.easeOut.speed(2)) {
+                                                tabBarManager.navigationShowTab()
+                                            }
+                                        }
+
+                                    ) {
+                                        if budgets.count == 0 {
+                                            MainBudgetView(budget: first, solo: true)
+                                                .padding(.horizontal, 25)
+                                                .padding(.bottom, 15)
+                                        } else {
+                                            MainBudgetView(budget: first, solo: false)
+                                                .padding(.horizontal, 25)
+                                                .padding(.bottom, 15)
+                                        }
+                                    }
+                                }
+
+                                if budgetRows {
+                                    VStack(spacing: 10) {
+                                        ForEach(budgets, id: \.self) { budget in
+                                            NavigationLink(destination: DetailedBudgetView(budget: budget)
+                                                .onAppear {
+                                                    withAnimation(.easeOut.speed(2)) {
+                                                        tabBarManager.navigationHideTab()
+                                                    }
+                                                }
+                                                .onDisappear {
+                                                    withAnimation(.easeOut.speed(2)) {
+                                                        tabBarManager.navigationShowTab()
+                                                    }
+                                                }
+
+                                            ) {
+                                                SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
+                                            }
+                                        }
+                                    }
+
+                                } else {
+                                    LazyVGrid(columns: layout, spacing: 15) {
+                                        ForEach(budgets, id: \.self) { budget in
+                                            NavigationLink(destination: DetailedBudgetView(budget: budget)
+                                                .onAppear {
+                                                    withAnimation(.easeOut.speed(2)) {
+                                                        tabBarManager.navigationHideTab()
+                                                    }
+                                                }
+                                                .onDisappear {
+                                                    withAnimation(.easeOut.speed(2)) {
+                                                        tabBarManager.navigationShowTab()
+                                                    }
+                                                }
+
+                                            ) {
+                                                SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
+                                            }
+                                        }
+                                    }
+                                    .padding(.horizontal, 25)
+                                    .padding(5)
+                                }
+                            }
+                            .padding(.bottom, 70)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        VStack(spacing: 5) {
+                            Spacer()
+                            Text("🙈")
+                                .font(.system(.largeTitle, design: .rounded))
+//                                .font(.system(size: 45))
+                                .padding(.bottom, 9)
+
+                            Text("No Budgets Found")
+                                .font(.system(.title2, design: .rounded).weight(.medium))
+//                                .font(.system(size: 23.5, weight: .medium, design: .rounded))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(Color.PrimaryText.opacity(0.8))
+
+                            Text("Add your first budget today!")
+                                .font(.system(.body, design: .rounded).weight(.medium))
+//                                .font(.system(size: 18, weight: .medium, design: .rounded))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(Color.SubtitleText.opacity(0.7))
+
+                            Spacer()
+                            Spacer()
+                        }
+                        .padding(20)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             .navigationBarTitle("")
-            .navigationBarHidden(true)
-            .background(Color.PrimaryBackground)
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $toEdit, onDismiss: {
                 toEdit = nil
             }) { budget in
@@ -412,7 +413,7 @@ struct MainBudgetView: View {
         }
         .padding(.bottom)
         .frame(width: width + 30, height: soloBudget ? 230 : 200, alignment: .bottom)
-        .background(soloBudget ? Color.Outline.opacity(0.2) : Color.PrimaryBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 13))
         .contextMenu {
             Button {
@@ -586,7 +587,7 @@ struct SingleBudgetView: View {
 //                        .font(.system(size: 13, weight: .bold))
                         .foregroundColor(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
                         .padding(5)
-                        .background(deleteConfirm ? Color.AlertRed.opacity(0.23) : Color.SecondaryBackground, in: Circle())
+                        .tintedGlassChip(deleteConfirm ? Color.AlertRed : Color.SubtitleText, in: Circle())
                         .scaleEffect(deleteConfirm ? 1.1 : 1)
                         .contentShape(Circle())
                         .opacity(deleted ? 0 : 1)
@@ -635,7 +636,7 @@ struct SingleBudgetView: View {
                         }
                     }
                     .padding(10)
-                    .background(colorScheme == .dark ? Color.Outline.opacity(0.2) : Color.Outline.opacity(0.35), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .contentShape(RoundedRectangle(cornerRadius: 13))
                     .contextMenu {
                         Button {
@@ -786,7 +787,7 @@ struct SingleBudgetView: View {
                 }
                 .padding(15)
                 .frame(width: width + 30)
-                .background(colorScheme == .dark ? Color.Outline.opacity(0.2) : Color.Outline.opacity(0.35), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .contentShape(RoundedRectangle(cornerRadius: 13))
                 .contextMenu {
                     Button {
@@ -996,7 +997,7 @@ struct DeleteBudgetAlert: View {
                 }
             }
             .padding(13)
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
@@ -1079,7 +1080,7 @@ struct DeleteMainBudgetAlert: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(13)
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
@@ -1162,7 +1163,7 @@ struct DetailedBudgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .sheet(item: $toEdit, onDismiss: {
             toEdit = nil
         }) { budget in
@@ -1227,7 +1228,7 @@ struct DetailedMainBudgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .fullScreenCover(item: $toEdit, onDismiss: {
             toEdit = nil
         }) { budget in

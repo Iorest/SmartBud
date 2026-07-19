@@ -67,16 +67,13 @@ struct CustomTabBar: View {
         .padding(.top, 10)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity)
-        .background {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(.ultraThinMaterial)
-        }
+        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.surface, style: .continuous))
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Color.primary.opacity(0.12))
                 .frame(height: 0.5)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: GlassRadius.surface, style: .continuous))
         .padding(.horizontal, 10)
         .padding(.bottom, bottomEdge - 10)
         .fullScreenCover(isPresented: $addTransaction, onDismiss: {
@@ -156,10 +153,21 @@ struct TabButton: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: 28, maxHeight: 28)
+                .padding(8)
+                .background {
+                    if currentTab == image {
+                        Circle()
+                            .fill(.clear)
+                    }
+                }
                 .animation(.easeInOut(duration: 0.3), value: currentTab)
                 .frame(maxWidth: .infinity)
                 .foregroundColor(currentTab == image ? Color.DarkIcon : Color.GreyIcon)
         }
+        .glassChip(
+            in: Circle(),
+            interactive: currentTab == image
+        )
         .buttonStyle(BouncyButton(duration: 0.3, scale: 0.6))
         .accessibilityLabel("\(image) tab")
         .accessibilityAddTraits(

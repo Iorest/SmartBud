@@ -63,9 +63,9 @@ struct SuggestedTransactions: View {
                         }
                         .padding(5)
                         .background(
-                            Color.SecondaryBackground,
-                            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                            RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
                         )
+                        .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
                     }
                 }
             }

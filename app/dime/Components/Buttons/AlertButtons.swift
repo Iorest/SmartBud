@@ -18,6 +18,16 @@ struct DeleteButton: View {
             .foregroundColor(red ? Color.white : Color.PrimaryText.opacity(0.9))
             .frame(height: 45)
             .frame(maxWidth: .infinity)
-            .background(red ? Color.AlertRed : Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .background {
+                if red {
+                    Capsule().fill(Color.AlertRed)
+                } else {
+                    Capsule().fill(.clear)
+                }
+            }
+            .glassEffect(
+                red ? Glass.regular.tint(Color.AlertRed) : .regular,
+                in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+            )
     }
 }

@@ -47,7 +47,7 @@ struct InsightsSummaryBlockView: View {
         .onTapGesture {
             self.action()
         }
-        .background(Color.TertiaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
             if showOverlay {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)

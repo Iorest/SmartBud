@@ -133,7 +133,7 @@ struct CategoryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard, edges: .all)
-        .background(Color.PrimaryBackground)
+        .background(.clear)
         .onAppear {
             categoryVM.load()
         }
@@ -579,7 +579,7 @@ struct CategoryListView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Color.PrimaryBackground)
+        .background(.clear)
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: toDelete) { _, _ in
             if toDelete != nil {
@@ -645,7 +645,7 @@ struct CategoryListView: View {
                     }
                 }
                 .padding(13)
-                .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+                .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
                 .offset(y: offset)
                 .gesture(
@@ -973,7 +973,7 @@ struct NewCategoryAlert: View {
             .frame(maxHeight: bottomSpacers ? 350 : .infinity)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(Color.PrimaryBackground)
+        .background(.clear)
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: expenseCategories.count) { _, _ in
             if expenseCategories.count == 24 {
@@ -1341,7 +1341,7 @@ struct EditCategoryAlert: View {
             .frame(maxHeight: bottomSpacers ? 350 : .infinity)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(Color.PrimaryBackground)
+        .background(.clear)
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in
             if newValue {
@@ -1512,7 +1512,7 @@ struct DeleteCategoryAlert: View {
             }
             .padding(13)
 //            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(

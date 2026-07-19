@@ -31,7 +31,7 @@ struct UpdateAlert: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.PrimaryBackground.opacity(opacity)
+            Color.clear.opacity(opacity)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -139,7 +139,7 @@ struct UpdateAlert: View {
                     .multilineTextAlignment(.center)
             }
             .padding(18)
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .padding(.horizontal, 17)

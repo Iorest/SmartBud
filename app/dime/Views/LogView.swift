@@ -83,7 +83,7 @@ struct LogView: View {
             .padding(.horizontal, 30)
             .frame(height: 250, alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.PrimaryBackground)
+            .background(.clear)
 
         } else {
             VStack(spacing: 0) {
@@ -245,7 +245,7 @@ struct LogView: View {
             }
 //            .onAppear(perform: scrollDelegate.addGesture)
 //            .onDisappear(perform: scrollDelegate.removeGesture)
-            .background(Color.PrimaryBackground)
+            .background(.clear)
             .fullScreenCover(isPresented: $searchMode) {
                 SearchView()
             }
@@ -306,7 +306,7 @@ struct LogView: View {
         }
         .padding(4)
         .padding(.horizontal, 6)
-        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: 9, style: .continuous))
 //        .font(.system(size: 17, weight: .medium, design: .rounded))
         .foregroundColor(Color.PrimaryText)
     }
@@ -509,7 +509,7 @@ struct SearchView: View {
                 }
                 .padding(6)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 8))
+                .glassCard(in: RoundedRectangle(cornerRadius: 8))
 
                 Button {
                     dismiss()
@@ -1413,7 +1413,7 @@ struct DeleteTransactionAlert: View {
             }
             .padding(13)
             //            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
 //            .offset(y: offset)
 //            .gesture(

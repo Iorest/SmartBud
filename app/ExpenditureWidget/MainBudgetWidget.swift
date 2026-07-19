@@ -271,7 +271,7 @@ struct MainBudgetWidgetEntryView: View {
                     .foregroundColor(Color.SubtitleText)
                     .padding(15)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .containerBackground(for: .widget) { Color.PrimaryBackground }
+                    .containerBackground(for: .widget) { WidgetGlassBackground() }
             } else {
                 VStack(spacing: 12) {
                     HStack(alignment: .top) {
@@ -281,7 +281,7 @@ struct MainBudgetWidgetEntryView: View {
                                 .lineLimit(1)
                                 .foregroundColor(Color.PrimaryText)
 
-                            Text("SPENT: \(percentString1)")
+                            Text(String(format: String(localized: "SPENT: %@"), percentString1))
                                 .font(.system(size: 10, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
                         }
@@ -356,7 +356,7 @@ struct MainBudgetWidgetEntryView: View {
                     .frame(maxHeight: .infinity, alignment: .bottom)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .containerBackground(for: .widget) { Color.PrimaryBackground }
+                .containerBackground(for: .widget) { WidgetGlassBackground() }
             }
 
         default:

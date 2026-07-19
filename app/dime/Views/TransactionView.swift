@@ -356,19 +356,20 @@ struct TransactionView: View {
 
     @ViewBuilder
     var swipeAndNumberPadArea: some View {
-        ZStack {
-            // swipe to change between income and expense
-            Color.clear
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .simultaneousGesture(incomeExpenseSwipeGesture)
-
-            // number display and note view
+        VStack(spacing: 0) {
             VStack(spacing: 8) {
                 NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
                 NoteView(note: $note, focused: $textFieldFocused)
             }
+            // Bottom spacer absorbs every remaining point in the parent VStack
+            // so the date row + number pad get pinned to the screen edge.
+            // Without this the VStack's intrinsic-size pass gives the pad an
+            // extra ~70pt of breathing room below it.
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
+        .simultaneousGesture(incomeExpenseSwipeGesture)
     }
 
     @ViewBuilder

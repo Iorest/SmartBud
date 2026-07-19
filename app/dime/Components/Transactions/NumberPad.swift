@@ -38,6 +38,13 @@ struct NumberPad: View {
     private let numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     private let rowShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
 
+    /// Fixed row height (was `frame(maxHeight: .infinity)` in the previous
+    /// rewrite — that made each row greedy and the bottom row clipped off-screen
+    /// when the parent (`.keyboardAwareHeight`) gave it 800pt to fill). At
+    /// 4 × 72pt + 3 × 8pt = 312pt the whole pad fits a standard iPhone without
+    /// spilling into the rest of the add-transaction layout.
+    @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 72
+
     /// Fires on every digit tap, with intensity driven by the user's
     /// `haptics` preference (computed in the VM). Skipped entirely when
     /// haptics are disabled, matching the old `if hapticType == 2` guard.
@@ -46,13 +53,10 @@ struct NumberPad: View {
             VStack(spacing: 8) {
                 ForEach(numPadNumbers, id: \.self) { row in
                     numberRow(row)
-                        .frame(maxHeight: .infinity)
                 }
                 bottomRow
-                    .frame(maxHeight: .infinity)
             }
         }
-        .frame(maxHeight: .infinity)
         .padding(.bottom, 15)
         .keyboardAwareHeight(showToolbar: showingNotePicker)
         .modifier(DigitHapticModifier(
@@ -66,8 +70,6 @@ struct NumberPad: View {
         ))
     }
 
-    // MARK: - Rows
-
     @ViewBuilder
     private func numberRow(_ row: [Int]) -> some View {
         HStack(spacing: 8) {
@@ -75,6 +77,7 @@ struct NumberPad: View {
                 digitButton(digit)
             }
         }
+        .frame(height: rowHeight)
     }
 
     @ViewBuilder
@@ -88,6 +91,7 @@ struct NumberPad: View {
             digitButton(0)
             checkmarkButton
         }
+        .frame(height: rowHeight)
     }
 
     // MARK: - Buttons
@@ -98,13 +102,23 @@ struct NumberPad: View {
         Button {
             vm.tap(digit)
         } label: {
-            Text("\(digit)")
-                .font(.system(.title2, design: .rounded))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(Color.PrimaryText)
-                .background(rowShape.fill(.clear))
-                .glassChip(in: rowShape)
-                .opacity(disabled ? 0.6 : 1)
+            // `VStack` with equal Spacers above and below is the only way
+            // to put the glyph truly in the middle of the cell. Text has a
+            // fixed line height and the glyph sits at the baseline, so
+            // `frame(alignment: .center)` and `ZStack` both leave the
+            // digit hovering at the top or bottom of the cell instead of
+            // centred. The Spacers push the Text away from both edges.
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                Text("\(digit)")
+                    .font(.system(.title2, design: .rounded))
+                    .foregroundStyle(Color.PrimaryText)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(rowShape.fill(.clear))
+            .glassChip(in: rowShape)
+            .opacity(disabled ? 0.6 : 1)
         }
         .disabled(disabled)
         .buttonStyle(NumPadButton())
@@ -116,13 +130,17 @@ struct NumberPad: View {
         Button {
             vm.deleteLast()
         } label: {
-            Image("tag-cross")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 32, height: 32)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(Color.LightIcon)
-                .background(Color.DarkBackground, in: rowShape)
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                Image("tag-cross")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                    .foregroundStyle(Color.LightIcon)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.DarkBackground, in: rowShape)
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text("Delete"))
@@ -133,12 +151,16 @@ struct NumberPad: View {
         Button {
             vm.enterDecimal()
         } label: {
-            Text(Locale.current.decimalSeparator ?? ".")
-                .font(.system(.title2, design: .rounded))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(Color.PrimaryText)
-                .background(rowShape.fill(.clear))
-                .glassChip(in: rowShape)
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                Text(Locale.current.decimalSeparator ?? ".")
+                    .font(.system(.title2, design: .rounded))
+                    .foregroundStyle(Color.PrimaryText)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(rowShape.fill(.clear))
+            .glassChip(in: rowShape)
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text("Decimal point"))
@@ -146,18 +168,29 @@ struct NumberPad: View {
 
     @ViewBuilder
     private var checkmarkButton: some View {
+        let canSubmit = vm.price != 0
         Button {
-            vm.submit()
+            // IMPORTANT: do NOT call `vm.submit()` here before the parent
+            // closure. The parent reads `padVM.price` to decide whether to
+            // create the transaction; if the VM clears it first, the
+            // parent sees `amount == 0` and shows a "Missing Amount" toast
+            // instead of committing. The parent calls `padVM.submit()` itself
+            // once it has captured the value and the transaction is saved.
             submit()
         } label: {
-            Image(systemName: "checkmark.square.fill")
-                .font(.system(.title2, design: .rounded).weight(.medium))
-                .symbolEffect(.bounce.up.byLayer, value: vm.price != 0 && category != nil)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundStyle(Color.LightIcon)
-                .background(Color.DarkBackground, in: rowShape)
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                Image(systemName: "checkmark")
+                    .font(.system(.title2, design: .rounded).weight(.semibold))
+                    .symbolEffect(.bounce.up.byLayer, value: canSubmit)
+                    .foregroundStyle(Color.LightIcon)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.accentColor.opacity(canSubmit ? 1 : 0.4), in: rowShape)
         }
         .buttonStyle(NumPadButton())
+        .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
     }
 }

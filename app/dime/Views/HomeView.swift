@@ -61,22 +61,28 @@ struct HomeView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            AppGlassBackground()
+
             TabView(selection: $currentTab) {
                 LogView(topEdge: topEdge, bottomEdge: bottomEdge, launchSearch: launchSearch)
                     .ignoresSafeArea(.all)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppGlassBackground())
                     .tag("Log")
 
                 InsightsView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppGlassBackground())
                     .tag("Insights")
 
                 BudgetView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppGlassBackground())
                     .tag("Budget")
 
                 SettingsView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppGlassBackground())
                     .tag("Settings")
             }
             .allowsHitTesting(showPopup ? false : true)
@@ -223,6 +229,7 @@ struct AppLockView: View {
         }
         .padding(.horizontal, 30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.PrimaryBackground)
+        .background(Color.PrimaryBackground.opacity(0.3))
+        .background(.ultraThinMaterial)
     }
 }

@@ -6,7 +6,7 @@ struct ToolbarButton: View {
 
     var body: some View {
         Circle()
-            .fill(Color.SecondaryBackground)
+            .fill(.clear)
             .frame(width: 33, height: 33)
             .overlay {
                 Image(systemName: systemName)
@@ -15,6 +15,7 @@ struct ToolbarButton: View {
                     .foregroundColor(Color.SubtitleText)
                     .offset(y: 0.8)
             }
+            .glassChip(in: Circle())
             .onTapGesture {
                 onTapGesture?()
             }

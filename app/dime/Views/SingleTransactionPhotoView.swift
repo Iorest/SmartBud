@@ -49,14 +49,15 @@ struct SingleDayPhotoView: View {
             }
             .padding(30)
             .frame(maxWidth: .infinity)
-            .background(Color.PrimaryBackground, in: RoundedRectangle(cornerRadius: 40))
+            .background(.clear)
+            .glassCard(in: RoundedRectangle(cornerRadius: 40))
             .shadow(color: Color.Outline, radius: 30)
 //            .background(Color.neuBackground, in: RoundedRectangle(cornerRadius: 40))
 //            .shadow(color: .dropShadow, radius: 45, x: 40, y: 40)
 //            .shadow(color: .dropLight, radius: 45, x: -40, y: -40)
         }
         .padding(60)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .frame(width: 1100, alignment: .top)
     }
 }

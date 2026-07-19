@@ -78,10 +78,10 @@ struct NewCategoryPickerView: View {
             .padding(.vertical, 9)
             .padding(.horizontal, 18)
             .foregroundColor(Color.SubtitleText)
-            .background(
-                RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(Color.SecondaryBackground).shadow(
-                    color: colorScheme == .light ? Color.Outline  : Color.clear, radius: 6)
-            )
+            .background {
+                RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
+            }
+            .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
             .contentShape(Rectangle())
             .onTapGesture {
                 let impactMed = UIImpactFeedbackGenerator(style: .light)

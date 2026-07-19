@@ -22,7 +22,8 @@ struct DetailedBudgetViewTopBarButton: View {
                 .foregroundColor(color)
                 .padding(8)
 //                .frame(width: 30, height: 30)
-                .background(color.opacity(0.23), in: Circle())
+                .background(Circle().fill(.clear))
+                .tintedGlassChip(color.opacity(0.5), in: Circle())
                 .contentShape(Circle())
         }
     }

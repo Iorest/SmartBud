@@ -52,9 +52,9 @@ extension UIApplication {
 }
 
 struct KeyboardAwareModifier: ViewModifier {
-    @AppStorage("keyboard", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedKeyboardHeight: Double = .init(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first?.screen.bounds.height ?? 800 / 2.5)
+    @AppStorage("keyboard", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedKeyboardHeight: Double = 291
     var showToolbar: Bool
-//    @State private var keyboardHeight: CGFloat = 250
+    @State private var isKeyboardVisible = false
 
     private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
         Publishers.Merge(
@@ -70,10 +70,14 @@ struct KeyboardAwareModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .frame(height: savedKeyboardHeight)
+            .padding(.bottom, isKeyboardVisible ? max(0, savedKeyboardHeight) : 0)
+            .animation(.easeOut(duration: 0.25), value: isKeyboardVisible)
             .onReceive(keyboardHeightPublisher) { value in
                 if value > 200 {
-                    self.savedKeyboardHeight = value - 20
+                    isKeyboardVisible = true
+                    savedKeyboardHeight = value - 20
+                } else {
+                    isKeyboardVisible = false
                 }
             }
     }

@@ -405,25 +405,27 @@ struct TemplateTransactionView: View {
 
                             NumberButton(number: 0, size: proxy.size)
 
+                            let canSubmit = transactionValue != 0
                             Button {
                                 submit()
                             } label: {
                                 Group {
                                     if #available(iOS 17.0, *) {
-                                        Image(systemName: "checkmark.square.fill")
-                                            .font(.system(size: 30, weight: .medium, design: .rounded))
-                                            .symbolEffect(.bounce.up.byLayer, value: transactionValue != 0 && category != nil)
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 30, weight: .semibold, design: .rounded))
+                                            .symbolEffect(.bounce.up.byLayer, value: canSubmit)
 //                                            .symbolEffectsRemoved()
                                     } else {
-                                        Image(systemName: "checkmark.square.fill")
-                                            .font(.system(size: 30, weight: .medium, design: .rounded))
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 30, weight: .semibold, design: .rounded))
                                     }
                                 }
                                 .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                 .foregroundColor(Color.LightIcon)
-                                .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .background(Color.accentColor.opacity(canSubmit ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
                             .buttonStyle(NumPadButton())
+                            .disabled(!canSubmit)
                         }
                     }
                     .frame(width: proxy.size.width, height: proxy.size.height)
@@ -433,7 +435,7 @@ struct TemplateTransactionView: View {
             }
             .padding(17)
             .frame(width: proxy.size.width, height: proxy.size.height)
-            .background(Color.PrimaryBackground)
+            .background(Color.clear)
             .onTapGesture {
                 self.hideKeyboard()
             }
@@ -494,7 +496,7 @@ struct TemplateTransactionView: View {
                         }
                     }
                     .padding(13)
-                    .background(RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+                    .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
                     .offset(y: offset)
                     .gesture(
@@ -527,7 +529,7 @@ struct TemplateTransactionView: View {
         .animation(.easeOut(duration: 0.2), value: showToast)
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .ignoresSafeArea(.all)
         .onChange(of: showToast) { _, newValue in
             if newValue {

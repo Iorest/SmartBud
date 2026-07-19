@@ -813,7 +813,7 @@ struct ImportDataView: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard)
-        .background(Color.PrimaryBackground)
+        .appBackground()
         .onAppear {
             categoryVM.load()
         }

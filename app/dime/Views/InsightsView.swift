@@ -70,7 +70,7 @@ struct InsightsView: View {
             }
             .padding(.bottom, 40)
         }
-        .background(Color.PrimaryBackground.ignoresSafeArea())
+        .background(Color.clear.ignoresSafeArea())
         .onAppear {
             insightsVM.setPeriod(period)
             insightsVM.refreshAll()
@@ -438,7 +438,7 @@ struct FilteredCategoryInsightsView: View {
                 .foregroundColor(Color.SubtitleText)
         }
         .padding(12)
-        .background(Color.TertiaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
