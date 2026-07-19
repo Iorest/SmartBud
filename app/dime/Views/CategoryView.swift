@@ -671,8 +671,6 @@ struct NewCategoryAlert: View {
     @State var showNativePicker: Bool = false
     @State var customSelectedColor = Color.white
 
-//    @State var isFetching = false
-
     var body: some View {
         VStack {
             VStack {
@@ -833,25 +831,6 @@ struct NewCategoryAlert: View {
                             ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, expenseCategories: expenseCategories)
                         }
                     }
-//
-//                    HStack(spacing: 8) {
-//
-//
-//                        if isFetching {
-//                            ProgressView()
-//                                .padding(8)
-//                        } else if newName != "" {
-//                            Image(systemName: "xmark.circle.fill")
-//                                .foregroundStyle(Color.SubtitleText)
-//                                .font(.system(size: 20, weight: .semibold))
-//                                .padding(8)
-//                                .onTapGesture {
-//                                    withAnimation {
-//                                        newName = ""
-//                                    }
-//                                }
-//                        }
-//                    }
                     NormalTextField(text: $newName, placeholder: String(localized: "Category Name"), action: verification)
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
@@ -1007,49 +986,6 @@ struct NewCategoryAlert: View {
         }
     }
 
-//    func GPTRecommendations(emoji: String, income: Bool) {
-//        guard let url = URL(string: "https://api.openai.com/v1/completions") else {
-//            return
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//
-//        let parameters: [String:Any] = ["model":"text-davinci-003", "prompt":"What is the likely transaction category name for a \(income ? "income" : "expense") category with the emoji \(emoji)?", "temperature":0.9]
-//
-//        // Convert parameters into JSON data
-//        let postData = try? JSONSerialization.data(withJSONObject: parameters)
-//
-//        request.httpBody = postData
-//        request.addValue("Bearer \(Constants.openAPIKey)", forHTTPHeaderField: "Authorization")
-//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//
-//        isFetching = true
-//
-//        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-//            DispatchQueue.main.async {
-//
-//                if let data = data {
-//                    let decoder = JSONDecoder()
-//
-//                    do {
-//                        // Decode data using your model structure
-//                        let result = try decoder.decode(OpenAICompletionsResponse.self, from: data)
-//                        self.newName = result.choices.first?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-//                        isFetching = false
-//                    } catch {
-//                        print("Failed to decode JSON")
-//                        isFetching = false
-//                    }
-//                } else if let error = error {
-//                    print("HTTP Request Failed \(error.localizedDescription)")
-//                    isFetching = false
-//                }
-//            }
-//        }
-//
-//        task.resume()
-//    }
 
     init(income: Binding<Bool>, bottomSpacers: Bool, budgetMode: Bool = false) {
         _income = income
@@ -1807,13 +1743,4 @@ struct ColourPickerView: View {
 
         self.selectedColours = selectedColours
     }
-}
-
-struct OpenAICompletionsResponse: Decodable {
-    let id: String
-    let choices: [OpenAICompletionsOptions]
-}
-
-struct OpenAICompletionsOptions: Decodable {
-    let text: String
 }

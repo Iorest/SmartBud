@@ -55,9 +55,6 @@ struct LogView: View {
 //        case none, search, filter
 //    }
 
-//    @State var pullStatus: PullToReach = .none
-//    @State var released: PullToReach = .none
-
     @State var progress = 0.0
 
     var body: some View {
@@ -199,53 +196,7 @@ struct LogView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-//
-//                CustomRefreshView {
-//                    VStack {
-//
-//                    }
-//
-//                } onRefresh: {
-//                    searchMode = true
-//                }
-//
-
-//                ScrollView(showsIndicators: false) {
-//                    if filter == .all {
-//                        LogInsightsView(navBarText: $navBarText, showCents: showCents, currencySymbol: currencySymbol)
-//
-//                    }
-//
-//
-//                    TransactionsList(filter: filter, category: categoryFilter, date: dateFilter, week: weekFilter, month: monthFilter, income: income)
-//                        .zIndex(0)
-//                        .padding(.horizontal, 20)
-//                        .padding(.bottom, 70 + bottomEdge)
-                ////                        .offsetExtractor(coordinateSpace: "Scroll") { rect in
-                ////                            DispatchQueue.main.async {
-                ////                                print(rect.minY)
-                ////                                pullStatus = rect.minY > 355 ? (rect.minY > 410 ? .filter : .search) : .none
-                ////                            }
-                ////                        }
-//                }
-//                .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                .onReceive(scrollDelegate.gestureEnded) { _ in
-//                    if pullStatus == .filter {
-//                        showFilter = true
-//                        released = .filter
-//                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-//                    } else if pullStatus == .search {
-//                        released = .search
-//                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                            searchMode = true
-//                        }
-//
-//                    }
-//                }
             }
-//            .onAppear(perform: scrollDelegate.addGesture)
-//            .onDisappear(perform: scrollDelegate.removeGesture)
             .background(.clear)
             .fullScreenCover(isPresented: $searchMode) {
                 SearchView()
@@ -264,18 +215,6 @@ struct LogView: View {
                     transactionVM.updateAllRecurring()
                 }
             }
-//            .animation(.spring(duration: 0.5), value: released)
-//            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: pullStatus)
-//            .onChange(of: pullStatus) { newValue in
-//                if newValue != .none && released == .none {
-//                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-//                }
-//            }
-//            .onChange(of: released) { _ in
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                    released = .none
-//                }
-//            }
             .onOpenURL { url in
                 guard url.host == "search" else {
                     return
