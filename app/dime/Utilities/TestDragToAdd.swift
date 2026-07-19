@@ -228,12 +228,12 @@ struct CustomProgressView: View {
                 // V1 with simple plus
                 /*  Image(systemName: "plus")
                  .font(.system(size: 16 * (0.6 + progress), weight: .semibold))
-                 .foregroundColor(.accentColorPrimary).opacity((0.3 + progress) > 1 ? 1 : (0.3 + progress)) */
+                 .foregroundStyle(.accentColorPrimary).opacity((0.3 + progress) > 1 ? 1 : (0.3 + progress)) */
 
                 // Var 2: Filled
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 32 * (0.6 + progress)))
-                    .foregroundColor(Color.Outline).opacity((0.6 + progress) > 1 ? 1 : (0.6 + progress))
+                    .foregroundStyle(Color.Outline).opacity((0.6 + progress) > 1 ? 1 : (0.6 + progress))
             }
             Text("Pull to add update")
         }

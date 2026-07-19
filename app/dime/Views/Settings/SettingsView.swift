@@ -238,7 +238,7 @@ struct SettingsView: View {
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -322,7 +322,7 @@ struct SettingsView: View {
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -393,7 +393,7 @@ struct SettingsView: View {
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -459,7 +459,7 @@ struct SettingsView: View {
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -515,17 +515,17 @@ struct SettingsView: View {
                 .font(.system(.footnote, design: .rounded).weight(.medium))
 
                 //                                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
 
               Text("·")
                 .font(.system(.footnote, design: .rounded).weight(.medium))
 
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
 
               Text("What's New")
                 .font(.system(.footnote, design: .rounded).weight(.medium))
 
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .onTapGesture {
                   showUpdate = true
                 }
@@ -538,7 +538,7 @@ struct SettingsView: View {
             )
               .font(.system(.footnote, design: .rounded).weight(.medium))
 
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .multilineTextAlignment(.center)
           }
           .padding(.horizontal, 25)
@@ -563,7 +563,7 @@ struct SettingsView: View {
     HStack(spacing: 12) {
       Image(systemName: icon)
             .font(.system(smaller ? .subheadline : .body, design: .rounded))
-        .foregroundColor(.white)
+        .foregroundStyle(.white)
         .frame(
           width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
           alignment: .center
@@ -573,17 +573,17 @@ struct SettingsView: View {
       Text(LocalizedStringKey(text))
         .font(.system(.body, design: .rounded).weight(.medium))
         .lineLimit(1)
-        .foregroundColor(Color.PrimaryText)
+        .foregroundStyle(Color.PrimaryText)
 
       Spacer()
 
       ZStack(alignment: bool ? .trailing : .leading) {
         Capsule()
           .frame(width: 42, height: 28)
-          .foregroundColor(bool ? .green : .gray.opacity(0.8))
+          .foregroundStyle(bool ? .green : .gray.opacity(0.8))
 
         Circle()
-          .foregroundColor(Color.white)
+          .foregroundStyle(Color.white)
           .padding(2)
           .frame(width: 28, height: 28)
           .matchedGeometryEffect(id: "toggle\(color)", in: animation)
@@ -676,7 +676,7 @@ struct SettingsRowView: View {
 
         //                .font(.system(size: 17))
         //                .padding(5)
-        .foregroundColor(.white)
+        .foregroundStyle(.white)
         .frame(
           width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
           alignment: .center
@@ -688,7 +688,7 @@ struct SettingsRowView: View {
 
         //                .font(.system(size: 17, weight: .medium, design: .rounded))
         .lineLimit(1)
-        .foregroundColor(Color.PrimaryText)
+        .foregroundStyle(Color.PrimaryText)
 
       Spacer()
 
@@ -697,7 +697,7 @@ struct SettingsRowView: View {
           .font(.system(.body, design: .rounded))
 
           //                    .font(.system(size: 17, weight: .regular, design: .rounded))
-          .foregroundColor(.DarkIcon.opacity(0.6))
+          .foregroundStyle(Color.DarkIcon.opacity(0.6))
           .layoutPriority(1)
           .padding(.trailing, -8)
       }
@@ -705,7 +705,7 @@ struct SettingsRowView: View {
       Image(systemName: "chevron.forward")
         .font(.system(.subheadline, design: .rounded))
         //                .font(.system(size: 15))
-        .foregroundColor(.DarkIcon.opacity(0.6))
+        .foregroundStyle(Color.DarkIcon.opacity(0.6))
     }
     .frame(maxWidth: .infinity)
     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)

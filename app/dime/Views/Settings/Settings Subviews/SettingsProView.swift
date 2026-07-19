@@ -48,7 +48,7 @@ struct SettingsProView: View {
             .overlay(alignment: .center) {
                 Text(String(localized: "SmartBud Pro"))
                     .font(.system(.title3, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
             }
             .padding(.bottom, 20)
 
@@ -81,7 +81,7 @@ struct SettingsProView: View {
                     .shadow(color: Color(red: 0.95, green: 0.78, blue: 0.31).opacity(0.4), radius: 12, y: 4)
                 Image(systemName: "crown.fill")
                     .font(.system(size: 38, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
             .padding(.top, 8)
 
@@ -92,7 +92,7 @@ struct SettingsProView: View {
 
             Text(String(localized: "iCloud Sync, Batch Recognition and more"))
                 .font(.system(.subheadline, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 4)
@@ -102,13 +102,13 @@ struct SettingsProView: View {
         VStack(spacing: 12) {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 56))
-                .foregroundColor(Color.IncomeGreen)
+                .foregroundStyle(Color.IncomeGreen)
             Text(String(localized: "Pro Active"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
             Text(String(localized: "Thank you for supporting SmartBud development."))
                 .font(.system(.subheadline, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .multilineTextAlignment(.center)
         }
         .padding(.vertical, 30)
@@ -120,16 +120,16 @@ struct SettingsProView: View {
                 HStack(spacing: 14) {
                     Image(systemName: feature.icon)
                         .font(.system(.body, design: .rounded))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(width: 36, height: 36)
                         .background(Color(feature.color), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(feature.title)
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.PrimaryText)
+                            .foregroundStyle(Color.PrimaryText)
                         Text(feature.subtitle)
                             .font(.system(.footnote, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                     }
                     Spacer()
                 }
@@ -149,10 +149,10 @@ struct SettingsProView: View {
             VStack(spacing: 8) {
                 Text(String(localized: "Coming Soon"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
                 Text(String(localized: "Subscription products will be available in a future update."))
                     .font(.system(.footnote, design: .rounded))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
             }
             .padding(20)
@@ -175,7 +175,7 @@ struct SettingsProView: View {
                 } label: {
                     Text(String(localized: "Restore Purchases"))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundStyle(Color.SubtitleText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                 }

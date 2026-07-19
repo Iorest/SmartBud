@@ -37,7 +37,7 @@ struct SettingsGoofyView: View {
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                .font(.system(size: 20, weight: .semibold, design: .rounded))
-        .foregroundColor(Color.PrimaryText)
+        .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
           Button {
@@ -62,7 +62,7 @@ struct SettingsGoofyView: View {
           .font(.system(.caption, design: .rounded).weight(.medium))
           .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
           //                    .font(.system(size: 12, weight: .medium, design: .rounded))
-          .foregroundColor(Color.SubtitleText)
+          .foregroundStyle(Color.SubtitleText)
           .padding(.horizontal, 15)
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.bottom, 30)
@@ -76,7 +76,7 @@ struct SettingsGoofyView: View {
         .font(.system(.caption, design: .rounded).weight(.medium))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                    .font(.system(size: 12, weight: .medium, design: .rounded))
-        .foregroundColor(Color.SubtitleText)
+        .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 30)
@@ -90,7 +90,7 @@ struct SettingsGoofyView: View {
         .font(.system(.caption, design: .rounded).weight(.medium))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                    .font(.system(size: 12, weight: .medium, design: .rounded))
-        .foregroundColor(Color.SubtitleText)
+        .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 30)
@@ -101,7 +101,7 @@ struct SettingsGoofyView: View {
       //
       //            Text("Enables a chromatic abberation effect on the 'New Transaction' page when a future date is set.")
       //                .font(.system(size: 12, weight: .medium, design: .rounded))
-      //                .foregroundColor(Color.SubtitleText)
+      //                .foregroundStyle(Color.SubtitleText)
       //                .padding(.horizontal, 15)
       //                .frame(maxWidth: .infinity, alignment: .leading)
       //                .padding(.bottom, 30)
@@ -116,17 +116,17 @@ struct SettingsGoofyView: View {
         .font(.system(.body, design: .rounded))
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                .font(.system(size: 17, weight: .regular, design: .rounded))
-        .foregroundColor(Color.PrimaryText)
+        .foregroundStyle(Color.PrimaryText)
 
       Spacer()
 
       ZStack(alignment: bool.wrappedValue ? .trailing : .leading) {
         Capsule()
           .frame(width: 42, height: 28)
-          .foregroundColor(bool.wrappedValue ? .green : .gray.opacity(0.8))
+          .foregroundStyle(bool.wrappedValue ? .green : .gray.opacity(0.8))
 
         Circle()
-          .foregroundColor(Color.white)
+          .foregroundStyle(Color.white)
           .padding(2)
           .frame(width: 28, height: 28)
           .matchedGeometryEffect(id: "toggle\(id)", in: animation)

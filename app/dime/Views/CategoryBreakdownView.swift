@@ -30,7 +30,7 @@ struct CategoryBreakdownView: View {
             if !categories.isEmpty {
                 Text("Categories", comment: "Insights category breakdown heading")
                     .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
 
                 stackedBar
 
@@ -65,18 +65,18 @@ struct CategoryBreakdownView: View {
         return HStack(spacing: 10) {
             Text(category.category.fullName)
                 .font(.system(.title3, design: .rounded).weight(.semibold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
 
             Text(formattedAmount(category.amount))
                 .font(.system(.body, design: .rounded).weight(.medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .lineLimit(1)
 
             Text("\(Int((category.percent * 100).rounded()))%")
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                .foregroundColor(color)
+                .foregroundStyle(color)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 6)
                 .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: 8, style: .continuous))

@@ -115,7 +115,7 @@ struct MyButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .font(.system(size: 26, weight: .bold))
-            .foregroundColor(.white)
+            .foregroundStyle(.white)
             .frame(width: 58, height: 58)
             .background(
                 Circle()
@@ -162,7 +162,7 @@ struct TabButton: View {
                 }
                 .animation(.easeInOut(duration: 0.3), value: currentTab)
                 .frame(maxWidth: .infinity)
-                .foregroundColor(currentTab == image ? Color.DarkIcon : Color.GreyIcon)
+                .foregroundStyle(currentTab == image ? Color.DarkIcon : Color.GreyIcon)
         }
         .glassChip(
             in: Circle(),

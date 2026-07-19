@@ -25,7 +25,7 @@ struct SettingsLanguageView: View {
         VStack(spacing: 10) {
             Text(String(localized: "Language"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
                     Button {
@@ -41,14 +41,14 @@ struct SettingsLanguageView: View {
                     HStack {
                         Text(settingsVM.displayName(for: code))
                             .font(.system(.body, design: .rounded))
-                            .foregroundColor(Color.PrimaryText)
+                            .foregroundStyle(Color.PrimaryText)
 
                         Spacer()
 
                         if appLanguage == code {
                             Image(systemName: "checkmark")
                                 .font(.system(.subheadline, design: .rounded).weight(.medium))
-                                .foregroundColor(.DarkIcon.opacity(0.6))
+                                .foregroundStyle(Color.DarkIcon.opacity(0.6))
                                 .matchedGeometryEffect(id: "tick", in: animation)
                         }
                     }
@@ -75,7 +75,7 @@ struct SettingsLanguageView: View {
 
             Text(String(localized: "Close and reload app for change to take effect."))
                 .font(.system(.caption, design: .rounded).weight(.medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .padding(.horizontal, 15)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

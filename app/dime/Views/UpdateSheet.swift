@@ -61,7 +61,7 @@ struct UpdateAlert: View {
                             .font(.system(.title2, design: .rounded).weight(.medium))
 //                            .font(.system(size: 22, weight: .medium, design: .rounded))
                     }
-                    .foregroundColor(.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
 
                     Text(
                         String(
@@ -72,7 +72,7 @@ struct UpdateAlert: View {
                     )
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
 //                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundColor(.SubtitleText)
+                        .foregroundStyle(Color.SubtitleText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .overlay(alignment: .topTrailing) {
@@ -88,7 +88,7 @@ struct UpdateAlert: View {
                         Image(systemName: "xmark")
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 //                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
                             .contentShape(Circle())
@@ -104,7 +104,7 @@ struct UpdateAlert: View {
                                 Image(systemName: row.icon)
                                     .font(.system(.title2, design: .rounded))
 //                                    .font(.system(size: 24, weight: .regular))
-                                    .foregroundColor(Color.SubtitleText)
+                                    .foregroundStyle(Color.SubtitleText)
                                     .frame(width: 35, alignment: .leading)
                                     .offset(y: 2)
 
@@ -112,14 +112,14 @@ struct UpdateAlert: View {
                                     Text(LocalizedStringKey(row.header))
                                         .font(.system(.body, design: .rounded).weight(.medium))
 //                                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundStyle(Color.PrimaryText)
 
                                     Text(LocalizedStringKey(row.subtitle))
                                         .font(.system(.subheadline, design: .rounded).weight(.medium))
 //                                        .font(.system(size: 16, weight: .regular, design: .rounded))
 //                                            .lineSpacing(0.6)
                                         .fixedSize(horizontal: false, vertical: true)
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
                                 }
                             }
                         }
@@ -134,7 +134,7 @@ struct UpdateAlert: View {
                         + AttributedString(String(localized: " for contributing"))
                 )
                     .font(.system(.footnote, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
             }

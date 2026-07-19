@@ -44,7 +44,7 @@ struct CategoryView: View {
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundColor(income == false ? Color.PrimaryText : Color.SubtitleText)
+                        .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                         .padding(6)
                         .padding(.horizontal, 8)
                         .background {
@@ -67,7 +67,7 @@ struct CategoryView: View {
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundColor(income == true ? Color.PrimaryText : Color.SubtitleText)
+                        .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                         .padding(6)
                         .padding(.horizontal, 8)
                         .background {
@@ -104,7 +104,7 @@ struct CategoryView: View {
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                 }
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .padding(6)
                 .padding(.horizontal, 4.5)
                 .background(Color.SecondaryBackground, in: Capsule())
@@ -199,14 +199,14 @@ struct CategoryListView: View {
                         .font(.system(.subheadline, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(toastColor)
+                        .foregroundStyle(toastColor)
 
                     Text(toastTitle)
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .lineLimit(1)
 //                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(toastColor)
+                        .foregroundStyle(toastColor)
                 }
                 .padding(8)
                 .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -227,7 +227,7 @@ struct CategoryListView: View {
                                             .font(.system(.callout, design: .rounded).weight(.semibold))
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color.IncomeGreen)
+                                            .foregroundStyle(Color.IncomeGreen)
                                     }
                                     .onTapGesture {
                                         withAnimation {
@@ -242,7 +242,7 @@ struct CategoryListView: View {
                                         Image(systemName: "arrow.up.arrow.down")
                                             .font(.system(.callout, design: .rounded).weight(.semibold))
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                     }
                                     .onTapGesture {
                                         withAnimation {
@@ -259,7 +259,7 @@ struct CategoryListView: View {
                                 Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                    .foregroundColor(Color.SubtitleText)
+                                    .foregroundStyle(Color.SubtitleText)
                                     .offset(y: 0.8)
                             }
                             .onTapGesture {
@@ -278,7 +278,7 @@ struct CategoryListView: View {
                                     Image(systemName: "arrow.right")
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        .foregroundColor(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
+                                        .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
 
                                     if allCategories.count == 0 {
                                         Circle()
@@ -314,7 +314,7 @@ struct CategoryListView: View {
                                         .font(.system(.body, design: .rounded).weight(.semibold))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
                                 .onTapGesture {
@@ -328,7 +328,7 @@ struct CategoryListView: View {
                                     Image(systemName: "chevron.down")
                                         .font(.system(.body, design: .rounded).weight(.semibold))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
                                 .onTapGesture {
@@ -346,7 +346,7 @@ struct CategoryListView: View {
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(Color.SubtitleText)
+                                    .foregroundStyle(Color.SubtitleText)
                                     .offset(y: 0.8)
                             }
                             .onTapGesture {
@@ -365,7 +365,7 @@ struct CategoryListView: View {
                                             .font(.system(.callout, design: .rounded).weight(.semibold))
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color.IncomeGreen)
+                                            .foregroundStyle(Color.IncomeGreen)
                                     }
                                     .onTapGesture {
                                         withAnimation {
@@ -381,7 +381,7 @@ struct CategoryListView: View {
                                             .font(.system(.callout, design: .rounded).weight(.semibold))
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                     }
                                     .onTapGesture {
                                         withAnimation {
@@ -405,14 +405,14 @@ struct CategoryListView: View {
 
             VStack {
                     List {
-                        Section(header: Text(sectionHeader).foregroundColor(Color.SubtitleText)) {
+                        Section(header: Text(sectionHeader).foregroundStyle(Color.SubtitleText)) {
                             if categories.isEmpty {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
                                         .font(.system(.largeTitle, design: .rounded).weight(.light))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                        .font(.system(size: 37, weight: .light))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
 
                                     Group {
                                         if income {
@@ -426,7 +426,7 @@ struct CategoryListView: View {
 //                                    .font(.system(size: 17, weight: .medium, design: .rounded))
                                     .italic()
                                     .multilineTextAlignment(.center)
-                                    .foregroundColor(Color.SubtitleText)
+                                    .foregroundStyle(Color.SubtitleText)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.vertical, 37)
@@ -443,7 +443,7 @@ struct CategoryListView: View {
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
                                             .lineLimit(1)
-                                            .foregroundColor(toDelete == category ? Color.AlertRed : Color.PrimaryText)
+                                            .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
 
                                         Spacer()
 
@@ -515,11 +515,11 @@ struct CategoryListView: View {
                     let deleteName = toDelete?.wrappedName ?? ""
                     Text(String(format: String(localized: "Delete '%@'?"), deleteName))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
-                        .foregroundColor(.PrimaryText)
+                        .foregroundStyle(Color.PrimaryText)
 
                     Text(String(format: String(localized: "This action cannot be undone, and all %@ transactions would be deleted."), deleteName))
                         .font(.system(size: 16, weight: .medium, design: .rounded))
-                        .foregroundColor(.SubtitleText)
+                        .foregroundStyle(Color.SubtitleText)
                         .padding(.bottom, 15)
 
                     Button {
@@ -535,7 +535,7 @@ struct CategoryListView: View {
                     } label: {
                         Text(String(localized: "Delete"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
                             .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -551,7 +551,7 @@ struct CategoryListView: View {
                     } label: {
                         Text(String(localized: "Cancel"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.PrimaryText.opacity(0.9))
+                            .foregroundStyle(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
                             //                        .background(Color("13").opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -684,14 +684,14 @@ struct NewCategoryAlert: View {
                                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(toastColor)
+                                .foregroundStyle(toastColor)
 
                             Text(toastTitle)
                                 .font(.system(.callout, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                 .lineLimit(1)
 //                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(toastColor)
+                                .foregroundStyle(toastColor)
                         }
                         .padding(6)
                         .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -716,7 +716,7 @@ struct NewCategoryAlert: View {
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundColor(income == false ? Color.PrimaryText : Color.SubtitleText)
+                                    .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                                     .padding(5)
                                     .padding(.horizontal, 7)
                                     .background {
@@ -739,7 +739,7 @@ struct NewCategoryAlert: View {
                                     .font(.system(.callout, design: .rounded).weight(.semibold))
                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundColor(income == true ? Color.PrimaryText : Color.SubtitleText)
+                                    .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                                     .padding(5)
                                     .padding(.horizontal, 7)
                                     .background {
@@ -774,7 +774,7 @@ struct NewCategoryAlert: View {
                             .font(.system(.callout, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
                             .contentShape(Circle())
@@ -805,7 +805,7 @@ struct NewCategoryAlert: View {
                     if newEmoji == "" {
                         Image("emoji-happy")
                             .resizable()
-                            .foregroundColor(Color.PrimaryText)
+                            .foregroundStyle(Color.PrimaryText)
                             .frame(width: 35, height: 35, alignment: .center)
                             .allowsHitTesting(false)
                     }
@@ -843,7 +843,7 @@ struct NewCategoryAlert: View {
 //                                .padding(8)
 //                        } else if newName != "" {
 //                            Image(systemName: "xmark.circle.fill")
-//                                .foregroundColor(Color.SubtitleText)
+//                                .foregroundStyle(Color.SubtitleText)
 //                                .font(.system(size: 20, weight: .semibold))
 //                                .padding(8)
 //                                .onTapGesture {
@@ -857,7 +857,7 @@ struct NewCategoryAlert: View {
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .foregroundColor(Color.PrimaryText)
+                        .foregroundStyle(Color.PrimaryText)
 
                         .frame(height: 50)
                         .background {
@@ -870,7 +870,7 @@ struct NewCategoryAlert: View {
                         verification()
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(Color.LightIcon)
+                            .foregroundStyle(Color.LightIcon)
                             .font(.system(.title3, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .semibold))
@@ -1117,7 +1117,7 @@ struct EditCategoryAlert: View {
                             .font(.system(.callout, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
                             .contentShape(Circle())
@@ -1131,14 +1131,14 @@ struct EditCategoryAlert: View {
                                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(Color.AlertRed)
+                                .foregroundStyle(Color.AlertRed)
 
                             Text(toastTitle)
                                 .font(.system(.callout, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                 .lineLimit(1)
 //                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(Color.AlertRed)
+                                .foregroundStyle(Color.AlertRed)
                         }
                         .padding(6)
                         .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -1160,7 +1160,7 @@ struct EditCategoryAlert: View {
                             .font(.system(.callout, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color.AlertRed)
+                            .foregroundStyle(Color.AlertRed)
                             .padding(7)
                             .background(Color.AlertRed.opacity(0.23), in: Circle())
                             .contentShape(Circle())
@@ -1192,7 +1192,7 @@ struct EditCategoryAlert: View {
                     if newEmoji == "" {
                         Image("emoji-happy")
                             .resizable()
-                            .foregroundColor(Color.PrimaryText)
+                            .foregroundStyle(Color.PrimaryText)
                             .frame(width: 35, height: 35, alignment: .center)
                             .allowsHitTesting(false)
                     }
@@ -1227,7 +1227,7 @@ struct EditCategoryAlert: View {
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
                         .frame(height: 50)
-                        .foregroundColor(Color.PrimaryText)
+                        .foregroundStyle(Color.PrimaryText)
                         .background {
                             RoundedRectangle(cornerRadius: 13, style: .continuous)
                                 .strokeBorder((focusedField == .name && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
@@ -1238,7 +1238,7 @@ struct EditCategoryAlert: View {
                         verification()
                     } label: {
                         Image(systemName: "checkmark")
-                            .foregroundColor(Color.LightIcon)
+                            .foregroundStyle(Color.LightIcon)
                             .font(.system(.title3, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .semibold))
@@ -1373,13 +1373,13 @@ struct DeleteCategoryAlert: View {
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
-                    .foregroundColor(.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
 
                 Text(String(localized: "This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundColor(.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 15)
                     .accessibility(hidden: true)
 
@@ -1397,7 +1397,7 @@ struct DeleteCategoryAlert: View {
                     Text(String(localized: "Delete"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
                         .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -1414,7 +1414,7 @@ struct DeleteCategoryAlert: View {
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 20, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color.PrimaryText.opacity(0.9))
+                        .foregroundStyle(Color.PrimaryText.opacity(0.9))
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
                         .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -1511,7 +1511,7 @@ struct SuggestedCategoriesView: View {
 
     var body: some View {
         if !suggestions.isEmpty {
-            Section(header: Text(String(localized: "SUGGESTED")).foregroundColor(Color.SubtitleText)) {
+            Section(header: Text(String(localized: "SUGGESTED")).foregroundStyle(Color.SubtitleText)) {
                 ForEach(suggestions, id: \.self) { category in
                     HStack(spacing: 8) {
                         Text(category.emoji)
@@ -1530,13 +1530,13 @@ struct SuggestedCategoriesView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                             .padding(4)
                             .background(Color.SecondaryBackground, in: Circle())
                             .contentShape(Circle())
                     }
                     .padding(.vertical, 5)
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
                     .listRowBackground(Color.SettingsBackground)
                     .listRowSeparatorTint(Color.Outline)
                     .contentShape(Rectangle())
@@ -1742,11 +1742,11 @@ struct ColourPickerView: View {
                         if customMode {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(customSelectedColor.luminance() > 0.5 ? Color.black : Color.white)
+                                .foregroundStyle(customSelectedColor.luminance() > 0.5 ? Color.black : Color.white)
                         } else {
                             Image(systemName: "plus")
                                 .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(Color.black)
+                                .foregroundStyle(Color.black)
                         }
                     }
                     .frame(width: 40, height: 40, alignment: .center)
@@ -1772,7 +1772,7 @@ struct ColourPickerView: View {
                             if selectedColour == suggestedColor && !customMode {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 15, weight: .bold))
-                                    .foregroundColor(Color.black)
+                                    .foregroundStyle(Color.black)
                             }
                         }
                 }

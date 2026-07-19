@@ -198,11 +198,11 @@ struct AppLockView: View {
         VStack(spacing: 15) {
             Image(systemName: "lock.fill")
                 .font(.system(size: 65))
-                .foregroundColor(Color.DarkIcon.opacity(0.7))
+                .foregroundStyle(Color.DarkIcon.opacity(0.7))
 
             Text("App Locked")
                 .font(.system(size: 28, weight: .semibold, design: .rounded))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .padding(.bottom, 30)
 
             Button {
@@ -214,7 +214,7 @@ struct AppLockView: View {
                     Text("Unlock App")
                 }
                 .font(.system(size: 20, weight: .medium, design: .rounded))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 15)
                 .overlay {
@@ -226,7 +226,7 @@ struct AppLockView: View {
             if appLockVM.enrollmentError {
                 Text("Please re-enable Face ID access in the Settings app to unlock application.")
                     .font(.system(size: 15, weight: .regular, design: .rounded))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
             }
         }

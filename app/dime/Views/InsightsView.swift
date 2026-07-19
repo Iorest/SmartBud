@@ -87,7 +87,7 @@ struct InsightsView: View {
         HStack(alignment: .center) {
             Text("Insights", comment: "Insights screen title")
                 .font(.system(.title, design: .rounded).weight(.bold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
             Spacer()
             periodPickerChip
         }
@@ -129,10 +129,10 @@ struct InsightsView: View {
             HStack(spacing: 6) {
                 Text(periodTitle)
                     .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
             }
             .padding(.vertical, 3)
             .padding(.horizontal, 8)
@@ -149,7 +149,7 @@ struct InsightsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(insightsVM.periodDateRangeText.isEmpty ? "—" : insightsVM.periodDateRangeText)
                     .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
 
                 InsightsDollarView(
                     amount: insightsVM.periodTotalNet,
@@ -166,7 +166,7 @@ struct InsightsView: View {
                      ? String(localized: "AVG/MONTH", comment: "Insights avg per month")
                      : String(localized: "AVG/DAY", comment: "Insights avg per day"))
                     .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
 
                 InsightsDollarView(
                     amount: insightsVM.periodAverage,
@@ -277,11 +277,11 @@ struct InsightsView: View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
                 .font(.system(.footnote, design: .rounded).weight(.semibold))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
             Spacer()
             Text(sectionAmountString(amount))
                 .font(.system(.body, design: .rounded).weight(.semibold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .lineLimit(1)
         }
     }
@@ -352,10 +352,10 @@ private struct InsightsDollarView: View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
             Text(symbol)
                 .font(.system(.title3, design: .rounded).weight(.medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
             Text(formattedAmount)
                 .font(.system(.title, design: .rounded).weight(.medium))
-                .foregroundColor(color)
+                .foregroundStyle(color)
         }
         .lineLimit(1)
         .minimumScaleFactor(0.7)
@@ -384,18 +384,18 @@ private struct InsightsTransactionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(transaction.wrappedNote.isEmpty ? (transaction.category?.wrappedName ?? "") : transaction.wrappedNote)
                     .font(.system(.body, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundStyle(Color.PrimaryText)
                     .lineLimit(1)
                 Text(timeLabel(transaction.wrappedDate))
                     .font(.system(.subheadline, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(amountString)
                 .font(.system(.title3, design: .rounded).weight(.medium))
-                .foregroundColor(transaction.income ? Color.IncomeGreen : Color.PrimaryText)
+                .foregroundStyle(transaction.income ? Color.IncomeGreen : Color.PrimaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -435,7 +435,7 @@ struct FilteredCategoryInsightsView: View {
                 .font(.system(.headline, design: .rounded))
             Text(date, format: .dateTime.day().month())
                 .font(.system(.caption, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
         }
         .padding(12)
         .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -450,7 +450,7 @@ struct FilteredDateInsightsView: View {
         HStack {
             Text(date, format: .dateTime.day().month().year())
             Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
-                .foregroundColor(income ? Color.IncomeGreen : Color.AlertRed)
+                .foregroundStyle(income ? Color.IncomeGreen : Color.AlertRed)
         }
         .font(.system(.subheadline, design: .rounded))
     }
@@ -463,7 +463,7 @@ struct FilteredInsightsView: View {
     var body: some View {
         Text(startDate, format: .dateTime.day().month().year())
             .font(.system(.caption, design: .rounded))
-            .foregroundColor(Color.SubtitleText)
+            .foregroundStyle(Color.SubtitleText)
     }
 }
 

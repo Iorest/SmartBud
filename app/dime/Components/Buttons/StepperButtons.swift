@@ -19,7 +19,7 @@ struct StepperButtonView: View {
         }) {
             Image(systemName: left ? "chevron.left" : "chevron.right")
                 .font(.system(.subheadline, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .padding(8)
                 .background(Circle().fill(.clear))
                 .glassChip(in: Circle(), interactive: !disabled)
