@@ -13,6 +13,7 @@ import StoreKit
 
 struct SettingsProView: View {
     @Environment(\.dismiss) var dismiss
+    @StateObject var settingsVM = SettingsViewModel.shared
 
     @AppStorage("isProSubscriber", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var isProSubscriber: Bool = false
@@ -84,9 +85,9 @@ struct SettingsProView: View {
             }
             .padding(.top, 8)
 
-            Text(String(localized: "Unlock premium features"))
+            Text(settingsVM.proCardSubtitle)
                 .font(.system(.title2, design: .rounded).weight(.bold))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
                 .multilineTextAlignment(.center)
 
             Text(String(localized: "iCloud Sync, Batch Recognition and more"))

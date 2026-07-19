@@ -151,8 +151,23 @@ struct SettingsView: View {
 
   @StateObject var settingsVM = SettingsViewModel.shared
 
-  var body: some View {
-    NavigationView {
+    /// Cap each settings card at this many points. Used inside the
+    /// `cardMaxWidthFrame` modifier so the cap is applied as a container-
+    /// relative frame (full width on iPhone, capped on iPad/Pro Max).
+    /// iPhone screens are already under this, so visible behaviour is
+    /// unchanged there.
+    private static let cardMaxWidth: CGFloat = 540
+
+    /// Relative-to-container width cap. Returns the container's full width,
+    /// but never more than `cardMaxWidth`. Use as:
+    ///   `.containerRelativeFrame(.horizontal, alignment: .center) { w, _ in
+    ///       cardMaxWidthFrame(width: w) }`
+    private func cardMaxWidthFrame(width: CGFloat) -> CGFloat {
+        min(width, Self.cardMaxWidth)
+    }
+
+    var body: some View {
+      NavigationView {
       VStack {
         HStack {
           Text("Settings")
@@ -170,22 +185,53 @@ struct SettingsView: View {
           VStack(spacing: 5) {
             Text("PRO")
               .font(.system(.footnote, design: .rounded).weight(.semibold))
-              .foregroundColor(Color.SubtitleText)
+              .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(spacing: 13) {
+            VStack(alignment: .leading, spacing: 6) {
               NavigationLink(destination: SettingsProView()) {
-                SettingsRowView(
-                  systemImage: "crown.fill", title: "SmartBud Pro", colour: 200,
-                  optionalText: nil)
+                HStack(spacing: 12) {
+                  Image(systemName: "crown.fill")
+                    .font(.system(.body, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(
+                      width: dynamicTypeSize > .xLarge ? 40 : 30,
+                      height: dynamicTypeSize > .xLarge ? 40 : 30,
+                      alignment: .center
+                    )
+                    .background(Color("200"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+
+                  VStack(alignment: .leading, spacing: 2) {
+                    Text("SmartBud Pro")
+                      .font(.system(.body, design: .rounded).weight(.semibold))
+                      .foregroundStyle(Color.PrimaryText)
+                      .lineLimit(1)
+
+                    Text(settingsVM.proCardSubtitle)
+                      .font(.system(.footnote, design: .rounded))
+                      .foregroundStyle(Color.SubtitleText)
+                      .lineLimit(1)
+                  }
+
+                  Spacer()
+
+                  Image(systemName: "chevron.forward")
+                    .font(.system(.subheadline, design: .rounded))
+                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                }
+                .frame(maxWidth: .infinity)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
               }
             }
             .padding(10)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
+          .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
+              cardMaxWidthFrame(width: width)
+          }
 
           VStack(spacing: 5) {
             Text("GENERAL")
@@ -254,10 +300,13 @@ struct SettingsView: View {
                 
             }
             .padding(10)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
+          .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
+              cardMaxWidthFrame(width: width)
+          }
           .onChange(of: currency) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
@@ -322,10 +371,13 @@ struct SettingsView: View {
 
             }
             .padding(10)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
+          .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
+              cardMaxWidthFrame(width: width)
+          }
           .onChange(of: currency) { _, _ in
             WidgetCenter.shared.reloadAllTimelines()
           }
@@ -394,10 +446,13 @@ struct SettingsView: View {
               }
             }
             .padding(10)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 25)
+          .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
+              cardMaxWidthFrame(width: width)
+          }
 
           VStack(spacing: 5) {
             Text("OTHERS")
@@ -444,10 +499,13 @@ struct SettingsView: View {
 
             }
             .padding(10)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 15)
+          .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
+              cardMaxWidthFrame(width: width)
+          }
 
           VStack(spacing: 5) {
             HStack(spacing: 3) {
@@ -489,7 +547,7 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
       }
-      .background(Color.PrimaryBackground)
+      .background(AppGlassBackground())
       .fullScreenCover(isPresented: $showUpdate) {
         UpdateAlert()
       }
@@ -661,6 +719,6 @@ struct SettingsCategoryView: View {
       CategoryView(mode: .settings, income: false)
       .navigationBarBackButtonHidden(true)
       .toolbar(.hidden, for: .navigationBar)
-      .background(Color.PrimaryBackground)
+      .background(Color.clear)
   }
 }

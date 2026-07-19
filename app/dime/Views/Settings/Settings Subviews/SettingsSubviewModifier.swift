@@ -15,7 +15,11 @@ struct SettingsSubviewModifier: ViewModifier {
             .toolbar(.hidden, for: .navigationBar)
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(Color.PrimaryBackground)
+            // Settings is wrapped in `NavigationView`, which does not pass
+            // through the parent's `AppGlassBackground`. Each subview gets its
+            // own gradient here so the `glassCard` / `glassChip` surfaces
+            // have colour to refract.
+            .background(AppGlassBackground())
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
