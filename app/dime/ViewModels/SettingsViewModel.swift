@@ -33,6 +33,14 @@ final class SettingsViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Pro card
+
+    /// Subtitle shown in the PRO section of `SettingsView`. Localized so it
+    /// follows the in-app language switch in `SettingsLanguageView`.
+    var proCardSubtitle: String {
+        String(localized: "Unlock all Pro features")
+    }
+
     /// Convert a stored language code into a `Locale` override.
     /// Returns `nil` for the empty (system) case so SwiftUI falls back to the
     /// device locale.

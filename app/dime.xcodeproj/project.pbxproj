@@ -66,6 +66,7 @@
 		534973D628CB5A75000201F9 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534973D528CB5A75000201F9 /* URLExtension.swift */; };
 		5358E9172AC86DA1003E8CA9 /* SingleTransactionPhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5358E9162AC86DA1003E8CA9 /* SingleTransactionPhotoView.swift */; };
 		5358E9192AC885E3003E8CA9 /* AlertToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5358E9182AC885E3003E8CA9 /* AlertToast.swift */; };
+		D1550AA12D26000000000002 /* GlassTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1550AA02D26000000000001 /* GlassTheme.swift */; };
 		53620B8B28CAE3520058F216 /* LockBudgetWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53620B8A28CAE3520058F216 /* LockBudgetWidget.swift */; };
 		5362CF322A92750800244744 /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5362CF312A92750800244744 /* ImportDataView.swift */; };
 		536715ED28E1E9A3008461F2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 536715EC28E1E9A3008461F2 /* StoreKit.framework */; };
@@ -96,6 +97,8 @@
 		53B1D193288ED87000E28062 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53B1D192288ED87000E28062 /* Assets.xcassets */; };
 		53B1D197288ED87000E28062 /* ExpenditureWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		53B1D1A5289383B100E28062 /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B1D1A4289383B100E28062 /* FontExtension.swift */; };
+		7A0B1C2D3E4F5061718192BB /* WidgetGlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B1C2D3E4F5061718192AA /* WidgetGlassBackground.swift */; };
+		7A0B1C2D3E4F5061718192CC /* WidgetGlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B1C2D3E4F5061718192AA /* WidgetGlassBackground.swift */; };
 		53B7D0D129701DB700F81002 /* MainBudgetWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B7D0D029701DB700F81002 /* MainBudgetWidget.swift */; };
 		53B7D0D229701DB800F81002 /* MainBudgetWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B7D0D029701DB700F81002 /* MainBudgetWidget.swift */; };
 		53B822AA2A6D50CC000FC7C9 /* NewTransactionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B822A92A6D50CC000FC7C9 /* NewTransactionIntent.swift */; };
@@ -164,6 +167,7 @@
 		EA73CF5EB74E4812BEFC8A76 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */; };
 		EAD8E5794121478C9198DC1C /* SwiftDataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12072D557564B5B9E98F56D /* SwiftDataCore.swift */; };
 		FCCEDDC1F83742EC8CE62204 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */; };
+		AA11BB22CC33DD44EEFF5511 /* NumberPadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -259,6 +263,7 @@
 		534973D528CB5A75000201F9 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		5358E9162AC86DA1003E8CA9 /* SingleTransactionPhotoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleTransactionPhotoView.swift; sourceTree = "<group>"; };
 		5358E9182AC885E3003E8CA9 /* AlertToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertToast.swift; sourceTree = "<group>"; };
+		D1550AA02D26000000000001 /* GlassTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlassTheme.swift; sourceTree = "<group>"; };
 		53620B8A28CAE3520058F216 /* LockBudgetWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockBudgetWidget.swift; sourceTree = "<group>"; };
 		5362CF312A92750800244744 /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		536715EC28E1E9A3008461F2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -284,6 +289,7 @@
 		53B1D18B288ED7E400E28062 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		53B1D18D288ED7E500E28062 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		53B1D190288ED7E500E28062 /* ExpenditureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenditureWidget.swift; sourceTree = "<group>"; };
+		7A0B1C2D3E4F5061718192AA /* WidgetGlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetGlassBackground.swift; sourceTree = "<group>"; };
 		53B1D192288ED87000E28062 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53B1D194288ED87000E28062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53B1D1A4289383B100E28062 /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
@@ -338,6 +344,7 @@
 		E1E7AEE3300B627F00E5B3E1 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainInterface.xcstrings; sourceTree = "<group>"; };
 		E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = Localizations/Localizable.xcstrings; sourceTree = "<group>"; };
 		F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
+		BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModel.swift; sourceTree = "<group>"; };
 		F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionViewModel.swift; sourceTree = "<group>"; };
 		F69F2676652B477A97938CFD /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -389,6 +396,7 @@
 				F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */,
 				F69F2676652B477A97938CFD /* InsightsViewModel.swift */,
 				9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */,
+				BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -486,6 +494,7 @@
 			isa = PBXGroup;
 			children = (
 				5358E9182AC885E3003E8CA9 /* AlertToast.swift */,
+				D1550AA02D26000000000001 /* GlassTheme.swift */,
 				53A839C028D732E1006F227C /* TabBarHiding.swift */,
 				53326B2B2ADC3C8D0027C693 /* TestDragToAdd.swift */,
 				5327D2AF287C6AFB00F76ADF /* Authentication.swift */,
@@ -584,6 +593,7 @@
 			isa = PBXGroup;
 			children = (
 				53B1D190288ED7E500E28062 /* ExpenditureWidget.swift */,
+				7A0B1C2D3E4F5061718192AA /* WidgetGlassBackground.swift */,
 				5324985428A64DA7007B34D1 /* RecentTransactionsWidget.swift */,
 				53D5F02228A8E0E4004573C8 /* InsightsWidget.swift */,
 				53B7D0D029701DB700F81002 /* MainBudgetWidget.swift */,
@@ -907,6 +917,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA73CF5EB74E4812BEFC8A76 /* SettingsViewModel.swift in Sources */,
+				AA11BB22CC33DD44EEFF5511 /* NumberPadViewModel.swift in Sources */,
 				CF42FFB1F9D04BBCB7112646 /* InsightsViewModel.swift in Sources */,
 				FCCEDDC1F83742EC8CE62204 /* BudgetViewModel.swift in Sources */,
 				1107D1BB658F43AE96D49E56 /* CategoryViewModel.swift in Sources */,
@@ -924,10 +935,12 @@
 				53B907992AE817EA0001F496 /* DonutSemicircle.swift in Sources */,
 				53B9079F2AE818B90001F496 /* Ring.swift in Sources */,
 				5358E9192AC885E3003E8CA9 /* AlertToast.swift in Sources */,
+				D1550AA12D26000000000002 /* GlassTheme.swift in Sources */,
 				5327D2C4287C6B2500F76ADF /* TimeFrame.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
 				53B7D0D129701DB700F81002 /* MainBudgetWidget.swift in Sources */,
+				7A0B1C2D3E4F5061718192CC /* WidgetGlassBackground.swift in Sources */,
 				AEADEF752AE94DC3006EB614 /* Toolbar.swift in Sources */,
 				5327D2C8287C6B2500F76ADF /* ChartTimeFrame.swift in Sources */,
 				536FA6C12A7E05C600C52490 /* GetInsightsIntent.swift in Sources */,
@@ -1024,6 +1037,7 @@
 				530C9DFE28ACE14A0038535F /* BudgetWidget.swift in Sources */,
 				53BC2A432A8B234E0019E4A8 /* MainModel.xcdatamodeld in Sources */,
 				53EB930F28A65B250026BE28 /* FontExtension.swift in Sources */,
+				7A0B1C2D3E4F5061718192BB /* WidgetGlassBackground.swift in Sources */,
 				53B1D191288ED7E500E28062 /* ExpenditureWidget.swift in Sources */,
 				5321E1DE291FE2CE00D5A931 /* CategoryCreationErrors.swift in Sources */,
 				53D520FC2AAF1190000AC055 /* (null) in Sources */,
