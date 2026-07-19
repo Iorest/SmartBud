@@ -66,9 +66,9 @@ struct ContentView: View {
             // First-run language bootstrap: if the user hasn't picked yet
             // (appLanguage == "" = "follow system"), and the system is
             // Chinese, snap to a concrete zh-Hans / zh-Hant so the Settings
-            // row shows a real choice ("简体中文" / "繁體中文") instead of
-            // the abstract "System" placeholder. Users can still revert to
-            // "System" from the language picker.
+            // row shows a real choice ("Simplified Chinese" / "Traditional Chinese")
+            // instead of the abstract "System" placeholder. Users can still
+            // revert to "System" from the language picker.
             if appLanguage.isEmpty {
                 let langCode = Locale.current.language.languageCode?.identifier
                 let scriptCode = Locale.current.language.script?.identifier

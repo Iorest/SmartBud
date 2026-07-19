@@ -27,8 +27,8 @@ final class SettingsViewModel: ObservableObject {
         switch code {
         case "":        return String(localized: "System")
         case "en":      return String(localized: "English")
-        case "zh-Hans": return String(localized: "简体中文")
-        case "zh-Hant": return String(localized: "繁體中文")
+        case "zh-Hans": return String(localized: "Simplified Chinese")
+        case "zh-Hant": return String(localized: "Traditional Chinese")
         default:        return code
         }
     }

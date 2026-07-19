@@ -494,11 +494,11 @@ struct SingleBudgetView: View {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%@h left"), "\(24 - components.hour!)")
+                return String(format: String(localized: "%dh left"), 24 - components.hour!)
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%@d left"), "\(7 - (components.day ?? 0))")
+                return String(format: String(localized: "%dd left"), 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
@@ -507,18 +507,18 @@ struct SingleBudgetView: View {
                 let numberOfDaysPast = components2.day ?? 0
 
                 let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                return String(format: String(localized: "%@d left"), "\(daysLeftNumber)"
+                return String(format: String(localized: "%dd left"), daysLeftNumber
                 )
             }
         } else {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%@ hours left"), "\(24 - (components.hour ?? 0))")
+                return String(format: String(localized: "%d hours left"), 24 - (components.hour ?? 0))
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%@ days left"), "\(7 - (components.day ?? 0))")
+                return String(format: String(localized: "%d days left"), 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
