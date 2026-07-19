@@ -145,6 +145,7 @@
 		D63B20542D8728C300CAFB20 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		D63B205C2D8728C300CAFB31 /* BarGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205C2D8728C300CAFB30 /* BarGraph.swift */; };
 		D63B205D2D8728C300CAFB41 /* CategoryBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */; };
+		D63B20E92D8728C300CAFB60 /* DottedLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B20E92D8728C300CAFB50 /* DottedLine.swift */; };
 		D63B205E2D8728C300CAFB21 /* ScreenSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205E2D8728C300CAFB20 /* ScreenSize.swift */; };
 		D63B205E2D8728C300CAFC01 /* SettingsLanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */; };
 		D9EC4FFE9AD4139968DC41B7 /* WidgetConfigurationIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B54BF48675833D778520E2 /* WidgetConfigurationIntents.swift */; };
@@ -295,6 +296,7 @@
 		D1CE5701500000000000B006 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		D63B205C2D8728C300CAFB30 /* BarGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarGraph.swift; sourceTree = "<group>"; };
 		D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryBreakdownView.swift; sourceTree = "<group>"; };
+		D63B20E92D8728C300CAFB50 /* DottedLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DottedLine.swift; sourceTree = "<group>"; };
 		D63B205E2D8728C300CAFB20 /* ScreenSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSize.swift; sourceTree = "<group>"; };
 		D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLanguageView.swift; sourceTree = "<group>"; };
 		E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = Localizations/Localizable.xcstrings; sourceTree = "<group>"; };
@@ -458,6 +460,7 @@
 				5358E9162AC86DA1003E8CA9 /* SingleTransactionPhotoView.swift */,
 				D63B205C2D8728C300CAFB30 /* BarGraph.swift */,
 				D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */,
+				D63B20E92D8728C300CAFB50 /* DottedLine.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -825,6 +828,7 @@
 				D63B205E2D8728C300CAFB21 /* ScreenSize.swift in Sources */,
 				D63B205C2D8728C300CAFB31 /* BarGraph.swift in Sources */,
 				D63B205D2D8728C300CAFB41 /* CategoryBreakdownView.swift in Sources */,
+				D63B20E92D8728C300CAFB60 /* DottedLine.swift in Sources */,
 				D63B205E2D8728C300CAFC01 /* SettingsLanguageView.swift in Sources */,
 				E0906D770E6D45DD97BD672A /* SettingsProView.swift in Sources */,
 				DC1A413685F24A9FE8B7507D /* WidgetEnums.swift in Sources */,

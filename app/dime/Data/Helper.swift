@@ -251,9 +251,11 @@ func getStartOfMonth(startDay: Int) -> Date {
 // A single sampled data point on the `LineGraph` view, used by the Insights screen and the
 // "Get Insights" App Intent snippet. `Equatable` so SwiftUI diffing can skip no-op redraws.
 
-struct LineGraphDataPoint: Equatable {
+struct LineGraphDataPoint: Equatable, Identifiable {
     let date: Date
     let amount: Double
+
+    var id: Date { date }
 
     var dateString: String {
         let dateFormatter = DateFormatter()

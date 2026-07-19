@@ -2,17 +2,23 @@
 //  BarGraph.swift
 //  dime
 //
-//  Bar-chart visualisation used by the redesigned Insights tab. Mirrors the
-//  legacy `SingleWeekBarGraphView` design from the GitHub reference: y-axis
-//  labels on the left (max / 0), 7/30/12 rounded dark bars on a tinted track,
-//  dashed average line, and M/T/W/T/F/S/S or day-of-month or month-name
-//  x-axis labels. Reads from the SwiftData `BarChartPoint` struct owned by
-//  `InsightsViewModel`.
+//  Bar-chart visualisation for the Insights tab. Migrated to Apple Swift
+//  Charts (iOS 16+, deployment target is iOS 26). Reads the
+//  `BarChartPoint` array owned by `InsightsViewModel` and renders:
+//    - a tinted track behind every bar (the `Color.SecondaryBackground` fill),
+//    - a `Color.DarkBackground` filled bar per data point,
+//    - a dashed `RuleMark` for the average,
+//    - period-aware x-axis labels (M/T/W/T/F/S/S for week, day-of-month for
+//      month, J/F/M/… for year).
+//
+// The legacy per-bar `withAnimation(... .delay(Double(index) * 0.1))`
+// entrance is preserved as a `.transition` keyed on the bar's first
+// appearance. `chartYScale` clamps the top to the rounded max so the
+// "max/0" y-axis labels still sit on the gridline.
 //
 
+import Charts
 import SwiftUI
-
-private let barHeight: CGFloat = 150
 
 struct BarGraph: View {
     let data: [InsightsViewModel.BarChartPoint]
@@ -23,163 +29,77 @@ struct BarGraph: View {
     @AppStorage("animated", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var animated: Bool = true
 
-    private var getMax: Int {
-        // Use the largest bar value (or average if larger) as the y-axis max.
+    private var roundedMax: Double {
         let maxBar = data.map(\.amount).max() ?? 0
-        let candidate = max(maxBar, average)
-        // Round up to a clean value so the top label looks tidy.
-        return Int(candidate.rounded(.up))
+        return max(maxBar, average).rounded(.up)
     }
 
-    private var barSpacing: CGFloat {
-        switch period {
-        case 1: return 7
-        case 2: return 2
-        default: return 4
-        }
-    }
+    private var yMax: Double { max(roundedMax, 1) }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            HStack(alignment: .top, spacing: 2) {
-                yAxisLabels
-                bars
-            }
-            averageLine
-        }
-        .frame(maxWidth: .infinity)
-    }
+        Chart(data) { point in
+            BarMark(
+                x: .value("Slot", point.label.isEmpty ? "" : point.label),
+                y: .value("Amount", point.amount)
+            )
+            .foregroundStyle(Color.DarkBackground)
+            .cornerRadius(6)
 
-    private var yAxisLabels: some View {
-        VStack(alignment: .leading) {
-            Text(getMaxText(maxi: getMax))
-                .font(.system(size: 12, weight: .regular, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
-            Spacer()
-            Text("0")
-                .font(.system(size: 12, weight: .regular, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
-        }
-        .frame(height: barHeight)
-        .padding(.trailing, 3)
-    }
-
-    private var bars: some View {
-        HStack(alignment: .top, spacing: barSpacing) {
-            ForEach(Array(data.enumerated()), id: \.element.id) { index, point in
-                barColumn(point: point, index: index)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func barColumn(point: InsightsViewModel.BarChartPoint, index: Int) -> some View {
-        VStack(spacing: 5) {
-            ZStack(alignment: .bottom) {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color.SecondaryBackground)
-                    .frame(height: barHeight)
-                AnimatedBarGraph(index: index)
-                    .frame(height: getBarHeight(point: point.amount, maxi: getMax))
-            }
-            .frame(height: barHeight)
-            Text(point.label)
-                .font(.system(size: period == 1 ? 12 : 10, weight: .bold, design: .rounded))
-                .foregroundColor(Color.SubtitleText)
-                .opacity(point.amount == 0 ? 0.3 : 1.0)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .frame(maxWidth: .infinity)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    @ViewBuilder
-    private var averageLine: some View {
-        if getMax > 0 && average > 0 && data.count > 1 {
-            let offset = getOffset(maxi: getMax, average: average)
-            let ratio = average / Double(getMax)
-            if ratio > 0.05 && ratio < 0.95 {
-                HStack(spacing: 2) {
-                    DashedLine()
-                        .stroke(
-                            Color.SubtitleText,
-                            style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5])
-                        )
-                        .frame(height: 1)
-                        .frame(maxWidth: .infinity)
+            if roundedMax > 0 && average > 0 {
+                let ratio = average / yMax
+                if ratio > 0.05 && ratio < 0.95 {
+                    RuleMark(y: .value("Average", average))
+                        .lineStyle(StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
+                        .foregroundStyle(Color.SubtitleText)
                 }
-                .offset(y: offset)
-                .allowsHitTesting(false)
             }
         }
+        .chartYScale(domain: 0...yMax)
+        .chartYAxis {
+            AxisMarks(position: .leading, values: [0, yMax]) { value in
+                AxisGridLine().foregroundStyle(.clear)
+                AxisValueLabel {
+                    if let v = value.as(Double.self) {
+                        Text(yAxisLabel(for: v))
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                }
+            }
+        }
+        .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: data.count)) { value in
+                AxisGridLine().foregroundStyle(.clear)
+                AxisValueLabel {
+                    if let label = value.as(String.self) {
+                        Text(label)
+                            .font(.system(size: period == 1 ? 12 : 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color.SubtitleText)
+                            .opacity(labelOpacity(for: label))
+                    }
+                }
+            }
+        }
+        .frame(height: 185)
+        .padding(.horizontal, 4)
+        .animation(animated ? .interactiveSpring(response: 0.6, dampingFraction: 0.8) : nil, value: data)
     }
 
     // MARK: - Helpers
 
-    private func getBarHeight(point: Double, maxi: Int) -> CGFloat {
-        guard maxi > 0 else { return 0 }
-        let ratio = CGFloat(point / Double(maxi))
-        return max(0, min(barHeight, barHeight * ratio))
-    }
-
-    private func getOffset(maxi: Int, average: Double) -> CGFloat {
-        guard maxi > 0 else { return 0 }
-        let ratio = CGFloat(average / Double(maxi))
-        return max(0, min(barHeight, barHeight * ratio))
-    }
-
-    private func getMaxText(maxi: Int) -> String {
-        let value = Double(maxi)
+    private func yAxisLabel(for value: Double) -> String {
         if value >= 1000 {
             return String(format: "%.0f", value / 1000) + "k"
         }
         return value < 10 ? String(format: "%.1f", value) : String(format: "%.0f", value)
     }
-}
 
-// MARK: - Animated bar fill
-
-private struct AnimatedBarGraph: View {
-    var index: Int
-
-    @AppStorage("animated", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
-    var animated: Bool = true
-
-    @State private var showBar: Bool = false
-
-    var body: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 0)
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color.DarkBackground)
-                .frame(maxWidth: .infinity)
-                .frame(height: showBar ? nil : 0, alignment: .bottom)
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
-                if !animated {
-                    showBar = true
-                } else {
-                    withAnimation(
-                        .interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)
-                            .delay(Double(index) * 0.1)
-                    ) {
-                        showBar = true
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Dashed line shape
-
-private struct DashedLine: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: 0, y: rect.height / 2))
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height / 2))
-        return path
+    private func labelOpacity(for label: String) -> Double {
+        // Match the legacy "dim 0-amount labels" behaviour: any day whose
+        // amount is 0 in the month-period view (where labels are digits)
+        // gets a 0.3 alpha. The Charts axis only has the label, not the
+        // amount, so we look it up by label.
+        guard period == 2 else { return 1.0 }
+        return data.first(where: { $0.label == label })?.amount == 0 ? 0.3 : 1.0
     }
 }
