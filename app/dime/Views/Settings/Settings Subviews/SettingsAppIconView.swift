@@ -31,17 +31,7 @@ struct SettingsAppIconView: View {
       displayName: String(localized: "Unicorn"),
       displaySubtitle: String(
         localized:
-          "Dime definitely isn't becoming one but it never hurts to keep dreaming.")),
-    AppIconBundle(
-      actualFileName: "AppIcon3", exampleFileName: "AppIcon3_EG",
-      displayName: String(localized: "V1.5"),
-      displaySubtitle: String(
-        localized: "An early prototype also designed by @rudra_dsigns that I kinda fancy.")),
-    AppIconBundle(
-      actualFileName: "AppIcon4", exampleFileName: "AppIcon4_EG",
-      displayName: String(localized: "O.G."),
-      displaySubtitle: String(
-        localized: "Haphazardly put together in under 30 minutes, the original Dime icon."))
+          "Dime definitely isn't becoming one but it never hurts to keep dreaming."))
   ]
 
   @State private var position: Int?

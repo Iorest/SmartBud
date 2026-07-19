@@ -160,6 +160,7 @@
 		D63B205D2D8728C300CAFB41 /* CategoryBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */; };
 		D63B205E2D8728C300CAFB21 /* ScreenSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205E2D8728C300CAFB20 /* ScreenSize.swift */; };
 		D63B205E2D8728C300CAFC01 /* SettingsLanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */; };
+		D1CE5701500000000000B001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1CE5701500000000000B002 /* InfoPlist.strings */; };
 		E0906D770E6D45DD97BD672A /* SettingsProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */; };
 		E1E7AEE5300B627F00E5B3E1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */; };
 		EA73CF5EB74E4812BEFC8A76 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */; };
@@ -334,6 +335,10 @@
 		D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryBreakdownView.swift; sourceTree = "<group>"; };
 		D63B205E2D8728C300CAFB20 /* ScreenSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSize.swift; sourceTree = "<group>"; };
 		D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLanguageView.swift; sourceTree = "<group>"; };
+		D1CE5701500000000000B003 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D1CE5701500000000000B004 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D1CE5701500000000000B005 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		D1CE5701500000000000B006 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		E1E7AEE3300B627F00E5B3E1 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainInterface.xcstrings; sourceTree = "<group>"; };
 		E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = Localizations/Localizable.xcstrings; sourceTree = "<group>"; };
 		F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
@@ -460,6 +465,7 @@
 				5327D2DF287C6B7C00F76ADF /* DeviceModels.json */,
 				5327D2CA287C6B4700F76ADF /* ContentView.swift */,
 				5327D294287C698900F76ADF /* Assets.xcassets */,
+				D1CE5701500000000000B002 /* InfoPlist.strings */,
 				530C89D42A793B4400B5028D /* Shortcuts */,
 				5327D298287C69B800F76ADF /* Views */,
 				5327D299287C69C100F76ADF /* Models */,
@@ -829,6 +835,7 @@
 				5327D295287C698900F76ADF /* Assets.xcassets in Resources */,
 				53756F632AC3C25E0065D0C2 /* sample.csv in Resources */,
 				E1E7AEE5300B627F00E5B3E1 /* Localizable.xcstrings in Resources */,
+				D1CE5701500000000000B001 /* InfoPlist.strings in Resources */,
 				5327D2E0287C6B7D00F76ADF /* DeviceModels.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -854,15 +861,17 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)",
 			);
 			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/swiftlint_run.marker",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint --fix\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "mkdir -p \"$DERIVED_FILE_DIR\"\nif which swiftlint >/dev/null; then\n  swiftlint --fix --quiet || true\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\ntouch \"$DERIVED_FILE_DIR/swiftlint_run.marker\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1073,6 +1082,17 @@
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
+		D1CE5701500000000000B002 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1CE5701500000000000B003 /* Base */,
+				D1CE5701500000000000B004 /* en */,
+				D1CE5701500000000000B005 /* zh-Hans */,
+				D1CE5701500000000000B006 /* zh-Hant */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -1249,7 +1269,6 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1308,7 +1327,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1319,7 +1337,7 @@
 		5327D292287C697C00F76ADF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon4 AppIcon3 AppIcon2 AppIcon1";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon2 AppIcon1";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -1359,7 +1377,7 @@
 		5327D293287C697C00F76ADF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon4 AppIcon3 AppIcon2 AppIcon1";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon2 AppIcon1";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;

@@ -40,8 +40,6 @@ struct SettingsView: View {
       return String(localized: "v2.0")
     } else if activeIcon == "AppIcon2" {
       return String(localized: "Unicorn")
-    } else if activeIcon == "AppIcon3" {
-      return String(localized: "v1.5")
     } else {
       return String(localized: "O.G.")
     }
@@ -524,7 +522,7 @@ struct SettingsView: View {
         )
         .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
 
-      Text(String(localized: String.LocalizationValue(text)))
+      Text(LocalizedStringKey(text))
         .font(.system(.body, design: .rounded).weight(.medium))
         .lineLimit(1)
         .foregroundColor(Color.PrimaryText)
@@ -871,7 +869,7 @@ struct SettingsRowView: View {
         )
         .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
 
-      Text(String(localized: String.LocalizationValue(title)))
+      Text(LocalizedStringKey(title))
         .font(.system(.body, design: .rounded).weight(.medium))
 
         //                .font(.system(size: 17, weight: .medium, design: .rounded))
