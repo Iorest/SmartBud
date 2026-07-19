@@ -2,7 +2,7 @@
 //  SettingsProView.swift
 //  dime
 //
-//  智账 Pro subscription view. Shows the premium feature list and a
+//  SmartBud Pro subscription view. Shows the premium feature list and a
 //  StoreKit 2 ProductView for purchasing. When no products are configured
 //  (e.g. development build without App Store Connect setup), falls back to
 //  a "Coming Soon" placeholder so the screen still renders correctly.
@@ -45,7 +45,7 @@ struct SettingsProView: View {
                 Spacer()
             }
             .overlay(alignment: .center) {
-                Text(String(localized: "智账 Pro"))
+                Text(String(localized: "SmartBud Pro"))
                     .font(.system(.title3, design: .rounded).weight(.semibold))
                     .foregroundColor(Color.PrimaryText)
             }
@@ -105,7 +105,7 @@ struct SettingsProView: View {
             Text(String(localized: "Pro Active"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .foregroundColor(Color.PrimaryText)
-            Text(String(localized: "Thank you for supporting 智账 development."))
+            Text(String(localized: "Thank you for supporting SmartBud development."))
                 .font(.system(.subheadline, design: .rounded))
                 .foregroundColor(Color.SubtitleText)
                 .multilineTextAlignment(.center)
@@ -159,13 +159,15 @@ struct SettingsProView: View {
             .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 12))
         } else {
             VStack(spacing: 12) {
-                ProductView(products: loadedProducts)
-                    .productViewStyle(.compact)
-                    .onInAppPurchaseCompletion { _, result in
-                        if case .success = result {
-                            isProSubscriber = true
+                ForEach(loadedProducts) { product in
+                    ProductView(product)
+                        .productViewStyle(.compact)
+                        .onInAppPurchaseCompletion { _, result in
+                            if case .success = result {
+                                isProSubscriber = true
+                            }
                         }
-                    }
+                }
 
                 Button {
                     Task { await restorePurchases() }
