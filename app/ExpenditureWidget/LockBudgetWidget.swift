@@ -19,7 +19,7 @@ struct LockBudgetWidget: Widget {
     ]
 
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: LockBudgetWidgetProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: LockBudgetWidgetProvider()) { entry in
             LockBudgetWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Budget")
@@ -28,7 +28,7 @@ struct LockBudgetWidget: Widget {
     }
 }
 
-struct LockBudgetWidgetProvider: IntentTimelineProvider {
+struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     typealias Intent = BudgetWidgetConfigurationIntent
 
     public typealias Entry = LockBudgetWidgetEntry
@@ -49,21 +49,21 @@ struct LockBudgetWidgetProvider: IntentTimelineProvider {
         return LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: BudgetWidgetConfigurationIntent())
     }
 
-    func getSnapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context, completion: @escaping (LockBudgetWidgetEntry) -> Void) {
-        let loaded = loadData(budgetId: configuration.budget?.identifier ?? "")
+    func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> LockBudgetWidgetEntry {
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
         let entry = LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: configuration)
-        completion(entry)
+        return entry
     }
 
-    func getTimeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context, completion: @escaping (Timeline<Entry>) -> Void) {
-        let loaded = loadData(budgetId: configuration.budget?.identifier ?? "")
+    func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
         let entry = LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: configuration)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
-        completion(timeline)
+        return timeline
     }
 
     func loadData(budgetId: String) -> (total: Double, timeLeft: String, budget: HoldingBudget) {

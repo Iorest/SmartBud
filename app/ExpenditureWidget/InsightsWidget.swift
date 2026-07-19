@@ -14,7 +14,7 @@ struct InsightsWidget: Widget {
     let kind: String = "InsightsWidget"
 
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: InsightsWidgetConfigurationIntent.self, provider: InsightsProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: InsightsWidgetConfigurationIntent.self, provider: InsightsProvider()) { entry in
             InsightsWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Insights")
@@ -23,7 +23,7 @@ struct InsightsWidget: Widget {
     }
 }
 
-struct InsightsProvider: IntentTimelineProvider {
+struct InsightsProvider: AppIntentTimelineProvider {
     typealias Intent = InsightsWidgetConfigurationIntent
 
     public typealias Entry = InsightsWidgetEntry
@@ -40,21 +40,21 @@ struct InsightsProvider: IntentTimelineProvider {
         return InsightsWidgetEntry(date: Date(), amount: results.amount, duration: .week, maximum: results.maximum, dates: results.dates, dictionary: results.dateDictionary, numberOfDays: results.numberOfDays, average: results.average, categories: results.categories, income: true)
     }
 
-    func getSnapshot(for configuration: InsightsWidgetConfigurationIntent, in _: Context, completion: @escaping (InsightsWidgetEntry) -> Void) {
+    func snapshot(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> InsightsWidgetEntry {
         let loaded = loadData(type: configuration.duration, income: configuration.income == .income)
 
         let entry = InsightsWidgetEntry(date: Date(), amount: loaded.amount, duration: configuration.duration, maximum: loaded.maximum, dates: loaded.dates, dictionary: loaded.dateDictionary, numberOfDays: loaded.numberOfDays, average: loaded.average, categories: loaded.categories, income: configuration.income == .income)
-        completion(entry)
+        return entry
     }
 
-    func getTimeline(for configuration: InsightsWidgetConfigurationIntent, in _: Context, completion: @escaping (Timeline<Entry>) -> Void) {
+    func timeline(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
         let loaded = loadData(type: configuration.duration, income: configuration.income == .income)
 
         let entry = InsightsWidgetEntry(date: Date(), amount: loaded.amount, duration: configuration.duration, maximum: loaded.maximum, dates: loaded.dates, dictionary: loaded.dateDictionary, numberOfDays: loaded.numberOfDays, average: loaded.average, categories: loaded.categories, income: configuration.income == .income)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
-        completion(timeline)
+        return timeline
     }
 
     func loadData(type: InsightsTimePeriod, income: Bool) -> (amount: Double, maximum: Double, average: Double, numberOfDays: Int, dates: [Date], dateDictionary: [Date: Double], categories: [HoldingCategory]) {

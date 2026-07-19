@@ -20,7 +20,7 @@ struct RecentExpenditureWidget: Widget {
     ]
 
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: RecentWidgetConfigurationIntent.self, provider: Provider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: RecentWidgetConfigurationIntent.self, provider: Provider()) { entry in
             ExpenditureWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Recent Transactions")
@@ -29,7 +29,7 @@ struct RecentExpenditureWidget: Widget {
     }
 }
 
-struct Provider: IntentTimelineProvider {
+struct Provider: AppIntentTimelineProvider {
     typealias Intent = RecentWidgetConfigurationIntent
 
     public typealias Entry = RecentWidgetEntry
@@ -47,17 +47,17 @@ struct Provider: IntentTimelineProvider {
         RecentWidgetEntry(date: Date(), amount: loadAmount(type: .week, insightsType: .net), transactions: loadTransactions(type: .week, count: 9), duration: .week, type: .net)
     }
 
-    func getSnapshot(for configuration: RecentWidgetConfigurationIntent, in _: Context, completion: @escaping (RecentWidgetEntry) -> Void) {
+    func snapshot(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> RecentWidgetEntry {
         let entry = RecentWidgetEntry(date: Date(), amount: loadAmount(type: configuration.duration, insightsType: configuration.insightsType), transactions: loadTransactions(type: configuration.duration, count: 9), duration: configuration.duration, type: configuration.insightsType)
-        completion(entry)
+        return entry
     }
 
-    func getTimeline(for configuration: RecentWidgetConfigurationIntent, in _: Context, completion: @escaping (Timeline<Entry>) -> Void) {
+    func timeline(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
         let entry = RecentWidgetEntry(date: Date(), amount: loadAmount(type: configuration.duration, insightsType: configuration.insightsType), transactions: loadTransactions(type: configuration.duration, count: 9), duration: configuration.duration, type: configuration.insightsType)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
-        completion(timeline)
+        return timeline
     }
 
     func loadAmount(type: TimePeriod, insightsType: InsightsType) -> Double {

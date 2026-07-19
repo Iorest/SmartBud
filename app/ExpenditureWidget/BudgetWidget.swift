@@ -13,7 +13,7 @@ struct BudgetWidget: Widget {
     let kind: String = "BudgetWidget"
 
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: BudgetWidgetProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: BudgetWidgetProvider()) { entry in
             BudgetWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Budget")
@@ -22,7 +22,7 @@ struct BudgetWidget: Widget {
     }
 }
 
-struct BudgetWidgetProvider: IntentTimelineProvider {
+struct BudgetWidgetProvider: AppIntentTimelineProvider {
     typealias Intent = BudgetWidgetConfigurationIntent
 
     public typealias Entry = BudgetWidgetEntry
@@ -43,21 +43,20 @@ struct BudgetWidgetProvider: IntentTimelineProvider {
         return BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: BudgetWidgetConfigurationIntent())
     }
 
-    func getSnapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context, completion: @escaping (BudgetWidgetEntry) -> Void) {
-        let loaded = loadData(budgetId: configuration.budget?.identifier ?? "")
+    func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> BudgetWidgetEntry {
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
-        let entry = BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: configuration)
-        completion(entry)
+        return BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: configuration)
     }
 
-    func getTimeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context, completion: @escaping (Timeline<Entry>) -> Void) {
-        let loaded = loadData(budgetId: configuration.budget?.identifier ?? "")
+    func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
         let entry = BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: configuration)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
-        completion(timeline)
+        return timeline
     }
 
     func loadData(budgetId: String) -> (total: Double, percentage: Double, budget: HoldingBudget) {
