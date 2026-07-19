@@ -13,7 +13,7 @@ import StoreKit
 
 struct SettingsProView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var settingsVM = SettingsViewModel.shared
+    @State var settingsVM = SettingsViewModel.shared
 
     @AppStorage("isProSubscriber", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var isProSubscriber: Bool = false

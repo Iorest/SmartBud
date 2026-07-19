@@ -1,13 +1,15 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @MainActor
-final class BudgetViewModel: ObservableObject {
+@Observable
+final class BudgetViewModel{
     static let shared = BudgetViewModel()
     private let repo = DataRepository.shared
 
-    @Published var budgets: [BudgetModel] = []
-    @Published var mainBudgets: [MainBudgetModel] = []
+    var budgets: [BudgetModel] = []
+    var mainBudgets: [MainBudgetModel] = []
 
     func load() {
         budgets = repo.fetch(BudgetModel.self, sort: [SortDescriptor(\.dateCreated)])

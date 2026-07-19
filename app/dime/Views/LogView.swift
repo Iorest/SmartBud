@@ -12,7 +12,7 @@ import SwiftUI
 struct LogView: View {
     @Query private var transactions: [TransactionModel]
 
-    @EnvironmentObject var transactionVM: TransactionViewModel
+    @Environment(TransactionViewModel.self) var transactionVM
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
 
@@ -365,7 +365,7 @@ struct NumberView: View {
 }
 
 struct LogInsightsView: View {
-    @EnvironmentObject var insightsVM: InsightsViewModel
+    @Environment(InsightsViewModel.self) var insightsVM
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     @Binding var navBarText: String
@@ -819,7 +819,7 @@ struct ListView: View {
 
     @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
 
-    @EnvironmentObject var toastPresenter: OverallToastPresenter
+    @Environment(OverallToastPresenter.self) var toastPresenter
 
     var groupedByDay: [(day: Date, transactions: [TransactionModel])] {
         let grouped = Dictionary(grouping: transactions) { $0.day ?? Date.now }
@@ -1046,8 +1046,8 @@ struct SingleTransactionView: View {
 
     @State var refreshID = UUID()
 
-    @EnvironmentObject var transactionVM: TransactionViewModel
-    @EnvironmentObject var transactionManager: OverallTransactionManager
+    @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(OverallTransactionManager.self) var transactionManager
 
     // delete mode
 //    @State private var toDelete: Transaction?
@@ -1349,9 +1349,9 @@ struct EmojiLogView: View {
 }
 
 struct DeleteTransactionAlert: View {
-    @EnvironmentObject var transactionVM: TransactionViewModel
+    @Environment(TransactionViewModel.self) var transactionVM
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var transactionManager: OverallTransactionManager
+    @Environment(OverallTransactionManager.self) var transactionManager
 
     var stopRecurring: Bool {
         if let unwrapped = transactionManager.toDelete {

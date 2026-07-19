@@ -73,7 +73,7 @@ struct SettingsView: View {
     }
   }
 
-  @EnvironmentObject var appLockVM: AppLockViewModel
+  @Environment(AppLockViewModel.self) var appLockVM
   @Namespace var animation
 
   var iCloudString: String {
@@ -145,11 +145,11 @@ struct SettingsView: View {
   @State var showImportGuide = false
   @State var showUpdate: Bool = false
 
-  @EnvironmentObject var tabBarManager: TabBarManager
+  @Environment(TabBarManager.self) var tabBarManager
 
   @Environment(\.modelContext) var modelContext
 
-  @StateObject var settingsVM = SettingsViewModel.shared
+  @State var settingsVM = SettingsViewModel.shared
 
     /// Cap each settings card at this many points. Used inside the
     /// `cardMaxWidthFrame` modifier so the cap is applied as a container-

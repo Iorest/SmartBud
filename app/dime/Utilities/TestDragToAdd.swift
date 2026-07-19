@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Observation
 
 // Usage:
 /*
@@ -28,7 +29,7 @@ struct CustomRefreshView<Content: View>: View {
         self.onRefresh = onRefresh
     }
 
-    @StateObject var scrollDelegate: ScrollViewModel = .init()
+    @State var scrollDelegate: ScrollViewModel = .init()
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: showsIndicator) {
@@ -108,17 +109,19 @@ struct CustomRefreshView_Previews: PreviewProvider {
     }
 }
 
-class ScrollViewModel: NSObject, ObservableObject, UIGestureRecognizerDelegate {
+@Observable
+
+class ScrollViewModel: NSObject, UIGestureRecognizerDelegate{
     // MARK: Properties
 
-    @Published var isEligible: Bool = false
-    @Published var isRefreshing: Bool = false
+    var isEligible: Bool = false
+    var isRefreshing: Bool = false
 
     // MARK: Gesture Properties
 
-    @Published var scrollOffset: CGFloat = 0
-    @Published var contentOffset: CGFloat = 0
-    @Published var progress: CGFloat = 0
+    var scrollOffset: CGFloat = 0
+    var contentOffset: CGFloat = 0
+    var progress: CGFloat = 0
     let gestureID: String = UUID().uuidString
 
     // MARK: Haptic Feedback Properties

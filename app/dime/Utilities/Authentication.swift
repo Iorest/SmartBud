@@ -8,16 +8,18 @@
 import Foundation
 import LocalAuthentication
 import SwiftUI
+import Observation
 // All App Lock related methods will be handled here
 
 @MainActor
-class AppLockViewModel: ObservableObject, @unchecked Sendable {
+@Observable
+class AppLockViewModel: @unchecked Sendable{
     // Publishing the applock state from user defaults
-    @Published var isAppLockEnabled: Bool = false
+    var isAppLockEnabled: Bool = false
     // Publishing if the app is curretly unlocked or not
-    @Published var isAppUnLocked: Bool = false
+    var isAppUnLocked: Bool = false
 
-    @Published var enrollmentError: Bool = false
+    var enrollmentError: Bool = false
 
     init() {
         getAppLockState()

@@ -8,7 +8,7 @@ import SwiftUI
 import WidgetKit
 
 struct ContentView: View {
-    @EnvironmentObject var appLockVM: AppLockViewModel
+    @Environment(AppLockViewModel.self) var appLockVM
 
     @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
     @Environment(\.scenePhase) var scenePhase

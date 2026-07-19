@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @MainActor
-final class SettingsViewModel: ObservableObject {
+@Observable
+final class SettingsViewModel{
     static let shared = SettingsViewModel()
     private let repo = DataRepository.shared
 

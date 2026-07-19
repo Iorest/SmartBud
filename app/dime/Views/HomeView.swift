@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Observation
 import SwiftUI
 
-class OverallToastPresenter: ObservableObject {
-    @Published var showToast: Bool = false
+@Observable
+class OverallToastPresenter {
+    var showToast: Bool = false
 }
 
 enum DeletionType {
@@ -17,20 +19,21 @@ enum DeletionType {
     case prompt
 }
 
-class OverallTransactionManager: ObservableObject {
-    @Published var toEdit: TransactionModel?
-    @Published var toDelete: TransactionModel?
-    @Published var showToast: Bool = false
-    @Published var showPopup: Bool = false
-    @Published var future: Bool = false
+@Observable
+class OverallTransactionManager {
+    var toEdit: TransactionModel?
+    var toDelete: TransactionModel?
+    var showToast: Bool = false
+    var showPopup: Bool = false
+    var future: Bool = false
 }
 
 struct HomeView: View {
-    @EnvironmentObject var appLockVM: AppLockViewModel
+    @Environment(AppLockViewModel.self) var appLockVM
 
-    @StateObject var toastPresenter = OverallToastPresenter()
-    @StateObject var transactionManager = OverallTransactionManager()
-    @EnvironmentObject var transactionVM: TransactionViewModel
+    @State var toastPresenter = OverallToastPresenter()
+    @State var transactionManager = OverallTransactionManager()
+    @Environment(TransactionViewModel.self) var transactionVM
 
     @State var currentTab = "Log"
 
@@ -48,7 +51,7 @@ struct HomeView: View {
     @State var counter = 0
     @State private var showConfetti = false
 
-    @EnvironmentObject var tabBarManager: TabBarManager
+    @Environment(TabBarManager.self) var tabBarManager
 
     @State var showPopup = false
 
@@ -86,8 +89,8 @@ struct HomeView: View {
                     .tag("Settings")
             }
             .allowsHitTesting(showPopup ? false : true)
-            .environmentObject(toastPresenter)
-            .environmentObject(transactionManager)
+            .environment(toastPresenter)
+            .environment(transactionManager)
 
             CustomTabBar(currentTab: $currentTab, topEdge: topEdge, bottomEdge: bottomEdge, counter: $counter, launchAdd: launchAdd)
                 .offset(y: tabBarManager.hideTab ? (70 + bottomEdge) : 0)
@@ -104,7 +107,7 @@ struct HomeView: View {
 
             DeleteTransactionAlert()
                 .offset(y: showPopup ? 0 : 300)
-                .environmentObject(transactionManager)
+                .environment(transactionManager)
 
             if appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked {
                 AppLockView()
@@ -189,7 +192,7 @@ struct HomeView: View {
 }
 
 struct AppLockView: View {
-    @EnvironmentObject var appLockVM: AppLockViewModel
+    @Environment(AppLockViewModel.self) var appLockVM
 
     var body: some View {
         VStack(spacing: 15) {

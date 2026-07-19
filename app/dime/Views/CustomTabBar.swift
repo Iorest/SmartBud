@@ -10,7 +10,7 @@ import SwiftUI
 import SwiftData
 
 struct CustomTabBar: View {
-    @EnvironmentObject var appLockVM: AppLockViewModel
+    @Environment(AppLockViewModel.self) var appLockVM
     @Binding var currentTab: String
     var topEdge: CGFloat
     var bottomEdge: CGFloat

@@ -49,8 +49,8 @@ struct ActualBudgetView: View {
 
     @Query(sort: [SortDescriptor(\BudgetModel.dateCreated)]) private var budgets: [BudgetModel]
     @Query private var mainBudget: [MainBudgetModel]
-    @EnvironmentObject var budgetVM: BudgetViewModel
-    @EnvironmentObject var tabBarManager: TabBarManager
+    @Environment(BudgetViewModel.self) var budgetVM
+    @Environment(TabBarManager.self) var tabBarManager
 
     @State var newBudget = false
 
@@ -235,7 +235,7 @@ struct ActualBudgetView: View {
 struct MainBudgetView: View {
     let budget: MainBudgetModel
 
-    @EnvironmentObject var budgetVM: BudgetViewModel
+    @Environment(BudgetViewModel.self) var budgetVM
 
     @State var toEdit: MainBudgetModel?
     @State var toDelete: MainBudgetModel?
@@ -450,7 +450,7 @@ struct MainBudgetView: View {
 struct SingleBudgetView: View {
     let budget: BudgetModel
 
-    @EnvironmentObject var budgetVM: BudgetViewModel
+    @Environment(BudgetViewModel.self) var budgetVM
 
     @Binding var toDelete: BudgetModel?
     @Binding var toEdit: BudgetModel?
@@ -943,7 +943,7 @@ struct DetailedBudgetDifferenceDollarView: View {
 }
 
 struct DeleteBudgetAlert: View {
-    @EnvironmentObject var budgetVM: BudgetViewModel
+    @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: BudgetModel
     @Environment(\.colorScheme) var systemColorScheme
@@ -1028,7 +1028,7 @@ struct DeleteBudgetAlert: View {
 }
 
 struct DeleteMainBudgetAlert: View {
-    @EnvironmentObject var budgetVM: BudgetViewModel
+    @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: MainBudgetModel
     @Environment(\.colorScheme) var systemColorScheme

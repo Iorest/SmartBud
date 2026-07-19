@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @MainActor
-final class TransactionViewModel: ObservableObject {
+@Observable
+final class TransactionViewModel{
     static let shared = TransactionViewModel()
     private let repo = DataRepository.shared
 

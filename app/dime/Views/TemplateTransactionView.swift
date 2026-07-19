@@ -11,8 +11,8 @@ import SwiftUI
 import WidgetKit
 
 struct TemplateTransactionView: View {
-    @EnvironmentObject var transactionVM: TransactionViewModel
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(CategoryViewModel.self) var categoryVM
     @Environment(\.dismiss) var dismiss
 
     @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
@@ -723,7 +723,7 @@ struct TemplateTransactionView: View {
 }
 
 struct CategoryRowPickerView: View {
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     @Binding var selectedCategory: CategoryModel?
     @State var showCategorySheet = false
@@ -926,7 +926,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
 
-    @StateObject var gridData = GridViewModel()
+    @State var gridData = GridViewModel()
     @State var selectedItem: Grid?
     @State var lastSelectedIndex: Int = 0
 
@@ -1106,11 +1106,12 @@ struct Grid: Identifiable {
 }
 
 @MainActor
-class GridViewModel: ObservableObject {
-    @Published var currentGrid: Grid?
-    @Published var dragging = false
+@Observable
+class GridViewModel {
+    var currentGrid: Grid?
+    var dragging = false
 
-    @Published var gridItems = [
+    var gridItems = [
         Grid(index: 0),
         Grid(index: 1),
         Grid(index: 2),

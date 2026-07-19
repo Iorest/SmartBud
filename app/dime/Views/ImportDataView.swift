@@ -38,8 +38,8 @@ extension Sequence where Iterator.Element: Hashable {
 
 struct ImportDataView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var categoryVM: CategoryViewModel
-    @EnvironmentObject var transactionVM: TransactionViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
+    @Environment(TransactionViewModel.self) var transactionVM
 
     @State private var exportSample = false
     @State private var importing = false

@@ -1,17 +1,19 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @MainActor
-final class HomeViewModel: ObservableObject {
+@Observable
+final class HomeViewModel{
     static let shared = HomeViewModel()
     private let repo = DataRepository.shared
 
-    @Published var periodType: Int = 3
-    @Published var totalSpent: Double = 0
-    @Published var totalIncome: Double = 0
-    @Published var netValue: Double = 0
-    @Published var netPositive: Bool = true
-    @Published var recentTransactions: [TransactionModel] = []
+    var periodType: Int = 3
+    var totalSpent: Double = 0
+    var totalIncome: Double = 0
+    var netValue: Double = 0
+    var netPositive: Bool = true
+    var recentTransactions: [TransactionModel] = []
 
     func refresh() {
         let txns = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .reverse)])

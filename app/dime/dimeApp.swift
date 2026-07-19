@@ -10,15 +10,15 @@ import SwiftData
 
 @main
 struct dimeApp: App {
-    @StateObject var dataRepository: DataRepository
-    @StateObject var appLockVM = AppLockViewModel()
-    @StateObject var tabBarManager = TabBarManager()
-    @StateObject var homeVM: HomeViewModel
-    @StateObject var transactionVM: TransactionViewModel
-    @StateObject var categoryVM: CategoryViewModel
-    @StateObject var budgetVM: BudgetViewModel
-    @StateObject var insightsVM: InsightsViewModel
-    @StateObject var settingsVM: SettingsViewModel
+    @State private var dataRepository = DataRepository.shared
+    @State private var appLockVM = AppLockViewModel()
+    @State private var tabBarManager = TabBarManager()
+    @State private var homeVM = HomeViewModel.shared
+    @State private var transactionVM = TransactionViewModel.shared
+    @State private var categoryVM = CategoryViewModel.shared
+    @State private var budgetVM = BudgetViewModel.shared
+    @State private var insightsVM = InsightsViewModel.shared
+    @State private var settingsVM = SettingsViewModel.shared
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
@@ -26,28 +26,14 @@ struct dimeApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(dataRepository.modelContainer)
-                .environmentObject(appLockVM)
-                .environmentObject(tabBarManager)
-                .environmentObject(homeVM)
-                .environmentObject(transactionVM)
-                .environmentObject(categoryVM)
-                .environmentObject(budgetVM)
-                .environmentObject(insightsVM)
-                .environmentObject(settingsVM)
+                .environment(appLockVM)
+                .environment(tabBarManager)
+                .environment(homeVM)
+                .environment(transactionVM)
+                .environment(categoryVM)
+                .environment(budgetVM)
+                .environment(insightsVM)
+                .environment(settingsVM)
         }
-    }
-
-    init() {
-        let dataRepository = DataRepository.shared
-
-        _dataRepository = StateObject(wrappedValue: dataRepository)
-        _homeVM = StateObject(wrappedValue: HomeViewModel.shared)
-        _transactionVM = StateObject(wrappedValue: TransactionViewModel())
-        _categoryVM = StateObject(wrappedValue: CategoryViewModel())
-        _budgetVM = StateObject(wrappedValue: BudgetViewModel())
-        _insightsVM = StateObject(wrappedValue: InsightsViewModel())
-        _settingsVM = StateObject(wrappedValue: SettingsViewModel())
-
-        UITableView.appearance().backgroundColor = .clear
     }
 }

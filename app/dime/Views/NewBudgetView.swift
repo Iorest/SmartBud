@@ -33,7 +33,7 @@ struct BrandNewBudgetView: View {
     @AppStorage("firstWeekday", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstWeekday: Int = 1
     @AppStorage("firstDayOfMonth", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstDayOfMonth: Int = 1
 
-    @EnvironmentObject var budgetVM: BudgetViewModel
+    @Environment(BudgetViewModel.self) var budgetVM
 
     @Environment(\.dismiss) var dismiss
 

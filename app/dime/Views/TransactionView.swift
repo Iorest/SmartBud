@@ -10,8 +10,8 @@ import Foundation
 import SwiftUI
 
 struct TransactionView: View {
-    @EnvironmentObject var categoryVM: CategoryViewModel
-    @EnvironmentObject var transactionVM: TransactionViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
+    @Environment(TransactionViewModel.self) var transactionVM
 
     @Environment(\.dismiss) var dismiss
 

@@ -23,7 +23,7 @@ struct CategoryView: View {
 
     @State var newCategory = false
 
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     @State var showToast = false
     @State var toastTitle = ""
@@ -142,7 +142,7 @@ struct CategoryListView: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
 
@@ -632,7 +632,7 @@ struct NewCategoryAlert: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     @Namespace var animation
 
@@ -1070,7 +1070,7 @@ struct EditCategoryAlert: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var systemColorScheme
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     @Namespace var animation
 
@@ -1349,7 +1349,7 @@ struct EditCategoryAlert: View {
 }
 
 struct DeleteCategoryAlert: View {
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
     @Environment(\.dismiss) var dismiss
     let toDelete: CategoryModel
     @Binding var deleted: Bool
@@ -1460,7 +1460,7 @@ struct DeleteCategoryAlert: View {
 
 struct SuggestedCategoriesView: View {
     let income: Bool
-    @EnvironmentObject var categoryVM: CategoryViewModel
+    @Environment(CategoryViewModel.self) var categoryVM
 
     var categories: [CategoryModel] {
         income ? categoryVM.incomeCategories : categoryVM.expenseCategories

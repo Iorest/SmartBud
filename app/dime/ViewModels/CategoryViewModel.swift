@@ -1,13 +1,15 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 @MainActor
-final class CategoryViewModel: ObservableObject {
+@Observable
+final class CategoryViewModel{
     static let shared = CategoryViewModel()
     private let repo = DataRepository.shared
 
-    @Published var incomeCategories: [CategoryModel] = []
-    @Published var expenseCategories: [CategoryModel] = []
+    var incomeCategories: [CategoryModel] = []
+    var expenseCategories: [CategoryModel] = []
 
     func load() {
         incomeCategories = repo.fetch(CategoryModel.self, predicate: #Predicate { $0.income == true }, sort: [SortDescriptor(\.order)])

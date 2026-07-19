@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Observation
 
 struct SummaryData: Equatable {
     let spent: Double
@@ -10,13 +11,14 @@ struct SummaryData: Equatable {
 }
 
 @MainActor
-final class InsightsViewModel: ObservableObject {
+@Observable
+final class InsightsViewModel{
     static let shared = InsightsViewModel()
     private let repo = DataRepository.shared
 
-    @Published var selectedPeriod: Int = 2
-    @Published var summary: SummaryData = SummaryData(spent: 0, income: 0, net: 0, positive: true, average: 0)
-    @Published var lineGraphData: [LineGraphDataPoint] = []
+    var selectedPeriod: Int = 2
+    var summary: SummaryData = SummaryData(spent: 0, income: 0, net: 0, positive: true, average: 0)
+    var lineGraphData: [LineGraphDataPoint] = []
 
     func setPeriod(_ type: Int) { selectedPeriod = type; refresh() }
     func refresh() { refreshSummary(); refreshLineGraph() }
@@ -402,24 +404,24 @@ final class InsightsViewModel: ObservableObject {
     }
 
     // Period state (1=week, 2=month, 3=year).
-    @Published var periodDateRangeText: String = ""
-    @Published var periodTotalNet: Double = 0
-    @Published var periodNetPositive: Bool = true
-    @Published var periodTotalIncome: Double = 0
-    @Published var periodTotalSpent: Double = 0
-    @Published var periodAverage: Double = 0
-    @Published var periodDateRangeIncomeText: String = ""
-    @Published var periodAverageIncome: Double = 0
-    @Published var barChartData: [BarChartPoint] = []
-    @Published var categoryBreakdown: [PowerCategory] = []
-    @Published var todayTotal: Double = 0
-    @Published var todayCount: Int = 0
-    @Published var todayTransactions: [TransactionModel] = []
-    @Published var yesterdayTotal: Double = 0
-    @Published var yesterdayTransactions: [TransactionModel] = []
-    @Published var currency: String = Locale.current.currency?.identifier ?? "USD"
-    @Published var showCents: Bool = true
-    @Published var currencySymbol: String = Locale.current.currencySymbol ?? "$"
+    var periodDateRangeText: String = ""
+    var periodTotalNet: Double = 0
+    var periodNetPositive: Bool = true
+    var periodTotalIncome: Double = 0
+    var periodTotalSpent: Double = 0
+    var periodAverage: Double = 0
+    var periodDateRangeIncomeText: String = ""
+    var periodAverageIncome: Double = 0
+    var barChartData: [BarChartPoint] = []
+    var categoryBreakdown: [PowerCategory] = []
+    var todayTotal: Double = 0
+    var todayCount: Int = 0
+    var todayTransactions: [TransactionModel] = []
+    var yesterdayTotal: Double = 0
+    var yesterdayTransactions: [TransactionModel] = []
+    var currency: String = Locale.current.currency?.identifier ?? "USD"
+    var showCents: Bool = true
+    var currencySymbol: String = Locale.current.currencySymbol ?? "$"
 
     /// Gregorian calendar with the user's first-weekday preference applied.
     private var configuredCalendar: Calendar {

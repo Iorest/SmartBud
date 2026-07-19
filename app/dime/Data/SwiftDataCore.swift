@@ -1,13 +1,15 @@
 import Foundation
 import SwiftData
 import WidgetKit
+import Observation
 
 // @Model types (TransactionModel, CategoryModel, etc.) defined in Helper.swift
 
 // MARK: - DataRepository (pure data access layer)
 
 @MainActor
-final class DataRepository: ObservableObject {
+@Observable
+final class DataRepository{
     static let shared = DataRepository()
 
     let container: ModelContainer

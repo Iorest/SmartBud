@@ -17,7 +17,7 @@ struct SettingsLanguageView: View {
     var appLanguage: String = ""
 
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var settingsVM: SettingsViewModel
+    @Environment(SettingsViewModel.self) var settingsVM
 
     @Namespace var animation
 

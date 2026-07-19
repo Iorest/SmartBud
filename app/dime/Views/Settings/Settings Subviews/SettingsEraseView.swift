@@ -60,7 +60,7 @@ struct DeleteAllAlert: View {
   @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) var dismiss
   @Environment(\.colorScheme) var systemColorScheme
-  @StateObject var settingsVM = SettingsViewModel.shared
+  @State var settingsVM = SettingsViewModel.shared
 
   @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
   var bottomEdge: Double = 15

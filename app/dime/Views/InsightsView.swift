@@ -40,7 +40,7 @@ enum InsightsPeriod: Int, CaseIterable, Identifiable {
 // MARK: - InsightsView
 
 struct InsightsView: View {
-    @EnvironmentObject var insightsVM: InsightsViewModel
+    @Environment(InsightsViewModel.self) var insightsVM
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     private var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -471,7 +471,7 @@ struct FilteredInsightsView: View {
 
 #Preview("Insights") {
     InsightsView()
-        .environmentObject(InsightsViewModel())
+        .environment(InsightsViewModel())
         .modelContainer(for: [
             TransactionModel.self,
             CategoryModel.self,
