@@ -11,7 +11,6 @@ import SwiftData
 @main
 struct dimeApp: App {
     @StateObject var dataRepository: DataRepository
-    @StateObject var unlockManager: UnlockManager
     @StateObject var appLockVM = AppLockViewModel()
     @StateObject var tabBarManager = TabBarManager()
     @StateObject var homeVM: HomeViewModel
@@ -28,7 +27,6 @@ struct dimeApp: App {
             ContentView()
                 .modelContainer(dataRepository.modelContainer)
                 .environmentObject(appLockVM)
-                .environmentObject(unlockManager)
                 .environmentObject(tabBarManager)
                 .environmentObject(homeVM)
                 .environmentObject(transactionVM)
@@ -41,10 +39,8 @@ struct dimeApp: App {
 
     init() {
         let dataRepository = DataRepository.shared
-        let unlockManager = UnlockManager()
 
         _dataRepository = StateObject(wrappedValue: dataRepository)
-        _unlockManager = StateObject(wrappedValue: unlockManager)
         _homeVM = StateObject(wrappedValue: HomeViewModel.shared)
         _transactionVM = StateObject(wrappedValue: TransactionViewModel())
         _categoryVM = StateObject(wrappedValue: CategoryViewModel())
