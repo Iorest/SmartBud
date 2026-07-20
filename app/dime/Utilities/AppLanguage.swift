@@ -50,4 +50,10 @@ struct AppLanguage: DynamicProperty {
     }
 
     var projectedValue: Binding<String> { $value }
+
+    /// The `Locale` corresponding to the user's pick, or `nil` when the
+    /// empty-string sentinel means "follow system locale".
+    var locale: Locale? {
+        wrappedValue.isEmpty ? nil : Locale(identifier: wrappedValue)
+    }
 }

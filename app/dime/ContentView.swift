@@ -46,6 +46,9 @@ struct ContentView: View {
                 .ignoresSafeArea(.all, edges: .bottom)
                 .preferredColorScheme(colourScheme == 1 ? .light : colourScheme == 2 ? .dark : nil)
                 .environment(\.locale, appLanguage.isEmpty ? Locale.current : Locale(identifier: appLanguage))
+                .onChange(of: appLanguage) { _, _ in
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
                 .fullScreenCover(isPresented: $showIntro) {
                     WelcomeSheetView()
                 }
@@ -63,22 +66,10 @@ struct ContentView: View {
                 appLockVM.appLockValidation()
             }
 
-            // First-run language bootstrap: if the user hasn't picked yet
-            // (appLanguage == "" = "follow system"), and the system is
-            // Chinese, snap to a concrete zh-Hans / zh-Hant so the Settings
-            // row shows a real choice ("Simplified Chinese" / "Traditional Chinese")
-            // instead of the abstract "System" placeholder. Users can still
-            // revert to "System" from the language picker.
-            if appLanguage.isEmpty {
-                let langCode = Locale.current.language.languageCode?.identifier
-                let scriptCode = Locale.current.language.script?.identifier
-                if langCode == "zh" {
-                    appLanguage = (scriptCode == "Hant") ? "zh-Hant" : "zh-Hans"
-                }
-            }
+            // "Follow system" is the default — picker shows a "System" row that
+            // maps to the empty string. Users can always opt into zh-Hans/zh-Hant.
 
-            let defaults =
-                UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? UserDefaults.standard
+            let defaults = UserDefaults.appGroup
 
             if defaults.object(forKey: "firstDayOfMonth") == nil {
                 defaults.set(1, forKey: "firstDayOfMonth")

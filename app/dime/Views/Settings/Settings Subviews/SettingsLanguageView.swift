@@ -75,12 +75,6 @@ struct SettingsLanguageView: View {
             }
             .padding(.horizontal, 15)
             .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
-
-            Text(String(localized: "Close and reload app for change to take effect."))
-                .font(.system(.caption, design: .rounded).weight(.medium))
-                .foregroundStyle(Color.SubtitleText)
-                .padding(.horizontal, 15)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .modifier(SettingsSubviewModifier())
     }
