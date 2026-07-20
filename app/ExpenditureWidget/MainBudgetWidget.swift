@@ -132,6 +132,7 @@ struct MainBudgetWidgetEntryView: View {
 
     var headingText: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         switch entry.type {
         case 1:
@@ -368,6 +369,7 @@ struct MainBudgetWidgetEntryView: View {
 
 func formatDateRange(date1: Date, date2: Date) -> String {
     let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale.appLocale
 
     let calendar = Calendar.current
     let components1 = calendar.dateComponents([.day, .month], from: date1)

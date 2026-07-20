@@ -327,7 +327,25 @@ struct InsightsWidgetEntryView: View {
 
     let numberArray = [1, 8, 15, 22, 29]
     let monthNumberArray = [1, 4, 7, 10]
-    let monthNames: [Int: String] = [1: "Jan", 4: "Apr", 7: "Jul", 10: "Oct"]
+
+    /// Short month names for the four quarter markers (Jan/Apr/Jul/Oct in
+    /// English; "1月"/"4月"/"7月"/"10月" in zh-Hans, etc.). Built on every
+    /// body evaluation so it stays in sync with Locale.appLocale.
+    var monthNames: [Int: String] {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.appLocale
+        formatter.dateFormat = "MMM"
+        let calendar = Calendar(identifier: .gregorian)
+        return monthNumberArray.reduce(into: [:]) { dict, month in
+            var components = DateComponents()
+            components.year = 2024
+            components.month = month
+            components.day = 1
+            if let date = calendar.date(from: components) {
+                dict[month] = formatter.string(from: date)
+            }
+        }
+    }
 
     @AppStorage("firstDayOfMonth", store: .appGroup) var firstDayOfMonth: Int = 1
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -355,6 +373,7 @@ struct InsightsWidgetEntryView: View {
             return String(localized: "THIS MONTH").uppercased()
         case .year:
             let formatter = DateFormatter()
+            formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
             return String(format: String(localized: "in %@"), formatter.string(from: Date.now)).uppercased()
         }
@@ -604,6 +623,7 @@ struct InsightsWidgetEntryView: View {
 
     func getWeekday(day: Date) -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "EEE"
 

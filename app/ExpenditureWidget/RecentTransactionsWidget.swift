@@ -181,10 +181,12 @@ struct ExpenditureWidgetEntryView: View {
             return String(localized: "this week")
         case .month:
             let formatter = DateFormatter()
+            formatter.locale = Locale.appLocale
             formatter.dateFormat = "MMM"
             return String(localized: "in \(formatter.string(from: Date.now))")
         case .year:
             let formatter = DateFormatter()
+            formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
             return String(localized: "in \(formatter.string(from: Date.now))")
         }
