@@ -6892,6 +6892,30 @@
         }
       }
     },
+    "NIL" : {
+      "comment" : "Placeholder shown in widgets when there is no data (e.g. no recent transactions). Kept as the English acronym across locales because it is a recognised technical term.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
+          }
+        }
+      }
+    },
     "Name" : {
       "localizations" : {
         "zh-Hans" : {
