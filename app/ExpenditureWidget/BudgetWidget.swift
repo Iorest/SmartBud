@@ -148,7 +148,7 @@ struct BudgetWidgetEntryView: View {
         case 4:
             return String(localized: "this year")
         default:
-            return "this week"
+            return String(localized: "this week")
         }
     }
 
@@ -174,7 +174,7 @@ struct BudgetWidgetEntryView: View {
 
     var body: some View {
         if entry.configuration.budget == nil {
-            Text("Select budget in widget options")
+            Text(String(localized: "Select budget in widget options"))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.SubtitleText)
@@ -185,7 +185,7 @@ struct BudgetWidgetEntryView: View {
                 }
 
         } else if entry.budget.emoji == "failed" {
-            Text("Budget no longer exists - please select new budget from widget options.")
+            Text(String(localized: "Budget no longer exists - please select new budget from widget options."))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.SubtitleText)
@@ -247,11 +247,11 @@ struct BudgetWidgetEntryView: View {
                                         .foregroundColor(Color.SubtitleText)
                                 } else {
                                     if entry.budget.budgetAmount >= entry.totalSpent {
-                                        Text("left")
+                                        Text(String(localized: "left"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
                                             .foregroundColor(Color.SubtitleText)
                                     } else {
-                                        Text("over")
+                                        Text(String(localized: "over"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
                                             .foregroundColor(Color.SubtitleText)
                                     }

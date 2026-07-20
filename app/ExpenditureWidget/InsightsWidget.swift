@@ -348,7 +348,7 @@ struct InsightsWidgetEntryView: View {
     var subtitleText: String {
         switch entry.duration {
         case .unknown:
-            return "NIL"
+            return String(localized: "NIL")
         case .week:
             return String(localized: "THIS WEEK").uppercased()
         case .month:
@@ -363,7 +363,7 @@ struct InsightsWidgetEntryView: View {
     var subtitleText1: String {
         switch entry.duration {
         case .unknown:
-            return "NIL"
+            return String(localized: "NIL")
         case .week:
             return String(localized: "THIS WEEK").uppercased()
         case .month:
@@ -406,7 +406,7 @@ struct InsightsWidgetEntryView: View {
 
                                     Spacer()
 
-                                    Text("0")
+                                    Text(String(localized: "0"))
                                         .font(.system(size: 8, weight: .regular, design: .rounded))
                                         .foregroundColor(Color.SubtitleText)
                                 }
@@ -673,7 +673,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
     var subtitleText1: String {
         switch duration {
         case .unknown:
-            return "NIL"
+            return String(localized: "NIL")
         case .week:
             return String(localized: "THIS WEEK").uppercased()
         case .month:
@@ -722,7 +722,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                     Image(systemName: "plus")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
 
-                    Text("New Expense")
+                    Text(String(localized: "New Expense"))
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundColor(Color.PrimaryText)
                 }

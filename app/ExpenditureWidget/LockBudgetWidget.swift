@@ -149,7 +149,7 @@ struct LockBudgetWidgetEntryView: View {
         case 4:
             return String(localized: "this year")
         default:
-            return "this week"
+            return String(localized: "this week")
         }
     }
 
@@ -184,7 +184,7 @@ struct LockBudgetWidgetEntryView: View {
         switch widgetFamily {
         case .accessoryInline:
             if entry.configuration.budget == nil {
-                Text("Select budget in widget options")
+                Text(String(localized: "Select budget in widget options"))
             } else {
                 Text("\(entry.budget.emoji) \(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle)")
                     .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
@@ -195,7 +195,7 @@ struct LockBudgetWidgetEntryView: View {
                 ZStack {
                     AccessoryWidgetBackground()
 
-                    Text("SELECT BUDGET")
+                    Text(String(localized: "SELECT BUDGET"))
                         .font(.system(size: 8, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
@@ -214,7 +214,7 @@ struct LockBudgetWidgetEntryView: View {
 
         case .accessoryRectangular:
             if entry.configuration.budget == nil {
-                Text("SELECT BUDGET IN WIDGET OPTIONS")
+                Text(String(localized: "SELECT BUDGET IN WIDGET OPTIONS"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
@@ -226,7 +226,7 @@ struct LockBudgetWidgetEntryView: View {
                             Text(entry.budget.name)
 
                             if showPercent(size: proxy.size.width) {
-                                Text("•")
+                                Text(String(localized: "•"))
                                 Text(percentString)
                             }
                         }
@@ -237,7 +237,7 @@ struct LockBudgetWidgetEntryView: View {
                             .foregroundColor(Color.SubtitleText)
 
                         Gauge(value: percent, in: 0 ... 1) {
-                            Text("Percent Spent")
+                            Text(String(localized: "Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()
                         } minimumValueLabel: {

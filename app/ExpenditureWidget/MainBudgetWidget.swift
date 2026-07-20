@@ -126,7 +126,7 @@ struct MainBudgetWidgetEntryView: View {
         case 4:
             return String(localized: "this year")
         default:
-            return "this week"
+            return String(localized: "this week")
         }
     }
 
@@ -204,7 +204,7 @@ struct MainBudgetWidgetEntryView: View {
                     AccessoryWidgetBackground()
 
                     VStack {
-                        Text("ADD\nBUDGET")
+                        Text(String(localized: "ADD BUDGET"))
                             .font(.system(size: 8, weight: .semibold, design: .rounded))
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
@@ -223,7 +223,7 @@ struct MainBudgetWidgetEntryView: View {
 
         case .accessoryRectangular:
             if !entry.found {
-                Text("ADD OVERALL BUDGET")
+                Text(String(localized: "ADD OVERALL BUDGET"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .multilineTextAlignment(.center)
                     .containerBackground(for: .widget) { Color.clear }
@@ -234,7 +234,7 @@ struct MainBudgetWidgetEntryView: View {
                             Text(headingText)
 
                             if showPercent(size: proxy.size.width) {
-                                Text("•")
+                                Text(String(localized: "•"))
                                 Text(percentString)
                             }
                         }
@@ -245,7 +245,7 @@ struct MainBudgetWidgetEntryView: View {
                             .foregroundColor(Color.SubtitleText)
 
                         Gauge(value: percent, in: 0 ... 1) {
-                            Text("Percent Spent")
+                            Text(String(localized: "Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()
                         } minimumValueLabel: {
@@ -266,7 +266,7 @@ struct MainBudgetWidgetEntryView: View {
 
         case .systemSmall:
             if !entry.found {
-                Text("Create your overall budget in the app")
+                Text(String(localized: "Create your overall budget in the app"))
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color.SubtitleText)
@@ -321,11 +321,11 @@ struct MainBudgetWidgetEntryView: View {
                                             .foregroundColor(Color.SubtitleText)
                                     } else {
                                         if entry.budgetAmount >= entry.totalSpent {
-                                            Text("left")
+                                            Text(String(localized: "left"))
                                                 .font(.system(size: 10, weight: .medium, design: .rounded))
                                                 .foregroundColor(Color.SubtitleText)
                                         } else {
-                                            Text("over")
+                                            Text(String(localized: "over"))
                                                 .font(.system(size: 10, weight: .medium, design: .rounded))
                                                 .foregroundColor(Color.SubtitleText)
                                         }
