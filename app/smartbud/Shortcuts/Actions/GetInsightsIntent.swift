@@ -2,7 +2,7 @@
 //  GetInsightsIntent.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/8/23.
+//  Created by Iorest on 5/8/23.
 //
 
 import AppIntents

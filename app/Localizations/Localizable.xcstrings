@@ -2,6 +2,26 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     " for contributing" : {
@@ -38,6 +58,26 @@
       }
     },
     "-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%1$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%1$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%1$@"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     ", state the format of the dates in the assigned column." : {
@@ -65,6 +105,26 @@
       }
     },
     "." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "\"Cent-less\"" : {
@@ -124,6 +184,26 @@
       }
     },
     "%.2f" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%.2f"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%.2f"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%.2f"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "%@ (%@)" : {
@@ -152,7 +232,19 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@ %2$@"
           }
         }
@@ -371,22 +463,23 @@
         }
       }
     },
-    "%@%.2f" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$.2f"
-          }
-        }
-      },
-      "shouldTranslate" : false
-    },
     "%@%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$@%2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@%2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@%2$@"
           }
         }
@@ -419,7 +512,19 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$@%2$lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@%2$lld"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@%2$lld"
           }
         }
@@ -430,11 +535,24 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$@0 %2$@ %3$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@0 %2$@ %3$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@0 %2$@ %3$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%d days left" : {
       "localizations" : {
@@ -519,13 +637,45 @@
       }
     },
     "%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "%lld %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$lld %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld %2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$lld %2$@"
           }
         }
@@ -896,6 +1046,26 @@
       }
     },
     "%lld%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "%lld%% spent" : {
@@ -949,18 +1119,118 @@
       }
     },
     "•" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "•"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "•"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "•"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "+%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%1$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%1$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%1$@"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "📭️" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📭️"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📭️"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📭️"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "🙈" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "0" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "3 new Siri shortcuts allow you to conveniently add new transactions or access insights." : {
@@ -987,6 +1257,29 @@
         }
       }
     },
+    "A bright aqua background with a glowing yellow tie on a light bag." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bright aqua background with a glowing yellow tie on a light bag."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bright aqua background with a glowing yellow tie on a light bag."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bright aqua background with a glowing yellow tie on a light bag."
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "A convenient button to log new purchases." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1009,6 +1302,98 @@
           }
         }
       }
+    },
+    "A deeper violet bag with a soft amber tie on indigo." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A deeper violet bag with a soft amber tie on indigo."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A deeper violet bag with a soft amber tie on indigo."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A deeper violet bag with a soft amber tie on indigo."
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "A soft sky background with a deep violet bag and golden tie." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A soft sky background with a deep violet bag and golden tie."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "柔和天空蓝背景，深紫袋身配以金色领带。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "柔和天空藍背景，深紫袋身配以金色領結。"
+          }
+        }
+      }
+    },
+    "A soft sky background with a white bag and yellow tie." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A soft sky background with a white bag and yellow tie."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A soft sky background with a white bag and yellow tie."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A soft sky background with a white bag and yellow tie."
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "A teal-to-gold gradient backdrop with a deep teal bag." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A teal-to-gold gradient backdrop with a deep teal bag."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A teal-to-gold gradient backdrop with a deep teal bag."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A teal-to-gold gradient backdrop with a deep teal bag."
+          }
+        }
+      },
+      "shouldTranslate" : false
     },
     "ADD BUDGET" : {
       "extractionState" : "manual",
@@ -1739,6 +2124,29 @@
         }
       }
     },
+    "Aqua · 浅青辉光" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aqua · 浅青辉光"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aqua · 浅青辉光"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aqua · 浅青辉光"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "As transactions start piling up" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1951,6 +2359,12 @@
     },
     "Back" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2543,6 +2957,12 @@
     },
     "Cancel" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2997,6 +3417,12 @@
     },
     "Continue" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3024,6 +3450,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法儲存到資料庫"
+          }
+        }
+      }
+    },
+    "Cream · 米色" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cream · 米色"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cream · 米色"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cream · 米色"
+          }
+        }
+      }
+    },
+    "Cream backdrop, teal-blue bag with a yellow star and smile." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cream backdrop, teal-blue bag with a yellow star and smile."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "米色背景，蓝绿色袋身，缀有黄色星星与微笑。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "米色背景，藍綠色袋身，綴有黃色星星與微笑。"
           }
         }
       }
@@ -3141,6 +3613,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自訂類別顏色"
+          }
+        }
+      }
+    },
+    "Custom color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom color"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义颜色"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自訂顏色"
           }
         }
       }
@@ -3510,6 +4004,28 @@
         }
       }
     },
+    "Deep Sea · 深青" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep Sea · 深青"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep Sea · 深青"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep Sea · 深青"
+          }
+        }
+      }
+    },
     "Deeper breakdowns, custom date ranges, exportable charts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3535,6 +4051,12 @@
     },
     "Delete" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3750,6 +4272,7 @@
       }
     },
     "Designed by the brilliant @rudra_dsigns, check out his work on Twitter." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3886,6 +4409,12 @@
       "comment" : "Done button",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4033,6 +4562,12 @@
     },
     "Edit" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4509,6 +5044,28 @@
         }
       }
     },
+    "Export Failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "導出失敗"
+          }
+        }
+      }
+    },
     "ExportCSVHeader" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -4934,48 +5491,48 @@
         }
       }
     },
-    "Follow Rafael on Instagram" : {
+    "Follow Iorest on Instagram" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Follow Rafael on Instagram"
+            "value" : "Follow Iorest on Instagram"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Instagram 关注 Rafael"
+            "value" : "在 Instagram 关注 Iorest"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Instagram 追蹤 Rafael"
+            "value" : "在 Instagram 追蹤 Iorest"
           }
         }
       }
     },
-    "Follow Rafael on X" : {
+    "Follow Iorest on X" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Follow Rafael on X"
+            "value" : "Follow Iorest on X"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 X 上关注 Rafael"
+            "value" : "在 X 上关注 Iorest"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 X 上關注 Rafael"
+            "value" : "在 X 上關注 Iorest"
           }
         }
       }
@@ -5343,6 +5900,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隱藏"
+          }
+        }
+      }
+    },
+    "Hide suggestions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide suggestions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏建议"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏建議"
           }
         }
       }
@@ -5932,6 +6511,29 @@
         }
       }
     },
+    "Indigo · 深紫" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indigo · 深紫"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indigo · 深紫"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indigo · 深紫"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "Insights" : {
       "comment" : "Insights screen title",
       "localizations" : {
@@ -6088,9 +6690,6 @@
           }
         }
       }
-    },
-    "It definitely isn't becoming one, but it never hurts to keep dreaming." : {
-
     },
     "Jan" : {
       "extractionState" : "manual",
@@ -6767,6 +7366,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "將「類別」欄中出現的值匹配到 SmartBud 中對應的類別。"
+          }
+        }
+      }
+    },
+    "Midnight · 紫袋辉光" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midnight · 紫袋辉光"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midnight · 紫袋辉光"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midnight · 紫袋輝光"
           }
         }
       }
@@ -7512,6 +8133,12 @@
     },
     "No remaining\ncategories." : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No remaining\ncategories."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7968,6 +8595,28 @@
         }
       }
     },
+    "OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確定"
+          }
+        }
+      }
+    },
     "On" : {
       "localizations" : {
         "en" : {
@@ -8009,6 +8658,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 %@"
+          }
+        }
+      }
+    },
+    "Original design with a glowing amber tie on a deep violet bag." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original design with a glowing amber tie on a deep violet bag."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "经典款设计，深紫袋身配以琥珀色发光领带。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經典款設計，深紫袋身配以琥珀色發光領結。"
           }
         }
       }
@@ -8458,6 +9129,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請稍候，我們正在處理你的新交易。"
+          }
+        }
+      }
+    },
+    "Plum · 紫袋" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plum · 紫袋"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plum · 紫袋"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plum · 紫袋"
           }
         }
       }
@@ -9114,6 +9807,28 @@
         }
       }
     },
+    "Reorder categories" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reorder categories"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调整类别顺序"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整類別順序"
+          }
+        }
+      }
+    },
     "Repeats every" : {
       "localizations" : {
         "zh-Hans" : {
@@ -9274,6 +9989,12 @@
       "comment" : "Save button",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9666,6 +10387,28 @@
         }
       }
     },
+    "Show suggestions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show suggestions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示建议"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示建議"
+          }
+        }
+      }
+    },
     "showing transactions from %@ to %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9811,6 +10554,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Siri 捷徑"
+          }
+        }
+      }
+    },
+    "Sky · 浅蓝" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sky · 浅蓝"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sky · 浅蓝"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sky · 淺藍"
           }
         }
       }
@@ -10422,6 +11187,29 @@
         }
       }
     },
+    "Sunset · 黄昏" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunset · 黄昏"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunset · 黄昏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunset · 黄昏"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "Swaps the time label of each transaction with its category name. However, if you do not manually input a note for each transaction - in which case the note is the category name by default - duplicate text will appear." : {
       "localizations" : {
         "zh-Hans" : {
@@ -10574,6 +11362,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "預算將根據你的偏好定期重新整理。"
+          }
+        }
+      }
+    },
+    "The classic bag in a brighter plum tone, no glow." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The classic bag in a brighter plum tone, no glow."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "经典袋身的亮泽梅红款，无辉光效果。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經典袋身的亮澤梅紅款，無輝光效果。"
           }
         }
       }
@@ -10970,6 +11780,12 @@
       "comment" : "Today label",
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11477,6 +12293,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "交易類型"
+          }
+        }
+      }
+    },
+    "Unable to access file" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to access file"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法访问文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法存取檔案"
           }
         }
       }

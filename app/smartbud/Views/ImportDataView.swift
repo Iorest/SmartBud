@@ -2,7 +2,7 @@
 //  ImportDataView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 21/8/23.
+//  Created by Iorest on 21/8/23.
 //
 
 import Foundation
@@ -52,6 +52,8 @@ struct ImportDataView: View {
 
     @State private var remainingColumns = [Int]()
     @State private var selectedColumns = [Int]()
+
+    @State private var lightHaptic = 0
 
     var indexColumnWidth: CGFloat {
         let additionalPadding: Double
@@ -653,7 +655,7 @@ struct ImportDataView: View {
                 if progress == 1 {
                     VStack(spacing: 13) {
                         Button {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            lightHaptic &+= 1
 
                             importing = true
 
@@ -735,8 +737,7 @@ struct ImportDataView: View {
                                 }
 
                                 // remove from possible pool
-                                let index = remainingColumns.firstIndex(of: selectedColumn) ?? 0
-                                remainingColumns.remove(at: index)
+                                remainingColumns.removeAll { $0 == selectedColumn }
 
                                 // add to holding pool
                                 selectedColumns.append(selectedColumn)
@@ -778,7 +779,7 @@ struct ImportDataView: View {
                             }
                         }
                     } label: {
-                        Text("Continue")
+                        Text(String(localized: "Continue"))
                             .font(.system(.title3, design: .rounded).weight(.semibold))
 
 //                            .font(.system(size: 19, weight: .semibold, design: .rounded))
@@ -805,25 +806,29 @@ struct ImportDataView: View {
         ) { result in
             switch result {
             case let .success(file):
+                guard file.startAccessingSecurityScopedResource() else {
+                    showToast = true
+                    toastMessage = String(localized: "Unable to access file")
+                    return
+                }
+                defer { file.stopAccessingSecurityScopedResource() }
+
                 do {
-                    if file.startAccessingSecurityScopedResource() {
-                        guard let message = try String(data: Data(contentsOf: file), encoding: .utf8) else {
-                            showToast = true
-                            toastMessage = String(localized: "Invalid File")
-                            return
-                        }
-
-                        data = message
-
-                        processCSV()
-
-                        do {
-                            file.stopAccessingSecurityScopedResource()
-                        }
+                    guard let message = try String(data: Data(contentsOf: file), encoding: .utf8) else {
+                        showToast = true
+                        toastMessage = String(localized: "Invalid File")
+                        return
                     }
-                } catch {}
-            case let .failure(error):
-                print(error.localizedDescription)
+
+                    data = message
+                    processCSV()
+                } catch {
+                    showToast = true
+                    toastMessage = String(localized: "Import Failed")
+                }
+            case .failure:
+                showToast = true
+                toastMessage = String(localized: "Import Failed")
             }
         }
         .sheet(isPresented: $exportSample) {
@@ -852,6 +857,7 @@ struct ImportDataView: View {
         }
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: confettiNumber) { _, _ in showConfetti = true }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 
     func validateDoubles(strings: [String]) -> Bool {
@@ -1070,7 +1076,7 @@ struct MatchCategoryStepperView: View {
                         .foregroundStyle(Color.SubtitleText.opacity(0.7))
                         .padding(.top, 20)
 
-                    Text("No remaining\ncategories.")
+                    Text(String(localized: "No remaining\ncategories."))
                         .font(.system(.callout, design: .rounded).weight(.medium))
 
 //                        .font(.system(size: 16, weight: .medium, design: .rounded))

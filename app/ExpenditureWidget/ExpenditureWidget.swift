@@ -2,7 +2,7 @@
 //  ExpenditureWidget.swift
 //  ExpenditureWidget
 //
-//  Created by Rafael Soh on 25/7/22.
+//  Created by Iorest on 25/7/22.
 //
 
 import SwiftUI

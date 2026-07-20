@@ -2,7 +2,7 @@
 //  SettingsAppIconView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/11/23.
+//  Created by Iorest on 5/11/23.
 //
 
 import Foundation
@@ -23,15 +23,34 @@ struct SettingsAppIconView: View {
   let options: [AppIconBundle] = [
     AppIconBundle(
       actualFileName: "AppIcon1", exampleFileName: "AppIcon1_EG",
-      displayName: String(localized: "V2.0"),
+      displayName: String(localized: "Midnight · 紫袋辉光"),
       displaySubtitle: String(
-        localized: "Designed by the brilliant @rudra_dsigns, check out his work on Twitter.")),
+        localized: "Original design with a glowing amber tie on a deep violet bag.")),
     AppIconBundle(
       actualFileName: "AppIcon2", exampleFileName: "AppIcon2_EG",
-      displayName: String(localized: "Unicorn"),
+      displayName: String(localized: "Plum · 紫袋"),
       displaySubtitle: String(
-        localized:
-          "It definitely isn't becoming one, but it never hurts to keep dreaming."))
+        localized: "The classic bag in a brighter plum tone, no glow.")),
+    AppIconBundle(
+      actualFileName: "AppIcon3", exampleFileName: "AppIcon3_EG",
+      displayName: String(localized: "Indigo · 深紫"),
+      displaySubtitle: String(
+        localized: "A deeper violet bag with a soft amber tie on indigo.")),
+    AppIconBundle(
+      actualFileName: "AppIcon4", exampleFileName: "AppIcon4_EG",
+      displayName: String(localized: "Sky · 浅蓝"),
+      displaySubtitle: String(
+        localized: "A soft sky background with a white bag and yellow tie.")),
+    AppIconBundle(
+      actualFileName: "AppIcon5", exampleFileName: "AppIcon5_EG",
+      displayName: String(localized: "Sunset · 黄昏"),
+      displaySubtitle: String(
+        localized: "A teal-to-gold gradient backdrop with a deep teal bag.")),
+    AppIconBundle(
+      actualFileName: "AppIcon6", exampleFileName: "AppIcon6_EG",
+      displayName: String(localized: "Aqua · 浅青辉光"),
+      displaySubtitle: String(
+        localized: "A bright aqua background with a glowing yellow tie on a light bag."))
   ]
 
   @Namespace var animation

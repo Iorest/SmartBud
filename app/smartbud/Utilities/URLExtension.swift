@@ -2,7 +2,7 @@
 //  URLExtension.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 9/9/22.
+//  Created by Iorest on 9/9/22.
 //
 
 import Foundation

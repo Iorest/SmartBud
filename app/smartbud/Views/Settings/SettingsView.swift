@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 20/5/22.
+//  Created by Iorest on 20/5/22.
 //
 
 import Foundation
@@ -34,12 +34,14 @@ struct SettingsView: View {
   @AppStorage("activeIcon", store: .appGroup)
   var activeIcon: String = "AppIcon"
   var appIconString: String {
-    if activeIcon == "AppIcon1" {
-      return String(localized: "v2.0")
-    } else if activeIcon == "AppIcon2" {
-      return String(localized: "Unicorn")
-    } else {
-      return String(localized: "O.G.")
+    switch activeIcon {
+    case "AppIcon1": return String(localized: "Midnight · 紫袋辉光")
+    case "AppIcon2": return String(localized: "Plum · 紫袋")
+    case "AppIcon3": return String(localized: "Indigo · 深紫")
+    case "AppIcon4": return String(localized: "Sky · 浅蓝")
+    case "AppIcon5": return String(localized: "Sunset · 黄昏")
+    case "AppIcon6": return String(localized: "Aqua · 浅青辉光")
+    default:         return String(localized: "Deep Sea · 深青")
     }
   }
 
@@ -83,9 +85,9 @@ struct SettingsView: View {
   }
 
   @Environment(\.openURL) var openURL
-  let supportEmail = SupportEmail(toAddress: "rafasohhh@gmail.com", subject: "Support Email")
+  let supportEmail = SupportEmail(toAddress: "iorest@qq.com", subject: "Support Email")
   let featureRequestEmail = SupportEmail(
-    toAddress: "rafasohhh@gmail.com", subject: "Feature Request")
+    toAddress: "iorest@qq.com", subject: "Feature Request")
 
   @AppStorage("numberEntryType", store: .appGroup)
   var numberEntryType: Int = 2
@@ -141,6 +143,8 @@ struct SettingsView: View {
   // popups
 
   @State var showImportGuide = false
+  @State var showExportError = false
+  @State var exportErrorMessage = ""
 
   @Environment(TabBarManager.self) var tabBarManager
 
@@ -167,7 +171,7 @@ struct SettingsView: View {
       NavigationStack {
       VStack {
         HStack {
-          Text("Settings")
+          Text(String(localized: "Settings"))
             .font(.system(.title, design: .rounded).weight(.semibold))
 
             //                        .font(.system(size: 25, weight: .semibold, design: .rounded))
@@ -491,9 +495,9 @@ struct SettingsView: View {
                 // The current ID points to the legacy listing, which keeps the
                 // "Rate on App Store" link functional for users on the old listing.
                 let url = "https://apps.apple.com/app/id1635280255?action=write-review"
-                guard let writeReviewURL = URL(string: url)
-                else { fatalError("Expected a valid URL") }
-                UIApplication.shared.open(writeReviewURL, options: [:], completionHandler: nil)
+                if let writeReviewURL = URL(string: url) {
+                    UIApplication.shared.open(writeReviewURL, options: [:], completionHandler: nil)
+                }
               } label: {
                 SettingsRowView(systemImage: "star.fill", title: "Rate on App Store", colour: 126)
               }
@@ -518,6 +522,11 @@ struct SettingsView: View {
       }
       .fullScreenCover(isPresented: .constant(CommandLine.arguments.contains("-openPro"))) {
         NavigationStack { SettingsProView() }
+      }
+      .alert(String(localized: "Export Failed"), isPresented: $showExportError) {
+        Button(String(localized: "OK"), role: .cancel) {}
+      } message: {
+        Text(exportErrorMessage)
       }
     }
   }
@@ -601,13 +610,20 @@ struct SettingsView: View {
       string.removeAll(where: { $0 == "," })
 
       csvText +=
-        "\(transaction.wrappedDate),\(string),\(String(format: "%.2f", transaction.wrappedAmount)),\(transaction.category?.wrappedName ?? ""),\(type)\n"
+        "\(transaction.wrappedDate),\(string),\(transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))),\(transaction.category?.wrappedName ?? ""),\(type)\n"
     }
 
+    var writeSucceeded = false
     do {
-      try csvText.write(to: path!, atomically: true, encoding: String.Encoding.utf8)
+        try csvText.write(to: path!, atomically: true, encoding: String.Encoding.utf8)
+        writeSucceeded = true
     } catch {
-      print("\(error)")
+        exportErrorMessage = error.localizedDescription
+        showExportError = true
+    }
+
+    guard writeSucceeded else {
+        return
     }
 
     var filesToShare = [Any]()

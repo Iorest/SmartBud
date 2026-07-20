@@ -32,8 +32,10 @@ struct LineGraph: View {
     }
 
     private var lineColor: Color {
-        guard let plot = currentPlot else { return color }
-        let index = data.firstIndex(of: plot) ?? 0
+        guard let plot = currentPlot,
+              let index = data.firstIndex(of: plot) else {
+            return color
+        }
         return data.count - range <= index ? color : Color.Outline
     }
 

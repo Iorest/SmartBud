@@ -2,7 +2,7 @@
 //  Currency.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/9/22.
+//  Created by Iorest on 5/9/22.
 //
 
 import Foundation

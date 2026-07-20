@@ -2,13 +2,14 @@
 //  HomeView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 20/5/22.
+//  Created by Iorest on 20/5/22.
 //
 
 import Foundation
 import Observation
 import SwiftUI
 
+@MainActor
 @Observable
 class OverallToastPresenter {
     var showToast: Bool = false
@@ -19,6 +20,7 @@ enum DeletionType {
     case prompt
 }
 
+@MainActor
 @Observable
 class OverallTransactionManager {
     var toEdit: TransactionModel?

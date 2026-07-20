@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 24/8/22.
+//  Created by Iorest on 24/8/22.
 //
 //  Handles home screen quick actions (3D Touch / long-press app icon).
 //  Replaces the previous SceneDelegate: SwiftUI's `App` lifecycle does not

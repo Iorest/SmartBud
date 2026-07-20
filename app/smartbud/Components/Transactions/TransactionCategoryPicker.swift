@@ -2,7 +2,7 @@
 //  TransactionCategoryPicker.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 20/11/23.
+//  Created by Iorest on 20/11/23.
 //
 
 import Foundation
@@ -15,6 +15,8 @@ struct NewCategoryPickerView: View {
     @Binding var showingCategoryView: Bool
     @Query var categories: [CategoryModel]
     @Environment(\.colorScheme) var colorScheme
+
+    @State private var lightHaptic = 0
 
     let layout = [
         GridItem(.flexible(), spacing: 10),
@@ -74,15 +76,14 @@ struct NewCategoryPickerView: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .overlay(alignment: .bottom) {
             Button {
-                let impactMed = UIImpactFeedbackGenerator(style: .light)
-                impactMed.impactOccurred()
+                lightHaptic &+= 1
                 showPicker = false
                 showingCategoryView = true
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "pencil")
                         .font(.system(.body, design: .rounded).weight(.semibold))
-                    Text("Edit")
+                    Text(String(localized: "Edit"))
                         .font(.system(.body, design: .rounded).weight(.semibold))
                 }
                 .padding(.vertical, 9)
@@ -98,7 +99,7 @@ struct NewCategoryPickerView: View {
             .accessibilityLabel(String(localized: "Edit"))
             .padding(.bottom, 15)
         }
-
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 
     init(

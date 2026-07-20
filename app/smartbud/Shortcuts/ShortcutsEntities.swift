@@ -2,7 +2,7 @@
 //  ShortcutsEntities.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 1/8/23.
+//  Created by Iorest on 1/8/23.
 //
 
 import AppIntents

@@ -2,7 +2,7 @@
 //  Wiggle.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 9/7/23.
+//  Created by Iorest on 9/7/23.
 //
 
 import SwiftUI

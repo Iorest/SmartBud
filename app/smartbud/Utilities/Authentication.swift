@@ -2,7 +2,7 @@
 //  Authentication.swift
 //  Bonsai
 //
-//  Created by Rafael Soh on 7/7/22.
+//  Created by Iorest on 7/7/22.
 //
 
 import Foundation
@@ -49,15 +49,11 @@ class AppLockViewModel{
 
         let isBiometricAvailable = laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
 
-        if let error = error {
-            print(error.localizedDescription)
-        }
-
-        if isBiometricAvailable {
-            enrollmentError = false
-        } else {
-            enrollmentError = true
-        }
+        // Surface biometric-unavailable errors via the existing
+        // `enrollmentError` flag so the UI can show a recovery hint.
+        // Do not log here: the error is a user-actionable state, not
+        // a developer diagnostic.
+        enrollmentError = !isBiometricAvailable || error != nil
 
         return isBiometricAvailable
     }
@@ -87,11 +83,11 @@ class AppLockViewModel{
                             self.isAppUnLocked = true
                         }
                     }
-                } else {
-                    if let error = error {
-                        DispatchQueue.main.async {
-                            print(error.localizedDescription)
-                        }
+                } else if error != nil {
+                    DispatchQueue.main.async {
+                        // Surface auth failure (e.g. user cancel, lockout)
+                        // to the UI via the existing enrollmentError flag.
+                        self.enrollmentError = true
                     }
                 }
             }
@@ -112,11 +108,11 @@ class AppLockViewModel{
                     DispatchQueue.main.async {
                         self.isAppUnLocked = true
                     }
-                } else {
-                    if let error = error {
-                        DispatchQueue.main.async {
-                            print(error.localizedDescription)
-                        }
+                } else if error != nil {
+                    DispatchQueue.main.async {
+                        // Surface auth failure to the UI so the user
+                        // can see why unlock did not succeed.
+                        self.enrollmentError = true
                     }
                 }
             }

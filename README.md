@@ -1,10 +1,11 @@
-# Dime
+# SmartBud
 
 <p align="center">
   <img src="./docs/assets/hero.png" width="451" style="max-width: 100%; height: auto;" />
 </p>
 
-Dime is a 100% free, open-source personal finance tracker built with iOS design guidelines in mind. [Download Dime on the App Store.](https://apps.apple.com/sg/app/dime-budget-expense-tracker/id1635280255)
+<!-- TODO: Replace `id1635280255` with SmartBud's App Store ID once SmartBud is published as a new listing. Current ID points to the legacy listing. -->
+SmartBud is a 100% free, open-source personal finance tracker built with iOS design guidelines in mind. [Download SmartBud on the App Store.](https://apps.apple.com/sg/app/id1635280255)
 
 ## App Preview
 
@@ -20,7 +21,7 @@ Dime is a 100% free, open-source personal finance tracker built with iOS design 
   <img src="./docs/assets/9.png" height="300" />
 </p>
 
-## Why You’ll Love Dime
+## Why You'll Love SmartBud
 
 - 100% free forever, with no paywall or ads.
 - Beautifully iOS-centric design, with simplicity at its core.
@@ -36,10 +37,9 @@ Dime is a 100% free, open-source personal finance tracker built with iOS design 
 
 ## How to help
 
-- Please feel free to raise [issues](https://github.com/rarfell/dimeApp/issues) for any inquiries, suggestions for improvements, or bugs you encounter.
+- Please feel free to raise [issues](https://github.com/iorest/smartbud/issues) for any inquiries, suggestions for improvements, or bugs you encounter.
 - You're welcome to fork the repository and propose changes through a pull request, although the decision to merge it rests with the project maintainers.
-- To follow along with app updates, follow [@budgetwithdime](https://x.com/budgetwithdime) on X / Twitter
-- If you would like to discuss with the contributors, feel free to drop [Rafael](https://x.com/rarfell) or [Jeffrey](https://x.com/jefcodes) a DM!
+- If you would like to discuss with the contributors, feel free to drop [Iorest](https://x.com/iorest) or [Jeffrey](https://x.com/jefcodes) a DM!
 
 ## How to build
 
@@ -50,10 +50,10 @@ Dime is a 100% free, open-source personal finance tracker built with iOS design 
 ### Build Steps
 
 - Clone this project either via Xcode or terminal:
-  `git clone https://github.com/rarfell/dimeApp.git`
+  `git clone https://github.com/iorest/smartbud.git`
 - For branch selection use:
   `--single-branch --branch [branchname]` after `clone`
-- After completion, open `dime.xcodeproj` using Xcode.
+- After completion, open `SmartBud.xcodeproj` using Xcode.
 - Please let all dependecies update automatically but we would recommend to run
   `File > Packages > Resolve Package Versions` to ensure, everything is updated.
 

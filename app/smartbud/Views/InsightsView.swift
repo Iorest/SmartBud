@@ -340,12 +340,7 @@ private struct InsightsDollarView: View {
     }
 
     private var formattedAmount: String {
-        let cents = showCents && amount < 100
-        if cents {
-            return String(format: "%.2f", amount)
-        } else {
-            return String(format: "%.0f", amount)
-        }
+        amount.formatted(.number.precision(.fractionLength(showCents && amount < 100 ? 2 : 0)))
     }
 
     var body: some View {

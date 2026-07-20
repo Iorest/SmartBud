@@ -2,7 +2,7 @@
 //  RecentTransactionsWidget.swift
 //  ExpenditureWidgetExtension
 //
-//  Created by Rafael Soh on 12/8/22.
+//  Created by Iorest on 12/8/22.
 //
 
 import SwiftUI
@@ -40,7 +40,7 @@ struct Provider: AppIntentTimelineProvider {
             TransactionModel.self,
             CategoryModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 

@@ -22,8 +22,8 @@ struct SettingsProView: View {
     @State private var isLoadingProducts: Bool = false
 
     private let productIDs: [String] = [
-        "com.rafaelsoh.smartbud.pro.monthly",
-        "com.rafaelsoh.smartbud.pro.yearly"
+        "com.iorest.smartbud.pro.monthly",
+        "com.iorest.smartbud.pro.yearly"
     ]
 
     private let features: [(icon: String, color: String, title: String, subtitle: String)] = [

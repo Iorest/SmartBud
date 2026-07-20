@@ -102,9 +102,9 @@ struct BarGraph: View {
 
     private func yAxisLabel(for value: Double) -> String {
         if value >= 1000 {
-            return String(format: "%.0f", value / 1000) + "k"
+            return value.formatted(.number.precision(.fractionLength(0))) + "k"
         }
-        return value < 10 ? String(format: "%.1f", value) : String(format: "%.0f", value)
+        return value.formatted(.number.precision(.fractionLength(value < 10 ? 1 : 0)))
     }
 
     private func labelOpacity(at index: Int) -> Double {

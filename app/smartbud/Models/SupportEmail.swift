@@ -2,7 +2,7 @@
 //  SupportEmail.swift
 //  Bonsai
 //
-//  Created by Rafael Soh on 8/7/22.
+//  Created by Iorest on 8/7/22.
 //
 
 import Foundation

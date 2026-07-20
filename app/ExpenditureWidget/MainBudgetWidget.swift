@@ -2,7 +2,7 @@
 //  MainBudgetWidget.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 12/1/23.
+//  Created by Iorest on 12/1/23.
 //
 
 import SwiftUI
@@ -35,7 +35,7 @@ struct MainBudgetWidgetProvider: TimelineProvider {
             MainBudgetModel.self,
             TransactionModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 

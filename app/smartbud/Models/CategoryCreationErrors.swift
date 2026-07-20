@@ -2,7 +2,7 @@
 //  CategoryCreationErrors.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 12/11/22.
+//  Created by Iorest on 12/11/22.
 //
 
 import Foundation

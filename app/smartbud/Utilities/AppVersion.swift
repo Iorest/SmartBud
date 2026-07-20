@@ -2,7 +2,7 @@
 //  AppVersion.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 25/8/22.
+//  Created by Iorest on 25/8/22.
 //
 
 import Foundation

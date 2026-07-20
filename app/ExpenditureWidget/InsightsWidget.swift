@@ -2,7 +2,7 @@
 //  InsightsWidget.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 14/8/22.
+//  Created by Iorest on 14/8/22.
 //
 
 import Foundation
@@ -31,7 +31,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     static let container: ModelContainer = {
         let schema = Schema([TransactionModel.self, CategoryModel.self])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 

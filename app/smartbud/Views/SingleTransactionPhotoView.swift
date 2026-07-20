@@ -2,7 +2,7 @@
 //  SingleTransactionPhotoView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 30/9/23.
+//  Created by Iorest on 30/9/23.
 //
 
 import Foundation

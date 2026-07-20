@@ -2,7 +2,7 @@
 //  InsightsSummaryBlock.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 19/11/23.
+//  Created by Iorest on 19/11/23.
 //
 
 import Foundation

@@ -2,7 +2,7 @@
 //  NewBudgetView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 15/7/23.
+//  Created by Iorest on 15/7/23.
 //
 
 import SwiftUI
@@ -44,6 +44,10 @@ struct BrandNewBudgetView: View {
 
     @State var showToast: Bool = false
     @State var toastMessage: String = String(localized: "Missing Category")
+
+    // sensory feedback triggers
+    @State private var errorHaptic = 0
+    @State private var lightHaptic = 0
 
     // stage one (ignore if editing), overall budget or category budget
     @State var categoryBudget: Bool = false
@@ -253,60 +257,61 @@ struct BrandNewBudgetView: View {
             if progress == 1 {
                 VStack {
                     VStack(alignment: .leading, spacing: 0) {
-                        HStack {
-                            Text("Overall Budget")
-                            Spacer()
-
-                            if !categoryBudget {
-                                Checkmark()
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(Color.PrimaryText)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
-//                        .font(.system(size: 20, weight: .medium, design: .rounded))
-                        .padding(8)
-                        .background {
-                            if !categoryBudget {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.SecondaryBackground)
-                                    .matchedGeometryEffect(id: "TAB1", in: animation)
-                            }
-                        }
-//                        .frame(height: 40)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
+                        Button {
                             withAnimation(.easeIn(duration: 0.15)) {
                                 categoryBudget = false
                             }
-                        }
+                        } label: {
+                            HStack {
+                                Text("Overall Budget")
+                                Spacer()
 
-                        HStack {
-                            Text("Category Budget")
-                            Spacer()
+                                if !categoryBudget {
+                                    Checkmark()
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundStyle(Color.PrimaryText)
+                            .font(.system(.title3, design: .rounded).weight(.medium))
+                            .padding(8)
+                            .background {
+                                if !categoryBudget {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.SecondaryBackground)
+                                        .matchedGeometryEffect(id: "TAB1", in: animation)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
 
-                            if categoryBudget {
-                                Checkmark()
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(Color.PrimaryText)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
-                        .padding(8)
-//                        .frame(height: 40)
-                        .background {
-                            if categoryBudget {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.SecondaryBackground)
-                                    .matchedGeometryEffect(id: "TAB1", in: animation)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
+                        Button {
                             withAnimation(.easeIn(duration: 0.15)) {
                                 categoryBudget = true
                             }
+                        } label: {
+                            HStack {
+                                Text("Category Budget")
+                                Spacer()
+
+                                if categoryBudget {
+                                    Checkmark()
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundStyle(Color.PrimaryText)
+                            .font(.system(.title3, design: .rounded).weight(.medium))
+                            .padding(8)
+                            .background {
+                                if categoryBudget {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.SecondaryBackground)
+                                        .matchedGeometryEffect(id: "TAB1", in: animation)
+                                }
+                            }
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
                     }
                     .modifier(PickerStyle(colorScheme: colorScheme))
 
@@ -323,7 +328,7 @@ struct BrandNewBudgetView: View {
                                 .foregroundStyle(Color.SubtitleText.opacity(0.7))
                                 .padding(.top, 20)
 
-                            Text("No remaining\ncategories.")
+                            Text(String(localized: "No remaining\ncategories."))
                                 .font(.system(.title3, design: .rounded).weight(.medium))
 //                                .font(.system(size: 21, weight: .medium, design: .rounded))
                                 .multilineTextAlignment(.center)
@@ -361,33 +366,33 @@ struct BrandNewBudgetView: View {
                 VStack {
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(BudgetTimeFrame.allCases, id: \.self) { time in
-                            HStack {
-                                Text(LocalizedStringKey(time.rawValue))
-                                Spacer()
-
-                                if time == budgetTimeFrame {
-                                    Checkmark()
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundStyle(Color.PrimaryText)
-                            .font(.system(.title3, design: .rounded).weight(.medium))
-//                            .font(.system(size: 20, weight: .medium, design: .rounded))
-                            .padding(8)
-//                            .frame(height: 40)
-                            .background {
-                                if time == budgetTimeFrame {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(Color.SecondaryBackground)
-                                        .matchedGeometryEffect(id: "TAB2", in: animation)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
+                            Button {
                                 withAnimation(.easeIn(duration: 0.15)) {
                                     budgetTimeFrame = time
                                 }
+                            } label: {
+                                HStack {
+                                    Text(LocalizedStringKey(time.rawValue))
+                                    Spacer()
+
+                                    if time == budgetTimeFrame {
+                                        Checkmark()
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundStyle(Color.PrimaryText)
+                                .font(.system(.title3, design: .rounded).weight(.medium))
+                                .padding(8)
+                                .background {
+                                    if time == budgetTimeFrame {
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color.SecondaryBackground)
+                                            .matchedGeometryEffect(id: "TAB2", in: animation)
+                                    }
+                                }
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     .modifier(PickerStyle(colorScheme: colorScheme))
@@ -404,10 +409,10 @@ struct BrandNewBudgetView: View {
                         ScrollView(showsIndicators: false) {
                             ScrollViewReader { value in
                                 VStack(alignment: .leading, spacing: 0) {
-                                    ForEach(weekdays, id: \.self) { day in
+                                    ForEach(Array(weekdays.enumerated()), id: \.element) { index, day in
                                         WeekdayPickerRow(
                                             day: day,
-                                            weekdays: weekdays,
+                                            weekdayIndex: index + 1,
                                             chosenDayWeek: $chosenDayWeek
                                         )
                                     }
@@ -424,36 +429,38 @@ struct BrandNewBudgetView: View {
                             ScrollViewReader { value in
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(1 ..< 29) { day in
-                                        HStack {
-                                            if Int(day) == 1 {
-                                                Text("Start of month")
-                                            } else {
-                                                Text(
-                                                    String(
-                                                        format: String(
-                                                            localized: "%@ of month"),
-                                                        getOrdinal(day))
-                                                )
-                                            }
-
-                                            Spacer()
-
-                                            if chosenDayMonth == day {
-                                                Checkmark()
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .foregroundStyle(Color.PrimaryText)
-                                        .font(.system(.title3, design: .rounded).weight(.medium))
-                                        .padding(8)
-                                        .background(dayRowBackground(isSelected: chosenDayMonth == day))
-                                        .contentShape(Rectangle())
-                                        .id(day)
-                                        .onTapGesture {
+                                        Button {
                                             withAnimation(.easeIn(duration: 0.15)) {
                                                 chosenDayMonth = day
                                             }
+                                        } label: {
+                                            HStack {
+                                                if Int(day) == 1 {
+                                                    Text("Start of month")
+                                                } else {
+                                                    Text(
+                                                        String(
+                                                            format: String(
+                                                                localized: "%@ of month"),
+                                                            getOrdinal(day))
+                                                    )
+                                                }
+
+                                                Spacer()
+
+                                                if chosenDayMonth == day {
+                                                    Checkmark()
+                                                }
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundStyle(Color.PrimaryText)
+                                            .font(.system(.title3, design: .rounded).weight(.medium))
+                                            .padding(8)
+                                            .background(dayRowBackground(isSelected: chosenDayMonth == day))
+                                            .contentShape(Rectangle())
                                         }
+                                        .buttonStyle(.plain)
+                                        .id(day)
                                     }
                                 }
                                 .onAppear {
@@ -503,11 +510,11 @@ struct BrandNewBudgetView: View {
                     if progress == 2 && selectedCategory == nil {
                         showToast = true
                         toastMessage = String(localized: "Missing Category")
-                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        errorHaptic &+= 1
                         return
                     }
 
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    lightHaptic &+= 1
 
                     withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                         if progress < 5 {
@@ -529,7 +536,7 @@ struct BrandNewBudgetView: View {
                         }
                     }
                 } label: {
-                    Text("Continue")
+                    Text(String(localized: "Continue"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
 //                        .font(.system(size: 19, weight: .semibold, design: .rounded))
 
@@ -658,6 +665,8 @@ struct BrandNewBudgetView: View {
                 }
             }
         }
+        .sensoryFeedback(.error, trigger: errorHaptic)
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 
     @ViewBuilder
@@ -669,13 +678,13 @@ struct BrandNewBudgetView: View {
     func submit() {
         let amount = padVM.price
         if amount == 0 {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            errorHaptic &+= 1
             showToast = true
             toastMessage = String(localized: "Missing Amount")
             return
         }
 
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        lightHaptic &+= 1
 
         let budgetType = getBudgetTypeInteger(budgetTimeFrame)
         let timeFrameInt: Int = {
@@ -942,37 +951,38 @@ struct RowProgressIndicator: View {
 
 private struct WeekdayPickerRow: View {
     let day: String
-    let weekdays: [String]
+    let weekdayIndex: Int
     @Binding var chosenDayWeek: Int
 
-    private var index: Int { (weekdays.firstIndex(of: day) ?? 0) + 1 }
-    private var isSelected: Bool { chosenDayWeek == index }
+    private var isSelected: Bool { chosenDayWeek == weekdayIndex }
 
     var body: some View {
-        HStack {
-            Text(LocalizedStringKey(day))
-            Spacer()
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.system(.callout, design: .rounded).weight(.medium))
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundStyle(Color.PrimaryText)
-        .font(.system(.title3, design: .rounded).weight(.medium))
-        .padding(8)
-        .background {
-            if isSelected {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.SecondaryBackground)
-            }
-        }
-        .id(index)
-        .contentShape(Rectangle())
-        .onTapGesture {
+        Button {
             withAnimation(.easeIn(duration: 0.15)) {
-                chosenDayWeek = index
+                chosenDayWeek = weekdayIndex
             }
+        } label: {
+            HStack {
+                Text(LocalizedStringKey(day))
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.system(.callout, design: .rounded).weight(.medium))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(Color.PrimaryText)
+            .font(.system(.title3, design: .rounded).weight(.medium))
+            .padding(8)
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.SecondaryBackground)
+                }
+            }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .id(weekdayIndex)
     }
 }

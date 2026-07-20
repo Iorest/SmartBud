@@ -2,7 +2,7 @@
 //  SettingsEraseView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/11/23.
+//  Created by Iorest on 5/11/23.
 //
 
 import Foundation
@@ -69,6 +69,7 @@ struct DeleteAllAlert: View {
 
   @GestureState var isDetectingLongPress = false
   @State var completedLongPress = false
+  @State private var heavyHaptic = 0
 
   var longPress: some Gesture {
     LongPressGesture(minimumDuration: 2)
@@ -143,8 +144,7 @@ struct DeleteAllAlert: View {
         )
         .onChange(of: completedLongPress) { _, _ in
           if completedLongPress {
-            let impactMed = UIImpactFeedbackGenerator(style: .heavy)
-            impactMed.impactOccurred()
+            heavyHaptic &+= 1
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
               settingsVM.eraseAllData()
@@ -153,6 +153,7 @@ struct DeleteAllAlert: View {
             }
           }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: heavyHaptic)
 
         Button {
           withAnimation(.easeOut(duration: 0.7)) {

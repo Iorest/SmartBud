@@ -29,8 +29,8 @@ final class DataRepository{
         // the locally-synced file.
         let config = ModelConfiguration(
             "MainModel",
-            groupContainer: .identifier("group.com.rafaelsoh.smartbud"),
-            cloudKitDatabase: .private("iCloud.com.rafaelsoh.smartbud")
+            groupContainer: .identifier("group.com.iorest.smartbud"),
+            cloudKitDatabase: .private("iCloud.com.iorest.smartbud")
         )
         do {
             container = try ModelContainer(

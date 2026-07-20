@@ -2,7 +2,7 @@
 //  BottomSheet.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 1/7/23.
+//  Created by Iorest on 1/7/23.
 //
 
 import SwiftUI

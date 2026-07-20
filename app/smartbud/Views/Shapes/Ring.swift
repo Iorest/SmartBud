@@ -2,7 +2,7 @@
 //  Ring.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 24/10/23.
+//  Created by Iorest on 24/10/23.
 //
 
 import Foundation

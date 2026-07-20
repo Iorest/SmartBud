@@ -2,7 +2,7 @@
 //  BudgetInsightsIntent.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 6/8/23.
+//  Created by Iorest on 6/8/23.
 //
 
 import AppIntents

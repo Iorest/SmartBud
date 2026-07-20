@@ -2,7 +2,7 @@
 //  SettingsCurrencyView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/11/23.
+//  Created by Iorest on 5/11/23.
 //
 
 import Foundation

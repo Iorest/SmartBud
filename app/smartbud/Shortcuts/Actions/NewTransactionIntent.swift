@@ -2,7 +2,7 @@
 //  NewTransactionIntent.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 23/7/23.
+//  Created by Iorest on 23/7/23.
 //
 
 import AppIntents

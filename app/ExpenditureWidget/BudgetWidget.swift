@@ -2,7 +2,7 @@
 //  BudgetWidget.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 17/8/22.
+//  Created by Iorest on 17/8/22.
 //
 
 import SwiftUI
@@ -34,7 +34,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             BudgetModel.self,
             CategoryModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 

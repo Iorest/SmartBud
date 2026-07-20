@@ -2,7 +2,7 @@
 //  Color.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 10/5/22.
+//  Created by Iorest on 10/5/22.
 //
 
 import Foundation

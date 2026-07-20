@@ -22,7 +22,7 @@ extension UserDefaults {
     /// Falls back to `.standard` when the suite is unavailable
     /// (e.g. unit tests, SwiftUI previews that lack the entitlement).
     nonisolated(unsafe) static let appGroup: UserDefaults = {
-        UserDefaults(suiteName: "group.com.rafaelsoh.smartbud") ?? .standard
+        UserDefaults(suiteName: "group.com.iorest.smartbud") ?? .standard
     }()
 }
 

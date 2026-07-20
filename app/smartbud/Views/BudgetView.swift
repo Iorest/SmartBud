@@ -2,7 +2,7 @@
 //  BudgetView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 20/5/22.
+//  Created by Iorest on 20/5/22.
 //
 
 import Foundation
@@ -393,10 +393,10 @@ struct MainBudgetView: View {
 
             HStack {
                 if totalSpent < 1000 && budgetAmount < 1000 {
-                    Text("\(totalSpent, specifier: "%.2f")")
+                    Text(totalSpent, format: .number.precision(.fractionLength(2)))
                         .frame(width: 60, alignment: .leading)
                     Spacer()
-                    Text("\(budgetAmount, specifier: "%.2f")")
+                    Text(budgetAmount, format: .number.precision(.fractionLength(2)))
                         .frame(width: 60, alignment: .trailing)
                 } else {
                     Text("\(Int(round(totalSpent)))")
@@ -420,13 +420,13 @@ struct MainBudgetView: View {
                 toEdit = budget
 
             } label: {
-                Label("Edit", systemImage: "pencil")
+                Label(String(localized: "Edit"), systemImage: "pencil")
             }
             Button {
                 toDelete = budget
 
             } label: {
-                Label("Delete", systemImage: "xmark.bin")
+                Label(String(localized: "Delete"), systemImage: "xmark.bin")
             }
         }
         .sheet(item: $toEdit, onDismiss: {
@@ -578,6 +578,9 @@ struct SingleBudgetView: View {
 
     @GestureState var isDragging = false
 
+    @State private var lightHaptic = 0
+    @State private var heavyHaptic = 0
+
     var body: some View {
         Group {
             if budgetRows {
@@ -643,12 +646,12 @@ struct SingleBudgetView: View {
                             toEdit = budget
 
                         } label: {
-                            Label("Edit", systemImage: "pencil")
+                            Label(String(localized: "Edit"), systemImage: "pencil")
                         }
                         Button {
                             toDelete = budget
                         } label: {
-                            Label("Delete", systemImage: "xmark.bin")
+                            Label(String(localized: "Delete"), systemImage: "xmark.bin")
                         }
                     }
                     .offset(x: offset)
@@ -656,12 +659,12 @@ struct SingleBudgetView: View {
                 .padding(.horizontal, 30)
                 .onChange(of: deletePopup) { _, _ in
                     if deletePopup {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        lightHaptic &+= 1
                     }
                 }
                 .onChange(of: deleteConfirm) { _, _ in
                     if deleteConfirm {
-                        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                        heavyHaptic &+= 1
                     }
                 }
                 .animation(.default, value: deletePopup)
@@ -794,16 +797,18 @@ struct SingleBudgetView: View {
                         toEdit = budget
 
                     } label: {
-                        Label("Edit", systemImage: "pencil")
+                        Label(String(localized: "Edit"), systemImage: "pencil")
                     }
                     Button {
                         toDelete = budget
                     } label: {
-                        Label("Delete", systemImage: "xmark.bin")
+                        Label(String(localized: "Delete"), systemImage: "xmark.bin")
                     }
                 }
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
+        .sensoryFeedback(.impact(weight: .heavy), trigger: heavyHaptic)
     }
 
     init(budget: BudgetModel, toDelete: Binding<BudgetModel?>?, toEdit: Binding<BudgetModel?>?, budgetRows: Bool) {
@@ -883,7 +888,7 @@ struct BudgetDollarView: View {
                 .font(.system(dynamicTypeSizes.symbol, design: .rounded).weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.SubtitleText)
 
-            Text("\(amount, specifier: showCents && amount < 100 ? "%.2f" : "%.0f")")
+            Text(amount, format: .number.precision(.fractionLength(showCents && amount < 100 ? 2 : 0)))
                 .font(.system(dynamicTypeSizes.amount, design: .rounded).weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.PrimaryText)
         }
@@ -907,7 +912,7 @@ struct DetailedBudgetDollarView: View {
                 .font(.system(.title2, design: .rounded).weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
 
-            Text("\(amount, specifier: showCents && amount < 100 ? "%.2f" : "%.0f")")
+            Text(amount, format: .number.precision(.fractionLength(showCents && amount < 100 ? 2 : 0)))
                 .font(.system(.largeTitle, design: .rounded).weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
         }
@@ -933,7 +938,7 @@ struct DetailedBudgetDifferenceDollarView: View {
                 .font(.system(.title2, design: .rounded).weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.SubtitleText)
 
-            Text("\(amount, specifier: showCents && amount < 100 ? "%.2f" : "%.0f")")
+            Text(amount, format: .number.precision(.fractionLength(showCents && amount < 100 ? 2 : 0)))
                 .font(.system(.largeTitle, design: .rounded).weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.PrimaryText)
         }
@@ -1131,7 +1136,7 @@ struct DetailedBudgetView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
-                        Text("Back")
+                        Text(String(localized: "Back"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
@@ -1199,7 +1204,7 @@ struct DetailedMainBudgetView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
-                        Text("Back")
+                        Text(String(localized: "Back"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
@@ -1508,9 +1513,9 @@ struct TimeBudgetView: View {
                 .frame(height: 28)
 
                 HStack {
-                    Text("\(currencySymbol)\(totalSpent, specifier: "%.2f")")
+                    Text("\(currencySymbol)\(totalSpent.formatted(.number.precision(.fractionLength(2))))")
                     Spacer()
-                    Text("\(currencySymbol)\(budgetAmount, specifier: "%.2f")")
+                    Text("\(currencySymbol)\(budgetAmount.formatted(.number.precision(.fractionLength(2))))")
                 }
                 .frame(maxWidth: .infinity)
                 .font(.system(.caption, design: .rounded))
@@ -1680,6 +1685,7 @@ struct FilteredBudgetView: View {
                 ForEach(groupedByDay, id: \.day) { entry in
                     let total = dayTotal(entry.transactions)
                     let dateText = dateConverter(date: entry.day).uppercased()
+                    let totalString = abs(total).formatted(.number.precision(.fractionLength(2)))
 
                     VStack(spacing: 0) {
                         VStack(spacing: 4) {
@@ -1694,7 +1700,7 @@ struct FilteredBudgetView: View {
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, String(format: "%.2f", abs(total)), dateConverterAccessibilityLabel(date: entry.day)))
+                            .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
 
                             Line()
                                 .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -2025,9 +2031,9 @@ struct TimeMainBudgetView: View {
                 .frame(height: 28)
 
                 HStack {
-                    Text("\(currencySymbol)\(totalSpent, specifier: "%.2f")")
+                    Text("\(currencySymbol)\(totalSpent.formatted(.number.precision(.fractionLength(2))))")
                     Spacer()
-                    Text("\(currencySymbol)\(budgetAmount, specifier: "%.2f")")
+                    Text("\(currencySymbol)\(budgetAmount.formatted(.number.precision(.fractionLength(2))))")
                 }
                 .frame(maxWidth: .infinity)
                 .font(.system(.caption, design: .rounded))

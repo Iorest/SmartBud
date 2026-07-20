@@ -2,7 +2,7 @@
 //  TransactionView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 14/5/22.
+//  Created by Iorest on 14/5/22.
 //
 
 import Foundation
@@ -53,6 +53,11 @@ struct TransactionView: View {
     @State var showToast = false
     @State var toastTitle = ""
     @State var toastImage = ""
+
+    // sensory feedback triggers
+    @State private var errorHaptic = 0
+    @State private var successHaptic = 0
+    @State private var lightHaptic = 0
 
     // shaking category error
     @State var categoryButtonTextColor = Color.SubtitleText
@@ -925,7 +930,7 @@ struct TransactionView: View {
             }
         }
         .onChange(of: income) { _, _ in
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            lightHaptic &+= 1
             category = nil
         }
         .onChange(of: numberEntryType) { _, new in
@@ -981,6 +986,9 @@ struct TransactionView: View {
                 swipingOffset = capsuleWidth
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
+        .sensoryFeedback(.error, trigger: errorHaptic)
+        .sensoryFeedback(.success, trigger: successHaptic)
     }
 
     func isDateToday(date: Date) -> Bool {
@@ -1043,7 +1051,6 @@ struct TransactionView: View {
     }
 
     func submit() {
-        let generator = UINotificationFeedbackGenerator()
         let amount = padVM.price
 
         if amount == 0 && category == nil {
@@ -1052,14 +1059,14 @@ struct TransactionView: View {
             showToast = true
             toggleFieldColors()
 
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
 
             return
         } else if amount == 0 {
             toastImage = "centsign.circle"
             toastTitle = String(localized: "Missing Amount")
             showToast = true
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
             return
         } else if category == nil {
             toastImage = "tray"
@@ -1068,11 +1075,11 @@ struct TransactionView: View {
 
             toggleFieldColors()
 
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
             return
         }
 
-        generator.notificationOccurred(.success)
+        successHaptic &+= 1
 
         if let editedTransaction = toEdit {
             let trimmedNote = note.trimmingCharacters(in: .whitespaces)
@@ -1271,7 +1278,7 @@ struct RecurringPickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
-            ForEach(stringArray, id: \.self) { string in
+            ForEach(Array(stringArray.enumerated()), id: \.element) { index, string in
                 HStack {
                     Text(LocalizedStringKey(string))
                         .font(.system(.body, design: .rounded).weight(.medium))
@@ -1279,7 +1286,7 @@ struct RecurringPickerView: View {
                         .lineLimit(1)
                     Spacer()
 
-                    if repeatType == (stringArray.firstIndex(of: string) ?? 0) && repeatCoefficient == 1 {
+                    if repeatType == index && repeatCoefficient == 1 {
                         Image(systemName: "checkmark")
                             .font(.system(.footnote, design: .rounded).weight(.medium))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -1290,7 +1297,7 @@ struct RecurringPickerView: View {
                 //                .font(.system(size: 18, weight: .medium, design: .rounded))
                 .padding(5)
                 .background {
-                    if repeatType == (stringArray.firstIndex(of: string) ?? 0) && repeatCoefficient == 1 {
+                    if repeatType == index && repeatCoefficient == 1 {
                         RoundedRectangle(cornerRadius: 6)
                             .fill(
                                 darkMode
@@ -1301,11 +1308,11 @@ struct RecurringPickerView: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    if repeatType == (stringArray.firstIndex(of: string) ?? 0) && repeatCoefficient == 1 {
+                    if repeatType == index && repeatCoefficient == 1 {
                         showMenu = false
                     } else {
                         withAnimation(.easeIn(duration: 0.15)) {
-                            repeatType = (stringArray.firstIndex(of: string) ?? 0)
+                            repeatType = index
                             repeatCoefficient = 1
                         }
 
@@ -1406,6 +1413,8 @@ struct CustomRecurringView: View {
 
     @Environment(\.dismiss) var dismiss
 
+    @State private var lightHaptic = 0
+
     @State var holdingType = 0
     @State var holdingCoefficient = 0
 
@@ -1438,7 +1447,7 @@ struct CustomRecurringView: View {
                     repeatType = holdingType
                     repeatCoefficient = holdingCoefficient
 
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    lightHaptic &+= 1
 
                     dismiss()
 
@@ -1558,6 +1567,7 @@ struct CustomRecurringView: View {
             holdingType = repeatType
             holdingCoefficient = repeatCoefficient
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 }
 

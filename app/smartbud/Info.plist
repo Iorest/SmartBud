@@ -8,7 +8,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.rafaelsoh.smartbud</string>
+			<string>com.iorest.smartbud</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>smartbud</string>

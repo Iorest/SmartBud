@@ -2,7 +2,7 @@
 //  TemplateTransactionView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 4/9/23.
+//  Created by Iorest on 4/9/23.
 //
 
 import Foundation
@@ -81,6 +81,10 @@ struct TemplateTransactionView: View {
     @State var toastTitle = ""
     @State var toastImage = ""
 
+    // sensory feedback triggers
+    @State private var errorHaptic = 0
+    @State private var successHaptic = 0
+
     @AppStorage("firstTransactionViewLaunch", store: .appGroup) var firstLaunch: Bool = true
 
     // edit mode
@@ -112,7 +116,7 @@ struct TemplateTransactionView: View {
         if numberEntryType == 2 {
             amountText = amount
         } else {
-            amountText = String(format: "%.2f", transactionValue)
+            amountText = transactionValue.formatted(.number.precision(.fractionLength(2)))
         }
 
         if (amountText.widthOfRoundedString(size: 32, weight: .regular) + currencySymbol.widthOfRoundedString(size: 20, weight: .light) + 4) > size {
@@ -308,7 +312,7 @@ struct TemplateTransactionView: View {
                                 .font(.system(size: downsize.small, weight: .light, design: .rounded))
                                 .foregroundStyle(Color.SubtitleText)
                                 .baselineOffset(getDollarOffset(big: downsize.big, small: downsize.small))
-                            Text("\(transactionValue, specifier: "%.2f")")
+                            Text(transactionValue, format: .number.precision(.fractionLength(2)))
                                 .font(.system(size: downsize.big, weight: .regular, design: .rounded))
                                 .foregroundStyle(Color.PrimaryText)
                         }
@@ -465,7 +469,7 @@ struct TemplateTransactionView: View {
                             dismiss()
 
                         } label: {
-                            Text("Delete")
+                            Text(String(localized: "Delete"))
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .frame(height: 45)
@@ -481,7 +485,7 @@ struct TemplateTransactionView: View {
                             }
 
                         } label: {
-                            Text("Cancel")
+                            Text(String(localized: "Cancel"))
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color.PrimaryText.opacity(0.9))
                                 .frame(height: 45)
@@ -536,7 +540,7 @@ struct TemplateTransactionView: View {
             categoryVM.load()
             DispatchQueue.main.async {
                 if let transaction = toEdit {
-                    let string = String(format: "%.2f", transaction.wrappedAmount)
+                    let string = transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))
 
                     var stringArray = string.compactMap { String($0) }
 
@@ -560,6 +564,8 @@ struct TemplateTransactionView: View {
                 CustomRecurringView(repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker)
                     .presentationDetents([.height(230)])
         }
+        .sensoryFeedback(.error, trigger: errorHaptic)
+        .sensoryFeedback(.success, trigger: successHaptic)
     }
 
     @ViewBuilder
@@ -623,30 +629,28 @@ struct TemplateTransactionView: View {
     }
 
     func submit() {
-        let generator = UINotificationFeedbackGenerator()
-
         if transactionValue == 0 && category == nil {
             toastImage = "questionmark.app"
             toastTitle = "Incomplete Entry"
             showToast = true
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
 
             return
         } else if transactionValue == 0 {
             toastImage = "centsign.circle"
             toastTitle = "Missing Amount"
             showToast = true
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
             return
         } else if category == nil {
             toastImage = "tray"
             toastTitle = "Missing Category"
             showToast = true
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
             return
         }
 
-        generator.notificationOccurred(.success)
+        successHaptic &+= 1
 
         if let editedTransaction = toEdit {
             if note.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
@@ -1028,9 +1032,9 @@ struct SingleTemplateButton: View {
         let size: CGFloat = 80
 
         if showCents && transaction.amount < 100 {
-            amountText = String(format: "%.2f", transaction.amount)
+            amountText = transaction.amount.formatted(.number.precision(.fractionLength(2)))
         } else {
-            amountText = String(format: "%.0f", transaction.amount)
+            amountText = transaction.amount.formatted(.number.precision(.fractionLength(0)))
         }
 
         if amountText.widthOfRoundedString(size: 16, weight: .semibold) + currencySymbol.widthOfRoundedString(size: 13, weight: .medium) + 2 > size {

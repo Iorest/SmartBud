@@ -2,7 +2,7 @@
 //  LogView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 19/5/22.
+//  Created by Iorest on 19/5/22.
 //
 
 import Foundation
@@ -489,7 +489,7 @@ struct FilteredSearchView: View {
         VStack {
             if searchQuery != "" && transactions.count == 0 {
                 VStack(spacing: 2) {
-                    Text("📭️")
+                    Text(String(localized: "📭️"))
                         .font(.system(size: 50))
                         .padding(.bottom, 15)
                     Text(String(localized: "No entries found."))
@@ -558,32 +558,7 @@ struct TimePickerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             ForEach(timeframes.indices, id: \.self) { index in
-                HStack {
-                    Text(LocalizedStringKey(timeframes[index]))
-                        .font(.system(.body, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-
-                    Spacer()
-
-                    if holdingTimeframe == index + 1 {
-                        Image(systemName: "checkmark")
-                            .font(.system(.footnote, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-//                            .font(.system(size: 14, weight: .medium))
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-//                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .padding(5)
-                .background {
-                    if holdingTimeframe == index + 1 {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
-                            .matchedGeometryEffect(id: "TAB", in: animation)
-                    }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
+                Button {
                     if holdingTimeframe == index + 1 {
                         showMenu = false
                     } else {
@@ -597,7 +572,34 @@ struct TimePickerView: View {
                             showMenu = false
                         }
                     }
+                } label: {
+                    HStack {
+                        Text(LocalizedStringKey(timeframes[index]))
+                            .font(.system(.body, design: .rounded).weight(.medium))
+                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+
+                        Spacer()
+
+                        if holdingTimeframe == index + 1 {
+                            Image(systemName: "checkmark")
+                                .font(.system(.footnote, design: .rounded).weight(.medium))
+                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+//                            .font(.system(size: 14, weight: .medium))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+//                .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .padding(5)
+                    .background {
+                        if holdingTimeframe == index + 1 {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
+                                .matchedGeometryEffect(id: "TAB", in: animation)
+                        }
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .accessibilityElement(children: .ignore)
             }
         }
@@ -630,37 +632,7 @@ struct FilterPickerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             ForEach(FilterType.allCases, id: \.self) { filter in
-                HStack {
-                    Image(systemName: FilterType.imageDictionary[filter] ?? "")
-//                        .font(.system(size: 16))
-                        .font(.system(.callout, design: .rounded).weight(.regular))
-                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                        .frame(width: 20)
-                    Text(LocalizedStringKey(filter.rawValue))
-//                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .font(.system(.body, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                        .lineLimit(1)
-                    Spacer()
-
-                    if filterType == filter {
-                        Image(systemName: "checkmark")
-                            .font(.system(.footnote, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-//                            .font(.system(size: 14, weight: .medium))
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(5)
-                .background {
-                    if filterType == filter {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
-                            .matchedGeometryEffect(id: "TAB", in: animation)
-                    }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
+                Button {
                     if filterType == filter {
                         showMenu = false
                     } else {
@@ -672,7 +644,39 @@ struct FilterPickerView: View {
                             showMenu = false
                         }
                     }
+                } label: {
+                    HStack {
+                        Image(systemName: FilterType.imageDictionary[filter] ?? "")
+//                        .font(.system(size: 16))
+                            .font(.system(.callout, design: .rounded).weight(.regular))
+                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            .frame(width: 20)
+                        Text(LocalizedStringKey(filter.rawValue))
+//                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                            .font(.system(.body, design: .rounded).weight(.medium))
+                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            .lineLimit(1)
+                        Spacer()
+
+                        if filterType == filter {
+                            Image(systemName: "checkmark")
+                                .font(.system(.footnote, design: .rounded).weight(.medium))
+                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+//                            .font(.system(size: 14, weight: .medium))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(5)
+                    .background {
+                        if filterType == filter {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
+                                .matchedGeometryEffect(id: "TAB", in: animation)
+                        }
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .accessibilityElement(children: .ignore)
             }
         }
@@ -774,6 +778,7 @@ struct ListView: View {
             ForEach(groupedByDay, id: \.day) { day in
                 let filtered = filterOutDupes(dayTransactions: day.transactions)
                 let dateText = dateConverter(date: day.day).uppercased()
+                let totalString = filtered.total.formatted(.number.precision(.fractionLength(2)))
 
                 VStack(spacing: 0) {
                     VStack(spacing: 4) {
@@ -789,7 +794,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, String(format: "%.2f", filtered.total), dateConverterAccessibilityLabel(date: day.day)))
+                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: day.day)))
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -1009,6 +1014,9 @@ struct SingleTransactionView: View {
 
     @GestureState var isDragging = false
 
+    @State private var lightHaptic = 0
+    @State private var mediumHaptic = 0
+
     var imageSize: Double {
         let scale = min(1.5, 1 + (abs(offset + 40) / 100))
         return scale * 10 as Double
@@ -1030,6 +1038,10 @@ struct SingleTransactionView: View {
         }
 
         return numberFormatter.string(from: NSNumber(value: transaction.amount)) ?? "$0"
+    }
+
+    var transactionAmountAccessibilityString: String {
+        transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))
     }
 
     var body: some View {
@@ -1135,16 +1147,16 @@ struct SingleTransactionView: View {
             }
             .offset(x: offset)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(format: String(localized: "%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, String(format: "%.2f", transaction.wrappedAmount), transaction.category?.wrappedName ?? String(localized: "Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
+            .accessibilityLabel(String(format: String(localized: "%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, transactionAmountAccessibilityString, transaction.category?.wrappedName ?? String(localized: "Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
         }
         .onChange(of: deletePopup) { _, _ in
             if deletePopup {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                lightHaptic &+= 1
             }
         }
         .onChange(of: deleteConfirm) { _, _ in
             if deleteConfirm {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                mediumHaptic &+= 1
             }
         }
         .animation(.easeInOut, value: deletePopup)
@@ -1220,6 +1232,8 @@ struct SingleTransactionView: View {
 //                }
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
+        .sensoryFeedback(.impact(weight: .medium), trigger: mediumHaptic)
     }
 
     func getSubtitle() -> String {
@@ -1846,7 +1860,7 @@ struct WeekStepperView: View {
             return Date.now
         } else {
             var calendar = Calendar(identifier: .gregorian)
-            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday") ?? 0
+            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
             calendar.minimumDaysInFirstWeek = 4
 
             let date = transactions[0].day ?? Date.now
@@ -1909,7 +1923,7 @@ struct WeekStepperView: View {
         .onAppear {
             var calendar = Calendar(identifier: .gregorian)
 
-            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday") ?? 0
+            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
             calendar.minimumDaysInFirstWeek = 4
 
             let date = transactionsReversed[0].day ?? Date.now

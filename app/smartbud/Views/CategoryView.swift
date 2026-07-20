@@ -2,7 +2,7 @@
 //  CategoryView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 10/5/22.
+//  Created by Iorest on 10/5/22.
 //
 
 import CoreHaptics
@@ -39,51 +39,55 @@ struct CategoryView: View {
 
             HStack {
                 HStack(spacing: 0) {
-                    Text(String(localized: "Expense"))
-                        .font(.system(.body, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                        .padding(6)
-                        .padding(.horizontal, 8)
-                        .background {
-                            if income == false {
-                                Capsule()
-                                    .fill(Color.SecondaryBackground)
-                                    .matchedGeometryEffect(id: "TAB1", in: animation)
+                    Button {
+                        DispatchQueue.main.async {
+                            withAnimation(.easeIn(duration: 0.15)) {
+                                income = false
                             }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            DispatchQueue.main.async {
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    income = false
+                    } label: {
+                        Text(String(localized: "Expense"))
+                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
+                            .padding(6)
+                            .padding(.horizontal, 8)
+                            .background {
+                                if income == false {
+                                    Capsule()
+                                        .fill(Color.SecondaryBackground)
+                                        .matchedGeometryEffect(id: "TAB1", in: animation)
                                 }
                             }
-                        }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
 
-                    Text(String(localized: "Income"))
-                        .font(.system(.body, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                        .padding(6)
-                        .padding(.horizontal, 8)
-                        .background {
-                            if income == true {
-                                Capsule()
-                                    .fill(Color.SecondaryBackground)
-                                    .matchedGeometryEffect(id: "TAB1", in: animation)
+                    Button {
+                        DispatchQueue.main.async {
+                            withAnimation(.easeIn(duration: 0.15)) {
+                                income = true
                             }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            DispatchQueue.main.async {
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    income = true
+                    } label: {
+                        Text(String(localized: "Income"))
+                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
+                            .padding(6)
+                            .padding(.horizontal, 8)
+                            .background {
+                                if income == true {
+                                    Capsule()
+                                        .fill(Color.SecondaryBackground)
+                                        .matchedGeometryEffect(id: "TAB1", in: animation)
                                 }
                             }
-                        }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(3)
                 .layoutPriority(1)
@@ -91,25 +95,7 @@ struct CategoryView: View {
 
                 Spacer()
 
-                HStack(spacing: 3) {
-                    Image(systemName: "plus")
-                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
-
-                    Text(String(localized: "New"))
-                        .font(.system(.body, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .lineLimit(1)
-                }
-                .foregroundStyle(Color.PrimaryText)
-                .padding(6)
-                .padding(.horizontal, 4.5)
-                .background(Color.SecondaryBackground, in: Capsule())
-                .opacity(disabled ? 0.5 : 1)
-                .contentShape(Rectangle())
-                .onTapGesture {
+                Button {
                     if disabled {
                         showToast = true
                         toastImage = "exclamationmark.triangle.fill"
@@ -118,7 +104,28 @@ struct CategoryView: View {
                     } else {
                         newCategory = true
                     }
+                } label: {
+                    HStack(spacing: 3) {
+                        Image(systemName: "plus")
+                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
+
+                        Text(String(localized: "New"))
+                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(Color.PrimaryText)
+                    .padding(6)
+                    .padding(.horizontal, 4.5)
+                    .background(Color.SecondaryBackground, in: Capsule())
+                    .opacity(disabled ? 0.5 : 1)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .disabled(disabled)
             }
             .padding(25)
         }
@@ -221,79 +228,91 @@ struct CategoryListView: View {
                     HStack(spacing: 8) {
                         if categories.count > 1 {
                             if isEditing {
-                                Circle()
-                                    .fill(Color.IncomeGreen.opacity(0.23))
-                                    .frame(width: 33, height: 33)
-                                    .overlay {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundStyle(Color.IncomeGreen)
-                                    }
-                                    .onTapGesture {
-                                        withAnimation {
-                                            isEditing.toggle()
+                                                .foregroundStyle(Color.IncomeGreen)
                                         }
-                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String(localized: "Done"))
                             } else {
-                                Circle()
-                                    .fill(Color.SecondaryBackground)
-                                    .frame(width: 33, height: 33)
-                                    .overlay {
-                                        Image(systemName: "arrow.up.arrow.down")
-                                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                            .foregroundStyle(Color.SubtitleText)
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
                                     }
-                                    .onTapGesture {
-                                        withAnimation {
-                                            isEditing.toggle()
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                .foregroundStyle(Color.SubtitleText)
                                         }
-                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String(localized: "Reorder categories"))
                             }
                         }
 
-                        Circle()
-                            .fill(Color.SecondaryBackground)
-                            .frame(width: 33, height: 33)
-                            .overlay {
-                                Image(systemName: showSuggestions ? "eye.slash" : "eye")
-                                    .font(.system(.callout, design: .rounded).weight(.semibold))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                    .foregroundStyle(Color.SubtitleText)
-                                    .offset(y: 0.8)
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
                             }
-                            .onTapGesture {
-                                withAnimation {
-                                    showSuggestions.toggle()
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
                                 }
-                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String(localized: "Hide suggestions") : String(localized: "Show suggestions"))
 
                         Spacer()
 
-                        Circle()
-                            .fill(!allCategories.isEmpty ? Color.IncomeGreen.opacity(0.23) : Color.clear)
-                            .frame(width: 33, height: 33)
-                            .overlay {
-                                ZStack {
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(.callout, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
+                        Button {
+                            if allCategories.count > 0 {
+                                dismiss()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(!allCategories.isEmpty ? Color.IncomeGreen.opacity(0.23) : Color.clear)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    ZStack {
+                                        Image(systemName: "arrow.right")
+                                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
 
-                                    if allCategories.count == 0 {
-                                        Circle()
-                                            .stroke(Color.Outline.opacity(0.4), lineWidth: 1.3)
-                                            .frame(width: 33, height: 33)
+                                        if allCategories.count == 0 {
+                                            Circle()
+                                                .stroke(Color.Outline.opacity(0.4), lineWidth: 1.3)
+                                                .frame(width: 33, height: 33)
+                                        }
                                     }
                                 }
-                            }
-                            .onTapGesture {
-                                if allCategories.count > 0 {
-                                    dismiss()
-                                }
-                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String(localized: "Continue"))
                     }
                     .frame(height: 35)
                     .frame(maxWidth: .infinity)
@@ -308,88 +327,103 @@ struct CategoryListView: View {
                 } else {
                     HStack(spacing: 8) {
                         if mode == .settings {
-                            Circle()
-                                .fill(Color.SecondaryBackground)
-                                .frame(width: 33, height: 33)
-                                .overlay {
-                                    Image(systemName: "chevron.left")
-                                        .font(.system(.body, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundStyle(Color.SubtitleText)
-                                        .offset(y: 0.8)
-                                }
-                                .onTapGesture {
-                                    dismiss()
-                                }
-                        } else {
-                            Circle()
-                                .fill(Color.SecondaryBackground)
-                                .frame(width: 33, height: 33)
-                                .overlay {
-                                    Image(systemName: "chevron.down")
-                                        .font(.system(.body, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        .foregroundStyle(Color.SubtitleText)
-                                        .offset(y: 0.8)
-                                }
-                                .onTapGesture {
-                                    dismiss()
-                                }
-                        }
-
-                        Spacer()
-
-                        Circle()
-                            .fill(Color.SecondaryBackground)
-                            .frame(width: 33, height: 33)
-                            .overlay {
-                                Image(systemName: showSuggestions ? "eye.slash" : "eye")
-                                    .font(.system(.callout, design: .rounded).weight(.semibold))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundStyle(Color.SubtitleText)
-                                    .offset(y: 0.8)
-                            }
-                            .onTapGesture {
-                                withAnimation {
-                                    showSuggestions.toggle()
-                                }
-                            }
-
-                        if categories.count > 1 {
-                            if isEditing {
-                                Circle()
-                                    .fill(Color.IncomeGreen.opacity(0.23))
-                                    .frame(width: 33, height: 33)
-                                    .overlay {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundStyle(Color.IncomeGreen)
-                                    }
-                                    .onTapGesture {
-                                        withAnimation {
-                                            isEditing.toggle()
-                                        }
-                                    }
-                            } else {
+                            Button {
+                                dismiss()
+                            } label: {
                                 Circle()
                                     .fill(Color.SecondaryBackground)
                                     .frame(width: 33, height: 33)
                                     .overlay {
-                                        Image(systemName: "arrow.up.arrow.down")
-                                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        Image(systemName: "chevron.left")
+                                            .font(.system(.body, design: .rounded).weight(.semibold))
                                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                            .font(.system(size: 16, weight: .semibold))
+//                                        .font(.system(size: 18, weight: .semibold))
                                             .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
                                     }
-                                    .onTapGesture {
-                                        withAnimation {
-                                            isEditing.toggle()
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String(localized: "Back"))
+                        } else {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Circle()
+                                    .fill(Color.SecondaryBackground)
+                                    .frame(width: 33, height: 33)
+                                    .overlay {
+                                        Image(systemName: "chevron.down")
+                                            .font(.system(.body, design: .rounded).weight(.semibold))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String(localized: "Close"))
+                        }
+
+                        Spacer()
+
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                    .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String(localized: "Hide suggestions") : String(localized: "Show suggestions"))
+
+                        if categories.count > 1 {
+                            if isEditing {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(Color.IncomeGreen)
                                         }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String(localized: "Done"))
+                            } else {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
                                     }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(Color.SubtitleText)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String(localized: "Reorder categories"))
                             }
                         }
                     }
@@ -462,6 +496,7 @@ struct CategoryListView: View {
                                     .onTapGesture {
                                         toEdit = category
                                     }
+                                    .accessibilityAddTraits(.isButton)
                                     .swipeActions(edge: .trailing) {
                                         Button {
                                             toDelete = category
@@ -512,6 +547,7 @@ struct CategoryListView: View {
                     .onTapGesture {
                         deleteMode = false
                     }
+                    .accessibilityAddTraits(.isButton)
 
                 VStack(alignment: .leading, spacing: 1.5) {
                     let deleteName = toDelete?.wrappedName ?? ""
@@ -674,6 +710,10 @@ struct NewCategoryAlert: View {
     @State var showNativePicker: Bool = false
     @State var customSelectedColor = Color.white
 
+    // haptic triggers (used to scope the modifier chain length)
+    @State private var errorHaptic: Int = 0
+    @State private var successHaptic: Int = 0
+
     var body: some View {
         VStack {
             VStack {
@@ -712,51 +752,55 @@ struct NewCategoryAlert: View {
                                 .padding(.top, 4)
                         } else {
                             HStack(spacing: 0) {
-                                Text(String(localized: "Expense"))
-                                    .font(.system(.callout, design: .rounded).weight(.semibold))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                                    .padding(5)
-                                    .padding(.horizontal, 7)
-                                    .background {
-                                        if income == false {
-                                            Capsule()
-                                                .fill(Color.SecondaryBackground)
-                                                .matchedGeometryEffect(id: "TAB1", in: animation)
+                                Button {
+                                    DispatchQueue.main.async {
+                                        withAnimation(.easeIn(duration: 0.15)) {
+                                            income = false
                                         }
                                     }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        DispatchQueue.main.async {
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                income = false
+                                } label: {
+                                    Text(String(localized: "Expense"))
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
+                                        .padding(5)
+                                        .padding(.horizontal, 7)
+                                        .background {
+                                            if income == false {
+                                                Capsule()
+                                                    .fill(Color.SecondaryBackground)
+                                                    .matchedGeometryEffect(id: "TAB1", in: animation)
                                             }
                                         }
-                                    }
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
 
-                                Text(String(localized: "Income"))
-                                    .font(.system(.callout, design: .rounded).weight(.semibold))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                                    .padding(5)
-                                    .padding(.horizontal, 7)
-                                    .background {
-                                        if income == true {
-                                            Capsule()
-                                                .fill(Color.SecondaryBackground)
-                                                .matchedGeometryEffect(id: "TAB1", in: animation)
+                                Button {
+                                    DispatchQueue.main.async {
+                                        withAnimation(.easeIn(duration: 0.15)) {
+                                            income = true
                                         }
                                     }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        DispatchQueue.main.async {
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                income = true
+                                } label: {
+                                    Text(String(localized: "Income"))
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
+                                        .padding(5)
+                                        .padding(.horizontal, 7)
+                                        .background {
+                                            if income == true {
+                                                Capsule()
+                                                    .fill(Color.SecondaryBackground)
+                                                    .matchedGeometryEffect(id: "TAB1", in: animation)
                                             }
                                         }
-                                    }
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
                             }
                             .padding(3)
                             .background(Capsule().fill(Color.PrimaryBackground).shadow(color: systemColorScheme == .light ? Color.Outline : Color.clear, radius: 6))
@@ -890,7 +934,7 @@ struct NewCategoryAlert: View {
             if !income {
                 expenseCategories.forEach { category in
                     if availableColours.contains(category.wrappedColour) {
-                        availableColours.remove(at: availableColours.firstIndex(of: category.wrappedColour) ?? 0)
+                        availableColours.removeAll { $0 == category.wrappedColour }
                     }
                 }
 
@@ -901,6 +945,7 @@ struct NewCategoryAlert: View {
                 }
             }
         }
+        .modifier(ErrorSuccessHaptics(error: errorHaptic, success: successHaptic))
     }
 
     func verification() {
@@ -909,8 +954,7 @@ struct NewCategoryAlert: View {
         outcome = results.error
 
         if outcome != .none {
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
 
             switch outcome {
             case .incomplete:
@@ -949,8 +993,7 @@ struct NewCategoryAlert: View {
         } else {
             toastTitle = String(format: String(localized: "Added %@"), newName)
 
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
+            successHaptic &+= 1
 
             if income {
                 _ = categoryVM.create(name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: "IncomeGreen", income: true, order: results.order)
@@ -966,7 +1009,7 @@ struct NewCategoryAlert: View {
                 availableColours = Color.colorArray
                 expenseCategories.forEach { category in
                     if availableColours.contains(category.wrappedColour) {
-                        availableColours.remove(at: availableColours.firstIndex(of: category.wrappedColour) ?? 0)
+                        availableColours.removeAll { $0 == category.wrappedColour }
                     }
                 }
 
@@ -979,7 +1022,6 @@ struct NewCategoryAlert: View {
 
             if budgetMode {
                 dismiss()
-                return
             } else {
                 focusedField = .emoji
                 toastImage = "checkmark.circle.fill"
@@ -988,7 +1030,6 @@ struct NewCategoryAlert: View {
             }
         }
     }
-
 
     init(income: Binding<Bool>, bottomSpacers: Bool, budgetMode: Bool = false) {
         _income = income
@@ -1046,6 +1087,10 @@ struct EditCategoryAlert: View {
 
     @State var showNativePicker: Bool = false
     @State var customSelectedColor = Color.white
+
+    // haptic triggers (used to scope the modifier chain length)
+    @State private var errorHaptic: Int = 0
+    @State private var successHaptic: Int = 0
 
     var body: some View {
         VStack {
@@ -1224,6 +1269,7 @@ struct EditCategoryAlert: View {
             newEmoji = toEdit.wrappedEmoji
             selectedColour = toEdit.wrappedColour
         }
+        .modifier(ErrorSuccessHaptics(error: errorHaptic, success: successHaptic))
     }
 
     func verification() {
@@ -1232,8 +1278,7 @@ struct EditCategoryAlert: View {
         outcome = results.error
 
         if outcome != .none {
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.error)
+            errorHaptic &+= 1
 
             switch outcome {
             case .incomplete:
@@ -1268,8 +1313,7 @@ struct EditCategoryAlert: View {
 
             showToast = true
         } else {
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
+            successHaptic &+= 1
 
             if toEdit.income {
                 categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: toEdit.colour)
@@ -1308,6 +1352,7 @@ struct DeleteCategoryAlert: View {
                 .onTapGesture {
                     dismiss()
                 }
+                .accessibilityAddTraits(.isButton)
 
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(String(format: String(localized: "Delete '%@'?"), toDelete.wrappedName))
@@ -1449,87 +1494,92 @@ struct SuggestedCategoriesView: View {
 
     @State private var availableColours: [String] = Color.colorArray
     @State private var selectedColour = "1"
+    @State private var lightHaptic: Int = 0
 
     var body: some View {
-        if !suggestions.isEmpty {
-            Section(header: Text(String(localized: "SUGGESTED")).foregroundStyle(Color.SubtitleText)) {
-                ForEach(suggestions, id: \.self) { category in
-                    HStack(spacing: 8) {
-                        Text(category.emoji)
+        Group {
+            if !suggestions.isEmpty {
+                Section(header: Text(String(localized: "SUGGESTED")).foregroundStyle(Color.SubtitleText)) {
+                    ForEach(suggestions, id: \.self) { category in
+                        HStack(spacing: 8) {
+                            Text(category.emoji)
 //                            .font(.system(size: 15))
-                            .font(.system(.subheadline, design: .rounded))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        Text(LocalizedStringKey(category.name))
-                            .font(.system(.body, design: .rounded))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                .font(.system(.subheadline, design: .rounded))
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            Text(LocalizedStringKey(category.name))
+                                .font(.system(.body, design: .rounded))
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
-                            .lineLimit(1)
+                                .lineLimit(1)
 
-                        Spacer()
+                            Spacer()
 
-                        Image(systemName: "plus")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            Image(systemName: "plus")
+                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color.SubtitleText)
-                            .padding(4)
-                            .background(Color.SecondaryBackground, in: Circle())
-                            .contentShape(Circle())
-                    }
-                    .padding(.vertical, 5)
-                    .foregroundStyle(Color.PrimaryText)
-                    .listRowBackground(Color.SettingsBackground)
-                    .listRowSeparatorTint(Color.Outline)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // double check
-
-                        let (_, outcome, order) = categoryVM.validate(name: category.name, emoji: category.emoji, income: income)
-
-                        if outcome != .none {
-                            return
+                                .foregroundStyle(Color.SubtitleText)
+                                .padding(4)
+                                .background(Color.SecondaryBackground, in: Circle())
+                                .contentShape(Circle())
                         }
+                        .padding(.vertical, 5)
+                        .foregroundStyle(Color.PrimaryText)
+                        .listRowBackground(Color.SettingsBackground)
+                        .listRowSeparatorTint(Color.Outline)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            // double check
 
-                        let impactMed = UIImpactFeedbackGenerator(style: .light)
-                        impactMed.impactOccurred()
+                            let (_, outcome, order) = categoryVM.validate(name: category.name, emoji: category.emoji, income: income)
 
-                        if !income {
-                            _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: selectedColour, income: false, order: order)
 
-                            availableColours = Color.colorArray
-                            categories.forEach { category in
-                                if availableColours.contains(category.wrappedColour) {
-                                    availableColours.remove(at: availableColours.firstIndex(of: category.wrappedColour) ?? 0)
+                            if outcome != .none {
+                                return
+                            }
+
+                            lightHaptic &+= 1
+
+                            if !income {
+                                _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: selectedColour, income: false, order: order)
+
+                                availableColours = Color.colorArray
+                                categories.forEach { category in
+                                    if availableColours.contains(category.wrappedColour) {
+                                        availableColours.removeAll { $0 == category.wrappedColour }
+                                    }
                                 }
-                            }
 
-                            if availableColours.isEmpty {
-                                selectedColour = "#FFFFFF"
+                                if availableColours.isEmpty {
+                                    selectedColour = "#FFFFFF"
+                                } else {
+                                    selectedColour = availableColours[0]
+                                }
                             } else {
-                                selectedColour = availableColours[0]
+                                _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: "#76FBB0", income: true, order: order)
                             }
-                        } else {
-                            _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: "#76FBB0", income: true, order: order)
                         }
+                        .accessibilityAddTraits(.isButton)
                     }
                 }
-            }
-            .onAppear {
-                if !income {
-                    categories.forEach { category in
-                        if availableColours.contains(category.wrappedColour) {
-                            availableColours.remove(at: availableColours.firstIndex(of: category.wrappedColour) ?? 0)
+                .onAppear {
+                    if !income {
+                        categories.forEach { category in
+                            if availableColours.contains(category.wrappedColour) {
+                                availableColours.removeAll { $0 == category.wrappedColour }
+                            }
                         }
-                    }
 
-                    if availableColours.isEmpty {
-                        selectedColour = "#FFFFFF"
-                    } else {
-                        selectedColour = availableColours[0]
+                        if availableColours.isEmpty {
+                            selectedColour = "#FFFFFF"
+                        } else {
+                            selectedColour = availableColours[0]
+                        }
                     }
                 }
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 
     init(income: Bool) {
@@ -1668,54 +1718,59 @@ struct ColourPickerView: View {
         LazyVGrid(columns: columns, spacing: 6) {
             ForEach(Color.colorArray, id: \.self) { suggestedColor in
                 if suggestedColor == "#" {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 9)
-                            .fill(AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]), center: .center))
-
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
-                            .padding(4)
-
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(customSelectedColor)
-                            .padding(8)
-
-                        if customMode {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundStyle(customSelectedColor.luminance() > 0.5 ? Color.black : Color.white)
-                        } else {
-                            Image(systemName: "plus")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundStyle(Color.black)
-                        }
-                    }
-                    .frame(width: 40, height: 40, alignment: .center)
-                    .onTapGesture {
+                    Button {
                         showMenu = false
                         showNativePicker = true
-                    }
-                } else {
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(Color(hex: suggestedColor))
-                        .frame(height: 40)
-                        .opacity(selectedColours.contains(suggestedColor) ? 0.2 : 1)
-                        .onTapGesture {
-                            if !selectedColours.contains(suggestedColor) {
-                                withAnimation {
-                                    selectedColour = suggestedColor
-                                    customMode = false
-                                    showMenu = false
-                                }
-                            }
-                        }
-                        .overlay {
-                            if selectedColour == suggestedColor && !customMode {
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 9)
+                                .fill(AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]), center: .center))
+
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
+                                .padding(4)
+
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(customSelectedColor)
+                                .padding(8)
+
+                            if customMode {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 15, weight: .bold))
+                                    .foregroundStyle(customSelectedColor.luminance() > 0.5 ? Color.black : Color.white)
+                            } else {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 13, weight: .bold))
                                     .foregroundStyle(Color.black)
                             }
                         }
+                        .frame(width: 40, height: 40, alignment: .center)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(String(localized: "Custom color"))
+                } else {
+                    Button {
+                        if !selectedColours.contains(suggestedColor) {
+                            withAnimation {
+                                selectedColour = suggestedColor
+                                customMode = false
+                                showMenu = false
+                            }
+                        }
+                    } label: {
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .fill(Color(hex: suggestedColor))
+                            .frame(height: 40)
+                            .opacity(selectedColours.contains(suggestedColor) ? 0.2 : 1)
+                            .overlay {
+                                if selectedColour == suggestedColor && !customMode {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundStyle(Color.black)
+                                }
+                            }
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -1742,11 +1797,22 @@ struct ColourPickerView: View {
         }
 
         if let editted = toEdit {
-            if !selectedColours.isEmpty {
-                selectedColours.remove(at: selectedColours.firstIndex(of: editted.wrappedColour) ?? 0)
-            }
+            selectedColours.removeAll { $0 == editted.wrappedColour }
         }
 
         self.selectedColours = selectedColours
+    }
+}
+
+// Combines two .sensoryFeedback modifiers into a single .modifier() call so the
+// trailing modifier chain on category alerts stays short enough for type inference.
+private struct ErrorSuccessHaptics: ViewModifier {
+    let error: Int
+    let success: Int
+
+    func body(content: Content) -> some View {
+        content
+            .sensoryFeedback(.error, trigger: error)
+            .sensoryFeedback(.success, trigger: success)
     }
 }

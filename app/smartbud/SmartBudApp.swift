@@ -2,7 +2,7 @@
 //  SmartBudApp.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 11/7/22.
+//  Created by Iorest on 11/7/22.
 //
 
 import SwiftUI

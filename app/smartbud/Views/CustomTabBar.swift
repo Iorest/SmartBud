@@ -2,7 +2,7 @@
 //  CustomTabBar.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 20/5/22.
+//  Created by Iorest on 20/5/22.
 //
 
 import Foundation
@@ -28,6 +28,8 @@ struct CustomTabBar: View {
     @AppStorage("confetti", store: .appGroup) var confetti: Bool = false
     @AppStorage("firstTransactionViewLaunch", store: .appGroup) var firstLaunch: Bool = true
 
+    @State private var lightHaptic = 0
+
     private var isZoomed: Bool {
         false
     }
@@ -47,8 +49,7 @@ struct CustomTabBar: View {
             TabButton(image: "Insights", zoomed: isZoomed, currentTab: $currentTab)
 
             Button {
-                let impactMed = UIImpactFeedbackGenerator(style: .light)
-                impactMed.impactOccurred()
+                lightHaptic &+= 1
 
                 addTransaction = true
 
@@ -108,6 +109,7 @@ struct CustomTabBar: View {
 
             addTransaction = true
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 }
 

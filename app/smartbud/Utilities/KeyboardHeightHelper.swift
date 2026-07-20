@@ -2,7 +2,7 @@
 //  KeyboardHeightHelper.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 16/5/22.
+//  Created by Iorest on 16/5/22.
 //
 //  Tracks the soft-keyboard height via Foundation's `NotificationCenter`
 //  async sequence. Migrated off the legacy closure-based

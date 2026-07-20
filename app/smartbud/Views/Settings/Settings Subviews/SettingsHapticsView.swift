@@ -2,7 +2,7 @@
 //  SettingsHapticsView.swift
 //  smartbud
 //
-//  Created by Rafael Soh on 5/11/23.
+//  Created by Iorest on 5/11/23.
 //
 
 import Foundation
@@ -21,6 +21,9 @@ struct SettingsHapticsView: View {
     @State var alternateShake: Bool = false
 
     @State var wordShake: Bool = false
+
+    // sensory feedback triggers
+    @State private var hapticTrigger: Int = 0
 
     var body: some View {
         VStack(spacing: 10) {
@@ -87,7 +90,7 @@ struct SettingsHapticsView: View {
         .modifier(SettingsSubviewModifier())
         .onChange(of: hapticType) { _, newValue in
             if newValue == 2 {
-                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                hapticTrigger &+= 1
 
                 withAnimation(.easeInOut(duration: 0.1)) {
                     alternateShake = true
@@ -102,7 +105,7 @@ struct SettingsHapticsView: View {
                     }
                 }
             } else if newValue == 1 {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                hapticTrigger &+= 1
 
                 withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
                     wordShake = true
@@ -113,6 +116,13 @@ struct SettingsHapticsView: View {
                     }
                 }
             }
+        }
+        .sensoryFeedback(trigger: hapticTrigger) { oldValue, newValue in
+            // The haptic type depends on the current selection
+            // (heavy for "Excessive", light for "Subtle").
+            hapticType == 2
+                ? .impact(weight: .heavy)
+                : .impact(weight: .light)
         }
     }
 }
