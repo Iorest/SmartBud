@@ -19,6 +19,7 @@ struct MainBudgetWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: MainBudgetWidgetProvider()) { entry in
             MainBudgetWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .supportedFamilies(supportedFamilies)
         .configurationDisplayName("Overall Budget")

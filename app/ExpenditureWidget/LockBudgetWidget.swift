@@ -21,6 +21,7 @@ struct LockBudgetWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: LockBudgetWidgetProvider()) { entry in
             LockBudgetWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .configurationDisplayName("Budget")
         .description("Monitor how you are sticking to your budgets.")

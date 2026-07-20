@@ -16,6 +16,7 @@ struct InsightsWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: InsightsWidgetConfigurationIntent.self, provider: InsightsProvider()) { entry in
             InsightsWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .configurationDisplayName("Insights")
         .description("Analyse your expenditure breakdowns over various time periods.")

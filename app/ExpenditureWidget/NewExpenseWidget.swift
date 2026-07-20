@@ -16,6 +16,7 @@ struct NewExpenseWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: NewExpenseProvider()) { entry in
             NewExpenseWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .configurationDisplayName("New Expense")
         .description("A convenient button to log new purchases.")

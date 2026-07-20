@@ -15,6 +15,7 @@ struct BudgetWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: BudgetWidgetProvider()) { entry in
             BudgetWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .configurationDisplayName("Budget")
         .description("Monitor how you are sticking to your budgets.")

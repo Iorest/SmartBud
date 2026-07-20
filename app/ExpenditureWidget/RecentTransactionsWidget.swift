@@ -22,6 +22,7 @@ struct RecentExpenditureWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: RecentWidgetConfigurationIntent.self, provider: Provider()) { entry in
             ExpenditureWidgetEntryView(entry: entry)
+                .environment(\.locale, Locale.appLocale)
         }
         .configurationDisplayName("Recent Transactions")
         .description("View your latest expenses.")
