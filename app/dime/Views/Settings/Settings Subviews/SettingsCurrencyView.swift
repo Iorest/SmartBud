@@ -37,30 +37,7 @@ struct SettingsCurrencyView: View {
         ScrollViewReader { value in
           VStack(spacing: 0) {
             ForEach(currencies, id: \.self) { currency in
-              HStack(spacing: 10) {
-                Text(currency.code)
-                  .font(.system(.body, design: .rounded).weight(.semibold))
-                  .foregroundStyle(Color.SubtitleText)
-                  .lineLimit(1)
-                  //                                    .layoutPriority(1)
-                  .frame(width: dynamicTypeSize > .xLarge ? 55 : 45, alignment: .leading)
-                Text(currency.name)
-                  .font(.system(.body, design: .rounded))
-                  .foregroundStyle(Color.PrimaryText)
-                  .lineLimit(1)
-
-                Spacer()
-
-                if currency.code == currencyCode {
-                  Image(systemName: "checkmark")
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                    .matchedGeometryEffect(id: "tick", in: animation)
-                }
-              }
-              .frame(maxWidth: .infinity)
-              .contentShape(Rectangle())
-              .onTapGesture {
+              Button {
                 withAnimation(.easeIn(duration: 0.15)) {
                   currencyCode = currency.code
                 }
@@ -70,8 +47,36 @@ struct SettingsCurrencyView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                   dismiss()
                 }
+              } label: {
+                HStack(spacing: 10) {
+                  Text(currency.code)
+                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .foregroundStyle(Color.SubtitleText)
+                    .lineLimit(1)
+                    //                                    .layoutPriority(1)
+                    .frame(width: dynamicTypeSize > .xLarge ? 55 : 45, alignment: .leading)
+                  Text(currency.name)
+                    .font(.system(.body, design: .rounded))
+                    .foregroundStyle(Color.PrimaryText)
+                    .lineLimit(1)
+
+                  Spacer()
+
+                  if currency.code == currencyCode {
+                    Image(systemName: "checkmark")
+                      .font(.system(.subheadline, design: .rounded))
+                      .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                      .matchedGeometryEffect(id: "tick", in: animation)
+                      .accessibilityHidden(true)
+                  }
+                }
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .padding(.vertical, 9)
               }
-              .padding(.vertical, 9)
+              .buttonStyle(.plain)
+              .accessibilityLabel("\(currency.name) (\(currency.code))")
+              .accessibilityAddTraits(currency.code == currencyCode ? [.isButton, .isSelected] : .isButton)
               .overlay(alignment: .bottom) {
                 if currency != currencies.last {
                   Divider()

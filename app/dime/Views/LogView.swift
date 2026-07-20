@@ -21,7 +21,7 @@ struct LogView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @State var addTransaction = false
@@ -64,7 +64,7 @@ struct LogView: View {
                     .resizable()
                     .frame(width: 75, height: 75)
                     .padding(.bottom, 20)
-                    .accessibility(hidden: true)
+                    .accessibilityHidden(true)
 
                 Text(String(localized: "Your Log is Empty"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
@@ -427,7 +427,7 @@ struct SearchView: View {
                         .font(.system(.body, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.DarkIcon.opacity(0.8))
-                        .accessibility(hidden: true)
+                        .accessibilityHidden(true)
                     TextField(String(localized: "Search entry by note"), text: $searchQuery)
                         .focused($searchFocused)
                         .font(.system(.body, design: .rounded).weight(.regular))
@@ -752,7 +752,7 @@ struct ListView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
     
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
@@ -789,7 +789,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, String(format: "%.2f", filtered.string), dateConverterAccessibilityLabel(date: day.day)))
+                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, String(format: "%.2f", filtered.total), dateConverterAccessibilityLabel(date: day.day)))
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -820,7 +820,7 @@ struct ListView: View {
         }
     }
 
-    func filterOutDupes(dayTransactions: [TransactionModel]) -> (transactions: [TransactionModel], string: String) {
+    func filterOutDupes(dayTransactions: [TransactionModel]) -> (transactions: [TransactionModel], string: String, total: Double) {
         var seen = [TransactionModel]()
         let filtered = dayTransactions.filter { entity -> Bool in
 
@@ -852,7 +852,7 @@ struct ListView: View {
             text = (numberFormatter.string(from: NSNumber(value: total)) ?? "$0")
         }
 
-        return (filtered, text)
+        return (filtered, text, total)
     }
 }
 
@@ -895,7 +895,7 @@ struct FutureListView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
     
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
@@ -1324,7 +1324,7 @@ struct DeleteTransactionAlert: View {
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)
-                    .accessibility(hidden: true)
+                    .accessibilityHidden(true)
 
                 Button {
                     transactionManager.showPopup = false
@@ -1506,7 +1506,7 @@ struct FilteredDateView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false

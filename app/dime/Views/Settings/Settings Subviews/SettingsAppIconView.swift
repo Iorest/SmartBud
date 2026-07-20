@@ -34,8 +34,6 @@ struct SettingsAppIconView: View {
           "Dime definitely isn't becoming one but it never hurts to keep dreaming."))
   ]
 
-  @State private var position: Int?
-
   @Namespace var animation
 
   var body: some View {
@@ -55,50 +53,54 @@ struct SettingsAppIconView: View {
 
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { index in
-          HStack(spacing: 13) {
-            Image(options[index].exampleFileName)
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-              .frame(width: 70, height: 70)
-              .clipShape(RoundedRectangle(cornerRadius: 18))
-              .shadow(color: .black.opacity(0.15), radius: 5, x: 5, y: 5)
-
-            VStack(alignment: .leading, spacing: 3) {
-              Text(options[index].displayName)
-                .font(.system(.body, design: .rounded))
-                .foregroundStyle(Color.PrimaryText)
-
-              Text(options[index].displaySubtitle)
-                .font(.system(.caption, design: .rounded))
-                .foregroundStyle(Color.SubtitleText)
-            }
-
-            Spacer()
-
-            if activeIcon == options[index].actualFileName {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
-            } else {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.SettingsBackground)
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          Button {
             withAnimation {
               activeIcon = options[index].actualFileName
             }
-          }
-          .padding(.vertical, 15)
-          .overlay(alignment: .bottom) {
-            if index < (options.count - 1) {
-              Divider()
+          } label: {
+            HStack(spacing: 13) {
+              Image(options[index].exampleFileName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 70, height: 70)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .shadow(color: .black.opacity(0.15), radius: 5, x: 5, y: 5)
+                .accessibilityHidden(true)
+
+              VStack(alignment: .leading, spacing: 3) {
+                Text(options[index].displayName)
+                  .font(.system(.body, design: .rounded))
+                  .foregroundStyle(Color.PrimaryText)
+
+                Text(options[index].displaySubtitle)
+                  .font(.system(.caption, design: .rounded))
+                  .foregroundStyle(Color.SubtitleText)
+              }
+
+              Spacer()
+
+              Image(systemName: "checkmark")
+                .font(.system(.subheadline, design: .rounded))
+                .foregroundStyle(activeIcon == options[index].actualFileName
+                    ? Color.DarkIcon.opacity(0.6)
+                    : Color.SettingsBackground)
+                .matchedGeometryEffect(id: "tick", in: animation)
+                .accessibilityHidden(true)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 15)
+            .overlay(alignment: .bottom) {
+              if index < (options.count - 1) {
+                Divider()
+              }
             }
           }
+          .buttonStyle(.plain)
+          .accessibilityLabel(options[index].displayName)
+          .accessibilityAddTraits(activeIcon == options[index].actualFileName
+              ? [.isButton, .isSelected]
+              : .isButton)
         }
       }
       .padding(.horizontal, 15)

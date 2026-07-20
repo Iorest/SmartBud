@@ -163,6 +163,7 @@ struct TabButton: View {
                 .animation(.easeInOut(duration: 0.3), value: currentTab)
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(currentTab == image ? Color.DarkIcon : Color.GreyIcon)
+                .accessibilityHidden(true)
         }
         .glassChip(
             in: Circle(),

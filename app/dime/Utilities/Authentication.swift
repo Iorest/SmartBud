@@ -13,7 +13,7 @@ import Observation
 
 @MainActor
 @Observable
-class AppLockViewModel: @unchecked Sendable{
+class AppLockViewModel{
     // Publishing the applock state from user defaults
     var isAppLockEnabled: Bool = false
     // Publishing if the app is curretly unlocked or not

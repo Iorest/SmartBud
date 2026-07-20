@@ -111,34 +111,38 @@ struct SettingsGoofyView: View {
 
   @ViewBuilder
   func ToggleRow(text: String, bool: Binding<Bool>, id: Int) -> some View {
-    HStack {
-      Text(text)
-        .font(.system(.body, design: .rounded))
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        //                .font(.system(size: 17, weight: .regular, design: .rounded))
-        .foregroundStyle(Color.PrimaryText)
-
-      Spacer()
-
-      ZStack(alignment: bool.wrappedValue ? .trailing : .leading) {
-        Capsule()
-          .frame(width: 42, height: 28)
-          .foregroundStyle(bool.wrappedValue ? .green : .gray.opacity(0.8))
-
-        Circle()
-          .foregroundStyle(Color.white)
-          .padding(2)
-          .frame(width: 28, height: 28)
-          .matchedGeometryEffect(id: "toggle\(id)", in: animation)
+    Button {
+      withAnimation {
+        bool.wrappedValue.toggle()
       }
-      .onTapGesture {
-        withAnimation {
-          bool.wrappedValue.toggle()
+    } label: {
+      HStack {
+        Text(text)
+          .font(.system(.body, design: .rounded))
+          .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+          //                .font(.system(size: 17, weight: .regular, design: .rounded))
+          .foregroundStyle(Color.PrimaryText)
+
+        Spacer()
+
+        ZStack(alignment: bool.wrappedValue ? .trailing : .leading) {
+          Capsule()
+            .frame(width: 42, height: 28)
+            .foregroundStyle(bool.wrappedValue ? .green : .gray.opacity(0.8))
+
+          Circle()
+            .foregroundStyle(Color.white)
+            .padding(2)
+            .frame(width: 28, height: 28)
+            .matchedGeometryEffect(id: "toggle\(id)", in: animation)
         }
       }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
+      .padding(.vertical, 9)
+      .padding(.horizontal, 15)
     }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 9)
-    .padding(.horizontal, 15)
+    .buttonStyle(.plain)
+    .accessibilityAddTraits(bool.wrappedValue ? [.isButton, .isSelected] : .isButton)
   }
 }

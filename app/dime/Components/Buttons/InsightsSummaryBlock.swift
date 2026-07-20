@@ -19,34 +19,35 @@ struct InsightsSummaryBlockView: View {
     }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(color)
-                .padding(5)
-                .frame(width: 30, height: 30)
-                .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .padding(.horizontal, 3)
-
-            VStack(alignment: .leading, spacing: 0) {
-                Text(income ? "Income" : "Expenses")
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
-                    .lineLimit(1)
-                    .foregroundStyle(Color.SubtitleText)
-
-                Text(amountString)
-                    .font(.system(.title3, design: .rounded).weight(.medium))
+        Button(action: self.action) {
+            HStack(spacing: 6) {
+                Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .padding(5)
+                    .frame(width: 30, height: 30)
+                    .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .padding(.horizontal, 3)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(income ? "Income" : "Expenses")
+                        .font(.system(.caption, design: .rounded).weight(.semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(Color.SubtitleText)
+
+                    Text(amountString)
+                        .font(.system(.title3, design: .rounded).weight(.medium))
+                        .foregroundStyle(color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
             }
+            .padding(7)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
         }
-        .padding(7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            self.action()
-        }
+        .buttonStyle(.plain)
         .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
             if showOverlay {
@@ -54,5 +55,7 @@ struct InsightsSummaryBlockView: View {
                     .stroke(Color.SubtitleText.opacity(0.7), lineWidth: 1.3)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(income ? String(localized: "Income") : String(localized: "Expenses")), \(amountString)")
     }
 }

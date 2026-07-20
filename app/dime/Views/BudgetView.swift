@@ -267,7 +267,7 @@ struct MainBudgetView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var percentageOfDays: Double {
@@ -535,7 +535,7 @@ struct SingleBudgetView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var difference: Double {
@@ -864,7 +864,7 @@ struct BudgetDollarView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var dynamicTypeSizes: (symbol: Font.TextStyle, amount: Font.TextStyle) {
@@ -898,7 +898,7 @@ struct DetailedBudgetDollarView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var body: some View {
@@ -924,7 +924,7 @@ struct DetailedBudgetDifferenceDollarView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var body: some View {
@@ -1143,15 +1143,15 @@ struct DetailedBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110")) {
+                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110"), label: String(localized: "Add transaction")) {
                     newTransaction = true
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String(localized: "Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String(localized: "Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -1212,11 +1212,11 @@ struct DetailedMainBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String(localized: "Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String(localized: "Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -1303,7 +1303,7 @@ struct TimeBudgetView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var difference: Double {
@@ -1553,7 +1553,7 @@ struct FilteredCategoryDayBudgetView: View {
     @Binding var totalSpent: Double
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var date: Date
@@ -1638,7 +1638,7 @@ struct FilteredBudgetView: View {
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
@@ -1828,7 +1828,7 @@ struct TimeMainBudgetView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     var difference: Double {

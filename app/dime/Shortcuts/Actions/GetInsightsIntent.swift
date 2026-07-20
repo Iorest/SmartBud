@@ -137,7 +137,7 @@ struct ShortcutInsightsView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
-    var leftText: String.LocalizationValue {
+    var leftText: String {
         switch type {
         case .net:
             return "Net total"
@@ -148,7 +148,7 @@ struct ShortcutInsightsView: View {
         }
     }
 
-    var rightText: String.LocalizationValue {
+    var rightText: String {
         switch timeframe {
         case .day:
             return "today"

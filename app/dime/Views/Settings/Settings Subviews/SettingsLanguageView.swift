@@ -13,8 +13,7 @@
 import SwiftUI
 
 struct SettingsLanguageView: View {
-    @AppStorage("appLanguage", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
-    var appLanguage: String = ""
+    @AppLanguage var appLanguage: String = ""
 
     @Environment(\.dismiss) var dismiss
     @Environment(SettingsViewModel.self) var settingsVM
@@ -38,36 +37,40 @@ struct SettingsLanguageView: View {
 
             VStack(spacing: 0) {
                 ForEach(SettingsViewModel.supportedLanguageCodes, id: \.self) { code in
-                    HStack {
-                        Text(settingsVM.displayName(for: code))
-                            .font(.system(.body, design: .rounded))
-                            .foregroundStyle(Color.PrimaryText)
-
-                        Spacer()
-
-                        if appLanguage == code {
-                            Image(systemName: "checkmark")
-                                .font(.system(.subheadline, design: .rounded).weight(.medium))
-                                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                                .matchedGeometryEffect(id: "tick", in: animation)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
+                    Button {
                         withAnimation(.easeIn(duration: 0.15)) {
                             appLanguage = code
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             dismiss()
                         }
-                    }
-                    .padding(.vertical, 9)
-                    .overlay(alignment: .bottom) {
-                        if code != SettingsViewModel.supportedLanguageCodes.last {
-                            Divider()
+                    } label: {
+                        HStack {
+                            Text(settingsVM.displayName(for: code))
+                                .font(.system(.body, design: .rounded))
+                                .foregroundStyle(Color.PrimaryText)
+
+                            Spacer()
+
+                            if appLanguage == code {
+                                Image(systemName: "checkmark")
+                                    .font(.system(.subheadline, design: .rounded).weight(.medium))
+                                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                                    .matchedGeometryEffect(id: "tick", in: animation)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
+                        .padding(.vertical, 9)
+                        .overlay(alignment: .bottom) {
+                            if code != SettingsViewModel.supportedLanguageCodes.last {
+                                Divider()
+                            }
                         }
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(appLanguage == code ? [.isButton, .isSelected] : .isButton)
                 }
             }
             .padding(.horizontal, 15)

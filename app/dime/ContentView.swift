@@ -35,7 +35,7 @@ struct ContentView: View {
 
     @AppStorage("showUpdateSheet", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showUpdateSheet: Bool = true
 
-    @AppStorage("appLanguage", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var appLanguage: String = ""
+    @AppLanguage var appLanguage: String = ""
 
     var body: some View {
         GeometryReader { proxy in

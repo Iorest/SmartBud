@@ -25,32 +25,7 @@ struct NewCategoryPickerView: View {
         ScrollView(showsIndicators: false) {
             LazyVGrid(columns: layout, spacing: 10) {
                 ForEach(categories) { item in
-                    HStack(spacing: 7) {
-                        Text(item.wrappedEmoji)
-                            .font(.system(.subheadline, design: .rounded))
-
-                        Text(item.wrappedName)
-                            .font(.system(.body, design: .rounded).weight(.semibold))
-                            .lineLimit(1)
-                    }
-                    .id(item.id)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 9)
-                    .foregroundStyle(Color(hex: item.wrappedColour))
-                    .background(
-                        Color(hex: item.wrappedColour).opacity(0.35),
-                        in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
-                    )
-                    .contentShape(Rectangle())
-                    .overlay {
-                        if item == category {
-                            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
-                                .strokeBorder(Color(hex: item.wrappedColour),
-                                              style: StrokeStyle(lineWidth: 2))
-                        }
-                    }
-                    .onTapGesture {
+                    Button {
                         withAnimation {
                             category = item
                         }
@@ -60,7 +35,36 @@ struct NewCategoryPickerView: View {
                                 showPicker = false
                             }
                         }
+                    } label: {
+                        HStack(spacing: 7) {
+                            Text(item.wrappedEmoji)
+                                .font(.system(.subheadline, design: .rounded))
+
+                            Text(item.wrappedName)
+                                .font(.system(.body, design: .rounded).weight(.semibold))
+                                .lineLimit(1)
+                        }
+                        .id(item.id)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 11)
+                        .padding(.vertical, 9)
+                        .foregroundStyle(Color(hex: item.wrappedColour))
+                        .background(
+                            Color(hex: item.wrappedColour).opacity(0.35),
+                            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                        )
+                        .overlay {
+                            if item == category {
+                                RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                                    .strokeBorder(Color(hex: item.wrappedColour),
+                                                  style: StrokeStyle(lineWidth: 2))
+                            }
+                        }
                     }
+                    .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .accessibilityLabel(item.wrappedName)
+                    .accessibilityAddTraits(item == category ? [.isButton, .isSelected] : .isButton)
                     .opacity(category != nil ? (category == item ? 1 : 0.5) : 1)
 
                 }
@@ -69,26 +73,29 @@ struct NewCategoryPickerView: View {
         .keyboardAwareHeight(showToolbar: false)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .overlay(alignment: .bottom) {
-            HStack(spacing: 4) {
-                Image(systemName: "pencil")
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-                Text("Edit")
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-            }
-            .padding(.vertical, 9)
-            .padding(.horizontal, 18)
-            .foregroundStyle(Color.SubtitleText)
-            .background {
-                RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
-            }
-            .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
-            .contentShape(Rectangle())
-            .onTapGesture {
+            Button {
                 let impactMed = UIImpactFeedbackGenerator(style: .light)
                 impactMed.impactOccurred()
                 showPicker = false
                 showingCategoryView = true
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "pencil")
+                        .font(.system(.body, design: .rounded).weight(.semibold))
+                    Text("Edit")
+                        .font(.system(.body, design: .rounded).weight(.semibold))
+                }
+                .padding(.vertical, 9)
+                .padding(.horizontal, 18)
+                .foregroundStyle(Color.SubtitleText)
+                .background {
+                    RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
+                }
+                .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Edit"))
             .padding(.bottom, 15)
         }
 

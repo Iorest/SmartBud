@@ -39,69 +39,73 @@ struct SettingsNotificationsView: View {
         .padding(.bottom, 20)
 
       VStack(spacing: 0) {
-        HStack {
-          Text("Enable Notifications")
-            .font(.system(.body, design: .rounded))
-            .foregroundStyle(Color.PrimaryText)
-
-          Spacer()
-
-          ZStack(alignment: showNotifications ? .trailing : .leading) {
-            Capsule()
-              .frame(width: 42, height: 28)
-              .foregroundStyle(showNotifications ? .green : .gray.opacity(0.8))
-
-            Circle()
-              .foregroundStyle(Color.white)
-              .padding(2)
-              .frame(width: 28, height: 28)
-              .matchedGeometryEffect(id: "toggle", in: animation)
-          }
-          .onTapGesture {
-            if showNotifications {
-              withAnimation(.easeInOut(duration: 0.2)) {
-                center.removeAllPendingNotificationRequests()
-                showNotifications.toggle()
-              }
-            } else {
-              Task { @MainActor in
-                let status = await center.notificationSettings().authorizationStatus
-                if status == .notDetermined {
-                  do {
-                    let granted = try await center.requestAuthorization(options: [.alert, .badge, .sound])
-                    if granted {
-                      withAnimation(.easeInOut(duration: 0.2)) {
-                        showNotifications.toggle()
-                        newNotification()
-                      }
-                    } else {
-                      notificationsEnabled = false
-                    }
-                  } catch {
-                    print(error.localizedDescription)
-                    notificationsEnabled = false
-                  }
-                } else if status == .denied {
-                  notificationsEnabled = false
-
-                  if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                    await UIApplication.shared.open(settingsURL)
-                  }
-
-                } else {
-                  withAnimation(.easeInOut(duration: 0.2)) {
-                    showNotifications.toggle()
-                    if showNotifications {
+        Button {
+          if showNotifications {
+            withAnimation(.easeInOut(duration: 0.2)) {
+              center.removeAllPendingNotificationRequests()
+              showNotifications.toggle()
+            }
+          } else {
+            Task { @MainActor in
+              let status = await center.notificationSettings().authorizationStatus
+              if status == .notDetermined {
+                do {
+                  let granted = try await center.requestAuthorization(options: [.alert, .badge, .sound])
+                  if granted {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                      showNotifications.toggle()
                       newNotification()
                     }
+                  } else {
+                    notificationsEnabled = false
+                  }
+                } catch {
+                  print(error.localizedDescription)
+                  notificationsEnabled = false
+                }
+              } else if status == .denied {
+                notificationsEnabled = false
+
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                  await UIApplication.shared.open(settingsURL)
+                }
+
+              } else {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                  showNotifications.toggle()
+                  if showNotifications {
+                    newNotification()
                   }
                 }
               }
             }
           }
+        } label: {
+          HStack {
+            Text("Enable Notifications")
+              .font(.system(.body, design: .rounded))
+              .foregroundStyle(Color.PrimaryText)
+
+            Spacer()
+
+            ZStack(alignment: showNotifications ? .trailing : .leading) {
+              Capsule()
+                .frame(width: 42, height: 28)
+                .foregroundStyle(showNotifications ? .green : .gray.opacity(0.8))
+
+              Circle()
+                .foregroundStyle(Color.white)
+                .padding(2)
+                .frame(width: 28, height: 28)
+                .matchedGeometryEffect(id: "toggle", in: animation)
+            }
+          }
+          .frame(maxWidth: .infinity)
+          .contentShape(Rectangle())
+          .padding(.vertical, 9)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 9)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(showNotifications ? [.isButton, .isSelected] : .isButton)
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
@@ -109,86 +113,98 @@ struct SettingsNotificationsView: View {
 
       if showNotifications {
         VStack(spacing: 0) {
-          HStack {
-            Text("Every morning (8:00 AM)")
-              .font(.system(.body, design: .rounded))
-              .foregroundStyle(Color.PrimaryText)
-
-            Spacer()
-
-            if option == 1 {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          Button {
             withAnimation(.easeIn(duration: 0.15)) {
               option = 1
             }
-          }
-          .padding(.vertical, 9)
-          .overlay(alignment: .bottom) {
-            Divider()
-          }
+          } label: {
+            HStack {
+              Text("Every morning (8:00 AM)")
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
 
-          HStack {
-            Text("Every evening (8:00 PM)")
-              .font(.system(.body, design: .rounded))
-              .foregroundStyle(Color.PrimaryText)
+              Spacer()
 
-            Spacer()
-
-            if option == 2 {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
+              if option == 1 {
+                Image(systemName: "checkmark")
+                  .font(.system(.subheadline, design: .rounded))
+                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                  .matchedGeometryEffect(id: "tick", in: animation)
+                  .accessibilityHidden(true)
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
+            .overlay(alignment: .bottom) {
+              Divider()
             }
           }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(option == 1 ? [.isButton, .isSelected] : .isButton)
+
+          Button {
             withAnimation(.easeIn(duration: 0.15)) {
               option = 2
             }
-          }
-          .padding(.vertical, 9)
-          .overlay(alignment: .bottom) {
-            Divider()
-          }
+          } label: {
+            HStack {
+              Text("Every evening (8:00 PM)")
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
 
-          HStack {
-            Text("Custom Time")
-              .font(.system(.body, design: .rounded))
-              .foregroundStyle(Color.PrimaryText)
+              Spacer()
 
-            Spacer()
-
-            if option == 3 {
-              DatePicker(
-                "Custom notification time", selection: $customTime,
-                displayedComponents: .hourAndMinute
-              )
-              .labelsHidden()
-
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
+              if option == 2 {
+                Image(systemName: "checkmark")
+                  .font(.system(.subheadline, design: .rounded))
+                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                  .matchedGeometryEffect(id: "tick", in: animation)
+                  .accessibilityHidden(true)
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
+            .overlay(alignment: .bottom) {
+              Divider()
             }
           }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(option == 2 ? [.isButton, .isSelected] : .isButton)
+
+          Button {
             withAnimation(.easeIn(duration: 0.15)) {
               option = 3
             }
+          } label: {
+            HStack {
+              Text("Custom Time")
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
+
+              Spacer()
+
+              if option == 3 {
+                DatePicker(
+                  "Custom notification time", selection: $customTime,
+                  displayedComponents: .hourAndMinute
+                )
+                .labelsHidden()
+
+                Image(systemName: "checkmark")
+                  .font(.system(.subheadline, design: .rounded))
+                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                  .matchedGeometryEffect(id: "tick", in: animation)
+                  .accessibilityHidden(true)
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
           }
-          .padding(.vertical, 9)
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(option == 3 ? [.isButton, .isSelected] : .isButton)
         }
         .padding(.horizontal, 15)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))

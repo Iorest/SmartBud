@@ -69,23 +69,7 @@ struct SettingsWeekStartView: View {
 
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { option in
-          HStack {
-            Text(LocalizedStringKey(options[option]))
-              .font(.system(.body, design: .rounded))
-              .foregroundStyle(Color.PrimaryText)
-
-            Spacer()
-
-            if firstWeekday == (option + 1) {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded).weight(.medium))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          Button {
             DispatchQueue.main.async {
               withAnimation(.easeIn(duration: 0.15)) {
                 firstWeekday = (option + 1)
@@ -95,8 +79,28 @@ struct SettingsWeekStartView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
               dismiss()
             }
+          } label: {
+            HStack {
+              Text(LocalizedStringKey(options[option]))
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
+
+              Spacer()
+
+              if firstWeekday == (option + 1) {
+                Image(systemName: "checkmark")
+                  .font(.system(.subheadline, design: .rounded).weight(.medium))
+                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                  .matchedGeometryEffect(id: "tick", in: animation)
+                  .accessibilityHidden(true)
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
           }
-          .padding(.vertical, 9)
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(firstWeekday == (option + 1) ? [.isButton, .isSelected] : .isButton)
           .overlay(alignment: .bottom) {
             if option < (options.count - 1) {
               Divider()
@@ -118,26 +122,7 @@ struct SettingsWeekStartView: View {
         ScrollViewReader { value in
           VStack(alignment: .leading, spacing: 0) {
             ForEach(1..<29) { day in
-
-              HStack {
-                Text(
-                  String(format: String(localized: "%@ of month"), getOrdinal(day))
-                )
-                  .font(.system(.body, design: .rounded))
-                  .foregroundStyle(Color.PrimaryText)
-
-                Spacer()
-
-                if firstDayOfMonth == day {
-                  Image(systemName: "checkmark")
-                    .font(.system(.subheadline, design: .rounded).weight(.medium))
-                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                    .matchedGeometryEffect(id: "tick2", in: animation)
-                }
-              }
-              .frame(maxWidth: .infinity)
-              .contentShape(Rectangle())
-              .onTapGesture {
+              Button {
                 DispatchQueue.main.async {
                   withAnimation(.easeIn(duration: 0.15)) {
                     firstDayOfMonth = day
@@ -147,15 +132,37 @@ struct SettingsWeekStartView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                   dismiss()
                 }
-              }
-              .padding(.vertical, 9)
-              .id(day)
-              .overlay(alignment: .bottom) {
-                if day < 28 {
-                  Divider()
-                    .offset(y: 1)
+              } label: {
+                HStack {
+                  Text(
+                    String(format: String(localized: "%@ of month"), getOrdinal(day))
+                  )
+                    .font(.system(.body, design: .rounded))
+                    .foregroundStyle(Color.PrimaryText)
+
+                  Spacer()
+
+                  if firstDayOfMonth == day {
+                    Image(systemName: "checkmark")
+                      .font(.system(.subheadline, design: .rounded).weight(.medium))
+                      .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                      .matchedGeometryEffect(id: "tick2", in: animation)
+                      .accessibilityHidden(true)
+                  }
+                }
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .padding(.vertical, 9)
+                .id(day)
+                .overlay(alignment: .bottom) {
+                  if day < 28 {
+                    Divider()
+                      .offset(y: 1)
+                  }
                 }
               }
+              .buttonStyle(.plain)
+              .accessibilityAddTraits(firstDayOfMonth == day ? [.isButton, .isSelected] : .isButton)
             }
           }
           .onAppear {

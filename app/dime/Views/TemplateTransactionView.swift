@@ -71,7 +71,7 @@ struct TemplateTransactionView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @State var showingCategoryView = false
@@ -261,7 +261,7 @@ struct TemplateTransactionView: View {
                                     .background(Color.AlertRed.opacity(0.23), in: Circle())
                                     .contentShape(Circle())
                             }
-                            .accessibilityLabel("delete transaction")
+                            .accessibilityLabel(String(localized: "delete transaction"))
                         }
 
                         Button {
@@ -922,7 +922,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @State var gridData = GridViewModel()

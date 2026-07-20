@@ -25,5 +25,6 @@ struct StepperButtonView: View {
                 .glassChip(in: Circle(), interactive: !disabled)
                 .opacity(disabled ? 0.3 : 1)
         }
+        .accessibilityLabel(left ? String(localized: "Previous") : String(localized: "Next"))
     }
 }

@@ -31,33 +31,37 @@ struct SettingsCloudView: View {
         .padding(.bottom, 20)
 
       VStack(spacing: 0) {
-        HStack {
-          Text("Enable Sync")
-            .font(.system(.body, design: .rounded))
-            .foregroundStyle(Color.PrimaryText)
+        Button {
+          iCloudStorage.toggle()
+        } label: {
+          HStack {
+            Text("Enable Sync")
+              .font(.system(.body, design: .rounded))
+              .foregroundStyle(Color.PrimaryText)
 
-          Spacer()
+            Spacer()
 
-          ZStack(alignment: iCloudStorage ? .trailing : .leading) {
-            Capsule()
-              .frame(width: 42, height: 28)
-              .foregroundStyle(iCloudStorage ? .green : .gray.opacity(0.8))
+            ZStack(alignment: iCloudStorage ? .trailing : .leading) {
+              Capsule()
+                .frame(width: 42, height: 28)
+                .foregroundStyle(iCloudStorage ? .green : .gray.opacity(0.8))
 
-            Circle()
-              .foregroundStyle(Color.white)
-              .padding(2)
-              .frame(width: 28, height: 28)
-              .matchedGeometryEffect(id: "toggle", in: animation)
+              Circle()
+                .foregroundStyle(Color.white)
+                .padding(2)
+                .frame(width: 28, height: 28)
+                .matchedGeometryEffect(id: "toggle", in: animation)
+            }
           }
-          .onTapGesture {
-            iCloudStorage.toggle()
-          }
-          .onChange(of: iCloudStorage) { _, newValue in
-            NSUbiquitousKeyValueStore.default.set(newValue, forKey: "icloud_sync")
-          }
+          .frame(maxWidth: .infinity)
+          .contentShape(Rectangle())
+          .padding(.vertical, 9)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 9)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(iCloudStorage ? [.isButton, .isSelected] : .isButton)
+        .onChange(of: iCloudStorage) { _, newValue in
+          NSUbiquitousKeyValueStore.default.set(newValue, forKey: "icloud_sync")
+        }
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))

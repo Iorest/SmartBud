@@ -51,20 +51,29 @@ struct KeyboardAwareModifier: ViewModifier {
             .animation(.easeOut(duration: 0.25), value: isKeyboardVisible)
             .task {
                 // Two parallel async loops: keyboardWillShow updates the visible
-                // height and persists it; keyboardWillHide zeros it. `.task`
-                // cancels both automatically when the modifier goes away.
-                async {
-                    for await note in NotificationCenter.default.notifications(named: UIResponder.keyboardWillShowNotification) {
-                        let height = note.keyboardHeight
-                        if height > 200 {
-                            isKeyboardVisible = true
-                            savedKeyboardHeight = height - 20
+                // height and persists it; keyboardWillHide zeros it. `TaskGroup`
+                // gives both loops structured-concurrency cancellation when the
+                // modifier goes away (the legacy `async { … }` inside `.task`
+                // is deprecated and was replaced by `Task.init`). Each child
+                // dispatches back to the main actor before mutating the
+                // view-model state, since the async loops run on a generic
+                // executor.
+                await withTaskGroup(of: Void.self) { group in
+                    group.addTask {
+                        for await note in NotificationCenter.default.notifications(named: UIResponder.keyboardWillShowNotification) {
+                            let height = note.keyboardHeight
+                            if height > 200 {
+                                await MainActor.run {
+                                    isKeyboardVisible = true
+                                    savedKeyboardHeight = height - 20
+                                }
+                            }
                         }
                     }
-                }
-                async {
-                    for await _ in NotificationCenter.default.notifications(named: UIResponder.keyboardWillHideNotification) {
-                        isKeyboardVisible = false
+                    group.addTask {
+                        for await _ in NotificationCenter.default.notifications(named: UIResponder.keyboardWillHideNotification) {
+                            await MainActor.run { isKeyboardVisible = false }
+                        }
                     }
                 }
             }

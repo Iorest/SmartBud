@@ -15,6 +15,7 @@ struct DimeShortcuts: AppShortcutsProvider {
             phrases: [
                 "Log a new transaction in \(.applicationName)"
             ],
+            shortTitle: LocalizedStringResource("New Transaction"),
             systemImageName: "books.vertical.fill"
         )
         AppShortcut(
@@ -22,6 +23,7 @@ struct DimeShortcuts: AppShortcutsProvider {
             phrases: [
                 "Get insights in \(.applicationName)"
             ],
+            shortTitle: LocalizedStringResource("Get Insights"),
             systemImageName: "plusminus.circle.fill"
         )
         AppShortcut(
@@ -29,6 +31,7 @@ struct DimeShortcuts: AppShortcutsProvider {
             phrases: [
                 "Extract leftover amount for your budgets in \(.applicationName)"
             ],
+            shortTitle: LocalizedStringResource("Extract Budgets"),
             systemImageName: "circle.grid.2x2.fill"
         )
     }

@@ -43,7 +43,7 @@ struct TransactionView: View {
 
     @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     @State var showingDatePicker = false
@@ -235,7 +235,7 @@ struct TransactionView: View {
                 } label: {
                     deleteButtonIcon
                 }
-                .accessibilityLabel("delete transaction")
+                .accessibilityLabel(String(localized: "delete transaction"))
             }
 
             Button {

@@ -39,34 +39,38 @@ struct SettingsHapticsView: View {
 
             VStack(spacing: 0) {
                 ForEach(options.indices, id: \.self) { option in
-                    HStack {
-                        Text(LocalizedStringKey(options[option]))
-                            .font(.system(.body, design: .rounded))
-                            .foregroundStyle(Color.PrimaryText)
-
-                        Spacer()
-
-                        if hapticType == option {
-                            Image(systemName: "checkmark")
-                                .font(.system(.subheadline, design: .rounded))
-                                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                                .matchedGeometryEffect(id: "tick", in: animation)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .offset(x: wordShake && option == 1 ? -5 : 0)
-                    .onTapGesture {
+                    Button {
                         withAnimation(.easeIn(duration: 0.15)) {
                             hapticType = option
                         }
-                    }
-                    .padding(.vertical, 9)
-                    .overlay(alignment: .bottom) {
-                        if option < (options.count - 1) {
-                            Divider()
+                    } label: {
+                        HStack {
+                            Text(LocalizedStringKey(options[option]))
+                                .font(.system(.body, design: .rounded))
+                                .foregroundStyle(Color.PrimaryText)
+
+                            Spacer()
+
+                            if hapticType == option {
+                                Image(systemName: "checkmark")
+                                    .font(.system(.subheadline, design: .rounded))
+                                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                                    .matchedGeometryEffect(id: "tick", in: animation)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
+                        .offset(x: wordShake && option == 1 ? -5 : 0)
+                        .padding(.vertical, 9)
+                        .overlay(alignment: .bottom) {
+                            if option < (options.count - 1) {
+                                Divider()
+                            }
                         }
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(hapticType == option ? [.isButton, .isSelected] : .isButton)
                 }
             }
             .padding(.horizontal, 15)

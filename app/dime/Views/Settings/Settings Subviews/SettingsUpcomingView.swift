@@ -32,69 +32,77 @@ struct SettingsUpcomingView: View {
         .padding(.bottom, 20)
 
       VStack(spacing: 0) {
-        HStack {
-          Text("Display on Log Page")
-            .font(.system(.body, design: .rounded))
-            .foregroundStyle(Color.PrimaryText)
+        Button {
+          showFuture.toggle()
+        } label: {
+          HStack {
+            Text("Display on Log Page")
+              .font(.system(.body, design: .rounded))
+              .foregroundStyle(Color.PrimaryText)
 
-          Spacer()
+            Spacer()
 
-          ZStack(alignment: showFuture ? .trailing : .leading) {
-            Capsule()
-              .frame(width: 42, height: 28)
-              .foregroundStyle(showFuture ? .green : .gray.opacity(0.8))
+            ZStack(alignment: showFuture ? .trailing : .leading) {
+              Capsule()
+                .frame(width: 42, height: 28)
+                .foregroundStyle(showFuture ? .green : .gray.opacity(0.8))
 
-            Circle()
-              .foregroundStyle(Color.white)
-              .padding(2)
-              .frame(width: 28, height: 28)
-              .matchedGeometryEffect(id: "toggle1", in: animation)
-          }
-          .onTapGesture {
-            showFuture.toggle()
-          }
-          .onChange(of: showFuture) { _, newValue in
-            UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
-              newValue, forKey: "showUpcomingTransactions")
-
-            if !newValue {
-              showSoon = false
-              UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
-                false, forKey: "showUpcomingTransactionsWhenUpcoming")
+              Circle()
+                .foregroundStyle(Color.white)
+                .padding(2)
+                .frame(width: 28, height: 28)
+                .matchedGeometryEffect(id: "toggle1", in: animation)
             }
           }
+          .frame(maxWidth: .infinity)
+          .contentShape(Rectangle())
+          .padding(.vertical, 9)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 9)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(showFuture ? [.isButton, .isSelected] : .isButton)
+        .onChange(of: showFuture) { _, newValue in
+          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+            newValue, forKey: "showUpcomingTransactions")
 
-        HStack {
-          Text("Limit to 14-Day Outlook")
-            .font(.system(.body, design: .rounded))
-            .foregroundStyle(Color.PrimaryText)
-
-          Spacer()
-
-          ZStack(alignment: showSoon ? .trailing : .leading) {
-            Capsule()
-              .frame(width: 42, height: 28)
-              .foregroundStyle(showSoon ? .green : .gray.opacity(0.8))
-
-            Circle()
-              .foregroundStyle(Color.white)
-              .padding(2)
-              .frame(width: 28, height: 28)
-              .matchedGeometryEffect(id: "toggle2", in: animation)
-          }
-          .onTapGesture {
-            showSoon.toggle()
-          }
-          .onChange(of: showSoon) { _, newValue in
+          if !newValue {
+            showSoon = false
             UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
-              newValue, forKey: "showUpcomingTransactionsWhenUpcoming")
+              false, forKey: "showUpcomingTransactionsWhenUpcoming")
           }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 9)
+
+        Button {
+          showSoon.toggle()
+        } label: {
+          HStack {
+            Text("Limit to 14-Day Outlook")
+              .font(.system(.body, design: .rounded))
+              .foregroundStyle(Color.PrimaryText)
+
+            Spacer()
+
+            ZStack(alignment: showSoon ? .trailing : .leading) {
+              Capsule()
+                .frame(width: 42, height: 28)
+                .foregroundStyle(showSoon ? .green : .gray.opacity(0.8))
+
+              Circle()
+                .foregroundStyle(Color.white)
+                .padding(2)
+                .frame(width: 28, height: 28)
+                .matchedGeometryEffect(id: "toggle2", in: animation)
+            }
+          }
+          .frame(maxWidth: .infinity)
+          .contentShape(Rectangle())
+          .padding(.vertical, 9)
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
+        .onChange(of: showSoon) { _, newValue in
+          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+            newValue, forKey: "showUpcomingTransactionsWhenUpcoming")
+        }
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))

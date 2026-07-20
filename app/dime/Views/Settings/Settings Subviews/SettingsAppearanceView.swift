@@ -34,23 +34,7 @@ struct SettingsAppearanceView: View {
 
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { option in
-          HStack {
-            Text(LocalizedStringKey(options[option]))
-              .font(.system(.body, design: .rounded))
-              .foregroundStyle(Color.PrimaryText)
-
-            Spacer()
-
-            if colourScheme == option {
-              Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                .matchedGeometryEffect(id: "tick", in: animation)
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .onTapGesture {
+          Button {
             withAnimation(.easeIn(duration: 0.15)) {
               colourScheme = option
             }
@@ -58,13 +42,33 @@ struct SettingsAppearanceView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
               dismiss()
             }
-          }
-          .padding(.vertical, 9)
-          .overlay(alignment: .bottom) {
-            if option < (options.count - 1) {
-              Divider()
+          } label: {
+            HStack {
+              Text(LocalizedStringKey(options[option]))
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.PrimaryText)
+
+              Spacer()
+
+              if colourScheme == option {
+                Image(systemName: "checkmark")
+                  .font(.system(.subheadline, design: .rounded))
+                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
+                  .matchedGeometryEffect(id: "tick", in: animation)
+                  .accessibilityHidden(true)
+              }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
+            .overlay(alignment: .bottom) {
+              if option < (options.count - 1) {
+                Divider()
+              }
             }
           }
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(colourScheme == option ? [.isButton, .isSelected] : .isButton)
         }
       }
       .padding(.horizontal, 15)

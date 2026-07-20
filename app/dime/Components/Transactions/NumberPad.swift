@@ -153,7 +153,7 @@ struct NumberPad: View {
         } label: {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
-                Text(Locale.current.decimalSeparator ?? ".")
+                Text(Locale.appLocale.decimalSeparator ?? ".")
                     .font(.system(.title2, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
                 Spacer(minLength: 0)

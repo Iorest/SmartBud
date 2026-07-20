@@ -19,7 +19,7 @@ struct SettingsNumberEntryView: View {
         String = Locale.current.currency?.identifier ?? "USD"
 
     private var currencySymbol: String {
-        return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
+        return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
     /// Single source of truth for the demo amount. `@State` so the view owns
@@ -48,28 +48,31 @@ struct SettingsNumberEntryView: View {
             HStack(spacing: 0) {
                 ForEach(options.indices, id: \.self) { option in
                     let isSelected = numberEntryType == (option + 1)
-                    Text(LocalizedStringKey(options[option]))
-                        .font(.system(.body, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
-                        .padding(6)
-                        .padding(.horizontal, 8)
-                        .background {
-                            if isSelected {
-                                Capsule()
-                                    .fill(Color.SecondaryBackground)
-                                    .matchedGeometryEffect(id: "TAB1", in: animation)
+                    Button {
+                        DispatchQueue.main.async {
+                            withAnimation(.easeIn(duration: 0.15)) {
+                                numberEntryType = (option + 1)
+                                vm.numberEntryType = option + 1
                             }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            DispatchQueue.main.async {
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    numberEntryType = (option + 1)
-                                    vm.numberEntryType = option + 1
+                    } label: {
+                        Text(LocalizedStringKey(options[option]))
+                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
+                            .padding(6)
+                            .padding(.horizontal, 8)
+                            .background {
+                                if isSelected {
+                                    Capsule()
+                                        .fill(Color.SecondaryBackground)
+                                        .matchedGeometryEffect(id: "TAB1", in: animation)
                                 }
                             }
-                        }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
                 }
             }
             .padding(3)

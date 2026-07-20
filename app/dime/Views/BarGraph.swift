@@ -36,11 +36,23 @@ struct BarGraph: View {
 
     private var yMax: Double { max(roundedMax, 1) }
 
+    /// Indices into `data` that should be drawn on the x-axis. Using the array
+    /// index (not the label) as the BarMark x-value is critical: the month
+    /// period has 23 empty-label buckets that would otherwise all collapse
+    /// onto the same x position, hiding most of the bars.
+    private var xAxisTickIndices: [Int] {
+        switch period {
+        case 1: return Array(0..<min(7, data.count))
+        case 3: return Array(0..<min(12, data.count))
+        default: return stride(from: 0, to: data.count, by: 7).map { $0 }
+        }
+    }
+
     var body: some View {
-        Chart(data) { point in
+        Chart(Array(data.indices), id: \.self) { index in
             BarMark(
-                x: .value("Slot", point.label.isEmpty ? "" : point.label),
-                y: .value("Amount", point.amount)
+                x: .value("Slot", index),
+                y: .value("Amount", data[index].amount)
             )
             .foregroundStyle(Color.DarkBackground)
             .cornerRadius(6)
@@ -54,6 +66,7 @@ struct BarGraph: View {
                 }
             }
         }
+        .chartXScale(domain: -0.5...Double(max(0, data.count - 1)) + 0.5)
         .chartYScale(domain: 0...yMax)
         .chartYAxis {
             AxisMarks(position: .leading, values: [0, yMax]) { value in
@@ -68,14 +81,14 @@ struct BarGraph: View {
             }
         }
         .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: data.count)) { value in
+            AxisMarks(values: xAxisTickIndices) { value in
                 AxisGridLine().foregroundStyle(.clear)
                 AxisValueLabel {
-                    if let label = value.as(String.self) {
-                        Text(label)
+                    if let idx = value.as(Int.self), idx >= 0, idx < data.count {
+                        Text(data[idx].label)
                             .font(.system(size: period == 1 ? 12 : 10, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.SubtitleText)
-                            .opacity(labelOpacity(for: label))
+                            .opacity(labelOpacity(at: idx))
                     }
                 }
             }
@@ -94,12 +107,11 @@ struct BarGraph: View {
         return value < 10 ? String(format: "%.1f", value) : String(format: "%.0f", value)
     }
 
-    private func labelOpacity(for label: String) -> Double {
-        // Match the legacy "dim 0-amount labels" behaviour: any day whose
-        // amount is 0 in the month-period view (where labels are digits)
-        // gets a 0.3 alpha. The Charts axis only has the label, not the
-        // amount, so we look it up by label.
-        guard period == 2 else { return 1.0 }
-        return data.first(where: { $0.label == label })?.amount == 0 ? 0.3 : 1.0
+    private func labelOpacity(at index: Int) -> Double {
+        // Dim 0-amount day labels in the month view so users can see which
+        // days had no spending. Look up by index, not by label — multiple
+        // buckets share the same label, so a label-based lookup is wrong.
+        guard period == 2, index >= 0, index < data.count else { return 1.0 }
+        return data[index].amount == 0 ? 0.3 : 1.0
     }
 }

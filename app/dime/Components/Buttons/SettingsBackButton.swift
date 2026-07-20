@@ -16,5 +16,6 @@ struct SettingsBackButton: View {
       .padding(8)
       .background(Circle().fill(.clear))
       .glassChip(in: Circle())
+      .accessibilityLabel(String(localized: "Back"))
   }
 }

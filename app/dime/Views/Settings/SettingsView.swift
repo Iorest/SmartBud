@@ -26,8 +26,7 @@ struct SettingsView: View {
     }
   }
 
-  @AppStorage("appLanguage", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
-  var appLanguage: String = ""
+  @AppLanguage var appLanguage: String = ""
   var appLanguageString: String {
     settingsVM.displayName(for: appLanguage)
   }
@@ -521,13 +520,14 @@ struct SettingsView: View {
 
                 .foregroundStyle(Color.SubtitleText)
 
-              Text("What's New")
-                .font(.system(.footnote, design: .rounded).weight(.medium))
-
-                .foregroundStyle(Color.PrimaryText)
-                .onTapGesture {
-                  showUpdate = true
-                }
+              Button {
+                showUpdate = true
+              } label: {
+                Text("What's New")
+                  .font(.system(.footnote, design: .rounded).weight(.medium))
+                  .foregroundStyle(Color.PrimaryText)
+              }
+              .buttonStyle(.plain)
             }
 
             Text(
@@ -559,41 +559,47 @@ struct SettingsView: View {
   @ViewBuilder
     func ToggleRow(icon: String, color: String, text: String, bool: Bool, smaller: Bool = false, onTap: @escaping () -> Void)
     -> some View {
-    HStack(spacing: 12) {
-      Image(systemName: icon)
-            .font(.system(smaller ? .subheadline : .body, design: .rounded))
-        .foregroundStyle(.white)
-        .frame(
-          width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
-          alignment: .center
-        )
-        .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
-
-      Text(LocalizedStringKey(text))
-        .font(.system(.body, design: .rounded).weight(.medium))
-        .lineLimit(1)
-        .foregroundStyle(Color.PrimaryText)
-
-      Spacer()
-
-      ZStack(alignment: bool ? .trailing : .leading) {
-        Capsule()
-          .frame(width: 42, height: 28)
-          .foregroundStyle(bool ? .green : .gray.opacity(0.8))
-
-        Circle()
-          .foregroundStyle(Color.white)
-          .padding(2)
-          .frame(width: 28, height: 28)
-          .matchedGeometryEffect(id: "toggle\(color)", in: animation)
+    Button {
+      withAnimation {
+        onTap()
       }
-      .onTapGesture {
-        withAnimation {
-          onTap()
+    } label: {
+      HStack(spacing: 12) {
+        Image(systemName: icon)
+          .font(.system(smaller ? .subheadline : .body, design: .rounded))
+          .foregroundStyle(.white)
+          .frame(
+            width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
+            alignment: .center
+          )
+          .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
+          .accessibilityHidden(true)
+
+        Text(LocalizedStringKey(text))
+          .font(.system(.body, design: .rounded).weight(.medium))
+          .lineLimit(1)
+          .foregroundStyle(Color.PrimaryText)
+
+        Spacer()
+
+        ZStack(alignment: bool ? .trailing : .leading) {
+          Capsule()
+            .frame(width: 42, height: 28)
+            .foregroundStyle(bool ? .green : .gray.opacity(0.8))
+
+          Circle()
+            .foregroundStyle(Color.white)
+            .padding(2)
+            .frame(width: 28, height: 28)
+            .matchedGeometryEffect(id: "toggle\(color)", in: animation)
         }
       }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
     }
-    .frame(maxWidth: .infinity)
+    .buttonStyle(.plain)
+    .accessibilityLabel(LocalizedStringKey(text))
+    .accessibilityAddTraits(bool ? [.isButton, .isSelected] : .isButton)
   }
 
   func makeAttributedString() -> AttributedString {

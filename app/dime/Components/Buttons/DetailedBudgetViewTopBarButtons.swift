@@ -11,6 +11,7 @@ import SwiftUI
 struct DetailedBudgetViewTopBarButton: View {
     var imageName: String
     var color: Color
+    var label: String
     var action: () -> Void
 
     var body: some View {
@@ -26,5 +27,6 @@ struct DetailedBudgetViewTopBarButton: View {
                 .tintedGlassChip(color.opacity(0.5), in: Circle())
                 .contentShape(Circle())
         }
+        .accessibilityLabel(label)
     }
 }

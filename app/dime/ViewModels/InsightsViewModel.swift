@@ -421,7 +421,7 @@ final class InsightsViewModel{
     var yesterdayTransactions: [TransactionModel] = []
     var currency: String = Locale.current.currency?.identifier ?? "USD"
     var showCents: Bool = true
-    var currencySymbol: String = Locale.current.currencySymbol ?? "$"
+    var currencySymbol: String = Locale.appLocale.currencySymbol ?? "$"
 
     /// Gregorian calendar with the user's first-weekday preference applied.
     private var configuredCalendar: Calendar {
@@ -515,7 +515,8 @@ final class InsightsViewModel{
     }
 
     /// Bar-chart buckets for the period. Week: 7 daily buckets, single-letter M T W T F S S labels.
-    /// Month: 30 daily buckets, every 7th day labelled (1, 8, 15, 22, 29). Year: 12 monthly buckets.
+    /// Month: `count` daily buckets matching the actual days in the period (28/29/30/31),
+    /// every 7th day labelled (1, 8, 15, 22, 29). Year: 12 monthly buckets.
     func getBarChartData(for period: Int) -> [BarChartPoint] {
         let cal = configuredCalendar
         let (start, _) = getPeriodDateRange(for: period)
@@ -527,7 +528,10 @@ final class InsightsViewModel{
         switch period {
         case 1: count = 7; step = .day
         case 3: count = 12; step = .month
-        default: count = 30; step = .day
+        default:
+            // Match the period's actual day count (28/29/30/31), not a hardcoded 30.
+            count = cal.range(of: .day, in: .month, for: start)?.count ?? 30
+            step = .day
         }
 
         var result = [BarChartPoint]()
@@ -677,11 +681,10 @@ final class InsightsViewModel{
     }
 
     private func currencySymbolFor(code: String) -> String {
-        let locale = Locale(identifier: "en_US")
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = code
-        formatter.locale = locale
+        formatter.locale = Locale.appLocale
         return formatter.currencySymbol ?? code
     }
 }

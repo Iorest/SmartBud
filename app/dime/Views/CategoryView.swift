@@ -1316,7 +1316,7 @@ struct DeleteCategoryAlert: View {
 //                    .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 15)
-                    .accessibility(hidden: true)
+                    .accessibilityHidden(true)
 
                 Button {
                     deleted = true

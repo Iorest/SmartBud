@@ -11,7 +11,7 @@ struct BackButton: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        ToolbarButton(systemName: "chevron.left") {
+        ToolbarButton(systemName: "chevron.left", accessibilityLabel: String(localized: "Back")) {
             dismiss()
         }
     }

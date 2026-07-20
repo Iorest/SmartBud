@@ -34,8 +34,8 @@ extension Currency {
 
     static var allCurrencies: [Currency] {
         let currencies: [Currency] = currencyCodes.compactMap {
-            let name = Locale.current.localizedString(forCurrencyCode: $0) ?? ""
-            let symbol = Locale.current.localizedCurrencySymbol(forCurrencyCode: $0) ?? ""
+            let name = Locale.appLocale.localizedString(forCurrencyCode: $0) ?? ""
+            let symbol = Locale.appCurrencySymbol(forCurrencyCode: $0)
             return Currency(name: name, code: $0, symbol: symbol)
         }
         return currencies
