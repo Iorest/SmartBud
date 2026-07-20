@@ -153,6 +153,8 @@
 		DC1A413685F24A9FE8B7507D /* WidgetEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D7462C838073F70EB4B0F5 /* WidgetEnums.swift */; };
 		E0906D770E6D45DD97BD672A /* SettingsProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */; };
 		E1E7AEE5300B627F00E5B3E1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */; };
+		D6A1B2C3D4E5F6071829A0C6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */; };
+		D6A1B2C3D4E5F6071829A0C5 /* WidgetConfiguration.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0C4 /* WidgetConfiguration.xcstrings */; };
 		EA73CF5EB74E4812BEFC8A76 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */; };
 		EAD8E5794121478C9198DC1C /* SwiftDataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12072D557564B5B9E98F56D /* SwiftDataCore.swift */; };
 		FCCEDDC1F83742EC8CE62204 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */; };
@@ -301,6 +303,7 @@
 		D63B205E2D8728C300CAFB20 /* ScreenSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSize.swift; sourceTree = "<group>"; };
 		D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLanguageView.swift; sourceTree = "<group>"; };
 		E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = Localizations/Localizable.xcstrings; sourceTree = "<group>"; };
+		D6A1B2C3D4E5F6071829A0C4 /* WidgetConfiguration.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = WidgetConfiguration.xcstrings; path = ExpenditureWidget/WidgetConfiguration.xcstrings; sourceTree = "<group>"; };
 		F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
 		F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionViewModel.swift; sourceTree = "<group>"; };
 		F69F2676652B477A97938CFD /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
@@ -355,6 +358,7 @@
 			isa = PBXGroup;
 			children = (
 				E1E7AEE4300B627F00E5B3E1 /* Localizable.xcstrings */,
+				D6A1B2C3D4E5F6071829A0C4 /* WidgetConfiguration.xcstrings */,
 				53EB931028A65F670026BE28 /* ExpenditureWidgetExtension.entitlements */,
 				5327D285287C697400F76ADF /* dime */,
 				53B1D18F288ED7E500E28062 /* ExpenditureWidget */,
@@ -703,6 +707,8 @@
 				533182D328A0D61D00DEBFA3 /* Assets.xcassets in Resources */,
 				53B1D193288ED87000E28062 /* Assets.xcassets in Resources */,
 				D63B20542D8728C300CAFB20 /* (null) in Resources */,
+				D6A1B2C3D4E5F6071829A0C6 /* Localizable.xcstrings in Resources */,
+				D6A1B2C3D4E5F6071829A0C5 /* WidgetConfiguration.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

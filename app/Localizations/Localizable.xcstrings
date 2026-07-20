@@ -135,6 +135,18 @@
             "state" : "new",
             "value" : "%1$@ (%2$@)"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@（%2$@）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@（%2$@）"
+          }
         }
       }
     },
@@ -323,6 +335,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@, %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@，%2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@，%2$@"
           }
         }
       }
@@ -1803,7 +1827,27 @@
       }
     },
     "Average" : {
-
+      "comment" : "Insights avg-per-day label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        }
+      }
     },
     "AVG/DAY" : {
       "comment" : "Insights avg per day",
@@ -9530,7 +9574,27 @@
       }
     },
     "Slot" : {
-
+      "comment" : "Settings upcoming log time-slot",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slot"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间段"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時段"
+          }
+        }
+      }
     },
     "SmartBud Pro" : {
       "extractionState" : "manual",
