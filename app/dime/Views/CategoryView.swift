@@ -143,9 +143,9 @@ struct CategoryListView: View {
     @Environment(\.colorScheme) var systemColorScheme
     @Environment(CategoryViewModel.self) var categoryVM
 
-    @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
+    @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
 
-    @AppStorage("categorySuggestions", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showSuggestions: Bool = true
+    @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true
     @State var suggestionsToast = false
 
     @State private var offset: CGFloat = 0
@@ -1290,7 +1290,7 @@ struct DeleteCategoryAlert: View {
     @Binding var deleted: Bool
     @Environment(\.colorScheme) var systemColorScheme
 
-    @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
+    @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
 
     @State private var offset: CGFloat = 0
 
@@ -1650,7 +1650,7 @@ struct ColourPickerView: View {
         GridItem(.fixed(40))
     ]
 
-    @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
+    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
 
     @Environment(\.colorScheme) var systemColorScheme
 

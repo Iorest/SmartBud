@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsHapticsView: View {
-    @AppStorage("haptics", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("haptics", store: .appGroup)
     var hapticType: Int = 1
     @Environment(\.dismiss) var dismiss
 

@@ -61,12 +61,12 @@ struct SettingsUpcomingView: View {
         .buttonStyle(.plain)
         .accessibilityAddTraits(showFuture ? [.isButton, .isSelected] : .isButton)
         .onChange(of: showFuture) { _, newValue in
-          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+          UserDefaults.appGroup.set(
             newValue, forKey: "showUpcomingTransactions")
 
           if !newValue {
             showSoon = false
-            UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+            UserDefaults.appGroup.set(
               false, forKey: "showUpcomingTransactionsWhenUpcoming")
           }
         }
@@ -100,7 +100,7 @@ struct SettingsUpcomingView: View {
         .buttonStyle(.plain)
         .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
         .onChange(of: showSoon) { _, newValue in
-          UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+          UserDefaults.appGroup.set(
             newValue, forKey: "showUpcomingTransactionsWhenUpcoming")
         }
       }
@@ -124,9 +124,9 @@ struct SettingsUpcomingView: View {
     }
     .modifier(SettingsSubviewModifier())
     .onAppear {
-      showFuture = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.bool(
+      showFuture = UserDefaults.appGroup.bool(
         forKey: "showUpcomingTransactions")
-      showSoon = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.bool(
+      showSoon = UserDefaults.appGroup.bool(
         forKey: "showUpcomingTransactionsWhenUpcoming")
     }
   }

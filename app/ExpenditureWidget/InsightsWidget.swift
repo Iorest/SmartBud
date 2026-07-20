@@ -62,7 +62,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
         let context = ModelContext(Self.container)
         let now = Date.now
         var cal = Calendar(identifier: .gregorian)
-        cal.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+        cal.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
         cal.minimumDaysInFirstWeek = 4
 
         let startDate: Date
@@ -71,7 +71,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             let comps = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
             startDate = cal.date(from: comps)!
         case .month:
-            let sday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstDayOfMonth")
+            let sday = UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
             startDate = getStartOfMonth(startDay: sday)
         case .year:
             let comps = cal.dateComponents([.year], from: now)
@@ -96,7 +96,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             // calendar initialization
             var calendar = Calendar(identifier: .gregorian)
 
-            calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
             calendar.minimumDaysInFirstWeek = 4
 
             var dictionary = [Date: Double]()
@@ -328,13 +328,13 @@ struct InsightsWidgetEntryView: View {
     let monthNumberArray = [1, 4, 7, 10]
     let monthNames: [Int: String] = [1: "Jan", 4: "Apr", 7: "Jul", 10: "Oct"]
 
-    @AppStorage("firstDayOfMonth", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstDayOfMonth: Int = 1
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("firstDayOfMonth", store: .appGroup) var firstDayOfMonth: Int = 1
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
     var dollarText: String {
         if entry.amount < 10000 && showCents {

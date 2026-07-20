@@ -15,11 +15,11 @@ struct LogView: View {
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(\.scenePhase) private var scenePhase
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
     var topEdge: CGFloat
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
@@ -32,7 +32,7 @@ struct LogView: View {
     // top bar
     @State var navBarText = ""
     @State var showMenu = false
-    @AppStorage("logTimeFrame", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var logTimeFrame = 2
+    @AppStorage("logTimeFrame", store: .appGroup) var logTimeFrame = 2
     let subtitleText = ["today", "this week", "this month", "this year"]
 
     // show filter menu
@@ -316,10 +316,10 @@ struct LogInsightsView: View {
 
     @State var showMenu1 = false
 
-    @AppStorage("logInsightsTimeFrame", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var timeframe = 2
-    @AppStorage("logInsightsType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var insightsType = 1
+    @AppStorage("logInsightsTimeFrame", store: .appGroup) var timeframe = 2
+    @AppStorage("logInsightsType", store: .appGroup) var insightsType = 1
 
-    @AppStorage("logViewLineGraph", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var lineGraph: Bool = false
+    @AppStorage("logViewLineGraph", store: .appGroup) var lineGraph: Bool = false
 
     private var data: InsightsViewModel.LogInsightsData {
         insightsVM.logInsightsData(timeframe: timeframe, insightsType: insightsType)
@@ -545,7 +545,7 @@ struct TimePickerView: View {
     @Binding var timeframe: Int
     @State var holdingTimeframe = 0
 
-    @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
+    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
 
     @Environment(\.colorScheme) var systemColorScheme
 
@@ -618,7 +618,7 @@ struct FilterPickerView: View {
     @Binding var filterType: FilterType
     @Binding var showMenu: Bool
 
-    @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
+    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
 
     @Environment(\.colorScheme) var systemColorScheme
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
@@ -692,8 +692,8 @@ struct TransactionsList: View {
     var month: Date
     var income: Bool
 
-    @AppStorage("showUpcomingTransactions", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showUpcoming: Bool = true
-    @AppStorage("showUpcomingTransactionsWhenUpcoming", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showSoon: Bool = false
+    @AppStorage("showUpcomingTransactions", store: .appGroup) var showUpcoming: Bool = true
+    @AppStorage("showUpcomingTransactionsWhenUpcoming", store: .appGroup) var showSoon: Bool = false
 
     @Query private var transactions: [TransactionModel]
 
@@ -748,17 +748,17 @@ struct TransactionsList: View {
 struct ListView: View {
     var transactions: [TransactionModel]
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
     
-    @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
     var showExpenseOrIncomeSign: Bool = true
 
-    @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
+    @AppStorage("swapTimeLabel", store: .appGroup) var swapTimeLabel: Bool = false
 
     @Environment(OverallToastPresenter.self) var toastPresenter
 
@@ -891,17 +891,17 @@ struct FutureListView: View {
         }
     }
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
     
-    @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
     var showExpenseOrIncomeSign: Bool = true
 
-    @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
+    @AppStorage("swapTimeLabel", store: .appGroup) var swapTimeLabel: Bool = false
 
     var totalString: String {
         let numberFormatter = NumberFormatter()
@@ -1304,7 +1304,7 @@ struct DeleteTransactionAlert: View {
 
     @Environment(\.colorScheme) var systemColorScheme
 
-    @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var bottomEdge: Double = 15
+    @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
 
     @State private var offset: CGFloat = 0
 
@@ -1504,16 +1504,16 @@ struct FilteredDateView: View {
 
     var date: Date
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-    @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
+    @AppStorage("swapTimeLabel", store: .appGroup) var swapTimeLabel: Bool = false
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
-    @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
     var showExpenseOrIncomeSign: Bool = true
 
     var displayedTransactions: [TransactionModel] {
@@ -1846,7 +1846,7 @@ struct WeekStepperView: View {
             return Date.now
         } else {
             var calendar = Calendar(identifier: .gregorian)
-            calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")?.integer(forKey: "firstWeekday") ?? 0
+            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday") ?? 0
             calendar.minimumDaysInFirstWeek = 4
 
             let date = transactions[0].day ?? Date.now
@@ -1909,7 +1909,7 @@ struct WeekStepperView: View {
         .onAppear {
             var calendar = Calendar(identifier: .gregorian)
 
-            calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")?.integer(forKey: "firstWeekday") ?? 0
+            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday") ?? 0
             calendar.minimumDaysInFirstWeek = 4
 
             let date = transactionsReversed[0].day ?? Date.now

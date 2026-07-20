@@ -42,10 +42,10 @@ enum InsightsPeriod: Int, CaseIterable, Identifiable {
 struct InsightsView: View {
     @Environment(InsightsViewModel.self) var insightsVM
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("currency", store: .appGroup)
     private var currency: String = Locale.current.currency?.identifier ?? "USD"
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("showCents", store: .appGroup)
     private var showCents: Bool = true
 
     @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)

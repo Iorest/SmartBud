@@ -26,7 +26,7 @@ struct BarGraph: View {
     let income: Bool
     let period: Int  // 1=week, 2=month, 3=year
 
-    @AppStorage("animated", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("animated", store: .appGroup)
     var animated: Bool = true
 
     private var roundedMax: Double {

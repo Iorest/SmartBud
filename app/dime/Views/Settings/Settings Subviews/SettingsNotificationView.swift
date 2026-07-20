@@ -12,9 +12,9 @@ import SwiftUI
 struct SettingsNotificationsView: View {
   @Environment(\.dismiss) var dismiss
 
-  @AppStorage("showNotifications", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("showNotifications", store: .appGroup)
   var showNotifications: Bool = false
-  @AppStorage("notificationsEnabled", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("notificationsEnabled", store: .appGroup)
   var notificationsEnabled: Bool = true
   @State var option = 1
   @State var customTime = Date.now
@@ -209,7 +209,7 @@ struct SettingsNotificationsView: View {
         .padding(.horizontal, 15)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
         .onChange(of: option) { _, newValue in
-          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
+          let defaults = UserDefaults.appGroup
           defaults.set(
             option, forKey: "notificationOption")
 
@@ -225,7 +225,7 @@ struct SettingsNotificationsView: View {
           newNotification()
         }
         .onChange(of: customTime) { _, _ in
-          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
+          let defaults = UserDefaults.appGroup
           let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
           defaults.set(
@@ -236,7 +236,7 @@ struct SettingsNotificationsView: View {
           newNotification()
         }
         .onAppear {
-          let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime") ?? .standard
+          let defaults = UserDefaults.appGroup
           if defaults.object(
             forKey: "notificationOption") != nil {
             option = defaults.integer(
@@ -274,9 +274,9 @@ func newNotification() {
   var components = DateComponents()
   var option = 1
 
-  if UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(forKey: "notificationOption")
+  if UserDefaults.appGroup.object(forKey: "notificationOption")
     != nil {
-    option = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+    option = UserDefaults.appGroup.integer(
       forKey: "notificationOption")
   }
 
@@ -287,11 +287,11 @@ func newNotification() {
     components.hour = 20
     components.minute = 0
   } else {
-    if UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(forKey: "customHour") != nil,
-      UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.object(forKey: "customMinute") != nil {
-      components.hour = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+    if UserDefaults.appGroup.object(forKey: "customHour") != nil,
+      UserDefaults.appGroup.object(forKey: "customMinute") != nil {
+      components.hour = UserDefaults.appGroup.integer(
         forKey: "customHour")
-      components.minute = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(
+      components.minute = UserDefaults.appGroup.integer(
         forKey: "customMinute")
     } else {
       components.hour = 8

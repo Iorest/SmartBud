@@ -72,7 +72,7 @@ struct Provider: AppIntentTimelineProvider {
             startDate = calendar.startOfDay(for: now)
         case .week:
             var cal = calendar
-            cal.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+            cal.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
             cal.minimumDaysInFirstWeek = 4
             let dateComponents = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
             startDate = cal.date(from: dateComponents)!
@@ -116,7 +116,7 @@ struct Provider: AppIntentTimelineProvider {
         let now = Date.now
 
         var calendar = Calendar(identifier: .gregorian)
-        calendar.firstWeekday = UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.integer(forKey: "firstWeekday")
+        calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
         calendar.minimumDaysInFirstWeek = 4
 
         let startDate: Date
@@ -163,12 +163,12 @@ struct ExpenditureWidgetEntryView: View {
     @Environment(\.widgetFamily) var widgetFamily
     let entry: Provider.Entry
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-    @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
     var inlineSubtitleText: String {
         switch entry.duration {
@@ -494,7 +494,7 @@ struct RecentTransactionsDollarView: View {
     var net: Bool
     var bigger: Bool = false
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }

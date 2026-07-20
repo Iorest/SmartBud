@@ -15,7 +15,7 @@ struct SettingsProView: View {
     @Environment(\.dismiss) var dismiss
     @State var settingsVM = SettingsViewModel.shared
 
-    @AppStorage("isProSubscriber", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("isProSubscriber", store: .appGroup)
     var isProSubscriber: Bool = false
 
     @State private var loadedProducts: [Product] = []

@@ -14,7 +14,7 @@ import WidgetKit
 struct SettingsView: View {
   @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
-  @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("colourScheme", store: .appGroup)
   var colourScheme: Int = 0
   var colourSchemeString: String {
     if colourScheme == 1 {
@@ -31,7 +31,7 @@ struct SettingsView: View {
     settingsVM.displayName(for: appLanguage)
   }
 
-  @AppStorage("activeIcon", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("activeIcon", store: .appGroup)
   var activeIcon: String = "AppIcon"
   var appIconString: String {
     if activeIcon == "AppIcon1" {
@@ -43,7 +43,7 @@ struct SettingsView: View {
     }
   }
 
-  @AppStorage("firstWeekday", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("firstWeekday", store: .appGroup)
   var firstWeekday: Int = 1
   var firstWeekdayString: String {
     if firstWeekday == 1 {
@@ -53,9 +53,9 @@ struct SettingsView: View {
     }
   }
 
-  @AppStorage("showNotifications", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("showNotifications", store: .appGroup)
   var showNotifications: Bool = false
-  @AppStorage("notificationOption", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("notificationOption", store: .appGroup)
   var option: Int = 1
   var notificationString: String {
     if showNotifications {
@@ -87,7 +87,7 @@ struct SettingsView: View {
   let featureRequestEmail = SupportEmail(
     toAddress: "rafasohhh@gmail.com", subject: "Feature Request")
 
-  @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("numberEntryType", store: .appGroup)
   var numberEntryType: Int = 2
 
   var numberEntryString: String {
@@ -98,23 +98,23 @@ struct SettingsView: View {
     }
   }
 
-  @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("showCents", store: .appGroup)
   var showCents: Bool = true
 
-  @AppStorage("animated", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var animated:
+  @AppStorage("animated", store: .appGroup) var animated:
     Bool = true
 
-  @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency:
+  @AppStorage("currency", store: .appGroup) var currency:
     String = Locale.current.currency?.identifier ?? "USD"
 
-  @AppStorage("incomeTracking", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("incomeTracking", store: .appGroup)
   var incomeTracking: Bool = true
     
-  @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+  @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
   var showExpenseOrIncomeSign: Bool = true
 
   @AppStorage(
-    "showUpcomingTransactions", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    "showUpcomingTransactions", store: .appGroup)
   var showUpcoming: Bool = true
 
   var upcomingString: String {
@@ -125,7 +125,7 @@ struct SettingsView: View {
     }
   }
 
-    @AppStorage("haptics", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("haptics", store: .appGroup)
     var hapticType: Int = 1
 
     var hapticString: String {
@@ -285,9 +285,9 @@ struct SettingsView: View {
                   incomeTracking.toggle()
 
                   if !incomeTracking {
-                    UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+                    UserDefaults.appGroup.set(
                       false, forKey: "insightsViewIncomeFiltering")
-                    UserDefaults(suiteName: "group.com.rafaelsoh.dime")!.set(
+                    UserDefaults.appGroup.set(
                       3, forKey: "logInsightsType")
                   }
                 })

@@ -10,30 +10,30 @@ import WidgetKit
 struct ContentView: View {
     @Environment(AppLockViewModel.self) var appLockVM
 
-    @AppStorage("colourScheme", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var colourScheme: Int = 0
+    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
     @Environment(\.scenePhase) var scenePhase
-    @AppStorage("showNotifications", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showNotifications: Bool = false
-    @AppStorage("notificationsEnabled", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var notificationsEnabled: Bool = true
+    @AppStorage("showNotifications", store: .appGroup) var showNotifications: Bool = false
+    @AppStorage("notificationsEnabled", store: .appGroup) var notificationsEnabled: Bool = true
 
-    @AppStorage("firstLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstLaunch: Bool = true
+    @AppStorage("firstLaunch", store: .appGroup) var firstLaunch: Bool = true
 
     // adds category orders
-    @AppStorage("dataMigration1", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var dataMigration1: Bool = true
+    @AppStorage("dataMigration1", store: .appGroup) var dataMigration1: Bool = true
 
     // converts category colors to hex codes
-    @AppStorage("dataMigration2", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var dataMigration2: Bool = true
+    @AppStorage("dataMigration2", store: .appGroup) var dataMigration2: Bool = true
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     @State var showIntro: Bool = false
     @State var showUpdate: Bool = false
 
-    @AppStorage("topEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedTopEdge: Double = 30
-    @AppStorage("bottomEdge", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedBottomEdge: Double = 15
+    @AppStorage("topEdge", store: .appGroup) var savedTopEdge: Double = 30
+    @AppStorage("bottomEdge", store: .appGroup) var savedBottomEdge: Double = 15
 
-    @AppStorage("previousVersion", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var previousVersionString: String = "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"
+    @AppStorage("previousVersion", store: .appGroup) var previousVersionString: String = "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"
 
-    @AppStorage("showUpdateSheet", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showUpdateSheet: Bool = true
+    @AppStorage("showUpdateSheet", store: .appGroup) var showUpdateSheet: Bool = true
 
     @AppLanguage var appLanguage: String = ""
 

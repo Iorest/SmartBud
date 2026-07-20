@@ -25,8 +25,8 @@ struct CustomTabBar: View {
 
     var launchAdd: Bool
 
-    @AppStorage("confetti", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var confetti: Bool = false
-    @AppStorage("firstTransactionViewLaunch", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstLaunch: Bool = true
+    @AppStorage("confetti", store: .appGroup) var confetti: Bool = false
+    @AppStorage("firstTransactionViewLaunch", store: .appGroup) var firstLaunch: Bool = true
 
     private var isZoomed: Bool {
         false

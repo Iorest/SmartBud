@@ -9,13 +9,13 @@ import Foundation
 import SwiftUI
 
 struct SettingsNumberEntryView: View {
-    @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
+    @AppStorage("numberEntryType", store: .appGroup)
     var numberEntryType: Int = 1
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency:
+    @AppStorage("currency", store: .appGroup) var currency:
         String = Locale.current.currency?.identifier ?? "USD"
 
     private var currencySymbol: String {

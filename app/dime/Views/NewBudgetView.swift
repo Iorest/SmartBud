@@ -30,8 +30,8 @@ struct InstructionHeadings {
 struct BrandNewBudgetView: View {
     @Query private var categories: [CategoryModel]
 
-    @AppStorage("firstWeekday", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstWeekday: Int = 1
-    @AppStorage("firstDayOfMonth", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var firstDayOfMonth: Int = 1
+    @AppStorage("firstWeekday", store: .appGroup) var firstWeekday: Int = 1
+    @AppStorage("firstDayOfMonth", store: .appGroup) var firstDayOfMonth: Int = 1
 
     @Environment(BudgetViewModel.self) var budgetVM
 
@@ -85,11 +85,11 @@ struct BrandNewBudgetView: View {
 //        return (amount as NSString).doubleValue
 //    }
 
-    @AppStorage("numberEntryType", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var numberEntryType: Int = 1
+    @AppStorage("numberEntryType", store: .appGroup) var numberEntryType: Int = 1
 
     @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
-    @AppStorage("currency", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }

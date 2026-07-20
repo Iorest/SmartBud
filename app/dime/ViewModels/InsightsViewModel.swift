@@ -159,8 +159,8 @@ final class InsightsViewModel{
     /// configured first-weekday/first-day-of-month. `nil` means "all time" (no lower bound).
     private func logViewPeriodStart(type: Int) -> Date? {
         var calendar = Calendar(identifier: .gregorian)
-        let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime")
-        calendar.firstWeekday = defaults?.integer(forKey: "firstWeekday") ?? 0
+        let defaults = UserDefaults.appGroup
+        calendar.firstWeekday = defaults.integer(forKey: "firstWeekday")
         calendar.minimumDaysInFirstWeek = 4
         switch type {
         case 1:
@@ -169,7 +169,7 @@ final class InsightsViewModel{
             let comps = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: .now)
             return calendar.date(from: comps)
         case 3:
-            let startDay = defaults?.integer(forKey: "firstDayOfMonth") ?? 1
+            let startDay = defaults.integer(forKey: "firstDayOfMonth")
             return getStartOfMonth(startDay: startDay)
         case 4:
             let comps = calendar.dateComponents([.year], from: .now)
@@ -292,8 +292,8 @@ final class InsightsViewModel{
         default: green = false
         }
 
-        let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime")
-        let showCents = defaults?.bool(forKey: "showCents") ?? true
+        let defaults = UserDefaults.appGroup
+        let showCents = defaults.bool(forKey: "showCents")
 
         let amount: Double
         let headingKey: String.LocalizationValue
@@ -338,8 +338,8 @@ final class InsightsViewModel{
     /// `LineGraph` for its x-axis labels. Mirrors the legacy view's `range` Int.
     private func logViewRangeCount(timeframe: Int) -> Int {
         var calendar = Calendar(identifier: .gregorian)
-        let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime")
-        calendar.firstWeekday = defaults?.integer(forKey: "firstWeekday") ?? 0
+        let defaults = UserDefaults.appGroup
+        calendar.firstWeekday = defaults.integer(forKey: "firstWeekday")
         calendar.minimumDaysInFirstWeek = 4
         switch timeframe {
         case 3:
@@ -426,8 +426,8 @@ final class InsightsViewModel{
     /// Gregorian calendar with the user's first-weekday preference applied.
     private var configuredCalendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
-        let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime")
-        cal.firstWeekday = defaults?.integer(forKey: "firstWeekday") ?? 0
+        let defaults = UserDefaults.appGroup
+        cal.firstWeekday = defaults.integer(forKey: "firstWeekday")
         cal.minimumDaysInFirstWeek = 4
         return cal
     }
@@ -460,9 +460,9 @@ final class InsightsViewModel{
     /// Recomputes every new `@Published` property above for the current `selectedPeriod`.
     /// Also refreshes today / yesterday transaction lists.
     func refreshAll() {
-        let defaults = UserDefaults(suiteName: "group.com.rafaelsoh.dime")
-        showCents = defaults?.bool(forKey: "showCents") ?? true
-        currency = defaults?.string(forKey: "currency") ?? Locale.current.currency?.identifier ?? "USD"
+        let defaults = UserDefaults.appGroup
+        showCents = defaults.bool(forKey: "showCents")
+        currency = defaults.string(forKey: "currency") ?? Locale.current.currency?.identifier ?? "USD"
         currencySymbol = currencySymbolFor(code: currency)
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)

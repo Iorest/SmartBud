@@ -41,7 +41,7 @@ extension UIApplication {
 }
 
 struct KeyboardAwareModifier: ViewModifier {
-    @AppStorage("keyboard", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var savedKeyboardHeight: Double = 291
+    @AppStorage("keyboard", store: .appGroup) var savedKeyboardHeight: Double = 291
     var showToolbar: Bool
     @State private var isKeyboardVisible = false
 
