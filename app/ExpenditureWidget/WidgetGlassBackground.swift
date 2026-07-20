@@ -1,6 +1,6 @@
 //
 //  WidgetGlassBackground.swift
-//  dime
+//  smartbud
 //
 //  A compact version of `AppGlassBackground` sized for home-screen widgets.
 //  Same linear gradient as the in-app background but a single radial glow

@@ -1,6 +1,6 @@
 //
 //  InsightsWidget.swift
-//  dime
+//  smartbud
 //
 //  Created by Rafael Soh on 14/8/22.
 //
@@ -31,7 +31,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     static let container: ModelContainer = {
         let schema = Schema([TransactionModel.self, CategoryModel.self])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 
@@ -541,7 +541,7 @@ struct InsightsWidgetEntryView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .widgetURL(URL(string: "dimeapp://insights"))
+        .widgetURL(URL(string: "smartbud://insights"))
         .containerBackground(for: .widget) {
             WidgetGlassBackground()
         }
@@ -737,7 +737,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                     .frame(maxHeight: .infinity)
             }
 
-            Link(destination: URL(string: "dimeapp://newExpense")!) {
+            Link(destination: URL(string: "smartbud://newExpense")!) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
                         .font(.system(size: 9, weight: .medium, design: .rounded))

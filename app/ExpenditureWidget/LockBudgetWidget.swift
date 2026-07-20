@@ -40,7 +40,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
             BudgetModel.self,
             CategoryModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 
@@ -187,7 +187,7 @@ struct LockBudgetWidgetEntryView: View {
                 Text(String(localized: "Select budget in widget options"))
             } else {
                 Text("\(entry.budget.emoji) \(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle)")
-                    .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
+                    .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
             }
 
         case .accessoryCircular:
@@ -208,7 +208,7 @@ struct LockBudgetWidgetEntryView: View {
                     Text("\(Int(round(percent * 100)))%")
                 }
                 .gaugeStyle(AccessoryCircularGaugeStyle())
-                .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
+                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
                 .containerBackground(for: .widget) { Color.clear }
             }
 
@@ -253,7 +253,7 @@ struct LockBudgetWidgetEntryView: View {
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
+                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
                 .containerBackground(for: .widget) { Color.clear }
             }
 

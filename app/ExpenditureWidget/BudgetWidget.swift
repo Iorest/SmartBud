@@ -1,6 +1,6 @@
 //
 //  BudgetWidget.swift
-//  dime
+//  smartbud
 //
 //  Created by Rafael Soh on 17/8/22.
 //
@@ -34,7 +34,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             BudgetModel.self,
             CategoryModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 
@@ -286,7 +286,7 @@ struct BudgetWidgetEntryView: View {
             .containerBackground(for: .widget) {
                 WidgetGlassBackground()
             }
-            .widgetURL(URL(string: "dimeapp://budget?budget=\(entry.budget.name)"))
+            .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
         }
     }
 }

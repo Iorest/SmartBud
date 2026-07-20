@@ -40,7 +40,7 @@ struct Provider: AppIntentTimelineProvider {
             TransactionModel.self,
             CategoryModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 
@@ -353,7 +353,7 @@ struct ExpenditureWidgetEntryView: View {
             .containerBackground(for: .widget) {
                 WidgetGlassBackground()
             }
-            .widgetURL(entry.transactions.count < 2 ? URL(string: "dimeapp://newExpense") : nil)
+            .widgetURL(entry.transactions.count < 2 ? URL(string: "smartbud://newExpense") : nil)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
         case .systemLarge:
@@ -379,7 +379,7 @@ struct ExpenditureWidgetEntryView: View {
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
-                            Link(destination: URL(string: "dimeapp://newExpense")!) {
+                            Link(destination: URL(string: "smartbud://newExpense")!) {
                                 HStack(spacing: 4) {
                                     Image(systemName: "plus")
                                         .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -430,7 +430,7 @@ struct ExpenditureWidgetEntryView: View {
                             }
 
                             if entry.transactions.count < 5 {
-                                Link(destination: URL(string: "dimeapp://newExpense")!) {
+                                Link(destination: URL(string: "smartbud://newExpense")!) {
                                     HStack(spacing: 4) {
                                         Image(systemName: "plus")
                                             .font(.system(size: 13, weight: .semibold, design: .rounded))

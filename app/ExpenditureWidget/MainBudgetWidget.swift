@@ -1,6 +1,6 @@
 //
 //  MainBudgetWidget.swift
-//  dime
+//  smartbud
 //
 //  Created by Rafael Soh on 12/1/23.
 //
@@ -35,7 +35,7 @@ struct MainBudgetWidgetProvider: TimelineProvider {
             MainBudgetModel.self,
             TransactionModel.self
         ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.dime"))
+        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.rafaelsoh.smartbud"))
         return try! ModelContainer(for: schema, configurations: [config])
     }()
 

@@ -21,6 +21,7 @@
       }
     },
     " from 🇸🇬" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -64,9 +65,6 @@
       }
     },
     "." : {
-      "shouldTranslate" : false
-    },
-    "·" : {
       "shouldTranslate" : false
     },
     "\"Cent-less\"" : {
@@ -427,6 +425,16 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "%@0 %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@0 %2$@ %3$@"
+          }
+        }
+      }
     },
     "%d days left" : {
       "localizations" : {
@@ -1002,9 +1010,6 @@
         }
       }
     },
-    "ADD\nBUDGET" : {
-      "shouldTranslate" : false
-    },
     "ADD BUDGET" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1149,6 +1154,29 @@
         }
       }
     },
+    "Additional app icons and accent colors" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Additional app icons and accent colors"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更多应用图标和主题色"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更多應用圖示與主題色"
+          }
+        }
+      }
+    },
     "Additional Category Filters" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1177,6 +1205,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "其他提示"
+          }
+        }
+      }
+    },
+    "Advanced Insights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced Insights"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高级统计"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "進階統計"
           }
         }
       }
@@ -1436,6 +1487,29 @@
         }
       }
     },
+    "app_name" : {
+      "comment" : "welcome sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartBud"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartBud"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SmartBud"
+          }
+        }
+      }
+    },
     "Appearance" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1475,6 +1549,29 @@
         }
       }
     },
+    "Appears in the 'New Expense' bottom sheet and the 'Note' field of new transactions." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appears in the 'New Expense' bottom sheet and the 'Note' field of new transactions."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示在「新建支出」底栏和新建交易的「备注」字段中。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示在「新增支出」底欄和新增交易的「備註」欄位中。"
+          }
+        }
+      }
+    },
     "AppIconOG" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -1499,30 +1596,6 @@
         }
       }
     },
-    "AppIconOGSubtitle" : {
-      "comment" : "",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haphazardly put together in under 30 minutes, the original Dime icon."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 30 分钟内草草拼凑的最初版本——原始的 Dime 图标。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 30 分鐘內草草拼湊的最初版本——原始的 Dime 圖示。"
-          }
-        }
-      }
-    },
     "AppIconUnicorn" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -1543,30 +1616,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "獨角獸"
-          }
-        }
-      }
-    },
-    "AppIconUnicornSubtitle" : {
-      "comment" : "",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dime definitely isn't becoming one but it never hurts to keep dreaming."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dime 显然不会变成独角兽，但保持梦想也无妨。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dime 顯然不會變成獨角獸，但保持夢想也無妨。"
           }
         }
       }
@@ -1935,6 +1984,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "退出"
+          }
+        }
+      }
+    },
+    "Batch Recognition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batch Recognition"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "批量识别"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "批次辨識"
           }
         }
       }
@@ -3145,6 +3217,29 @@
         }
       }
     },
+    "Customizable notification schedules and quiet hours" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customizable notification schedules and quiet hours"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可自订的通知排程和免打扰时段"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可自訂的通知排程與靜音時段"
+          }
+        }
+      }
+    },
     "daily" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3415,6 +3510,29 @@
         }
       }
     },
+    "Deeper breakdowns, custom date ranges, exportable charts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deeper breakdowns, custom date ranges, exportable charts"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更深入的分析、自订日期范围、可导出图表"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更深入的分析、自訂日期範圍、可匯出圖表"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3647,41 +3765,25 @@
         }
       }
     },
-    "Dime definitely isn't becoming one but it never hurts to keep dreaming." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dime 显然不会变成独角兽，但保持梦想也无妨。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dime 顯然不會變成獨角獸，但保持夢想也無妨。"
-          }
-        }
-      }
-    },
-    "dime_name" : {
-      "comment" : "welcome sheet",
+    "Direct access to the development team for help" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dime"
+            "value" : "Direct access to the development team for help"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dime"
+            "value" : "直接联系开发团队获取帮助"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dime"
+            "value" : "直接聯絡開發團隊取得協助"
           }
         }
       }
@@ -4195,6 +4297,29 @@
         }
       }
     },
+    "Exclusive Themes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclusive Themes"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "专属主题"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "獨家主題"
+          }
+        }
+      }
+    },
     "expense" : {
       "localizations" : {
         "zh-Hans" : {
@@ -4408,22 +4533,6 @@
         }
       }
     },
-    "Extract leftover amount for a particular budget" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "提取特定预算的剩余金额"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "提取特定預算的剩餘金額"
-          }
-        }
-      }
-    },
     "Extract Budgets" : {
       "localizations" : {
         "zh-Hans" : {
@@ -4436,6 +4545,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "提取預算"
+          }
+        }
+      }
+    },
+    "Extract leftover amount for a particular budget" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提取特定预算的剩余金额"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提取特定預算的剩餘金額"
           }
         }
       }
@@ -4805,52 +4930,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按週"
-          }
-        }
-      }
-    },
-    "Follow Dime on Twitter" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Follow Dime on Twitter"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 Twitter 关注 Dime"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 Twitter 追蹤 Dime"
-          }
-        }
-      }
-    },
-    "Follow Dime on X" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Follow Dime on X"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 X 上关注 Dime"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 X 上關注 Dime"
           }
         }
       }
@@ -5451,6 +5530,29 @@
         }
       }
     },
+    "Import multiple transactions from a single receipt photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import multiple transactions from a single receipt photo"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从单张收据照片中导入多笔交易"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從單張收據照片匯入多筆交易"
+          }
+        }
+      }
+    },
     "Import Successful" : {
       "localizations" : {
         "zh-Hans" : {
@@ -5553,6 +5655,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "收入"
+          }
+        }
+      }
+    },
+    "Income / Expense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Income / Expense"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "收入 / 支出"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "收入 / 支出"
           }
         }
       }
@@ -5858,6 +5983,28 @@
         }
       }
     },
+    "Insufficient Columns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insufficient Columns"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "列数不足"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "欄位不足"
+          }
+        }
+      }
+    },
     "Into the unknown." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5871,6 +6018,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "進入未知領域。"
+          }
+        }
+      }
+    },
+    "Invalid Column" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid Column"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效的列"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無效的欄"
+          }
+        }
+      }
+    },
+    "Invalid File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid File"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效的文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無效的檔案"
           }
         }
       }
@@ -5897,6 +6088,9 @@
           }
         }
       }
+    },
+    "It definitely isn't becoming one, but it never hurts to keep dreaming." : {
+
     },
     "Jan" : {
       "extractionState" : "manual",
@@ -6472,6 +6666,7 @@
       }
     },
     "Made with ❤️ by " : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6552,26 +6747,26 @@
         }
       }
     },
-    "Match values found in the 'Category' column to the corresponding categories in Dime." : {
+    "Match values found in the 'Category' column to the corresponding categories in SmartBud." : {
       "comment" : "",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Match values found in the 'Category' column to the corresponding categories in Dime."
+            "value" : "Match values found in the 'Category' column to the corresponding categories in SmartBud."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将“类别”列中出现的值匹配到 Dime 中对应的类别。"
+            "value" : "将“类别”列中出现的值匹配到 SmartBud 中对应的类别。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "將「類別」欄中出現的值匹配到 Dime 中對應的類別。"
+            "value" : "將「類別」欄中出現的值匹配到 SmartBud 中對應的類別。"
           }
         }
       }
@@ -6892,30 +7087,6 @@
         }
       }
     },
-    "NIL" : {
-      "comment" : "Placeholder shown in widgets when there is no data (e.g. no recent transactions). Kept as the English acronym across locales because it is a recognised technical term.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NIL"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NIL"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NIL"
-          }
-        }
-      }
-    },
     "Name" : {
       "localizations" : {
         "zh-Hans" : {
@@ -7188,6 +7359,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下一週"
+          }
+        }
+      }
+    },
+    "NIL" : {
+      "comment" : "Placeholder shown in widgets when there is no data (e.g. no recent transactions). Kept as the English acronym across locales because it is a recognised technical term.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIL"
           }
         }
       }
@@ -8366,6 +8561,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上一週"
+          }
+        }
+      }
+    },
+    "Priority Support" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Priority Support"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "优先支持"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "優先支援"
           }
         }
       }
@@ -9620,6 +9838,29 @@
         }
       }
     },
+    "Smart Reminders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart Reminders"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "智能提醒"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "智慧提醒"
+          }
+        }
+      }
+    },
     "SmartBud Pro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10193,6 +10434,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "將每筆交易的時間標籤取代為類別名稱。但如果未手動為每筆交易輸入備註（預設備註為類別名稱），則會出現重複文字。"
+          }
+        }
+      }
+    },
+    "Sync your data across all your Apple devices" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync your data across all your Apple devices"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在所有 Apple 设备间同步你的数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在所有 Apple 裝置間同步你的資料"
           }
         }
       }
@@ -11264,6 +11528,28 @@
         }
       }
     },
+    "Unlinked Categories" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlinked Categories"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未关联的分类"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未關聯的類別"
+          }
+        }
+      }
+    },
     "Unlock all Pro features" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11904,6 +12190,7 @@
       }
     },
     "What's New" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
