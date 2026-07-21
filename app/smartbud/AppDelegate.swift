@@ -20,6 +20,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        NSLog("[AppDelegate] didFinishLaunching")
+        // Swap Bundle.main → LanguageBundle so that Foundation's
+        // `String(localized:)` resolves through the user's in-app
+        // language pick rather than the system locale. Must run before
+        // any view body / locale lookup so the very first render uses
+        // the right translation.
+        LanguageBundleInstaller.install()
+        NSLog("[AppDelegate] LanguageBundle installed")
+
         // Cold-start quick action: the user launched the app by tapping a
         // home-screen shortcut. Forward its `type` to openURL so the same
         // `.onOpenURL` handlers in the view tree can react.

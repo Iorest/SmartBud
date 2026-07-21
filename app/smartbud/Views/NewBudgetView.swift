@@ -100,6 +100,7 @@ struct BrandNewBudgetView: View {
 
     var amountPerDayString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 
@@ -827,6 +828,7 @@ struct BrandNewBudgetView: View {
         }
 
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .ordinal
 
         return formatter.string(from: number as NSNumber)!.replacingOccurrences(of: ".", with: "")

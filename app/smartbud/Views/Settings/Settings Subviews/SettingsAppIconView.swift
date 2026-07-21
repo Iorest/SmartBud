@@ -22,6 +22,11 @@ struct SettingsAppIconView: View {
 
   let options: [AppIconBundle] = [
     AppIconBundle(
+      actualFileName: "AppIcon", exampleFileName: "AppIcon_EG",
+      displayName: String(localized: "Deep Sea · 深青"),
+      displaySubtitle: String(
+        localized: "The original default app icon.")),
+    AppIconBundle(
       actualFileName: "AppIcon1", exampleFileName: "AppIcon1_EG",
       displayName: String(localized: "Midnight · 紫袋辉光"),
       displaySubtitle: String(
@@ -125,7 +130,7 @@ struct SettingsAppIconView: View {
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
       .onChange(of: activeIcon) { _, newValue in
-        UIApplication.shared.setAlternateIconName(newValue)
+        UIApplication.shared.setAlternateIconName(newValue == "AppIcon" ? nil : newValue)
       }
     }
     .modifier(SettingsSubviewModifier())

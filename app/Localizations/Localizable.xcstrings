@@ -11388,6 +11388,9 @@
         }
       }
     },
+    "The original default app icon." : {
+
+    },
     "The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only." : {
       "comment" : "",
       "extractionState" : "manual",

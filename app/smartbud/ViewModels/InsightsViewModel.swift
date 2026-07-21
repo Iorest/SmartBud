@@ -649,6 +649,7 @@ final class InsightsViewModel{
     func formattedCurrency(_ amount: Double, withCents: Bool? = nil, sign: Bool = false) -> String {
         let cents = withCents ?? showCents
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .currency
         formatter.currencyCode = currency
         formatter.maximumFractionDigits = cents ? 2 : 0
@@ -663,9 +664,11 @@ final class InsightsViewModel{
         let cal = configuredCalendar
         let (start, end) = getPeriodDateRange(for: period)
         let dayMonth = DateFormatter()
+        dayMonth.locale = Locale.appLocale
         dayMonth.dateFormat = "d MMM"
         dayMonth.calendar = cal
         let yearOnly = DateFormatter()
+        yearOnly.locale = Locale.appLocale
         yearOnly.dateFormat = "yyyy"
         yearOnly.calendar = cal
         switch period {

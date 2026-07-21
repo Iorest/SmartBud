@@ -27,11 +27,39 @@ final class DataRepository{
         // CloudKit private-database sync is enabled on the main-app side only;
         // the widget intentionally omits `cloudKitDatabase:` and just reads
         // the locally-synced file.
-        let config = ModelConfiguration(
-            "MainModel",
-            groupContainer: .identifier("group.com.iorest.smartbud"),
-            cloudKitDatabase: .private("iCloud.com.iorest.smartbud")
-        )
+        //
+        // Defensive fallback: if the App Group container isn't reachable
+        // (e.g. running in a simulator with stripped signing/entitlements),
+        // SwiftData's `ModelConfiguration(groupContainer:)` will trap with
+        // a fatal "Unable to find App Group Container" error. Probe the
+        // container with `FileManager` first; if it's nil, fall back to a
+        // local-only `ModelConfiguration` so the app at least launches.
+        // The widget and main app will then have separate stores — that's
+        // an acceptable dev-simulator degradation; production builds with
+        // proper signing always take the App Group path.
+        let appGroupID = "group.com.iorest.smartbud"
+        let useAppGroup = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupID
+        ) != nil
+
+        let config: ModelConfiguration
+        if useAppGroup {
+            config = ModelConfiguration(
+                "MainModel",
+                groupContainer: .identifier(appGroupID),
+                cloudKitDatabase: .private("iCloud.com.iorest.smartbud")
+            )
+        } else {
+            // Local-only store. No group container, no CloudKit — both
+            // can hang `ModelContainer` init on iOS 26.5.1 simulator
+            // when the App Group / iCloud account is unreachable, which
+            // presents as a black screen on first launch (regression
+            // 2026-07-20). The widget and main app will then have
+            // separate stores; that's an acceptable dev-simulator
+            // degradation. Production builds with proper signing
+            // always take the App Group + CloudKit path above.
+            config = ModelConfiguration("MainModel")
+        }
         do {
             container = try ModelContainer(
                 for: TransactionModel.self, CategoryModel.self,

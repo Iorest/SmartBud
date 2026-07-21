@@ -32,6 +32,7 @@ struct CustomCapsuleProgress: View {
 
     var percentString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .percent
 
         return numberFormatter.string(from: NSNumber(value: percent)) ?? "0%"

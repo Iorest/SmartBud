@@ -838,6 +838,7 @@ struct ListView: View {
         }
 
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 
@@ -910,6 +911,7 @@ struct FutureListView: View {
 
     var totalString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 
@@ -1028,6 +1030,7 @@ struct SingleTransactionView: View {
 
     var transactionAmountString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 
@@ -1248,6 +1251,7 @@ struct SingleTransactionView: View {
                 return transaction.wrappedCategoryName
             } else {
                 let formatter = DateFormatter()
+                formatter.locale = Locale.appLocale
                 formatter.dateFormat = "h:mm a"
 
                 return formatter.string(from: transaction.wrappedDate)
@@ -1258,6 +1262,7 @@ struct SingleTransactionView: View {
 
 func dateFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale.appLocale
 
     dateFormatter.dateFormat = "d MMM"
     return dateFormatter.string(from: date).uppercased()
@@ -1810,6 +1815,7 @@ struct DateStepperView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "d MMM yyyy"
 
@@ -1875,6 +1881,7 @@ struct WeekStepperView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "d MMM"
 
@@ -1886,6 +1893,7 @@ struct WeekStepperView: View {
 
     var accessibilityDateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "d MMM"
 
@@ -1971,6 +1979,7 @@ struct MonthStepperView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "MMM yyyy"
 
@@ -2039,6 +2048,7 @@ func dateConverter(date: Date) -> String {
         return String(localized: "yesterday")
     } else if startOfCurrentYear > date {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "EEE, d MMM yy"
 
@@ -2048,6 +2058,7 @@ func dateConverter(date: Date) -> String {
         return string
     } else {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "EEE, d MMM"
 
@@ -2064,6 +2075,7 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
         return String(localized: "yesterday")
     } else {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "EEE, d MMM yyyy"
 
@@ -2073,6 +2085,7 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
 
 func timeConverterAccessibilityLabel(date: Date) -> String {
     let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale.appLocale
 
     dateFormatter.dateFormat = "h:mm a"
 

@@ -76,6 +76,8 @@
 		53A4147F28B7C70D008C30E7 /* AppLocale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147E28B7C70D008C30E7 /* AppLocale.swift */; };
 		D6A1B2C3D4E5F6071829A0B1 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */; };
 		D6A1B2C3D4E5F6071829A0B3 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */; };
+		D6A1B2C3D4E5F6071829A0C1 /* LanguageBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */; };
+		D6A1B2C3D4E5F6071829A0C3 /* LanguageBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */; };
 		53A839C128D732E1006F227C /* TabBarHiding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A839C028D732E1006F227C /* TabBarHiding.swift */; };
 		53B1D18C288ED7E500E28062 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53B1D18B288ED7E400E28062 /* WidgetKit.framework */; };
 		53B1D18E288ED7E500E28062 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53B1D18D288ED7E500E28062 /* SwiftUI.framework */; };
@@ -241,6 +243,7 @@
 		53A4147C28B7C70D008C30E7 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		53A4147E28B7C70D008C30E7 /* AppLocale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocale.swift; sourceTree = "<group>"; };
 		D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageBundle.swift; sourceTree = "<group>"; };
 		53A839C028D732E1006F227C /* TabBarHiding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarHiding.swift; sourceTree = "<group>"; };
 		53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ExpenditureWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		53B1D18B288ED7E400E28062 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -421,6 +424,7 @@
 				53A4147C28B7C70D008C30E7 /* AppVersion.swift */,
 				53A4147E28B7C70D008C30E7 /* AppLocale.swift */,
 				D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */,
+				D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */,
 				534973D528CB5A75000201F9 /* URLExtension.swift */,
 				538A32A92A505AC6008AEF8C /* BottomSheet.swift */,
 				536A2A142A59C47400D81E02 /* Wiggle.swift */,
@@ -815,6 +819,7 @@
 				53A4147D28B7C70D008C30E7 /* AppVersion.swift in Sources */,
 				53A4147F28B7C70D008C30E7 /* AppLocale.swift in Sources */,
 				D6A1B2C3D4E5F6071829A0B1 /* AppLanguage.swift in Sources */,
+				D6A1B2C3D4E5F6071829A0C1 /* LanguageBundle.swift in Sources */,
 				53D6BDC82AF73B4800F5728E /* SettingsAppearanceView.swift in Sources */,
 				53B822AA2A6D50CC000FC7C9 /* NewTransactionIntent.swift in Sources */,
 				5327D2B6287C6AFB00F76ADF /* Authentication.swift in Sources */,
@@ -841,6 +846,7 @@
 			files = (
 				53A4147F28B7C70D008C30E7 /* AppLocale.swift in Sources */,
 				D6A1B2C3D4E5F6071829A0B3 /* AppLanguage.swift in Sources */,
+				D6A1B2C3D4E5F6071829A0C3 /* LanguageBundle.swift in Sources */,
 				53B907A32AE81A080001F496 /* DonutSemicircle.swift in Sources */,
 				53D5F02428A8E0E4004573C8 /* InsightsWidget.swift in Sources */,
 				53D0298228C62E1A00443F2B /* StringExtension.swift in Sources */,

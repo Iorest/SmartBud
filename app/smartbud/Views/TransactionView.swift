@@ -674,6 +674,7 @@ struct TransactionView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
         dateFormatter.dateFormat = "d MMM yyyy"
         return dateFormatter.string(from: date)
     }
@@ -999,6 +1000,7 @@ struct TransactionView: View {
 
     func getDateString(date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale.appLocale
 
         if isDateToday(date: date) {
             formatter.dateFormat = "d MMM"
@@ -1013,6 +1015,7 @@ struct TransactionView: View {
 
     func getTimeString(date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.locale = Locale.appLocale
 
         formatter.dateFormat = "HH:mm"
 

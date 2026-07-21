@@ -298,6 +298,7 @@ struct InsightsView: View {
 
     private func format(_ amount: Double) -> String {
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .currency
         formatter.currencyCode = currency
         formatter.maximumFractionDigits = showCents ? 2 : 0
@@ -306,6 +307,7 @@ struct InsightsView: View {
 
     private func sectionAmountString(_ amount: Double) -> String {
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .currency
         formatter.currencyCode = currency
         formatter.maximumFractionDigits = showCents ? 2 : 0
@@ -399,6 +401,7 @@ private struct InsightsTransactionRow: View {
 
     private var amountString: String {
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .currency
         formatter.currencyCode = currencySymbol == "$" ? "USD" : currencySymbol
         formatter.maximumFractionDigits = showCents ? 2 : 0

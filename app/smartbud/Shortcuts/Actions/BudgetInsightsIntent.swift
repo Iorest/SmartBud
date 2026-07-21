@@ -105,6 +105,7 @@ struct ShortcutBudgetView: View {
 
     var amountString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 

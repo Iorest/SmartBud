@@ -1262,6 +1262,7 @@ struct TimeBudgetView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         if budgetType == 1 {
             dateFormatter.dateFormat = "d MMM yyyy"
@@ -1332,6 +1333,7 @@ struct TimeBudgetView: View {
             } else {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
+                    dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
                     return String(format: String(localized: "left on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
@@ -1366,6 +1368,7 @@ struct TimeBudgetView: View {
             } else {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
+                    dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
                     return String(format: String(localized: "over on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
@@ -1664,6 +1667,7 @@ struct FilteredBudgetView: View {
 
     private func dayTotalString(_ total: Double) -> String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
         numberFormatter.maximumFractionDigits = showCents ? 2 : 0
@@ -1788,6 +1792,7 @@ struct TimeMainBudgetView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         if budgetType == 1 {
             dateFormatter.dateFormat = "d MMM yyyy"
@@ -1858,6 +1863,7 @@ struct TimeMainBudgetView: View {
             } else {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
+                    dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
                     return String(format: String(localized: "left on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
@@ -1892,6 +1898,7 @@ struct TimeMainBudgetView: View {
             } else {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
+                    dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
                     return String(format: String(localized: "over on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
@@ -2210,6 +2217,7 @@ struct BudgetStepperView: View {
 
     var dateString: String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         if type == 1 {
             dateFormatter.dateFormat = "d MMM yyyy"

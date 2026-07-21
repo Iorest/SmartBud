@@ -190,6 +190,7 @@ struct SettingsWeekStartView: View {
     //        }
     //
     let formatter = NumberFormatter()
+    formatter.locale = Locale.appLocale
     formatter.numberStyle = .ordinal
 
     return formatter.string(from: number as NSNumber)!.replacingOccurrences(of: ".", with: "")

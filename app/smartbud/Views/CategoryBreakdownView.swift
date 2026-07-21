@@ -100,6 +100,7 @@ struct CategoryBreakdownView: View {
 
     private func formattedAmount(_ amount: Double) -> String {
         let formatter = NumberFormatter()
+        formatter.locale = Locale.appLocale
         formatter.numberStyle = .currency
         formatter.maximumFractionDigits = showCents ? 2 : 0
         formatter.currencySymbol = currencySymbol

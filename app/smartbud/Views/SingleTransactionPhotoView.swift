@@ -72,6 +72,7 @@ struct SingleTransactionPhotoView: View {
 
     var transactionAmountString: String {
         let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
         numberFormatter.currencyCode = currency
 
@@ -159,6 +160,7 @@ struct SingleTransactionPhotoView: View {
 
     func dateFormatter(date: Date) -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "d MMM"
         return dateFormatter.string(from: date).uppercased()

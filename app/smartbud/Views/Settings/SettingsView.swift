@@ -35,6 +35,7 @@ struct SettingsView: View {
   var activeIcon: String = "AppIcon"
   var appIconString: String {
     switch activeIcon {
+    case "AppIcon":  return String(localized: "Deep Sea · 深青")
     case "AppIcon1": return String(localized: "Midnight · 紫袋辉光")
     case "AppIcon2": return String(localized: "Plum · 紫袋")
     case "AppIcon3": return String(localized: "Indigo · 深紫")
