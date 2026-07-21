@@ -46,7 +46,7 @@ struct SettingsProView: View {
                 Spacer()
             }
             .overlay(alignment: .center) {
-                Text(String(localized: "SmartBud Pro"))
+                Text(String.appLocalized("SmartBud Pro"))
                     .font(.system(.title3, design: .rounded).weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
             }
@@ -90,7 +90,7 @@ struct SettingsProView: View {
                 .foregroundStyle(Color.PrimaryText)
                 .multilineTextAlignment(.center)
 
-            Text(String(localized: "iCloud Sync, Batch Recognition and more"))
+            Text(String.appLocalized("iCloud Sync, Batch Recognition and more"))
                 .font(.system(.subheadline, design: .rounded))
                 .foregroundStyle(Color.SubtitleText)
                 .multilineTextAlignment(.center)
@@ -103,10 +103,10 @@ struct SettingsProView: View {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 56))
                 .foregroundStyle(Color.IncomeGreen)
-            Text(String(localized: "Pro Active"))
+            Text(String.appLocalized("Pro Active"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
-            Text(String(localized: "Thank you for supporting SmartBud development."))
+            Text(String.appLocalized("Thank you for supporting SmartBud development."))
                 .font(.system(.subheadline, design: .rounded))
                 .foregroundStyle(Color.SubtitleText)
                 .multilineTextAlignment(.center)
@@ -147,10 +147,10 @@ struct SettingsProView: View {
     private var subscribeSection: some View {
         if loadedProducts.isEmpty {
             VStack(spacing: 8) {
-                Text(String(localized: "Coming Soon"))
+                Text(String.appLocalized("Coming Soon"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
-                Text(String(localized: "Subscription products will be available in a future update."))
+                Text(String.appLocalized("Subscription products will be available in a future update."))
                     .font(.system(.footnote, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
@@ -173,7 +173,7 @@ struct SettingsProView: View {
                 Button {
                     Task { await restorePurchases() }
                 } label: {
-                    Text(String(localized: "Restore Purchases"))
+                    Text(String.appLocalized("Restore Purchases"))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
                         .foregroundStyle(Color.SubtitleText)
                         .frame(maxWidth: .infinity)

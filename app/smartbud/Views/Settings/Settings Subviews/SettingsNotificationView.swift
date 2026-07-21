@@ -265,8 +265,8 @@ func newNotification() {
   UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
   let content = UNMutableNotificationContent()
-  content.title = String(localized: "Keep the streak going!")
-  content.subtitle = String(localized: "Remember to input your expenses today.")
+  content.title = String.appLocalized("Keep the streak going!")
+  content.subtitle = String.appLocalized("Remember to input your expenses today.")
   content.sound = UNNotificationSound.default
 
   // show this notification five seconds from now

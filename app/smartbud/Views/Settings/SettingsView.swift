@@ -18,15 +18,15 @@ struct SettingsView: View {
   var colourScheme: Int = 0
   var colourSchemeString: String {
     if colourScheme == 1 {
-      return String(localized: "Light")
+      return String.appLocalized("Light")
     } else if colourScheme == 2 {
-      return String(localized: "Dark")
+      return String.appLocalized("Dark")
     } else {
-      return String(localized: "System")
+      return String.appLocalized("System")
     }
   }
 
-  @AppLanguage var appLanguage: String = ""
+  @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
   var appLanguageString: String {
     settingsVM.displayName(for: appLanguage)
   }
@@ -35,14 +35,14 @@ struct SettingsView: View {
   var activeIcon: String = "AppIcon"
   var appIconString: String {
     switch activeIcon {
-    case "AppIcon":  return String(localized: "Deep Sea · 深青")
-    case "AppIcon1": return String(localized: "Midnight · 紫袋辉光")
-    case "AppIcon2": return String(localized: "Plum · 紫袋")
-    case "AppIcon3": return String(localized: "Indigo · 深紫")
-    case "AppIcon4": return String(localized: "Sky · 浅蓝")
-    case "AppIcon5": return String(localized: "Sunset · 黄昏")
-    case "AppIcon6": return String(localized: "Aqua · 浅青辉光")
-    default:         return String(localized: "Deep Sea · 深青")
+    case "AppIcon":  return String.appLocalized("Deep Sea · 深青")
+    case "AppIcon1": return String.appLocalized("Midnight · 紫袋辉光")
+    case "AppIcon2": return String.appLocalized("Plum · 紫袋")
+    case "AppIcon3": return String.appLocalized("Indigo · 深紫")
+    case "AppIcon4": return String.appLocalized("Sky · 浅蓝")
+    case "AppIcon5": return String.appLocalized("Sunset · 黄昏")
+    case "AppIcon6": return String.appLocalized("Aqua · 浅青辉光")
+    default:         return String.appLocalized("Deep Sea · 深青")
     }
   }
 
@@ -50,9 +50,9 @@ struct SettingsView: View {
   var firstWeekday: Int = 1
   var firstWeekdayString: String {
     if firstWeekday == 1 {
-      return String(localized: "Sunday")
+      return String.appLocalized("Sunday")
     } else {
-      return String(localized: "Monday")
+      return String.appLocalized("Monday")
     }
   }
 
@@ -63,14 +63,14 @@ struct SettingsView: View {
   var notificationString: String {
     if showNotifications {
       if option == 1 {
-        return String(localized: "Mornings")
+        return String.appLocalized("Mornings")
       } else if option == 2 {
-        return String(localized: "Evenings")
+        return String.appLocalized("Evenings")
       } else {
-        return String(localized: "Custom")
+        return String.appLocalized("Custom")
       }
     } else {
-      return String(localized: "Off")
+      return String.appLocalized("Off")
     }
   }
 
@@ -79,9 +79,9 @@ struct SettingsView: View {
 
   var iCloudString: String {
     if NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-      return String(localized: "On")
+      return String.appLocalized("On")
     } else {
-      return String(localized: "Off")
+      return String.appLocalized("Off")
     }
   }
 
@@ -95,9 +95,9 @@ struct SettingsView: View {
 
   var numberEntryString: String {
     if numberEntryType == 1 {
-      return String(localized: "Type 1")
+      return String.appLocalized("Type 1")
     } else {
-      return String(localized: "Type 2")
+      return String.appLocalized("Type 2")
     }
   }
 
@@ -122,9 +122,9 @@ struct SettingsView: View {
 
   var upcomingString: String {
     if showUpcoming {
-      return String(localized: "Shown")
+      return String.appLocalized("Shown")
     } else {
-      return String(localized: "Hidden")
+      return String.appLocalized("Hidden")
     }
   }
 
@@ -133,11 +133,11 @@ struct SettingsView: View {
 
     var hapticString: String {
       if hapticType == 0 {
-        return String(localized: "None")
+        return String.appLocalized("None")
       } else if hapticType == 1 {
-        return String(localized: "Subtle")
+        return String.appLocalized("Subtle")
       } else {
-        return String(localized: "Excessive")
+        return String.appLocalized("Excessive")
       }
     }
 
@@ -172,7 +172,7 @@ struct SettingsView: View {
       NavigationStack {
       VStack {
         HStack {
-          Text(String(localized: "Settings"))
+          Text(String.appLocalized("Settings"))
             .font(.system(.title, design: .rounded).weight(.semibold))
 
             //                        .font(.system(size: 25, weight: .semibold, design: .rounded))
@@ -524,8 +524,8 @@ struct SettingsView: View {
       .fullScreenCover(isPresented: .constant(CommandLine.arguments.contains("-openPro"))) {
         NavigationStack { SettingsProView() }
       }
-      .alert(String(localized: "Export Failed"), isPresented: $showExportError) {
-        Button(String(localized: "OK"), role: .cancel) {}
+      .alert(String.appLocalized("Export Failed"), isPresented: $showExportError) {
+        Button(String.appLocalized("OK"), role: .cancel) {}
       } message: {
         Text(exportErrorMessage)
       }
@@ -596,16 +596,16 @@ struct SettingsView: View {
 
     let fileName = "export.csv"
     let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    var csvText = String(localized: "Date,Note,Amount,Category,Type\n")
+    var csvText = String.appLocalized("Date,Note,Amount,Category,Type\n")
 
     for transaction in transactions {
       var string = transaction.wrappedNote
       let type: String
 
       if transaction.income {
-        type = String(localized: "Income")
+        type = String.appLocalized("Income")
       } else {
-        type = String(localized: "Expense")
+        type = String.appLocalized("Expense")
       }
 
       string.removeAll(where: { $0 == "," })

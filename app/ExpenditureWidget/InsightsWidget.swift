@@ -366,37 +366,37 @@ struct InsightsWidgetEntryView: View {
     var subtitleText: String {
         switch entry.duration {
         case .unknown:
-            return String(localized: "NIL")
+            return String.appLocalized("NIL")
         case .week:
-            return String(localized: "THIS WEEK").uppercased()
+            return String.appLocalized("THIS WEEK").uppercased()
         case .month:
-            return String(localized: "THIS MONTH").uppercased()
+            return String.appLocalized("THIS MONTH").uppercased()
         case .year:
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(format: String(localized: "in %@"), formatter.string(from: Date.now)).uppercased()
+            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now)).uppercased()
         }
     }
 
     var subtitleText1: String {
         switch entry.duration {
         case .unknown:
-            return String(localized: "NIL")
+            return String.appLocalized("NIL")
         case .week:
-            return String(localized: "THIS WEEK").uppercased()
+            return String.appLocalized("THIS WEEK").uppercased()
         case .month:
-            return String(localized: "THIS MONTH").uppercased()
+            return String.appLocalized("THIS MONTH").uppercased()
         case .year:
-            return String(localized: "THIS YEAR").uppercased()
+            return String.appLocalized("THIS YEAR").uppercased()
         }
     }
 
     var verbText: String {
         if entry.income {
-            return String(localized: "EARNED ").uppercased()
+            return String.appLocalized("EARNED ").uppercased()
         } else {
-            return String(localized: "SPENT ").uppercased()
+            return String.appLocalized("SPENT ").uppercased()
         }
     }
 
@@ -425,7 +425,7 @@ struct InsightsWidgetEntryView: View {
 
                                     Spacer()
 
-                                    Text(String(localized: "0"))
+                                    Text(String.appLocalized("0"))
                                         .font(.system(size: 8, weight: .regular, design: .rounded))
                                         .foregroundColor(Color.SubtitleText)
                                 }
@@ -693,13 +693,13 @@ struct InsightsWidgetCategoryBreakdownView: View {
     var subtitleText1: String {
         switch duration {
         case .unknown:
-            return String(localized: "NIL")
+            return String.appLocalized("NIL")
         case .week:
-            return String(localized: "THIS WEEK").uppercased()
+            return String.appLocalized("THIS WEEK").uppercased()
         case .month:
-            return String(localized: "THIS MONTH").uppercased()
+            return String.appLocalized("THIS MONTH").uppercased()
         case .year:
-            return String(localized: "THIS YEAR").uppercased()
+            return String.appLocalized("THIS YEAR").uppercased()
         }
     }
 
@@ -729,7 +729,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             } else {
-                Text(String(format: String(localized: "NO TRANSACTIONS\n%@"), subtitleText1))
+                Text(String(format: String.appLocalized("NO TRANSACTIONS\n%@"), subtitleText1))
                     .font(.system(size: 10,
                                   weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -742,7 +742,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                     Image(systemName: "plus")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
 
-                    Text(String(localized: "New Expense"))
+                    Text(String.appLocalized("New Expense"))
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundColor(Color.PrimaryText)
                 }

@@ -43,7 +43,7 @@ struct BrandNewBudgetView: View {
     var initialProgress: Double
 
     @State var showToast: Bool = false
-    @State var toastMessage: String = String(localized: "Missing Category")
+    @State var toastMessage: String = String.appLocalized("Missing Category")
 
     // sensory feedback triggers
     @State private var errorHaptic = 0
@@ -70,13 +70,13 @@ struct BrandNewBudgetView: View {
     var timeFrameString: String {
         switch budgetTimeFrame {
         case .day:
-            return String(localized: "day")
+            return String.appLocalized("day")
         case .week:
-            return String(localized: "weekNewBudget")
+            return String.appLocalized("weekNewBudget")
         case .month:
-            return String(localized: "monthNewBudget")
+            return String.appLocalized("monthNewBudget")
         case .year:
-            return String(localized: "yearNewBudget")
+            return String.appLocalized("yearNewBudget")
         }
     }
 
@@ -116,7 +116,7 @@ struct BrandNewBudgetView: View {
 
         numberFormatter.maximumFractionDigits = 0
 
-        return "~\(numberFormatter.string(from: NSNumber(value: average)) ?? "$0") \(String(localized: "/day"))"
+        return "~\(numberFormatter.string(from: NSNumber(value: average)) ?? "$0") \(String.appLocalized("/day"))"
     }
 
     // height of pickers
@@ -145,29 +145,22 @@ struct BrandNewBudgetView: View {
     var instructions: [InstructionHeadings] {
         [
             InstructionHeadings(
-                title: String(localized: "Indicate budget type"),
-                subtitle: String(
-                    localized:
-                        "The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only.")),
+                title: String.appLocalized("Indicate budget type"),
+                subtitle: String.appLocalized("The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only.")),
             InstructionHeadings(
-                title: String(localized: "Select a category"),
-                subtitle: String(localized: "Begin by linking this budget to an existing category.")),
+                title: String.appLocalized("Select a category"),
+                subtitle: String.appLocalized("Begin by linking this budget to an existing category.")),
             InstructionHeadings(
-                title: String(localized: "Choose a time frame"),
-                subtitle: String(
-                    localized: "The budget will periodically refresh according to your preference.")),
+                title: String.appLocalized("Choose a time frame"),
+                subtitle: String.appLocalized("The budget will periodically refresh according to your preference.")),
             InstructionHeadings(
-                title: String(localized: "Pick a start date"),
+                title: String.appLocalized("Pick a start date"),
                 subtitle: String(
-                    format: String(
-                        localized:
-                            "Which day of the %@ do you want your budget to start from?"),
+                    format: String.appLocalized("Which day of the %@ do you want your budget to start from?"),
                     timeFrameString)),
             InstructionHeadings(
-                title: String(localized: "Set budget amount"),
-                subtitle: String(
-                    localized:
-                        "Try your best to stay under this limit! Also, feel free to change this in the future."))
+                title: String.appLocalized("Set budget amount"),
+                subtitle: String.appLocalized("Try your best to stay under this limit! Also, feel free to change this in the future."))
         ]
     }
 
@@ -329,7 +322,7 @@ struct BrandNewBudgetView: View {
                                 .foregroundStyle(Color.SubtitleText.opacity(0.7))
                                 .padding(.top, 20)
 
-                            Text(String(localized: "No remaining\ncategories."))
+                            Text(String.appLocalized("No remaining\ncategories."))
                                 .font(.system(.title3, design: .rounded).weight(.medium))
 //                                .font(.system(size: 21, weight: .medium, design: .rounded))
                                 .multilineTextAlignment(.center)
@@ -441,8 +434,7 @@ struct BrandNewBudgetView: View {
                                                 } else {
                                                     Text(
                                                         String(
-                                                            format: String(
-                                                                localized: "%@ of month"),
+                                                            format: String.appLocalized("%@ of month"),
                                                             getOrdinal(day))
                                                     )
                                                 }
@@ -510,7 +502,7 @@ struct BrandNewBudgetView: View {
                 Button {
                     if progress == 2 && selectedCategory == nil {
                         showToast = true
-                        toastMessage = String(localized: "Missing Category")
+                        toastMessage = String.appLocalized("Missing Category")
                         errorHaptic &+= 1
                         return
                     }
@@ -537,7 +529,7 @@ struct BrandNewBudgetView: View {
                         }
                     }
                 } label: {
-                    Text(String(localized: "Continue"))
+                    Text(String.appLocalized("Continue"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
 //                        .font(.system(size: 19, weight: .semibold, design: .rounded))
 
@@ -681,7 +673,7 @@ struct BrandNewBudgetView: View {
         if amount == 0 {
             errorHaptic &+= 1
             showToast = true
-            toastMessage = String(localized: "Missing Amount")
+            toastMessage = String.appLocalized("Missing Amount")
             return
         }
 
@@ -824,7 +816,7 @@ struct BrandNewBudgetView: View {
 
     func getOrdinal(_ number: Int) -> String {
         if number == 1 {
-            return String(localized: "Start")
+            return String.appLocalized("Start")
         }
 
         let formatter = NumberFormatter()

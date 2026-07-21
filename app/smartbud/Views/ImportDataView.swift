@@ -92,7 +92,7 @@ struct ImportDataView: View {
     }
 
     @State var showToast = false
-    @State var toastMessage: String = String(localized: "Invalid File")
+    @State var toastMessage: String = String.appLocalized("Invalid File")
 
     @State var showingCategoryView = false
     @State var pageIndex = 0
@@ -112,60 +112,42 @@ struct ImportDataView: View {
 
     let instructions: [InstructionHeadings] = [
         InstructionHeadings(
-            title: String(localized: "Import transactions"),
-            subtitle: String(
-                localized:
-                    "Begin by adding a CSV file with 4 columns: amount, note, date, and category.")),
+            title: String.appLocalized("Import transactions"),
+            subtitle: String.appLocalized("Begin by adding a CSV file with 4 columns: amount, note, date, and category.")),
         InstructionHeadings(
-            title: String(localized: "Assign category column"),
-            subtitle: String(
-                localized:
-                    "Select a column from your import that corresponds to the categories of your transactions.")),
+            title: String.appLocalized("Assign category column"),
+            subtitle: String.appLocalized("Select a column from your import that corresponds to the categories of your transactions.")),
         InstructionHeadings(
-            title: String(localized: "Assign note column"),
-            subtitle: String(
-                localized:
-                    "Select a column from your import that corresponds to the notes/subtitles of your transactions.")),
+            title: String.appLocalized("Assign note column"),
+            subtitle: String.appLocalized("Select a column from your import that corresponds to the notes/subtitles of your transactions.")),
         InstructionHeadings(
-            title: String(localized: "Assign date column"),
-            subtitle: String(
-                localized:
-                    "Select a column from your import that corresponds to the dates of your transactions.")),
+            title: String.appLocalized("Assign date column"),
+            subtitle: String.appLocalized("Select a column from your import that corresponds to the dates of your transactions.")),
         InstructionHeadings(
-            title: String(localized: "Assign amount column"),
-            subtitle: String(
-                localized:
-                    "Select a column from your import that corresponds to the values of your transactions.")),
+            title: String.appLocalized("Assign amount column"),
+            subtitle: String.appLocalized("Select a column from your import that corresponds to the values of your transactions.")),
         InstructionHeadings(
-            title: String(localized: "Indicate date format"),
-            subtitle: String(localized: "Referencing this article, state the format of the dates in the assigned column.")),
+            title: String.appLocalized("Indicate date format"),
+            subtitle: String.appLocalized("Referencing this article, state the format of the dates in the assigned column.")),
         InstructionHeadings(
-            title: String(localized: "Link categories"),
-            subtitle: String(
-                localized:
-                    "Match values found in the 'Category' column to the corresponding categories in SmartBud.")),
+            title: String.appLocalized("Link categories"),
+            subtitle: String.appLocalized("Match values found in the 'Category' column to the corresponding categories in SmartBud.")),
         InstructionHeadings(
-            title: String(localized: "Processing import"),
-            subtitle: String(localized: "Please wait while we process your new transactions."))
+            title: String.appLocalized("Processing import"),
+            subtitle: String.appLocalized("Please wait while we process your new transactions."))
     ]
 
     let labels: [ColumnLabel] = [
-        ColumnLabel(image: "square.grid.2x2.fill", label: String(localized: "Category")),
-        ColumnLabel(image: "doc.plaintext.fill", label: String(localized: "Note")),
-        ColumnLabel(image: "calendar", label: String(localized: "Date")),
-        ColumnLabel(image: "dollarsign.circle.fill", label: String(localized: "Amount"))
+        ColumnLabel(image: "square.grid.2x2.fill", label: String.appLocalized("Category")),
+        ColumnLabel(image: "doc.plaintext.fill", label: String.appLocalized("Note")),
+        ColumnLabel(image: "calendar", label: String.appLocalized("Date")),
+        ColumnLabel(image: "dollarsign.circle.fill", label: String.appLocalized("Amount"))
     ]
 
     let pointers = [
-        String(
-            localized:
-                "Ensure that the values in the 'Amount' column do not contain any currency symbols."),
-        String(
-            localized:
-                "All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am."),
-        String(
-            localized:
-                "Remove all commas in the 'Note' and 'Category' columns as they would disrupt the parsing of your file.")
+        String.appLocalized("Ensure that the values in the 'Amount' column do not contain any currency symbols."),
+        String.appLocalized("All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am."),
+        String.appLocalized("Remove all commas in the 'Note' and 'Category' columns as they would disrupt the parsing of your file.")
     ]
 
     var incomeCategories: [CategoryModel] {
@@ -310,12 +292,10 @@ struct ImportDataView: View {
                         .frame(maxWidth: .infinity)
 
                         Text(
-                            AttributedString(String(localized: "Referencing "))
+                            AttributedString(String.appLocalized("Referencing "))
                                 + makeAttributedString()
                                 + AttributedString(
-                                    String(
-                                        localized:
-                                            ", state the format of the dates in the assigned column."))
+                                    String.appLocalized(", state the format of the dates in the assigned column."))
                         )
                             .foregroundStyle(Color.SubtitleText)
                             .font(.system(.body, design: .rounded).weight(.medium))
@@ -561,7 +541,7 @@ struct ImportDataView: View {
                     }
                 } else if progress == 7 {
                     VStack(spacing: 10) {
-                        Text(String(format: String(localized: "%lld/^[%lld category](inflect: true) linked"), numberOfLinkedCategories, uniqueCategories.count))
+                        Text(String(format: String.appLocalized("%lld/^[%lld category](inflect: true) linked"), numberOfLinkedCategories, uniqueCategories.count))
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
 //                            .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -705,7 +685,7 @@ struct ImportDataView: View {
                                 importData()
                             } else {
                                 showToast = true
-                                toastMessage = String(localized: "Unlinked Categories")
+                                toastMessage = String.appLocalized("Unlinked Categories")
                             }
 
                         } else if progress > 5 {
@@ -721,7 +701,7 @@ struct ImportDataView: View {
 
                                     guard sample.containsDigits else {
                                         showToast = true
-                                        toastMessage = String(localized: "Invalid Column")
+                                        toastMessage = String.appLocalized("Invalid Column")
                                         return
                                     }
                                 }
@@ -731,7 +711,7 @@ struct ImportDataView: View {
 
                                     guard validateDoubles(strings: stringColumn) else {
                                         showToast = true
-                                        toastMessage = String(localized: "Invalid Column")
+                                        toastMessage = String.appLocalized("Invalid Column")
                                         return
                                     }
                                 }
@@ -745,7 +725,7 @@ struct ImportDataView: View {
                                 if progress < 5 {
                                     guard !remainingColumns.isEmpty else {
                                         showToast = true
-                                        toastMessage = String(localized: "Insufficient Columns")
+                                        toastMessage = String.appLocalized("Insufficient Columns")
                                         return
                                     }
                                     selectedColumn = remainingColumns[0]
@@ -779,7 +759,7 @@ struct ImportDataView: View {
                             }
                         }
                     } label: {
-                        Text(String(localized: "Continue"))
+                        Text(String.appLocalized("Continue"))
                             .font(.system(.title3, design: .rounded).weight(.semibold))
 
 //                            .font(.system(size: 19, weight: .semibold, design: .rounded))
@@ -808,7 +788,7 @@ struct ImportDataView: View {
             case let .success(file):
                 guard file.startAccessingSecurityScopedResource() else {
                     showToast = true
-                    toastMessage = String(localized: "Unable to access file")
+                    toastMessage = String.appLocalized("Unable to access file")
                     return
                 }
                 defer { file.stopAccessingSecurityScopedResource() }
@@ -816,7 +796,7 @@ struct ImportDataView: View {
                 do {
                     guard let message = try String(data: Data(contentsOf: file), encoding: .utf8) else {
                         showToast = true
-                        toastMessage = String(localized: "Invalid File")
+                        toastMessage = String.appLocalized("Invalid File")
                         return
                     }
 
@@ -824,11 +804,11 @@ struct ImportDataView: View {
                     processCSV()
                 } catch {
                     showToast = true
-                    toastMessage = String(localized: "Import Failed")
+                    toastMessage = String.appLocalized("Import Failed")
                 }
             case .failure:
                 showToast = true
-                toastMessage = String(localized: "Import Failed")
+                toastMessage = String.appLocalized("Import Failed")
             }
         }
         .sheet(isPresented: $exportSample) {
@@ -874,7 +854,7 @@ struct ImportDataView: View {
     func processCSV() {
         guard data.containsDigits else {
             showToast = true
-            toastMessage = String(localized: "Invalid File")
+            toastMessage = String.appLocalized("Invalid File")
             return
         }
 
@@ -886,7 +866,7 @@ struct ImportDataView: View {
 
         guard !holdingRows.isEmpty else {
             showToast = true
-            toastMessage = String(localized: "Invalid File")
+            toastMessage = String.appLocalized("Invalid File")
             return
         }
 
@@ -899,7 +879,7 @@ struct ImportDataView: View {
 //
         guard maxColumnCount > 3 else {
             showToast = true
-            toastMessage = String(localized: "Invalid File")
+            toastMessage = String.appLocalized("Invalid File")
             return
         }
 
@@ -1076,7 +1056,7 @@ struct MatchCategoryStepperView: View {
                         .foregroundStyle(Color.SubtitleText.opacity(0.7))
                         .padding(.top, 20)
 
-                    Text(String(localized: "No remaining\ncategories."))
+                    Text(String.appLocalized("No remaining\ncategories."))
                         .font(.system(.callout, design: .rounded).weight(.medium))
 
 //                        .font(.system(size: 16, weight: .medium, design: .rounded))

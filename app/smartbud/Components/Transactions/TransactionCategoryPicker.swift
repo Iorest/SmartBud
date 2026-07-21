@@ -83,7 +83,7 @@ struct NewCategoryPickerView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "pencil")
                         .font(.system(.body, design: .rounded).weight(.semibold))
-                    Text(String(localized: "Edit"))
+                    Text(String.appLocalized("Edit"))
                         .font(.system(.body, design: .rounded).weight(.semibold))
                 }
                 .padding(.vertical, 9)
@@ -96,7 +96,7 @@ struct NewCategoryPickerView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(String(localized: "Edit"))
+            .accessibilityLabel(String.appLocalized("Edit"))
             .padding(.bottom, 15)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)

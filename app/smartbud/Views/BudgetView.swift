@@ -253,15 +253,15 @@ struct MainBudgetView: View {
     var budgetType: String {
         switch budget.type {
         case 1:
-            return String(localized: "today")
+            return String.appLocalized("today")
         case 2:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         case 3:
-            return String(localized: "this month")
+            return String.appLocalized("this month")
         case 4:
-            return String(localized: "this year")
+            return String.appLocalized("this year")
         default:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         }
     }
 
@@ -374,7 +374,7 @@ struct MainBudgetView: View {
                     }
                 }
 
-                ArcedText(text: String(format: String(localized: "OVERALL SPENT: %@"), percentString1), radius: width / 2 + 8)
+                ArcedText(text: String(format: String.appLocalized("OVERALL SPENT: %@"), percentString1), radius: width / 2 + 8)
                     .font(.system(.footnote, design: .rounded).weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                     .frame(width: width, height: 10)
@@ -384,7 +384,7 @@ struct MainBudgetView: View {
                     BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 3, size: internalWidth)
                         .frame(width: internalWidth)
 
-                    Text("\(budgetAmount >= totalSpent ? String(localized: "left") : String(localized: "over")) \(budgetType)")
+                    Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
 //                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
@@ -420,13 +420,13 @@ struct MainBudgetView: View {
                 toEdit = budget
 
             } label: {
-                Label(String(localized: "Edit"), systemImage: "pencil")
+                Label(String.appLocalized("Edit"), systemImage: "pencil")
             }
             Button {
                 toDelete = budget
 
             } label: {
-                Label(String(localized: "Delete"), systemImage: "xmark.bin")
+                Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
             }
         }
         .sheet(item: $toEdit, onDismiss: {
@@ -476,15 +476,15 @@ struct SingleBudgetView: View {
     var budgetType: String {
         switch budget.type {
         case 1:
-            return String(localized: "today")
+            return String.appLocalized("today")
         case 2:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         case 3:
-            return String(localized: "this month")
+            return String.appLocalized("this month")
         case 4:
-            return String(localized: "this year")
+            return String.appLocalized("this year")
         default:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         }
     }
 
@@ -495,11 +495,11 @@ struct SingleBudgetView: View {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%dh left"), 24 - components.hour!)
+                return String(format: String.appLocalized("%dh left"), 24 - components.hour!)
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%dd left"), 7 - (components.day ?? 0))
+                return String(format: String.appLocalized("%dd left"), 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
@@ -508,18 +508,18 @@ struct SingleBudgetView: View {
                 let numberOfDaysPast = components2.day ?? 0
 
                 let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                return String(format: String(localized: "%dd left"), daysLeftNumber
+                return String(format: String.appLocalized("%dd left"), daysLeftNumber
                 )
             }
         } else {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%d hours left"), 24 - (components.hour ?? 0))
+                return String(format: String.appLocalized("%d hours left"), 24 - (components.hour ?? 0))
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(format: String(localized: "%d days left"), 7 - (components.day ?? 0))
+                return String(format: String.appLocalized("%d days left"), 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
@@ -528,7 +528,7 @@ struct SingleBudgetView: View {
                 let numberOfDaysPast = components2.day ?? 0
 
                 let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                return String(format: String(localized: "%@ days left"), "\(daysLeftNumber)")
+                return String(format: String.appLocalized("%@ days left"), "\(daysLeftNumber)")
             }
         }
     }
@@ -620,7 +620,7 @@ struct SingleBudgetView: View {
                                     .lineLimit(1)
                                     .foregroundStyle(Color.PrimaryText)
 
-                                Text(String(format: String(localized: "%@ • %@ spent"), timeLeft, percentString1))
+                                Text(String(format: String.appLocalized("%@ • %@ spent"), timeLeft, percentString1))
                                     .font(.system(.footnote, design: .rounded).weight(.medium))
 //                                    .font(.system(size: 13, weight: .medium, design: .rounded))
                                     .lineLimit(1)
@@ -633,7 +633,7 @@ struct SingleBudgetView: View {
                         VStack(alignment: .trailing, spacing: -4) {
                             BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 1, size: 80)
 
-                            Text("\(budgetAmount >= totalSpent ? String(localized: "left") : String(localized: "over")) \(budgetType)")
+                            Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
                                 .font(.system(.caption2, design: .rounded).weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
@@ -646,12 +646,12 @@ struct SingleBudgetView: View {
                             toEdit = budget
 
                         } label: {
-                            Label(String(localized: "Edit"), systemImage: "pencil")
+                            Label(String.appLocalized("Edit"), systemImage: "pencil")
                         }
                         Button {
                             toDelete = budget
                         } label: {
-                            Label(String(localized: "Delete"), systemImage: "xmark.bin")
+                            Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
                         }
                     }
                     .offset(x: offset)
@@ -742,7 +742,7 @@ struct SingleBudgetView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: -2) {
                             if totalSpent < budgetAmount {
-                                Text(String(format: String(localized: "%@ SPENT"), percentString1))
+                                Text(String(format: String.appLocalized("%@ SPENT"), percentString1))
                                     .font(.system(.caption2, design: .rounded).weight(.semibold))
 //                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
                                     .lineLimit(1)
@@ -752,7 +752,7 @@ struct SingleBudgetView: View {
 
                             BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2, size: width - 40)
 
-                            Text("\(budgetAmount >= totalSpent ? String(localized: "left") : String(localized: "over")) \(budgetType)")
+                            Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
                                 .font(.system(.footnote, design: .rounded).weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                                 .minimumScaleFactor(0.7)
@@ -797,12 +797,12 @@ struct SingleBudgetView: View {
                         toEdit = budget
 
                     } label: {
-                        Label(String(localized: "Edit"), systemImage: "pencil")
+                        Label(String.appLocalized("Edit"), systemImage: "pencil")
                     }
                     Button {
                         toDelete = budget
                     } label: {
-                        Label(String(localized: "Delete"), systemImage: "xmark.bin")
+                        Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
                     }
                 }
             }
@@ -969,7 +969,7 @@ struct DeleteBudgetAlert: View {
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(
                     String(
-                        format: String(localized: "Delete the '%@' budget?"),
+                        format: String.appLocalized("Delete the '%@' budget?"),
                         toDelete.category?.wrappedName ?? "")
                 )
                     .font(.system(.title2, design: .rounded).weight(.medium))
@@ -988,7 +988,7 @@ struct DeleteBudgetAlert: View {
                     }
 
                 } label: {
-                    DeleteButton(text: String(localized: "Delete"), red: true)
+                    DeleteButton(text: String.appLocalized("Delete"), red: true)
                 }
                 .padding(.bottom, 8)
 
@@ -998,7 +998,7 @@ struct DeleteBudgetAlert: View {
                     }
 
                 } label: {
-                    DeleteButton(text: String(localized: "Cancel"), red: false)
+                    DeleteButton(text: String.appLocalized("Cancel"), red: false)
                 }
             }
             .padding(13)
@@ -1069,7 +1069,7 @@ struct DeleteMainBudgetAlert: View {
                     }
 
                 } label: {
-                    DeleteButton(text: String(localized: "Delete"), red: true)
+                    DeleteButton(text: String.appLocalized("Delete"), red: true)
                 }
                 .padding(.bottom, 8)
 
@@ -1079,7 +1079,7 @@ struct DeleteMainBudgetAlert: View {
                     }
 
                 } label: {
-                    DeleteButton(text: String(localized: "Cancel"), red: false)
+                    DeleteButton(text: String.appLocalized("Cancel"), red: false)
                 }
             }
             .multilineTextAlignment(.leading)
@@ -1136,7 +1136,7 @@ struct DetailedBudgetView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
-                        Text(String(localized: "Back"))
+                        Text(String.appLocalized("Back"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
@@ -1148,15 +1148,15 @@ struct DetailedBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110"), label: String(localized: "Add transaction")) {
+                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110"), label: String.appLocalized("Add transaction")) {
                     newTransaction = true
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String(localized: "Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String.appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String(localized: "Delete budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String.appLocalized("Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -1204,7 +1204,7 @@ struct DetailedMainBudgetView: View {
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
-                        Text(String(localized: "Back"))
+                        Text(String.appLocalized("Back"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
@@ -1217,11 +1217,11 @@ struct DetailedMainBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String(localized: "Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String.appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String(localized: "Delete budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String.appLocalized("Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -1293,9 +1293,9 @@ struct TimeBudgetView: View {
 
         if budgetType == 1 {
             let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
-            return String(format: String(localized: "%@ hours left"), "\(24 - (components.hour ?? 0))")
+            return String(format: String.appLocalized("%@ hours left"), "\(24 - (components.hour ?? 0))")
         } else {
-            return String(format: String(localized: "%@ days left"), "\(daysLeftNumber)")
+            return String(format: String.appLocalized("%@ days left"), "\(daysLeftNumber)")
         }
     }
 
@@ -1320,13 +1320,13 @@ struct TimeBudgetView: View {
         if budgetAmount >= totalSpent {
             if startDate == budget.startDate {
                 if budgetType == 1 {
-                    return String(localized: "left today")
+                    return String.appLocalized("left today")
                 } else if budgetType == 2 {
-                    return String(localized: "left this week")
+                    return String.appLocalized("left this week")
                 } else if budgetType == 3 {
-                    return String(localized: "left this month")
+                    return String.appLocalized("left this month")
                 } else if budgetType == 4 {
-                    return String(localized: "left this year")
+                    return String.appLocalized("left this year")
                 } else {
                     return ""
                 }
@@ -1335,19 +1335,19 @@ struct TimeBudgetView: View {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
-                    return String(format: String(localized: "left on %@"), dateFormatter.string(from: startDate))
+                    return String(format: String.appLocalized("left on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(format: String(localized: "%@ weeks ago"), "\((components.day ?? 0) / 7)")
-                    return String(format: String(localized: "left %@"), weekString)
+                    let weekString = String(format: String.appLocalized("%@ weeks ago"), "\((components.day ?? 0) / 7)")
+                    return String(format: String.appLocalized("left %@"), weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(format: String(localized: "%@ months ago"), "\(components.month!)")
-                    return String(format: String(localized: "left %@"), monthString)
+                    let monthString = String(format: String.appLocalized("%@ months ago"), "\(components.month!)")
+                    return String(format: String.appLocalized("left %@"), monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(format: String(localized: "%@ years ago"), "\(components.year!)")
-                    return String(format: String(localized: "left %@"), yearString)
+                    let yearString = String(format: String.appLocalized("%@ years ago"), "\(components.year!)")
+                    return String(format: String.appLocalized("left %@"), yearString)
                 } else {
                     return ""
                 }
@@ -1355,13 +1355,13 @@ struct TimeBudgetView: View {
         } else {
             if startDate == budget.startDate {
                 if budgetType == 1 {
-                    return String(localized: "over today")
+                    return String.appLocalized("over today")
                 } else if budgetType == 2 {
-                    return String(localized: "over this week")
+                    return String.appLocalized("over this week")
                 } else if budgetType == 3 {
-                    return String(localized: "over this month")
+                    return String.appLocalized("over this month")
                 } else if budgetType == 4 {
-                    return String(localized: "over this year")
+                    return String.appLocalized("over this year")
                 } else {
                     return ""
                 }
@@ -1370,19 +1370,19 @@ struct TimeBudgetView: View {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
-                    return String(format: String(localized: "over on %@"), dateFormatter.string(from: startDate))
+                    return String(format: String.appLocalized("over on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(format: String(localized: "%@ weeks ago"), "\((components.day ?? 0) / 7)")
-                    return String(format: String(localized: "over %@"), weekString)
+                    let weekString = String(format: String.appLocalized("%@ weeks ago"), "\((components.day ?? 0) / 7)")
+                    return String(format: String.appLocalized("over %@"), weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(format: String(localized: "%@ months ago"), "\(components.month!)")
-                    return String(format: String(localized: "over %@"), monthString)
+                    let monthString = String(format: String.appLocalized("%@ months ago"), "\(components.month!)")
+                    return String(format: String.appLocalized("over %@"), monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(format: String(localized: "%@ years ago"), "\(components.year!)")
-                    return String(format: String(localized: "over %@"), yearString)
+                    let yearString = String(format: String.appLocalized("%@ years ago"), "\(components.year!)")
+                    return String(format: String.appLocalized("over %@"), yearString)
                 } else {
                     return ""
                 }
@@ -1704,7 +1704,7 @@ struct FilteredBudgetView: View {
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
+                            .accessibilityLabel(String(format: String.appLocalized("%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
 
                             Line()
                                 .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -1823,9 +1823,9 @@ struct TimeMainBudgetView: View {
 
         if budgetType == 1 {
             let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
-            return String(format: String(localized: "%@ hours left"), "\(24 - (components.hour ?? 0))")
+            return String(format: String.appLocalized("%@ hours left"), "\(24 - (components.hour ?? 0))")
         } else {
-            return String(format: String(localized: "%@ days left"), "\(daysLeftNumber)")
+            return String(format: String.appLocalized("%@ days left"), "\(daysLeftNumber)")
         }
     }
 
@@ -1850,13 +1850,13 @@ struct TimeMainBudgetView: View {
         if budgetAmount >= totalSpent {
             if startDate == budget.startDate {
                 if budgetType == 1 {
-                    return String(localized: "left today")
+                    return String.appLocalized("left today")
                 } else if budgetType == 2 {
-                    return String(localized: "left this week")
+                    return String.appLocalized("left this week")
                 } else if budgetType == 3 {
-                    return String(localized: "left this month")
+                    return String.appLocalized("left this month")
                 } else if budgetType == 4 {
-                    return String(localized: "left this year")
+                    return String.appLocalized("left this year")
                 } else {
                     return ""
                 }
@@ -1865,19 +1865,19 @@ struct TimeMainBudgetView: View {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
-                    return String(format: String(localized: "left on %@"), dateFormatter.string(from: startDate))
+                    return String(format: String.appLocalized("left on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(format: String(localized: "%@ weeks ago"), "\((components.day ?? 0) / 7)")
-                    return String(format: String(localized: "left %@"), weekString)
+                    let weekString = String(format: String.appLocalized("%@ weeks ago"), "\((components.day ?? 0) / 7)")
+                    return String(format: String.appLocalized("left %@"), weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(format: String(localized: "%@ months ago"), "\(components.month!)")
-                    return String(format: String(localized: "left %@"), monthString)
+                    let monthString = String(format: String.appLocalized("%@ months ago"), "\(components.month!)")
+                    return String(format: String.appLocalized("left %@"), monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(format: String(localized: "%@ years ago"), "\(components.year!)")
-                    return String(format: String(localized: "left %@"), yearString)
+                    let yearString = String(format: String.appLocalized("%@ years ago"), "\(components.year!)")
+                    return String(format: String.appLocalized("left %@"), yearString)
                 } else {
                     return ""
                 }
@@ -1885,13 +1885,13 @@ struct TimeMainBudgetView: View {
         } else {
             if startDate == budget.startDate {
                 if budgetType == 1 {
-                    return String(localized: "over today")
+                    return String.appLocalized("over today")
                 } else if budgetType == 2 {
-                    return String(localized: "over this week")
+                    return String.appLocalized("over this week")
                 } else if budgetType == 3 {
-                    return String(localized: "over this month")
+                    return String.appLocalized("over this month")
                 } else if budgetType == 4 {
-                    return String(localized: "over this year")
+                    return String.appLocalized("over this year")
                 } else {
                     return ""
                 }
@@ -1900,19 +1900,19 @@ struct TimeMainBudgetView: View {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
                     dateFormatter.dateFormat = "d MMM"
-                    return String(format: String(localized: "over on %@"), dateFormatter.string(from: startDate))
+                    return String(format: String.appLocalized("over on %@"), dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(format: String(localized: "%@ weeks ago"), "\((components.day ?? 0) / 7)")
-                    return String(format: String(localized: "over %@"), weekString)
+                    let weekString = String(format: String.appLocalized("%@ weeks ago"), "\((components.day ?? 0) / 7)")
+                    return String(format: String.appLocalized("over %@"), weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(format: String(localized: "%@ months ago"), "\(components.month!)")
-                    return String(format: String(localized: "over %@"), monthString)
+                    let monthString = String(format: String.appLocalized("%@ months ago"), "\(components.month!)")
+                    return String(format: String.appLocalized("over %@"), monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(format: String(localized: "%@ years ago"), "\(components.year!)")
-                    return String(format: String(localized: "over %@"), yearString)
+                    let yearString = String(format: String.appLocalized("%@ years ago"), "\(components.year!)")
+                    return String(format: String.appLocalized("over %@"), yearString)
                 } else {
                     return ""
                 }

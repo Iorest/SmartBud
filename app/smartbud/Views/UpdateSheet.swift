@@ -64,8 +64,7 @@ struct UpdateAlert: View {
 
                     Text(
                         String(
-                            format: String(
-                                localized: "Version %@ (%@) · 18 Sep 2023"),
+                            format: String.appLocalized("Version %@ (%@) · 18 Sep 2023"),
                             UIApplication.appVersion ?? "",
                             UIApplication.buildNumber ?? "")
                     )
@@ -128,9 +127,9 @@ struct UpdateAlert: View {
                 .frame(height: 300)
 
                 Text(
-                    AttributedString(String(localized: "Special thanks to "))
+                    AttributedString(String.appLocalized("Special thanks to "))
                         + makeAttributedString()
-                        + AttributedString(String(localized: " for contributing"))
+                        + AttributedString(String.appLocalized(" for contributing"))
                 )
                     .font(.system(.footnote, design: .rounded).weight(.medium))
                     .foregroundStyle(Color.SubtitleText)

@@ -135,7 +135,7 @@ struct SettingsWeekStartView: View {
               } label: {
                 HStack {
                   Text(
-                    String(format: String(localized: "%@ of month"), getOrdinal(day))
+                    String(format: String.appLocalized("%@ of month"), getOrdinal(day))
                   )
                     .font(.system(.body, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)

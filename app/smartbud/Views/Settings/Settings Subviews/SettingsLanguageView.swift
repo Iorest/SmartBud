@@ -13,7 +13,7 @@
 import SwiftUI
 
 struct SettingsLanguageView: View {
-    @AppLanguage var appLanguage: String = ""
+    @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
 
     @Environment(\.dismiss) var dismiss
     @Environment(SettingsViewModel.self) var settingsVM
@@ -22,7 +22,7 @@ struct SettingsLanguageView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Text(String(localized: "Language"))
+            Text(String.appLocalized("Language"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity)

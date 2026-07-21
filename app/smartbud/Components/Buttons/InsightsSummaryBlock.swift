@@ -56,6 +56,6 @@ struct InsightsSummaryBlockView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(income ? String(localized: "Income") : String(localized: "Expenses")), \(amountString)")
+        .accessibilityLabel("\(income ? String.appLocalized("Income") : String.appLocalized("Expenses")), \(amountString)")
     }
 }

@@ -32,9 +32,9 @@ struct TransactionView: View {
 
     var transactionTypeString: String {
         if income {
-            return String(localized: "Income")
+            return String.appLocalized("Income")
         } else {
-            return String(localized: "Expense")
+            return String.appLocalized("Expense")
         }
     }
 
@@ -154,7 +154,7 @@ struct TransactionView: View {
     var dateDisplayText: some View {
         let dateStr = getDateString(date: date)
         if isDateToday(date: date) {
-            Text(String(format: String(localized: "Today, %@"), dateStr))
+            Text(String(format: String.appLocalized("Today, %@"), dateStr))
                 .lineLimit(1)
         } else {
             Text(dateStr)
@@ -188,11 +188,11 @@ struct TransactionView: View {
     @ViewBuilder
     var deleteConfirmationHeader: some View {
         Group {
-            Text(String(localized: "Delete Expense?"))
+            Text(String.appLocalized("Delete Expense?"))
                 .font(.system(size: 20, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
-            Text(String(localized: "This action cannot be undone."))
+            Text(String.appLocalized("This action cannot be undone."))
                 .font(.system(size: 16, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.SubtitleText)
                 .padding(.bottom, 15)
@@ -240,7 +240,7 @@ struct TransactionView: View {
                 } label: {
                     deleteButtonIcon
                 }
-                .accessibilityLabel(String(localized: "delete transaction"))
+                .accessibilityLabel(String.appLocalized("delete transaction"))
             }
 
             Button {
@@ -442,7 +442,7 @@ struct TransactionView: View {
                 showingDatePicker = false
             }
 
-            DatePicker(String(localized: "Date"), selection: $date)
+            DatePicker(String.appLocalized("Date"), selection: $date)
                 .datePickerStyle(.graphical)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
@@ -523,7 +523,7 @@ struct TransactionView: View {
             Group {
                 if showCategoryPicker {
                     HStack(spacing: 10) {
-                        Text(String(localized: "Close"))
+                        Text(String.appLocalized("Close"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .lineLimit(1)
                     }
@@ -582,7 +582,7 @@ struct TransactionView: View {
             Image(systemName: "plus")
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
-            Text(String(localized: "Category"))
+            Text(String.appLocalized("Category"))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .lineLimit(1)
         }
@@ -615,7 +615,7 @@ struct TransactionView: View {
                         .bounce.up.byLayer, options: .repeating.speed(0.5),
                         value: showCategoryPicker)
 
-            Text(String(localized: "Category"))
+            Text(String.appLocalized("Category"))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .lineLimit(1)
         }
@@ -636,7 +636,7 @@ struct TransactionView: View {
 
     @ViewBuilder
     var expenseToggleButton: some View {
-        Text(String(localized: "Expense"))
+        Text(String.appLocalized("Expense"))
             .font(.system(.body, design: .rounded).weight(.semibold))
             .lineLimit(1)
             .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
@@ -655,7 +655,7 @@ struct TransactionView: View {
 
     @ViewBuilder
     var incomeToggleButton: some View {
-        Text(String(localized: "transaction-view-income-picker"))
+        Text(String.appLocalized("transaction-view-income-picker"))
             .font(.system(.body, design: .rounded).weight(.semibold))
             .lineLimit(1)
             .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
@@ -681,13 +681,13 @@ struct TransactionView: View {
 
     var repeatButtonAccessibility: String {
         if repeatType == 1 {
-            return String(localized: "transaction recurs daily, button to edit recurring duration")
+            return String.appLocalized("transaction recurs daily, button to edit recurring duration")
         } else if repeatType == 2 {
-            return String(localized: "transaction recurs weekly, button to edit recurring duration")
+            return String.appLocalized("transaction recurs weekly, button to edit recurring duration")
         } else if repeatType == 3 {
-            return String(localized: "transaction recurs monthly, button to edit recurring duration")
+            return String.appLocalized("transaction recurs monthly, button to edit recurring duration")
         } else {
-            return String(localized: "button to make transaction recurring")
+            return String.appLocalized("button to make transaction recurring")
         }
     }
 
@@ -717,7 +717,7 @@ struct TransactionView: View {
                     dismiss()
 
                 } label: {
-                    deleteButtonLabel(String(localized: "Delete"), color: Color.AlertRed)
+                    deleteButtonLabel(String.appLocalized("Delete"), color: Color.AlertRed)
                 }
                 .padding(.bottom, 8)
 
@@ -728,7 +728,7 @@ struct TransactionView: View {
                     }
 
                 } label: {
-                    cancelButtonLabel(String(localized: "Cancel"))
+                    cancelButtonLabel(String.appLocalized("Cancel"))
                 }
             }
             .padding(13)
@@ -1058,7 +1058,7 @@ struct TransactionView: View {
 
         if amount == 0 && category == nil {
             toastImage = "questionmark.app"
-            toastTitle = String(localized: "Incomplete Entry")
+            toastTitle = String.appLocalized("Incomplete Entry")
             showToast = true
             toggleFieldColors()
 
@@ -1067,13 +1067,13 @@ struct TransactionView: View {
             return
         } else if amount == 0 {
             toastImage = "centsign.circle"
-            toastTitle = String(localized: "Missing Amount")
+            toastTitle = String.appLocalized("Missing Amount")
             showToast = true
             errorHaptic &+= 1
             return
         } else if category == nil {
             toastImage = "tray"
-            toastTitle = String(localized: "Missing Category")
+            toastTitle = String.appLocalized("Missing Category")
             showToast = true
 
             toggleFieldColors()
@@ -1197,7 +1197,7 @@ struct NoteView: View {
 
         let size = (note as NSString).size(withAttributes: attributes)
 
-        let placeholder = String(localized: "Add Note")
+        let placeholder = String.appLocalized("Add Note")
         let placeholderSize = (placeholder as NSString).size(withAttributes: attributes)
 
         if !note.isEmpty {
@@ -1228,7 +1228,7 @@ struct NoteView: View {
                     .foregroundStyle(Color.PrimaryText)
 
                 if note.isEmpty {
-                    Text(String(localized: "Add Note"))
+                    Text(String.appLocalized("Add Note"))
                         .foregroundStyle(Color.SubtitleText)
                 }
             }
@@ -1328,14 +1328,14 @@ struct RecurringPickerView: View {
 
             HStack {
                 if repeatCoefficient == 1 {
-                    Text(String(localized: "custom"))
+                    Text(String.appLocalized("custom"))
                 } else {
                     if repeatType == 1 {
-                        Text("\(repeatCoefficient) \(String(localized: "days"))")
+                        Text("\(repeatCoefficient) \(String.appLocalized("days"))")
                     } else if repeatType == 2 {
-                        Text("\(repeatCoefficient) \(String(localized: "weeks"))")
+                        Text("\(repeatCoefficient) \(String.appLocalized("weeks"))")
                     } else if repeatType == 3 {
-                        Text("\(repeatCoefficient) \(String(localized: "months"))")
+                        Text("\(repeatCoefficient) \(String.appLocalized("months"))")
                     }
                 }
 
@@ -1439,7 +1439,7 @@ struct CustomRecurringView: View {
 
                 Spacer()
 
-                Text(String(localized: "Custom Interval"))
+                Text(String.appLocalized("Custom Interval"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 //                    .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -1467,7 +1467,7 @@ struct CustomRecurringView: View {
             }
 
             HStack(spacing: 10) {
-                Text(String(localized: "Repeats every"))
+                Text(String.appLocalized("Repeats every"))
                     .font(.system(size: 23, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
                     .padding(.trailing, 3)
@@ -1531,11 +1531,11 @@ struct CustomRecurringView: View {
 
                     Group {
                         if holdingType == 1 {
-                            Text(String(format: String(localized: "%lld days"), holdingCoefficient))
+                            Text(String(format: String.appLocalized("%lld days"), holdingCoefficient))
                         } else if holdingType == 2 {
-                            Text(String(format: String(localized: "%lld weeks"), holdingCoefficient))
+                            Text(String(format: String.appLocalized("%lld weeks"), holdingCoefficient))
                         } else if holdingType == 3 {
-                            Text(String(format: String(localized: "%lld months"), holdingCoefficient))
+                            Text(String(format: String.appLocalized("%lld months"), holdingCoefficient))
                         }
                     }
                     .font(.system(size: 23, weight: .medium, design: .rounded))

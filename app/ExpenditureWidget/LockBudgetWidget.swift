@@ -107,10 +107,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
 
         if budgetModel.type == 1 {
             let components = calendar.dateComponents([.hour], from: budgetModel.startDate, to: now)
-            timeLeft = String(format: String(localized: "%d hours left"), 24 - (components.hour ?? 0))
+            timeLeft = String(format: String.appLocalized("%d hours left"), 24 - (components.hour ?? 0))
         } else if budgetModel.type == 2 {
             let components = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
-            timeLeft = String(format: String(localized: "%d days left"), 7 - (components.day ?? 0))
+            timeLeft = String(format: String.appLocalized("%d days left"), 7 - (components.day ?? 0))
         } else {
             let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
             let numberOfDays = components1.day ?? 0
@@ -119,7 +119,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
             let numberOfDaysPast = components2.day ?? 0
 
             let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-            timeLeft = String(format: String(localized: "%d days left"), daysLeftNumber)
+            timeLeft = String(format: String.appLocalized("%d days left"), daysLeftNumber)
         }
 
         return (holdingTotal, timeLeft, returnBudget)
@@ -141,23 +141,23 @@ struct LockBudgetWidgetEntryView: View {
     var budgetType: String {
         switch entry.budget.type {
         case 1:
-            return String(localized: "today")
+            return String.appLocalized("today")
         case 2:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         case 3:
-            return String(localized: "this month")
+            return String.appLocalized("this month")
         case 4:
-            return String(localized: "this year")
+            return String.appLocalized("this year")
         default:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         }
     }
 
     var subtitle: String {
         if entry.budget.budgetAmount > entry.totalSpent {
-            return String(localized: "left")
+            return String.appLocalized("left")
         } else {
-            return String(localized: "over")
+            return String.appLocalized("over")
         }
     }
 
@@ -170,7 +170,7 @@ struct LockBudgetWidgetEntryView: View {
     }
 
     var percentString: String {
-        return String(localized: "\(Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))% spent")
+        return String(format: String.appLocalized("%lld%% spent"), Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))
     }
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -184,7 +184,7 @@ struct LockBudgetWidgetEntryView: View {
         switch widgetFamily {
         case .accessoryInline:
             if entry.configuration.budget == nil {
-                Text(String(localized: "Select budget in widget options"))
+                Text(String.appLocalized("Select budget in widget options"))
             } else {
                 Text("\(entry.budget.emoji) \(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle)")
                     .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
@@ -195,7 +195,7 @@ struct LockBudgetWidgetEntryView: View {
                 ZStack {
                     AccessoryWidgetBackground()
 
-                    Text(String(localized: "SELECT BUDGET"))
+                    Text(String.appLocalized("SELECT BUDGET"))
                         .font(.system(size: 8, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
@@ -214,7 +214,7 @@ struct LockBudgetWidgetEntryView: View {
 
         case .accessoryRectangular:
             if entry.configuration.budget == nil {
-                Text(String(localized: "SELECT BUDGET IN WIDGET OPTIONS"))
+                Text(String.appLocalized("SELECT BUDGET IN WIDGET OPTIONS"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
@@ -226,7 +226,7 @@ struct LockBudgetWidgetEntryView: View {
                             Text(entry.budget.name)
 
                             if showPercent(size: proxy.size.width) {
-                                Text(String(localized: "•"))
+                                Text(String.appLocalized("•"))
                                 Text(percentString)
                             }
                         }
@@ -237,7 +237,7 @@ struct LockBudgetWidgetEntryView: View {
                             .foregroundColor(Color.SubtitleText)
 
                         Gauge(value: percent, in: 0 ... 1) {
-                            Text(String(localized: "Percent Spent"))
+                            Text(String.appLocalized("Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()
                         } minimumValueLabel: {

@@ -326,8 +326,8 @@ final class InsightsViewModel{
             lineGraphData: graphData,
             lineGraphGreen: green,
             range: logViewRangeCount(timeframe: timeframe),
-            rangeLabel: String(localized: rangeLabelKey),
-            headingText: String(localized: headingKey),
+            rangeLabel: String.appLocalized(rangeLabelKey),
+            headingText: String.appLocalized(headingKey),
             amount: amount,
             formattedIncome: "+\(formatNumber(showCents: showCents, number: totalIncome))",
             formattedSpent: "-\(formatNumber(showCents: showCents, number: totalSpent))"
@@ -490,7 +490,7 @@ final class InsightsViewModel{
         periodAverageIncome = inc / max(1, divisor)
 
         periodDateRangeText = getDateRangeText(for: selectedPeriod)
-        periodDateRangeIncomeText = selectedPeriod == 3 ? String(localized: "AVG/MONTH", comment: "Insights avg per month") : String(localized: "AVG/DAY", comment: "Insights avg per day")
+        periodDateRangeIncomeText = selectedPeriod == 3 ? String.appLocalized("AVG/MONTH", comment: "Insights avg per month") : String.appLocalized("AVG/DAY", comment: "Insights avg per day")
 
         barChartData = getBarChartData(for: selectedPeriod)
         categoryBreakdown = getCategoryBreakdown(for: selectedPeriod)

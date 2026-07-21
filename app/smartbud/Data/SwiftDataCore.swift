@@ -67,6 +67,7 @@ final class DataRepository{
                 configurations: config
             )
         } catch {
+            NSLog("[DataRepository] ModelContainer FAILED: \(error)")
             fatalError("ModelContainer failed: \(error)")
         }
     }

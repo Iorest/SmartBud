@@ -174,21 +174,21 @@ struct ExpenditureWidgetEntryView: View {
     var inlineSubtitleText: String {
         switch entry.duration {
         case .unknown:
-            return String(localized: "NIL")
+            return String.appLocalized("NIL")
         case .day:
-            return String(localized: "today")
+            return String.appLocalized("today")
         case .week:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         case .month:
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "MMM"
-            return String(localized: "in \(formatter.string(from: Date.now))")
+            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now))
         case .year:
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(localized: "in \(formatter.string(from: Date.now))")
+            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now))
         }
     }
 
@@ -197,11 +197,11 @@ struct ExpenditureWidgetEntryView: View {
         case .unknown:
             return ""
         case .net:
-            return String(localized: "net")
+            return String.appLocalized("net")
         case .income:
-            return String(localized: "earned")
+            return String.appLocalized("earned")
         case .expense:
-            return String(localized: "spent")
+            return String.appLocalized("spent")
         }
     }
 
@@ -232,7 +232,7 @@ struct ExpenditureWidgetEntryView: View {
             }
         case .accessoryRectangular:
             if entry.transactions.count == 0 {
-                Text(String(localized: "NO RECENT EXPENSES"))
+                Text(String.appLocalized("NO RECENT EXPENSES"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .multilineTextAlignment(.center)
                     .containerBackground(for: .widget) { Color.clear }
@@ -275,7 +275,7 @@ struct ExpenditureWidgetEntryView: View {
 
                     if entry.transactions.isEmpty {
                         VStack(spacing: 5) {
-                            Text(String(localized: "NO RECENT EXPENSES"))
+                            Text(String.appLocalized("NO RECENT EXPENSES"))
                                 .font(.system(size: 9, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
                                 .frame(maxHeight: .infinity)
@@ -284,7 +284,7 @@ struct ExpenditureWidgetEntryView: View {
                                 Image(systemName: "plus")
                                     .font(.system(size: 10, weight: .medium, design: .rounded))
 
-                                Text(String(localized: "New Expense"))
+                                Text(String.appLocalized("New Expense"))
                                     .font(.system(size: 12, weight: .medium, design: .rounded))
                                     .foregroundColor(Color.PrimaryText)
                             }
@@ -297,7 +297,7 @@ struct ExpenditureWidgetEntryView: View {
 
                     } else {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text(String(localized: "RECENT EXPENSES"))
+                            Text(String.appLocalized("RECENT EXPENSES"))
                                 .font(.system(size: 9, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -334,7 +334,7 @@ struct ExpenditureWidgetEntryView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 10, weight: .medium, design: .rounded))
 
-                                    Text(String(localized: "New Expense"))
+                                    Text(String.appLocalized("New Expense"))
                                         .font(.system(size: 12, weight: .medium, design: .rounded))
                                         .foregroundColor(Color.PrimaryText)
                                 }
@@ -375,7 +375,7 @@ struct ExpenditureWidgetEntryView: View {
 
                     if entry.transactions.isEmpty {
                         VStack(spacing: 20) {
-                            Text(String(localized: "NO RECENT EXPENSES"))
+                            Text(String.appLocalized("NO RECENT EXPENSES"))
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -384,7 +384,7 @@ struct ExpenditureWidgetEntryView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 13, weight: .semibold, design: .rounded))
 
-                                    Text(String(localized: "New Expense"))
+                                    Text(String.appLocalized("New Expense"))
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundColor(Color.PrimaryText)
                                 }
@@ -397,7 +397,7 @@ struct ExpenditureWidgetEntryView: View {
 
                     } else {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(String(localized: "RECENT EXPENSES"))
+                            Text(String.appLocalized("RECENT EXPENSES"))
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
 
@@ -435,7 +435,7 @@ struct ExpenditureWidgetEntryView: View {
                                         Image(systemName: "plus")
                                             .font(.system(size: 13, weight: .semibold, design: .rounded))
 
-                                        Text(String(localized: "New Expense"))
+                                        Text(String.appLocalized("New Expense"))
                                             .font(.system(size: 16, weight: .semibold, design: .rounded))
                                             .foregroundColor(Color.PrimaryText)
                                     }

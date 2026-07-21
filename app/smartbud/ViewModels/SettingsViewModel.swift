@@ -27,10 +27,10 @@ final class SettingsViewModel{
     /// "logo" icon on the Settings row, not by country flags.
     func displayName(for code: String) -> String {
         switch code {
-        case "":        return String(localized: "System")
-        case "en":      return String(localized: "English")
-        case "zh-Hans": return String(localized: "Simplified Chinese")
-        case "zh-Hant": return String(localized: "Traditional Chinese")
+        case "":        return String.appLocalized("System")
+        case "en":      return String.appLocalized("English")
+        case "zh-Hans": return String.appLocalized("Simplified Chinese")
+        case "zh-Hant": return String.appLocalized("Traditional Chinese")
         default:        return code
         }
     }
@@ -40,14 +40,6 @@ final class SettingsViewModel{
     /// Subtitle shown in the PRO section of `SettingsView`. Localized so it
     /// follows the in-app language switch in `SettingsLanguageView`.
     var proCardSubtitle: String {
-        String(localized: "Unlock all Pro features")
-    }
-
-    /// Convert a stored language code into a `Locale` override.
-    /// Returns `nil` for the empty (system) case so SwiftUI falls back to the
-    /// device locale.
-    func locale(for code: String) -> Locale? {
-        guard !code.isEmpty else { return nil }
-        return Locale(identifier: code)
+        String.appLocalized("Unlock all Pro features")
     }
 }

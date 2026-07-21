@@ -29,9 +29,9 @@ struct TemplateTransactionView: View {
 
     var transactionTypeString: String {
         if income {
-            return String(localized: "Income")
+            return String.appLocalized("Income")
         } else {
-            return String(localized: "Expense")
+            return String.appLocalized("Expense")
         }
     }
 
@@ -132,13 +132,13 @@ struct TemplateTransactionView: View {
 
     var repeatButtonAccessibility: String {
         if repeatType == 1 {
-            return String(localized: "transaction recurs daily, button to edit recurring duration")
+            return String.appLocalized("transaction recurs daily, button to edit recurring duration")
         } else if repeatType == 2 {
-            return String(localized: "transaction recurs weekly, button to edit recurring duration")
+            return String.appLocalized("transaction recurs weekly, button to edit recurring duration")
         } else if repeatType == 3 {
-            return String(localized: "transaction recurs monthly, button to edit recurring duration")
+            return String.appLocalized("transaction recurs monthly, button to edit recurring duration")
         } else {
-            return String(localized: "button to make transaction recurring")
+            return String.appLocalized("button to make transaction recurring")
         }
     }
 
@@ -265,7 +265,7 @@ struct TemplateTransactionView: View {
                                     .background(Color.AlertRed.opacity(0.23), in: Circle())
                                     .contentShape(Circle())
                             }
-                            .accessibilityLabel(String(localized: "delete transaction"))
+                            .accessibilityLabel(String.appLocalized("delete transaction"))
                         }
 
                         Button {
@@ -469,7 +469,7 @@ struct TemplateTransactionView: View {
                             dismiss()
 
                         } label: {
-                            Text(String(localized: "Delete"))
+                            Text(String.appLocalized("Delete"))
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .frame(height: 45)
@@ -485,7 +485,7 @@ struct TemplateTransactionView: View {
                             }
 
                         } label: {
-                            Text(String(localized: "Cancel"))
+                            Text(String.appLocalized("Cancel"))
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color.PrimaryText.opacity(0.9))
                                 .frame(height: 45)

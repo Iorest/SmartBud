@@ -40,23 +40,6 @@
         }
       }
     },
-    " from 🇸🇬" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " 🇸🇬 用 ❤️ 制作"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " 🇸🇬 用 ❤️ 製作"
-          }
-        }
-      }
-    },
     "-%@" : {
       "localizations" : {
         "en" : {
@@ -1326,29 +1309,6 @@
       },
       "shouldTranslate" : false
     },
-    "A soft sky background with a deep violet bag and golden tie." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A soft sky background with a deep violet bag and golden tie."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "柔和天空蓝背景，深紫袋身配以金色领带。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "柔和天空藍背景，深紫袋身配以金色領結。"
-          }
-        }
-      }
-    },
     "A soft sky background with a white bag and yellow tie." : {
       "localizations" : {
         "en" : {
@@ -1930,29 +1890,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外觀"
-          }
-        }
-      }
-    },
-    "Appears in the 'New Expense' bottom sheet and the 'Note' field of new transactions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appears in the 'New Expense' bottom sheet and the 'Note' field of new transactions."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示在「新建支出」底栏和新建交易的「备注」字段中。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示在「新增支出」底欄和新增交易的「備註」欄位中。"
           }
         }
       }
@@ -2977,6 +2914,75 @@
         }
       }
     },
+    "Change" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更换"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更換"
+          }
+        }
+      }
+    },
+    "Change App Icon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change App Icon"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更换 App 图标"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更換 App 圖標"
+          }
+        }
+      }
+    },
+    "Switch to this icon?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to this icon?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换到这个图标？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換到這個圖標？"
+          }
+        }
+      }
+    },
     "categorical budget" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3450,52 +3456,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法儲存到資料庫"
-          }
-        }
-      }
-    },
-    "Cream · 米色" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cream · 米色"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cream · 米色"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cream · 米色"
-          }
-        }
-      }
-    },
-    "Cream backdrop, teal-blue bag with a yellow star and smile." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cream backdrop, teal-blue bag with a yellow star and smile."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "米色背景，蓝绿色袋身，缀有黄色星星与微笑。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "米色背景，藍綠色袋身，綴有黃色星星與微笑。"
           }
         }
       }
@@ -4267,23 +4227,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刪除交易"
-          }
-        }
-      }
-    },
-    "Designed by the brilliant @rudra_dsigns, check out his work on Twitter." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "由才华横溢的 @rudra_dsigns 设计，欢迎到 Twitter 欣赏他的作品。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "由才華橫溢的 @rudra_dsigns 設計，歡迎到 Twitter 欣賞他的作品。"
           }
         }
       }
@@ -5091,6 +5034,7 @@
       }
     },
     "Extract Budgets" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -6238,29 +6182,6 @@
         }
       }
     },
-    "Income / Expense" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Income / Expense"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入 / 支出"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入 / 支出"
-          }
-        }
-      }
-    },
     "INCOME CATEGORIES" : {
       "localizations" : {
         "zh-Hans" : {
@@ -7264,23 +7185,6 @@
         }
       }
     },
-    "Made with ❤️ by " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "由 "
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "由 "
-          }
-        }
-      }
-    },
     "Made with ❤️ by %@ from 🇸🇬" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8004,23 +7908,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "NIL"
-          }
-        }
-      }
-    },
-    "No %@ categories found,\nclick the 'New' button to add some." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未找到 %@ 类别，\n点击“新建”按钮添加。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未找到 %@ 類別，\n點擊「新增」按鈕添加。"
           }
         }
       }
@@ -9363,23 +9250,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "處理匯入中"
-          }
-        }
-      }
-    },
-    "Pull to add update" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下拉添加更新"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下拉新增更新"
           }
         }
       }
@@ -11260,13 +11130,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "跟随"
+            "value" : "跟随系统"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "跟隨"
+            "value" : "跟隨系統"
           }
         }
       }
@@ -11306,23 +11176,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "感謝您對智賬開發的支援。"
-          }
-        }
-      }
-    },
-    "That's all, buddy." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "就这些啦。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "就這些啦。"
           }
         }
       }
@@ -13026,23 +12879,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "屬於哪個類別？"
-          }
-        }
-      }
-    },
-    "What's New" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新功能"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新功能"
           }
         }
       }

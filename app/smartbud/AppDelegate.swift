@@ -4,12 +4,13 @@
 //
 //  Created by Iorest on 24/8/22.
 //
-//  Handles home screen quick actions (3D Touch / long-press app icon).
-//  Replaces the previous SceneDelegate: SwiftUI's `App` lifecycle does not
-//  expose `UIApplicationShortcutItem` directly, so we route both the cold-start
-//  case (`launchOptions[.shortcutItem]`) and the warm case
-//  (`application(_:performActionFor:completionHandler:)`) into `openURL`
-//  so the existing `.onOpenURL` handlers in the view tree can react.
+//  Hosts the small set of UIKit-level hooks that SwiftUI's `App` lifecycle
+//  cannot cover directly. Home-screen quick actions (3D Touch / long-press
+//  app icon) are now handled by `SceneDelegate` under the iOS 26 UIScene
+//  lifecycle — `launchOptions[.shortcutItem]` and
+//  `application(_:performActionFor:completionHandler:)` are deprecated
+//  in favor of `UIScene.ConnectionOptions.shortcutItem` and
+//  `windowScene(_:performActionFor:completionHandler:)` respectively.
 //
 
 import SwiftUI
@@ -21,25 +22,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         NSLog("[AppDelegate] didFinishLaunching")
-        // Swap Bundle.main → LanguageBundle so that Foundation's
-        // `String(localized:)` resolves through the user's in-app
-        // language pick rather than the system locale. Must run before
-        // any view body / locale lookup so the very first render uses
-        // the right translation.
-        LanguageBundleInstaller.install()
-        NSLog("[AppDelegate] LanguageBundle installed")
 
-        // Cold-start quick action: the user launched the app by tapping a
-        // home-screen shortcut. Forward its `type` to openURL so the same
-        // `.onOpenURL` handlers in the view tree can react.
-        if let shortcut = launchOptions?[.shortcutItem] as? UIApplicationShortcutItem,
-           let url = URL(string: shortcut.type) {
-            // Defer slightly so the root view is mounted and the openURL
-            // environment value is wired up before we trigger it.
-            DispatchQueue.main.async {
-                UIApplication.shared.open(url)
-            }
-        }
+        // Note: in-app language switching is handled by
+        // `String.appLocalized(...)` in `AppLocale.swift`, which resolves
+        // through the user's `appLanguage` pick on every call. The
+        // historical `LanguageBundleInstaller.install()` Bundle swizzle
+        // (kept for reference in `LanguageBundle.swift`) was abandoned
+        // because (a) it crashed on iOS 26.5.1 (EXC_BAD_ACCESS at
+        // objc_retain(0x1)) and (b) String Catalog entries cannot be
+        // served through a swizzled
+        // `Bundle.localizedString(forKey:value:table:)`. See
+        // `LanguageBundle.swift` for the full rationale.
+
         return true
     }
 
@@ -48,23 +42,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
-        // SwiftUI manages scene lifecycle itself; do not attach a custom
-        // SceneDelegate (the previous SceneDelegate.swift was removed as
-        // legacy pre-iOS-13 boilerplate).
-        UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(
-        _ application: UIApplication,
-        performActionFor shortcutItem: UIApplicationShortcutItem,
-        completionHandler: @escaping (Bool) -> Void
-    ) {
-        // Warm case: app was already running in the background, user tapped
-        // a home-screen shortcut.
-        guard let url = URL(string: shortcutItem.type) else {
-            completionHandler(false)
-            return
-        }
-        UIApplication.shared.open(url, options: [:], completionHandler: completionHandler)
+        // SwiftUI manages scene lifecycle itself, but we still need a
+        // UISceneDelegate on the configuration so the home-screen quick
+        // action hooks (cold start via `UIScene.ConnectionOptions.shortcutItem`
+        // and warm case via `windowScene(_:performActionFor:completionHandler:)`)
+        // are delivered. `SceneDelegate` forwards both to
+        // `UIApplication.open`, which in turn triggers the `.onOpenURL`
+        // handlers in the SwiftUI view tree.
+        let config = UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
+        config.delegateClass = SceneDelegate.self
+        return config
     }
 }

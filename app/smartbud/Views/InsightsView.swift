@@ -163,8 +163,8 @@ struct InsightsView: View {
 
             VStack(alignment: .trailing, spacing: 4) {
                 Text(period == 3
-                     ? String(localized: "AVG/MONTH", comment: "Insights avg per month")
-                     : String(localized: "AVG/DAY", comment: "Insights avg per day"))
+                     ? String.appLocalized("AVG/MONTH", comment: "Insights avg per month")
+                     : String.appLocalized("AVG/DAY", comment: "Insights avg per day"))
                     .font(.system(.callout, design: .rounded).weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
 
@@ -231,7 +231,7 @@ struct InsightsView: View {
     private var todaySection: some View {
         VStack(spacing: 0) {
             sectionHeader(
-                title: String(localized: "TODAY", comment: "Insights today section header"),
+                title: String.appLocalized("TODAY", comment: "Insights today section header"),
                 amount: insightsVM.todayTotal
             )
             .padding(.horizontal, 20)
@@ -253,7 +253,7 @@ struct InsightsView: View {
     private var yesterdaySection: some View {
         VStack(spacing: 0) {
             sectionHeader(
-                title: String(localized: "YESTERDAY", comment: "Insights yesterday section header"),
+                title: String.appLocalized("YESTERDAY", comment: "Insights yesterday section header"),
                 amount: insightsVM.yesterdayTotal
             )
             .padding(.horizontal, 20)
@@ -290,9 +290,9 @@ struct InsightsView: View {
 
     private var periodTitle: String {
         switch period {
-        case 1: return String(localized: "week", comment: "Period picker: week")
-        case 3: return String(localized: "year", comment: "Period picker: year")
-        default: return String(localized: "month", comment: "Period picker: month")
+        case 1: return String.appLocalized("week", comment: "Period picker: week")
+        case 3: return String.appLocalized("year", comment: "Period picker: year")
+        default: return String.appLocalized("month", comment: "Period picker: month")
         }
     }
 

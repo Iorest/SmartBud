@@ -1,21 +1,22 @@
+// `UserDefaults.appGroup` and `AppDefaultsKey.appLanguage` below are the
+// single source of truth for the in-app language key + App Group store.
+// They are read directly by:
+//   - `String.appLocalized(...)` and `Locale.appLocale` in `AppLocale.swift`
+//   - `@AppStorage(AppDefaultsKey.appLanguage, store: .appGroup)` at the
+//     call sites that need to participate in SwiftUI's automatic
+//     re-render on UserDefaults change (ContentView, SettingsView,
+//     SettingsLanguageView).
 //
-//  AppLanguage.swift
-//  smartbud
-//
-//  Single source of truth for the user's in-app language pick.
-//
-//  Before this file existed, the `appLanguage` key was read in four places,
-//  each one declaring its own `@AppStorage("appLanguage", store: ...)` or
-//  reaching into the shared `UserDefaults` suite directly. This wrapper
-//  centralises the key, the store, and the default ("follow system"),
-//  and exposes a typed `Locale?` so the call site at the SwiftUI root
-//  becomes a one-liner: `.environment(\.locale, appLanguage.locale ?? Locale.current)`.
-//
-//  Empty string = "follow system locale". Persisted in the App Group suite
-//  so the widget extension could read the same pick in the future.
-//
+// A previous `@AppLanguage` `DynamicProperty` wrapper lived in this file.
+// It was removed because the wrapper never forwarded `update()` to its
+// internal `@AppStorage`, so views using it (e.g. LogView) did not
+// re-render when the user picked a new language in Settings and the
+// LogView kept showing strings resolved for the old `appLanguage` value
+// until the app was relaunched. SwiftUI's built-in `@AppStorage` is
+// itself a `DynamicProperty` and observes UserDefaults KVO directly, so
+// using it at the call site removes the indirection entirely.
 
-import SwiftUI
+import Foundation
 
 extension UserDefaults {
     /// App group store shared with the widget extension.
@@ -30,30 +31,4 @@ enum AppDefaultsKey {
     /// Key for the user's in-app language pick.
     /// Empty string = follow system locale.
     static let appLanguage = "appLanguage"
-}
-
-/// SwiftUI property wrapper for the user's in-app language pick.
-/// Single source of truth — replaces the four scattered
-/// `@AppStorage("appLanguage", store: ...)` declarations across the app.
-@propertyWrapper
-struct AppLanguage: DynamicProperty {
-    @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup)
-    private var value: String = ""
-
-    init(wrappedValue: String = "") {
-        self._value = AppStorage(wrappedValue: wrappedValue, AppDefaultsKey.appLanguage, store: .appGroup)
-    }
-
-    var wrappedValue: String {
-        get { value }
-        nonmutating set { value = newValue }
-    }
-
-    var projectedValue: Binding<String> { $value }
-
-    /// The `Locale` corresponding to the user's pick, or `nil` when the
-    /// empty-string sentinel means "follow system locale".
-    var locale: Locale? {
-        wrappedValue.isEmpty ? nil : Locale(identifier: wrappedValue)
-    }
 }

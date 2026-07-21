@@ -58,7 +58,7 @@ struct CustomTabBar: View {
             }
             .buttonStyle(MyButtonStyle())
             .offset(y: -12)
-            .accessibilityLabel(String(localized: "Add New Transaction"))
+            .accessibilityLabel(String.appLocalized("Add New Transaction"))
 
             TabButton(image: "Budget", zoomed: isZoomed, currentTab: $currentTab)
 

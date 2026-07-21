@@ -33,7 +33,6 @@ struct LogView: View {
     @State var navBarText = ""
     @State var showMenu = false
     @AppStorage("logTimeFrame", store: .appGroup) var logTimeFrame = 2
-    let subtitleText = ["today", "this week", "this month", "this year"]
 
     // show filter menu
     @State var showFilter = false
@@ -66,13 +65,13 @@ struct LogView: View {
                     .padding(.bottom, 20)
                     .accessibilityHidden(true)
 
-                Text(String(localized: "Your Log is Empty"))
+                Text(String.appLocalized("Your Log is Empty"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
 //                    .font(.system(size: 23.5, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.PrimaryText.opacity(0.8))
 
-                Text(String(localized: "Press the plus button\nto add your first entry"))
+                Text(String.appLocalized("Press the plus button\nto add your first entry"))
                     .font(.system(.body, design: .rounded).weight(.medium))
 //                    .font(.system(size: 18, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -104,7 +103,7 @@ struct LogView: View {
                                         .opacity(progress)
                                 }
                         }
-                        .accessibilityLabel(Text(String(localized: "Search")))
+                        .accessibilityLabel(Text(String.appLocalized("Search")))
 
                         Spacer()
 
@@ -155,7 +154,7 @@ struct LogView: View {
 //                                    }
                                 }
                         }
-                        .accessibilityLabel(Text(String(localized: "Filter")))
+                        .accessibilityLabel(Text(String.appLocalized("Filter")))
                         .popover(isPresented: $showFilter) {
                             FilterPickerView(filterType: $filter, showMenu: $showFilter)
                         }
@@ -243,7 +242,7 @@ struct LogView: View {
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .foregroundStyle(Color.PrimaryText.opacity(0.7))
             }
-            .accessibilityLabel(Text(String(localized: "remove filter")))
+            .accessibilityLabel(Text(String.appLocalized("remove filter")))
         }
         .padding(4)
         .padding(.horizontal, 6)
@@ -356,7 +355,7 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 3
                     } label: {
-                        Label(String(localized: "Total Spent"), systemImage: "minus")
+                        Label(String.appLocalized("Total Spent"), systemImage: "minus")
                     }
                 }
 
@@ -364,7 +363,7 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 2
                     } label: {
-                        Label(String(localized: "Total Income"), systemImage: "plus")
+                        Label(String.appLocalized("Total Income"), systemImage: "plus")
                     }
                 }
 
@@ -372,7 +371,7 @@ struct LogInsightsView: View {
                     Button {
                         insightsType = 1
                     } label: {
-                        Label(String(localized: "Net Total"), systemImage: "alternatingcurrent")
+                        Label(String.appLocalized("Net Total"), systemImage: "alternatingcurrent")
                     }
                 }
             }
@@ -428,7 +427,7 @@ struct SearchView: View {
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.DarkIcon.opacity(0.8))
                         .accessibilityHidden(true)
-                    TextField(String(localized: "Search entry by note"), text: $searchQuery)
+                    TextField(String.appLocalized("Search entry by note"), text: $searchQuery)
                         .focused($searchFocused)
                         .font(.system(.body, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -455,7 +454,7 @@ struct SearchView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text(String(localized: "Cancel"))
+                    Text(String.appLocalized("Cancel"))
                         .foregroundStyle(Color.PrimaryText)
                         .font(.system(.body, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -489,15 +488,15 @@ struct FilteredSearchView: View {
         VStack {
             if searchQuery != "" && transactions.count == 0 {
                 VStack(spacing: 2) {
-                    Text(String(localized: "📭️"))
+                    Text(String.appLocalized("📭️"))
                         .font(.system(size: 50))
                         .padding(.bottom, 15)
-                    Text(String(localized: "No entries found."))
+                    Text(String.appLocalized("No entries found."))
                         .font(.system(.title3, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.PrimaryText)
-                    Text(String(localized: "Try a different search query!"))
+                    Text(String.appLocalized("Try a different search query!"))
                         .font(.system(.subheadline, design: .rounded).weight(.regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 14, weight: .regular, design: .rounded))
@@ -794,7 +793,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(String(format: String(localized: "%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: day.day)))
+                        .accessibilityLabel(String(format: String.appLocalized("%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: day.day)))
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -817,7 +816,7 @@ struct ListView: View {
 
                             self.toastPresenter.showToast.toggle()
                         } label: {
-                            Label(String(localized: "Save as Photo"), systemImage: "square.and.arrow.up")
+                            Label(String.appLocalized("Save as Photo"), systemImage: "square.and.arrow.up")
                         }
                 }
                 .padding(.bottom, 18)
@@ -943,7 +942,7 @@ struct FutureListView: View {
             VStack(spacing: 0) {
                 VStack(spacing: 4) {
                     HStack {
-                        Text(String(localized: "UPCOMING"))
+                        Text(String.appLocalized("UPCOMING"))
                         Spacer()
 
                         Text(totalString)
@@ -1125,14 +1124,14 @@ struct SingleTransactionView: View {
                     Button {
                         transactionVM.stopRecurring(transaction)
                     } label: {
-                        Label(String(localized: "Stop Recurring"), systemImage: "xmark")
+                        Label(String.appLocalized("Stop Recurring"), systemImage: "xmark")
                     }
                 }
 
                 Button {
                     transactionManager.toEdit = transaction
                 } label: {
-                    Label(String(localized: "Edit"), systemImage: "pencil")
+                    Label(String.appLocalized("Edit"), systemImage: "pencil")
                 }
 
                 if !(future && transaction.wrappedDate < Date.now && transaction.recurringType > 0) {
@@ -1144,13 +1143,13 @@ struct SingleTransactionView: View {
 //                        toDelete = transaction
 //                        deleteMode = true
                     } label: {
-                        Label(String(localized: "Delete"), systemImage: "xmark.bin")
+                        Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
                     }
                 }
             }
             .offset(x: offset)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(format: String(localized: "%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, transactionAmountAccessibilityString, transaction.category?.wrappedName ?? String(localized: "Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
+            .accessibilityLabel(String(format: String.appLocalized("%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, transactionAmountAccessibilityString, transaction.category?.wrappedName ?? String.appLocalized("Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
         }
         .onChange(of: deletePopup) { _, _ in
             if deletePopup {
@@ -1330,14 +1329,14 @@ struct DeleteTransactionAlert: View {
     var body: some View {
         if let unwrappedToDelete = transactionManager.toDelete {
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(stopRecurring ? String(localized: "Stop Recurring?") : String(format: String(localized: "Delete '%@'?"), unwrappedToDelete.wrappedNote))
+                Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String(format: String.appLocalized("Delete '%@'?"), unwrappedToDelete.wrappedNote))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 25, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
-                    .accessibilityLabel(String(format: String(localized: "Delete %@ transaction confirmation. This action cannot be undone."), unwrappedToDelete.wrappedNote))
+                    .accessibilityLabel(String(format: String.appLocalized("Delete %@ transaction confirmation. This action cannot be undone."), unwrappedToDelete.wrappedNote))
 
-                Text(String(localized: stopRecurring ? "The transaction will no longer be automatically logged." : "This action cannot be undone."))
+                Text(String.appLocalized(stopRecurring ? "The transaction will no longer be automatically logged." : "This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
@@ -1359,14 +1358,14 @@ struct DeleteTransactionAlert: View {
                         }
                     }
                 } label: {
-                    DeleteButton(text: String(localized: stopRecurring ? "Confirm" : "Delete"), red: true)
+                    DeleteButton(text: String.appLocalized(stopRecurring ? "Confirm" : "Delete"), red: true)
                 }
                 .padding(.bottom, 8)
 
                 Button {
                     transactionManager.showPopup = false
                 } label: {
-                    DeleteButton(text: String(localized: "Cancel"), red: false)
+                    DeleteButton(text: String.appLocalized("Cancel"), red: false)
                 }
             }
             .padding(13)
@@ -1576,7 +1575,7 @@ struct NoResultsView: View {
 //                    .font(.system(size: 38, weight: .regular, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
 
-                Text(String(localized: "No entries found."))
+                Text(String.appLocalized("No entries found."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 21, weight: .medium, design: .rounded))
@@ -1600,7 +1599,7 @@ struct NoResultsView: View {
                     .font(.system(size: 38, weight: .regular, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
 
-                Text(String(localized: "No entries found."))
+                Text(String.appLocalized("No entries found."))
                     .font(.system(size: 21, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
 
@@ -1748,7 +1747,7 @@ struct IncomeFilterToggleView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text(String(localized: "Expense"))
+            Text(String.appLocalized("Expense"))
 //                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -1829,7 +1828,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: -1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "previous day")))
+            .accessibilityLabel(Text(String.appLocalized("previous day")))
 
             Spacer()
 
@@ -1837,7 +1836,7 @@ struct DateStepperView: View {
                 .font(.system(.title3, design: .rounded).weight(.bold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .accessibilityLabel(String(format: String(localized: "showing transactions on %@"), dateString))
+                .accessibilityLabel(String(format: String.appLocalized("showing transactions on %@"), dateString))
 
             Spacer()
 
@@ -1846,7 +1845,7 @@ struct DateStepperView: View {
                     date = Calendar.current.date(byAdding: .day, value: 1, to: date) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "next day")))
+            .accessibilityLabel(Text(String.appLocalized("next day")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -1900,7 +1899,7 @@ struct WeekStepperView: View {
         let endComponents = DateComponents(day: 7, second: -1)
         let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
 
-        return String(format: String(localized: "showing transactions from %@ to %@"), dateFormatter.string(from: showingDate), dateFormatter.string(from: endWeekDate))
+        return String(format: String.appLocalized("showing transactions from %@ to %@"), dateFormatter.string(from: showingDate), dateFormatter.string(from: endWeekDate))
     }
 
     var body: some View {
@@ -1910,7 +1909,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: -7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "previous week")))
+            .accessibilityLabel(Text(String.appLocalized("previous week")))
 
             Spacer()
 
@@ -1925,7 +1924,7 @@ struct WeekStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .day, value: 7, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "next week")))
+            .accessibilityLabel(Text(String.appLocalized("next week")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -1993,13 +1992,13 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: -1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "previous month")))
+            .accessibilityLabel(Text(String.appLocalized("previous month")))
 
             Spacer()
 
             Text(dateString)
                 .font(.system(.title3, design: .rounded).weight(.bold))
-                .accessibilityLabel(String(format: String(localized: "showing transactions in %@"), dateString))
+                .accessibilityLabel(String(format: String.appLocalized("showing transactions in %@"), dateString))
 
             Spacer()
 
@@ -2008,7 +2007,7 @@ struct MonthStepperView: View {
                     showingDate = Calendar.current.date(byAdding: .month, value: 1, to: showingDate) ?? Date.now
                 }
             }
-            .accessibilityLabel(Text(String(localized: "next month")))
+            .accessibilityLabel(Text(String.appLocalized("next month")))
         }
         .frame(maxWidth: .infinity)
         .onAppear {
@@ -2043,9 +2042,9 @@ func dateConverter(date: Date) -> String {
     let startOfCurrentYear = calendar.date(from: dateComponents) ?? Date.now
 
     if calendar.isDateInToday(date) {
-        return String(localized: "today")
+        return String.appLocalized("today")
     } else if calendar.isDateInYesterday(date) {
-        return String(localized: "yesterday")
+        return String.appLocalized("yesterday")
     } else if startOfCurrentYear > date {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
@@ -2070,16 +2069,16 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
     let calendar = Calendar.current
 
     if calendar.isDateInToday(date) {
-        return String(localized: "today")
+        return String.appLocalized("today")
     } else if calendar.isDateInYesterday(date) {
-        return String(localized: "yesterday")
+        return String.appLocalized("yesterday")
     } else {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
 
         dateFormatter.dateFormat = "EEE, d MMM yyyy"
 
-        return String(format: String(localized: "on %@"), dateFormatter.string(from: date))
+        return String(format: String.appLocalized("on %@"), dateFormatter.string(from: date))
     }
 }
 

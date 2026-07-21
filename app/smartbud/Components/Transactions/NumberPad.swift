@@ -143,7 +143,7 @@ struct NumberPad: View {
             .background(Color.DarkBackground, in: rowShape)
         }
         .buttonStyle(NumPadButton())
-        .accessibilityLabel(Text(String(localized: "Delete")))
+        .accessibilityLabel(Text(String.appLocalized("Delete")))
     }
 
     @ViewBuilder
@@ -261,7 +261,7 @@ struct NumberPadTextView: View {
                 .contentShape(Circle())
         }
         .disabled(vm.price == 0 && !vm.isEditingDecimal)
-        .accessibilityLabel(Text(String(localized: "Delete")))
+        .accessibilityLabel(Text(String.appLocalized("Delete")))
     }
 }
 

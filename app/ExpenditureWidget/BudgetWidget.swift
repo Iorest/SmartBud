@@ -140,15 +140,15 @@ struct BudgetWidgetEntryView: View {
     var budgetType: String {
         switch entry.budget.type {
         case 1:
-            return String(localized: "today")
+            return String.appLocalized("today")
         case 2:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         case 3:
-            return String(localized: "this month")
+            return String.appLocalized("this month")
         case 4:
-            return String(localized: "this year")
+            return String.appLocalized("this year")
         default:
-            return String(localized: "this week")
+            return String.appLocalized("this week")
         }
     }
 
@@ -162,9 +162,9 @@ struct BudgetWidgetEntryView: View {
 
     var systemSmallWidgetText: String {
         if entry.budget.budgetAmount >= entry.totalSpent {
-            return String(localized: "left \(budgetType)")
+            return String(format: String.appLocalized("left %@"), budgetType)
         } else {
-            return String(localized: "over \(budgetType)")
+            return String(format: String.appLocalized("over %@"), budgetType)
         }
     }
 
@@ -174,7 +174,7 @@ struct BudgetWidgetEntryView: View {
 
     var body: some View {
         if entry.configuration.budget == nil {
-            Text(String(localized: "Select budget in widget options"))
+            Text(String.appLocalized("Select budget in widget options"))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.SubtitleText)
@@ -185,7 +185,7 @@ struct BudgetWidgetEntryView: View {
                 }
 
         } else if entry.budget.emoji == "failed" {
-            Text(String(localized: "Budget no longer exists - please select new budget from widget options."))
+            Text(String.appLocalized("Budget no longer exists - please select new budget from widget options."))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color.SubtitleText)
@@ -208,7 +208,7 @@ struct BudgetWidgetEntryView: View {
                         }
                         .foregroundColor(Color.PrimaryText)
 
-                        Text(String(format: String(localized: "SPENT: %@"), percentString1))
+                        Text(String(format: String.appLocalized("SPENT: %@"), percentString1))
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
                     }
@@ -247,11 +247,11 @@ struct BudgetWidgetEntryView: View {
                                         .foregroundColor(Color.SubtitleText)
                                 } else {
                                     if entry.budget.budgetAmount >= entry.totalSpent {
-                                        Text(String(localized: "left"))
+                                        Text(String.appLocalized("left"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
                                             .foregroundColor(Color.SubtitleText)
                                     } else {
-                                        Text(String(localized: "over"))
+                                        Text(String.appLocalized("over"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
                                             .foregroundColor(Color.SubtitleText)
                                     }

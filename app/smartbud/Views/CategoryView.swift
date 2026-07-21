@@ -46,7 +46,7 @@ struct CategoryView: View {
                             }
                         }
                     } label: {
-                        Text(String(localized: "Expense"))
+                        Text(String.appLocalized("Expense"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -71,7 +71,7 @@ struct CategoryView: View {
                             }
                         }
                     } label: {
-                        Text(String(localized: "Income"))
+                        Text(String.appLocalized("Income"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -99,7 +99,7 @@ struct CategoryView: View {
                     if disabled {
                         showToast = true
                         toastImage = "exclamationmark.triangle.fill"
-                        toastTitle = String(localized: "Limit Exceeded")
+                        toastTitle = String.appLocalized("Limit Exceeded")
                         positive = false
                     } else {
                         newCategory = true
@@ -111,7 +111,7 @@ struct CategoryView: View {
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
 
-                        Text(String(localized: "New"))
+                        Text(String.appLocalized("New"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -172,7 +172,7 @@ struct CategoryListView: View {
     @State private var toDelete: CategoryModel?
     var alertMessage: String {
         String.localizedStringWithFormat(
-            String(localized: "Delete '%@'?"),
+            String.appLocalized("Delete '%@'?"),
             toDelete?.wrappedName ?? ""
         )
     }
@@ -245,7 +245,7 @@ struct CategoryListView: View {
                                         }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel(String(localized: "Done"))
+                                .accessibilityLabel(String.appLocalized("Done"))
                             } else {
                                 Button {
                                     withAnimation {
@@ -263,7 +263,7 @@ struct CategoryListView: View {
                                         }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel(String(localized: "Reorder categories"))
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
                             }
                         }
 
@@ -284,7 +284,7 @@ struct CategoryListView: View {
                                 }
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(showSuggestions ? String(localized: "Hide suggestions") : String(localized: "Show suggestions"))
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String.appLocalized("Show suggestions"))
 
                         Spacer()
 
@@ -312,12 +312,12 @@ struct CategoryListView: View {
                                 }
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(String(localized: "Continue"))
+                        .accessibilityLabel(String.appLocalized("Continue"))
                     }
                     .frame(height: 35)
                     .frame(maxWidth: .infinity)
                     .overlay {
-                        Text(String(localized: "Categories"))
+                        Text(String.appLocalized("Categories"))
                             .font(.system(.title3, design: .rounded).weight(.medium))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .medium, design: .rounded))
@@ -343,7 +343,7 @@ struct CategoryListView: View {
                                     }
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(String(localized: "Back"))
+                            .accessibilityLabel(String.appLocalized("Back"))
                         } else {
                             Button {
                                 dismiss()
@@ -360,7 +360,7 @@ struct CategoryListView: View {
                                     }
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(String(localized: "Close"))
+                            .accessibilityLabel(String.appLocalized("Close"))
                         }
 
                         Spacer()
@@ -383,7 +383,7 @@ struct CategoryListView: View {
                                 }
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(showSuggestions ? String(localized: "Hide suggestions") : String(localized: "Show suggestions"))
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String.appLocalized("Show suggestions"))
 
                         if categories.count > 1 {
                             if isEditing {
@@ -404,7 +404,7 @@ struct CategoryListView: View {
                                         }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel(String(localized: "Done"))
+                                .accessibilityLabel(String.appLocalized("Done"))
                             } else {
                                 Button {
                                     withAnimation {
@@ -423,14 +423,14 @@ struct CategoryListView: View {
                                         }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel(String(localized: "Reorder categories"))
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
                             }
                         }
                     }
                     .frame(height: 35)
                     .frame(maxWidth: .infinity)
                     .overlay {
-                        Text(String(localized: "Categories"))
+                        Text(String.appLocalized("Categories"))
                             .font(.system(.title3, design: .rounded).weight(mode == .settings ? .semibold : .medium))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: mode == .settings ? .semibold : .medium, design: .rounded))
@@ -551,11 +551,11 @@ struct CategoryListView: View {
 
                 VStack(alignment: .leading, spacing: 1.5) {
                     let deleteName = toDelete?.wrappedName ?? ""
-                    Text(String(format: String(localized: "Delete '%@'?"), deleteName))
+                    Text(String(format: String.appLocalized("Delete '%@'?"), deleteName))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text(String(format: String(localized: "This action cannot be undone, and all %@ transactions would be deleted."), deleteName))
+                    Text(String(format: String.appLocalized("This action cannot be undone, and all %@ transactions would be deleted."), deleteName))
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(.bottom, 15)
@@ -571,7 +571,7 @@ struct CategoryListView: View {
                         deleteMode = false
 
                     } label: {
-                        Text(String(localized: "Delete"))
+                        Text(String.appLocalized("Delete"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
                             .frame(height: 45)
@@ -587,7 +587,7 @@ struct CategoryListView: View {
                         }
 
                     } label: {
-                        Text(String(localized: "Cancel"))
+                        Text(String.appLocalized("Cancel"))
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
                             .foregroundStyle(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
@@ -641,7 +641,7 @@ struct CategoryListView: View {
         }
         .onChange(of: showSuggestions) { _, newValue in
             if !newValue {
-                toastTitle = String(localized: "Suggestions Hidden")
+                toastTitle = String.appLocalized("Suggestions Hidden")
                 toastImage = "eye.slash"
                 showToast = true
                 positive = true
@@ -739,13 +739,13 @@ struct NewCategoryAlert: View {
                         .frame(maxWidth: 200)
                     } else {
                         if expenseCategories.count == 24 {
-                            Text(String(localized: "Income Category"))
+                            Text(String.appLocalized("Income Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else if budgetMode {
-                            Text(String(localized: "Expense Category"))
+                            Text(String.appLocalized("Expense Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -759,7 +759,7 @@ struct NewCategoryAlert: View {
                                         }
                                     }
                                 } label: {
-                                    Text(String(localized: "Expense"))
+                                    Text(String.appLocalized("Expense"))
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -784,7 +784,7 @@ struct NewCategoryAlert: View {
                                         }
                                     }
                                 } label: {
-                                    Text(String(localized: "Income"))
+                                    Text(String.appLocalized("Income"))
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
                                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -878,7 +878,7 @@ struct NewCategoryAlert: View {
                             ColourPickerView(selectedColor: $selectedColour, showMenu: $showingColourPicker, showNativePicker: $showNativePicker, expenseCategories: expenseCategories)
                         }
                     }
-                    NormalTextField(text: $newName, placeholder: String(localized: "Category Name"), action: verification)
+                    NormalTextField(text: $newName, placeholder: String.appLocalized("Category Name"), action: verification)
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
@@ -958,28 +958,28 @@ struct NewCategoryAlert: View {
 
             switch outcome {
             case .incomplete:
-                toastTitle = String(localized: "Incomplete Entry")
+                toastTitle = String.appLocalized("Incomplete Entry")
                 toastImage = "questionmark.app"
             case .missingEmoji:
-                toastTitle = String(localized: "Missing Emoji")
+                toastTitle = String.appLocalized("Missing Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .missingName:
-                toastTitle = String(localized: "Missing Name")
+                toastTitle = String.appLocalized("Missing Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
             case .duplicate:
-                toastTitle = String(localized: "Duplicate Found")
+                toastTitle = String.appLocalized("Duplicate Found")
                 toastImage = "externaldrive"
             case .duplicateEmoji:
-                toastTitle = String(localized: "Duplicate Emoji")
+                toastTitle = String.appLocalized("Duplicate Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .duplicateName:
-                toastTitle = String(localized: "Duplicate Name")
+                toastTitle = String.appLocalized("Duplicate Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
@@ -991,7 +991,7 @@ struct NewCategoryAlert: View {
             showToast = true
 
         } else {
-            toastTitle = String(format: String(localized: "Added %@"), newName)
+            toastTitle = String(format: String.appLocalized("Added %@"), newName)
 
             successHaptic &+= 1
 
@@ -1080,7 +1080,7 @@ struct EditCategoryAlert: View {
     @State private var toDelete: CategoryModel?
     var alertMessage: String {
         String.localizedStringWithFormat(
-            String(localized: "Delete '%@'?"),
+            String.appLocalized("Delete '%@'?"),
             toDelete?.wrappedName ?? ""
         )
     }
@@ -1208,7 +1208,7 @@ struct EditCategoryAlert: View {
                         }
                     }
 
-                    NormalTextField(text: $newName, placeholder: String(localized: "Category Name"), action: verification)
+                    NormalTextField(text: $newName, placeholder: String.appLocalized("Category Name"), action: verification)
                         .focused($focusedField, equals: .name)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
@@ -1282,28 +1282,28 @@ struct EditCategoryAlert: View {
 
             switch outcome {
             case .incomplete:
-                toastTitle = String(localized: "Incomplete Entry")
+                toastTitle = String.appLocalized("Incomplete Entry")
                 toastImage = "questionmark.app"
             case .missingEmoji:
-                toastTitle = String(localized: "Missing Emoji")
+                toastTitle = String.appLocalized("Missing Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .missingName:
-                toastTitle = String(localized: "Missing Name")
+                toastTitle = String.appLocalized("Missing Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
             case .duplicate:
-                toastTitle = String(localized: "Duplicate Found")
+                toastTitle = String.appLocalized("Duplicate Found")
                 toastImage = "externaldrive"
             case .duplicateEmoji:
-                toastTitle = String(localized: "Duplicate Emoji")
+                toastTitle = String.appLocalized("Duplicate Emoji")
                 toastImage = "person.fill"
 
                 focusedField = .emoji
             case .duplicateName:
-                toastTitle = String(localized: "Duplicate Name")
+                toastTitle = String.appLocalized("Duplicate Name")
                 toastImage = "character.cursor.ibeam"
 
                 focusedField = .name
@@ -1321,7 +1321,7 @@ struct EditCategoryAlert: View {
                 categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour)
             }
 
-            rootToastTitle = String(format: String(localized: "Edited %@"), newName)
+            rootToastTitle = String(format: String.appLocalized("Edited %@"), newName)
             rootToastImage = "checkmark.circle.fill"
             positive = true
             showRootToast = true
@@ -1355,13 +1355,13 @@ struct DeleteCategoryAlert: View {
                 .accessibilityAddTraits(.isButton)
 
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(String(format: String(localized: "Delete '%@'?"), toDelete.wrappedName))
+                Text(String(format: String.appLocalized("Delete '%@'?"), toDelete.wrappedName))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
 
-                Text(String(localized: "This action cannot be undone."))
+                Text(String.appLocalized("This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -1380,7 +1380,7 @@ struct DeleteCategoryAlert: View {
                     }
 
                 } label: {
-                    Text(String(localized: "Delete"))
+                    Text(String.appLocalized("Delete"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(.white)
@@ -1396,7 +1396,7 @@ struct DeleteCategoryAlert: View {
                     }
 
                 } label: {
-                    Text(String(localized: "Cancel"))
+                    Text(String.appLocalized("Cancel"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                        .font(.system(size: 20, weight: .semibold, design: .rounded))
@@ -1499,7 +1499,7 @@ struct SuggestedCategoriesView: View {
     var body: some View {
         Group {
             if !suggestions.isEmpty {
-                Section(header: Text(String(localized: "SUGGESTED")).foregroundStyle(Color.SubtitleText)) {
+                Section(header: Text(String.appLocalized("SUGGESTED")).foregroundStyle(Color.SubtitleText)) {
                     ForEach(suggestions, id: \.self) { category in
                         HStack(spacing: 8) {
                             Text(category.emoji)
@@ -1747,7 +1747,7 @@ struct ColourPickerView: View {
                         .frame(width: 40, height: 40, alignment: .center)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(String(localized: "Custom color"))
+                    .accessibilityLabel(String.appLocalized("Custom color"))
                 } else {
                     Button {
                         if !selectedColours.contains(suggestedColor) {
