@@ -34,16 +34,6 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
 
     public typealias Entry = LockBudgetWidgetEntry
 
-    static let container: ModelContainer = {
-        let schema = Schema([
-            TransactionModel.self,
-            BudgetModel.self,
-            CategoryModel.self
-        ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
-
     func placeholder(in _: Context) -> LockBudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
 
@@ -68,7 +58,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func loadData(budgetId: String) -> (total: Double, timeLeft: String, budget: HoldingBudget) {
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
@@ -107,10 +97,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
 
         if budgetModel.type == 1 {
             let components = calendar.dateComponents([.hour], from: budgetModel.startDate, to: now)
-            timeLeft = String(format: String.appLocalized("%d hours left"), 24 - (components.hour ?? 0))
+            timeLeft = String(localized: "^[\(24 - (components.hour ?? 0)) hours left](inflect: true)")
         } else if budgetModel.type == 2 {
             let components = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
-            timeLeft = String(format: String.appLocalized("%d days left"), 7 - (components.day ?? 0))
+            timeLeft = String(localized: "^[\(7 - (components.day ?? 0)) days left](inflect: true)")
         } else {
             let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
             let numberOfDays = components1.day ?? 0
@@ -119,7 +109,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
             let numberOfDaysPast = components2.day ?? 0
 
             let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-            timeLeft = String(format: String.appLocalized("%d days left"), daysLeftNumber)
+            timeLeft = String(localized: "^[\(daysLeftNumber) days left](inflect: true)")
         }
 
         return (holdingTotal, timeLeft, returnBudget)
@@ -170,7 +160,7 @@ struct LockBudgetWidgetEntryView: View {
     }
 
     var percentString: String {
-        return String(format: String.appLocalized("%lld%% spent"), Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))
+        return String(localized: "\(Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))% spent")
     }
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -187,7 +177,7 @@ struct LockBudgetWidgetEntryView: View {
                 Text(String.appLocalized("Select budget in widget options"))
             } else {
                 Text("\(entry.budget.emoji) \(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle)")
-                    .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
+                    .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
             }
 
         case .accessoryCircular:
@@ -208,7 +198,7 @@ struct LockBudgetWidgetEntryView: View {
                     Text("\(Int(round(percent * 100)))%")
                 }
                 .gaugeStyle(AccessoryCircularGaugeStyle())
-                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
+                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
                 .containerBackground(for: .widget) { Color.clear }
             }
 
@@ -253,7 +243,7 @@ struct LockBudgetWidgetEntryView: View {
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
+                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
                 .containerBackground(for: .widget) { Color.clear }
             }
 

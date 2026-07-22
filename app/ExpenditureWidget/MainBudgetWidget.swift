@@ -30,15 +30,6 @@ struct MainBudgetWidget: Widget {
 struct MainBudgetWidgetProvider: TimelineProvider {
     typealias Entry = MainBudgetWidgetEntry
 
-    static let container: ModelContainer = {
-        let schema = Schema([
-            MainBudgetModel.self,
-            TransactionModel.self
-        ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
-
     func placeholder(in _: Context) -> MainBudgetWidgetEntry {
         let loaded = loadData()
 
@@ -63,7 +54,7 @@ struct MainBudgetWidgetProvider: TimelineProvider {
     }
 
     func loadData() -> (found: Bool, totalSpent: Double, budgetAmount: Double, percentage: Double, type: Int, startDate: Date) {
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
 
         let budgetDescriptor = FetchDescriptor<MainBudgetModel>()
         guard let budget = try? context.fetch(budgetDescriptor).first else {
@@ -89,10 +80,12 @@ struct MainBudgetWidgetProvider: TimelineProvider {
             percentageOfDays = Double(components.minute ?? 0) / 1440
         } else {
             let components1 = calendar.dateComponents([.day], from: budget.startDate, to: budget.endDate)
-            let numberOfDays = components1.day!
+            guard let numberOfDays = components1.day, numberOfDays > 0 else {
+                return (true, holdingTotal, budget.amount, 0, budget.type, budget.startDate)
+            }
 
             let components2 = calendar.dateComponents([.day], from: budget.startDate, to: now)
-            let numberOfDaysPast = components2.day!
+            let numberOfDaysPast = components2.day ?? 0
 
             percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
         }
@@ -141,13 +134,17 @@ struct MainBudgetWidgetEntryView: View {
         case 2:
             dateFormatter.dateFormat = "d MMM"
             let endComponents = DateComponents(day: 7, second: -1)
-            let endWeekDate = Calendar.current.date(byAdding: endComponents, to: entry.startDate)!
+            guard let endWeekDate = Calendar.current.date(byAdding: endComponents, to: entry.startDate) else {
+                return formatDateRange(date1: entry.startDate, date2: entry.startDate)
+            }
             return formatDateRange(date1: entry.startDate, date2: endWeekDate)
 //            return dateFormatter.string(from: entry.startDate) + " - " + dateFormatter.string(from: endWeekDate)
         case 3:
             dateFormatter.dateFormat = "d MMM"
             let endComponents = DateComponents(month: 1, second: -1)
-            let endWeekDate = Calendar.current.date(byAdding: endComponents, to: entry.startDate)!
+            guard let endWeekDate = Calendar.current.date(byAdding: endComponents, to: entry.startDate) else {
+                return formatDateRange(date1: entry.startDate, date2: entry.startDate)
+            }
             return formatDateRange(date1: entry.startDate, date2: endWeekDate)
 //            return dateFormatter.string(from: entry.startDate) + " - " + dateFormatter.string(from: endWeekDate)
         case 4:
@@ -163,7 +160,7 @@ struct MainBudgetWidgetEntryView: View {
     }
 
     var percentString: String {
-        return String(format: String.appLocalized("%lld%% spent"), Int(round((entry.totalSpent / entry.budgetAmount) * 100)))
+        return String(localized: "\(Int(round((entry.totalSpent / entry.budgetAmount) * 100)))% spent")
     }
 
     var percentString1: String {
@@ -176,9 +173,9 @@ struct MainBudgetWidgetEntryView: View {
 
     var systemSmallWidgetText: String {
         if entry.budgetAmount >= entry.totalSpent {
-            return String(format: String.appLocalized("left %@"), budgetType)
+            return String(localized: "left \(budgetType)")
         } else {
-            return String(format: String.appLocalized("over %@"), budgetType)
+            return String(localized: "over \(budgetType)")
         }
     }
 
@@ -283,7 +280,7 @@ struct MainBudgetWidgetEntryView: View {
                                 .lineLimit(1)
                                 .foregroundColor(Color.PrimaryText)
 
-                            Text(String(format: String.appLocalized("SPENT: %@"), percentString1))
+                            Text(String(localized: "SPENT: \(percentString1)"))
                                 .font(.system(size: 10, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
                         }

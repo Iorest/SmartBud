@@ -28,16 +28,6 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
 
     public typealias Entry = BudgetWidgetEntry
 
-    static let container: ModelContainer = {
-        let schema = Schema([
-            TransactionModel.self,
-            BudgetModel.self,
-            CategoryModel.self
-        ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
-
     func placeholder(in _: Context) -> BudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
 
@@ -61,7 +51,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func loadData(budgetId: String) -> (total: Double, percentage: Double, budget: HoldingBudget) {
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
@@ -106,10 +96,12 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             percentageOfDays = Double(components.minute ?? 0) / 1440
         } else {
             let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
-            let numberOfDays = components1.day!
+            guard let numberOfDays = components1.day, numberOfDays > 0 else {
+                return (holdingTotal, 0, returnBudget)
+            }
 
             let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
-            let numberOfDaysPast = components2.day!
+            let numberOfDaysPast = components2.day ?? 0
 
             percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
         }
@@ -162,9 +154,9 @@ struct BudgetWidgetEntryView: View {
 
     var systemSmallWidgetText: String {
         if entry.budget.budgetAmount >= entry.totalSpent {
-            return String(format: String.appLocalized("left %@"), budgetType)
+            return String(localized: "left \(budgetType)")
         } else {
-            return String(format: String.appLocalized("over %@"), budgetType)
+            return String(localized: "over \(budgetType)")
         }
     }
 
@@ -208,7 +200,7 @@ struct BudgetWidgetEntryView: View {
                         }
                         .foregroundColor(Color.PrimaryText)
 
-                        Text(String(format: String.appLocalized("SPENT: %@"), percentString1))
+                        Text(String(localized: "SPENT: \(percentString1)"))
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
                     }
@@ -286,7 +278,7 @@ struct BudgetWidgetEntryView: View {
             .containerBackground(for: .widget) {
                 WidgetGlassBackground()
             }
-            .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name)"))
+            .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
         }
     }
 }

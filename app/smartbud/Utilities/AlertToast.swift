@@ -310,6 +310,8 @@ public struct AlertToast: View {
                         .onTapGesture {
                             onTap?()
                         }
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel(title ?? "")
                 case let .image(name, color):
                     Image(name)
                         .hudModifier()

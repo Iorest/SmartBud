@@ -551,11 +551,11 @@ struct CategoryListView: View {
 
                 VStack(alignment: .leading, spacing: 1.5) {
                     let deleteName = toDelete?.wrappedName ?? ""
-                    Text(String(format: String.appLocalized("Delete '%@'?"), deleteName))
+                    Text(String(localized: "Delete '\(deleteName)'?"))
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text(String(format: String.appLocalized("This action cannot be undone, and all %@ transactions would be deleted."), deleteName))
+                    Text(String(localized: "This action cannot be undone, and all \(deleteName) transactions would be deleted."))
                         .font(.system(size: 16, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(.bottom, 15)
@@ -634,7 +634,8 @@ struct CategoryListView: View {
         }
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
@@ -917,7 +918,8 @@ struct NewCategoryAlert: View {
         }
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
@@ -991,7 +993,7 @@ struct NewCategoryAlert: View {
             showToast = true
 
         } else {
-            toastTitle = String(format: String.appLocalized("Added %@"), newName)
+            toastTitle = String(localized: "Added \(newName)")
 
             successHaptic &+= 1
 
@@ -1241,7 +1243,8 @@ struct EditCategoryAlert: View {
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
@@ -1321,12 +1324,13 @@ struct EditCategoryAlert: View {
                 categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour)
             }
 
-            rootToastTitle = String(format: String.appLocalized("Edited %@"), newName)
+            rootToastTitle = String(localized: "Edited \(newName)")
             rootToastImage = "checkmark.circle.fill"
             positive = true
             showRootToast = true
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(150))
                 dismiss()
             }
         }
@@ -1355,7 +1359,7 @@ struct DeleteCategoryAlert: View {
                 .accessibilityAddTraits(.isButton)
 
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(String(format: String.appLocalized("Delete '%@'?"), toDelete.wrappedName))
+                Text(String(localized: "Delete '\(toDelete.wrappedName)'?"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
@@ -1373,7 +1377,8 @@ struct DeleteCategoryAlert: View {
                     deleted = true
                     dismiss()
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(500))
                         withAnimation {
                             categoryVM.delete(toDelete)
                         }

@@ -28,16 +28,16 @@ struct NewExpenseProvider: TimelineProvider {
     typealias Entry = NewExpenseWidgetEntry
 
     func placeholder(in _: Context) -> NewExpenseWidgetEntry {
-        NewExpenseWidgetEntry(date: Date())
+        NewExpenseWidgetEntry(date: .now)
     }
 
     func getSnapshot(in _: Context, completion: @escaping (NewExpenseWidgetEntry) -> Void) {
-        let entry = NewExpenseWidgetEntry(date: Date())
+        let entry = NewExpenseWidgetEntry(date: .now)
         completion(entry)
     }
 
     func getTimeline(in _: Context, completion: @escaping (Timeline<NewExpenseWidgetEntry>) -> Void) {
-        let entry = NewExpenseWidgetEntry(date: Date())
+        let entry = NewExpenseWidgetEntry(date: .now)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
@@ -63,7 +63,7 @@ struct NewExpenseWidgetEntryView: View {
 
             Text("\(currencySymbol.count < 3 ? "+" : "")\(currencySymbol)")
                 .font(.system(size: currencySymbol.count < 3 ? 13 : 11, weight: .bold, design: .rounded))
-                .foregroundColor(Color.SecondaryBackground)
+                .foregroundStyle(Color.SecondaryBackground)
                 .padding(.vertical, 2)
                 .frame(maxWidth: .infinity)
                 .background(Color.white, in: RoundedRectangle(cornerRadius: 4, style: .continuous))

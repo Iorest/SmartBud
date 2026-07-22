@@ -26,13 +26,13 @@ struct SettingsNumberEntryView: View {
     /// the VM's lifetime; `@Observable` gives automatic dependency tracking.
     @State private var vm = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
-    let options = ["Type 1", "Type 2"]
+    let options = [String.appLocalized("Type 1"), String.appLocalized("Type 2")]
 
     @Namespace var animation
 
     var body: some View {
         VStack(spacing: 10) {
-            Text("Number Entry Method")
+            Text(String.appLocalized("Number Entry Method"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 .foregroundStyle(Color.PrimaryText)
@@ -49,14 +49,13 @@ struct SettingsNumberEntryView: View {
                 ForEach(options.indices, id: \.self) { option in
                     let isSelected = numberEntryType == (option + 1)
                     Button {
-                        DispatchQueue.main.async {
-                            withAnimation(.easeIn(duration: 0.15)) {
-                                numberEntryType = (option + 1)
-                                vm.numberEntryType = option + 1
-                            }
+                        withAnimation(.easeIn(duration: 0.15)) {
+                            numberEntryType = (option + 1)
+                            vm.numberEntryType = option + 1
                         }
+
                     } label: {
-                        Text(LocalizedStringKey(options[option]))
+                        Text(options[option])
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                             .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
@@ -87,23 +86,23 @@ struct SettingsNumberEntryView: View {
 
             VStack(spacing: 10) {
                 if numberEntryType == 1 {
-                    Text("\"Pre-dotted\"")
+                    Text(String.appLocalized("\"Pre-dotted\""))
                         .font(.system(.title2, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text("If you're too lazy to add a decimal point, I gotchu covered.")
+                    Text(String.appLocalized("If you're too lazy to add a decimal point, I gotchu covered."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.SubtitleText)
                 } else {
-                    Text("\"Cent-less\"")
+                    Text(String.appLocalized("\"Cent-less\""))
                         .font(.system(.title2, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text("If your transactions usually amount to whole numbers - this one is for you.")
+                    Text(String.appLocalized("If your transactions usually amount to whole numbers - this one is for you."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .multilineTextAlignment(.center)

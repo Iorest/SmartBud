@@ -13,13 +13,13 @@ struct SettingsAppearanceView: View {
   var colourScheme: Int = 0
   @Environment(\.dismiss) var dismiss
 
-  let options = ["System", "Light", "Dark"]
+  let options = [String.appLocalized("System"), String.appLocalized("Light"), String.appLocalized("Dark")]
 
   @Namespace var animation
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Appearance")
+      Text(String.appLocalized("Appearance"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -38,13 +38,13 @@ struct SettingsAppearanceView: View {
             withAnimation(.easeIn(duration: 0.15)) {
               colourScheme = option
             }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            Task { @MainActor in
+              try? await Task.sleep(for: .milliseconds(400))
               dismiss()
             }
           } label: {
             HStack {
-              Text(LocalizedStringKey(options[option]))
+              Text(options[option])
                 .font(.system(.body, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
@@ -74,7 +74,7 @@ struct SettingsAppearanceView: View {
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
-      Text("Close and reload app for change to take effect.")
+      Text(String.appLocalized("Close and reload app for change to take effect."))
         .font(.system(.caption, design: .rounded).weight(.medium))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)

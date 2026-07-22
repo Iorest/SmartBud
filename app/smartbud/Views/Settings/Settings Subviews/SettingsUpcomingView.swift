@@ -10,15 +10,17 @@ import SwiftUI
 
 struct SettingsUpcomingView: View {
   @Environment(\.dismiss) var dismiss
-  @State private var showFuture: Bool = true
+  @AppStorage("showUpcomingTransactions", store: .appGroup)
+  var showFuture: Bool = true
 
-  @State private var showSoon: Bool = false
+  @AppStorage("showUpcomingTransactionsWhenUpcoming", store: .appGroup)
+  var showSoon: Bool = false
 
   @Namespace var animation
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Upcoming Logs")
+      Text(String.appLocalized("Upcoming Logs"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -36,7 +38,7 @@ struct SettingsUpcomingView: View {
           showFuture.toggle()
         } label: {
           HStack {
-            Text("Display on Log Page")
+            Text(String.appLocalized("Display on Log Page"))
               .font(.system(.body, design: .rounded))
               .foregroundStyle(Color.PrimaryText)
 
@@ -61,13 +63,10 @@ struct SettingsUpcomingView: View {
         .buttonStyle(.plain)
         .accessibilityAddTraits(showFuture ? [.isButton, .isSelected] : .isButton)
         .onChange(of: showFuture) { _, newValue in
-          UserDefaults.appGroup.set(
-            newValue, forKey: "showUpcomingTransactions")
-
-          if !newValue {
+          // Cross-toggle: hiding all upcoming transactions also turns off
+          // the 14-day outlook filter.
+          if !newValue && showSoon {
             showSoon = false
-            UserDefaults.appGroup.set(
-              false, forKey: "showUpcomingTransactionsWhenUpcoming")
           }
         }
 
@@ -75,7 +74,7 @@ struct SettingsUpcomingView: View {
           showSoon.toggle()
         } label: {
           HStack {
-            Text("Limit to 14-Day Outlook")
+            Text(String.appLocalized("Limit to 14-Day Outlook"))
               .font(.system(.body, design: .rounded))
               .foregroundStyle(Color.PrimaryText)
 
@@ -99,16 +98,12 @@ struct SettingsUpcomingView: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
-        .onChange(of: showSoon) { _, newValue in
-          UserDefaults.appGroup.set(
-            newValue, forKey: "showUpcomingTransactionsWhenUpcoming")
-        }
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
       Text(
-        "Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here."
+        String.appLocalized("Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here.")
       )
       .font(.system(.caption, design: .rounded).weight(.medium))
       .multilineTextAlignment(.leading)
@@ -117,17 +112,12 @@ struct SettingsUpcomingView: View {
       .padding(.bottom, 30)
       .frame(maxWidth: .infinity, alignment: .leading)
 
-      ScrollView(showsIndicators: false) {
+      ScrollView {
         FutureListView(filterMode: false, limitedMode: false)
           .padding(.bottom, 70)
       }
+      .scrollIndicators(.hidden)
     }
     .modifier(SettingsSubviewModifier())
-    .onAppear {
-      showFuture = UserDefaults.appGroup.bool(
-        forKey: "showUpcomingTransactions")
-      showSoon = UserDefaults.appGroup.bool(
-        forKey: "showUpcomingTransactionsWhenUpcoming")
-    }
   }
 }

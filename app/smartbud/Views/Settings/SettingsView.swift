@@ -11,6 +11,28 @@ import SwiftUI
 import UserNotifications
 import WidgetKit
 
+/// Navigation routes for `SettingsView`. The 12 leaf screens in Settings are
+/// all `View` types with no parameters, so a single `Hashable` enum covers
+/// every value-based `NavigationLink` in the screen. The `navigationDestination`
+/// resolver lives at the bottom of `SettingsView` and dispatches the case to
+/// the matching subview.
+enum SettingsRoute: Hashable {
+    case pro
+    case notifications
+    case currency
+    case weekStart
+    case appearance
+    case appIcon
+    case language
+    case upcoming
+    case cloud
+    case erase
+    case haptics
+    case featureLab
+    case numberEntry
+    case categories
+}
+
 struct SettingsView: View {
   @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
@@ -112,7 +134,7 @@ struct SettingsView: View {
 
   @AppStorage("incomeTracking", store: .appGroup)
   var incomeTracking: Bool = true
-    
+
   @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
   var showExpenseOrIncomeSign: Bool = true
 
@@ -183,16 +205,16 @@ struct SettingsView: View {
         .padding(.top, 20)
         .padding(.bottom, 10)
 
-        ScrollView(showsIndicators: false) {
+        ScrollView {
           VStack(spacing: 5) {
-            Text("PRO")
+            Text(String.appLocalized("PRO"))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
               .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
               .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 6) {
-              NavigationLink(destination: SettingsProView()) {
+              NavigationLink(value: SettingsRoute.pro) {
                 HStack(spacing: 12) {
                   Image(systemName: "crown.fill")
                     .font(.system(.body, design: .rounded))
@@ -205,7 +227,7 @@ struct SettingsView: View {
                     .background(Color("200"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
 
                   VStack(alignment: .leading, spacing: 2) {
-                    Text("SmartBud Pro")
+                    Text(String.appLocalized("SmartBud Pro"))
                       .font(.system(.body, design: .rounded).weight(.semibold))
                       .foregroundStyle(Color.PrimaryText)
                       .lineLimit(1)
@@ -223,7 +245,6 @@ struct SettingsView: View {
                     .foregroundStyle(Color.DarkIcon.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity)
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
               }
             }
             .padding(10)
@@ -236,7 +257,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text("GENERAL")
+            Text(String.appLocalized("GENERAL"))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -246,31 +267,19 @@ struct SettingsView: View {
 
             VStack(spacing: 13) {
 
-              NavigationLink(destination: SettingsNotificationsView()) {
+              NavigationLink(value: SettingsRoute.notifications) {
                 SettingsRowView(
                   systemImage: "bell.fill", title: "Notifications", colour: 102,
                   optionalText: notificationString)
               }
 
-              NavigationLink(destination: SettingsCurrencyView()) {
+              NavigationLink(value: SettingsRoute.currency) {
                 SettingsRowView(
                   systemImage: "coloncurrencysign.square.fill", title: "Currency", colour: 103,
                   optionalText: currency)
               }
 
-              NavigationLink(
-                destination: SettingsNumberEntryView()
-                  .onAppear {
-                    withAnimation(.easeOut.speed(1.5)) {
-                      tabBarManager.navigationHideTab()
-                    }
-                  }
-                  .onDisappear {
-                    withAnimation(.easeOut.speed(1.5)) {
-                      tabBarManager.navigationShowTab()
-                    }
-                  }
-              ) {
+              NavigationLink(value: SettingsRoute.numberEntry) {
                 SettingsRowView(
                   systemImage: "keyboard.fill", title: "Number Entry", colour: 104,
                   optionalText: numberEntryString)
@@ -296,10 +305,10 @@ struct SettingsView: View {
                   }
                 })
 
-              NavigationLink(destination: SettingsWeekStartView()) {
+              NavigationLink(value: SettingsRoute.weekStart) {
                 SettingsRowView(systemImage: "calendar", title: "Time Frames", colour: 109)
               }
-                
+
             }
             .padding(10)
             .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
@@ -320,7 +329,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text("APPEARANCE")
+            Text(String.appLocalized("APPEARANCE"))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -329,19 +338,19 @@ struct SettingsView: View {
               .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(spacing: 13) {
-              NavigationLink(destination: SettingsAppearanceView()) {
+              NavigationLink(value: SettingsRoute.appearance) {
                 SettingsRowView(
                   systemImage: "circle.righthalf.filled", title: "Theme", colour: 100,
                   optionalText: colourSchemeString)
               }
 
-              NavigationLink(destination: SettingsAppIconView()) {
+              NavigationLink(value: SettingsRoute.appIcon) {
                 SettingsRowView(
                   systemImage: "app.badge.fill", title: "App Icon", colour: 101,
                   optionalText: appIconString)
               }
 
-              NavigationLink(destination: SettingsLanguageView()) {
+              NavigationLink(value: SettingsRoute.language) {
                 SettingsRowView(
                   systemImage: "globe", title: "Language", colour: 132,
                   optionalText: appLanguageString)
@@ -353,12 +362,12 @@ struct SettingsView: View {
                   showCents.toggle()
                 })
 
-              NavigationLink(destination: SettingsUpcomingView()) {
+              NavigationLink(value: SettingsRoute.upcoming) {
                 SettingsRowView(
                   systemImage: "sun.min.fill", title: "Upcoming Logs", colour: 108,
                   optionalText: upcomingString)
               }
-                
+
               ToggleRow(
                 icon: "plusminus", color: "123", text: "Display +/- Symbol", bool: showExpenseOrIncomeSign,
                 onTap: {
@@ -391,7 +400,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text("DATA")
+            Text(String.appLocalized("DATA"))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -400,25 +409,12 @@ struct SettingsView: View {
               .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(spacing: 13) {
-              NavigationLink(
-                destination: SettingsCategoryView()
-                  .onAppear {
-                    withAnimation(.easeOut.speed(1.5)) {
-                      tabBarManager.navigationHideTab()
-                    }
-                  }
-                  .onDisappear {
-                    withAnimation(.easeOut.speed(1.5)) {
-                      tabBarManager.navigationShowTab()
-                    }
-                  }
-
-              ) {
+              NavigationLink(value: SettingsRoute.categories) {
                 SettingsRowView(
                   systemImage: "rectangle.grid.2x2.fill", title: "Categories", colour: 110)
               }
 
-              NavigationLink(destination: SettingsCloudView()) {
+              NavigationLink(value: SettingsRoute.cloud) {
                 SettingsRowView(
                   systemImage: "icloud.fill", title: "iCloud Sync", colour: 111,
                   optionalText: iCloudString)
@@ -443,7 +439,7 @@ struct SettingsView: View {
                   systemImage: "square.and.arrow.up.fill", title: "Export Data", colour: 113)
               }
 
-              NavigationLink(destination: SettingsEraseView()) {
+              NavigationLink(value: SettingsRoute.erase) {
                 SettingsRowView(systemImage: "xmark.bin.fill", title: "Erase Data", colour: 114)
               }
             }
@@ -457,7 +453,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text("OTHERS")
+            Text(String.appLocalized("OTHERS"))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -467,13 +463,13 @@ struct SettingsView: View {
 
             VStack(spacing: 13) {
 
-                NavigationLink(destination: SettingsHapticsView()) {
+                NavigationLink(value: SettingsRoute.haptics) {
                   SettingsRowView(
                     systemImage: "hand.tap.fill", title: "Haptics", colour: 100,
                     optionalText: hapticString)
                 }
 
-              NavigationLink(destination: SettingsGoofyView()) {
+              NavigationLink(value: SettingsRoute.featureLab) {
                 SettingsRowView(systemImage: "flame.fill", title: "Feature Lab", colour: 122)
               }
 
@@ -495,9 +491,8 @@ struct SettingsView: View {
                 // once SmartBud is published as a new App Store Connect listing.
                 // The current ID points to the legacy listing, which keeps the
                 // "Rate on App Store" link functional for users on the old listing.
-                let url = "https://apps.apple.com/app/id1635280255?action=write-review"
-                if let writeReviewURL = URL(string: url) {
-                    UIApplication.shared.open(writeReviewURL, options: [:], completionHandler: nil)
+                if let writeReviewURL = URL(string: "https://apps.apple.com/app/id1635280255?action=write-review") {
+                  openURL(writeReviewURL)
                 }
               } label: {
                 SettingsRowView(systemImage: "star.fill", title: "Rate on App Store", colour: 126)
@@ -514,10 +509,50 @@ struct SettingsView: View {
           }
           .padding(.bottom, 95)
         }
+        .scrollIndicators(.hidden)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
       }
       .background(AppGlassBackground())
+      .navigationDestination(for: SettingsRoute.self) { route in
+          switch route {
+          case .pro: SettingsProView()
+          case .notifications: SettingsNotificationsView()
+          case .currency: SettingsCurrencyView()
+          case .weekStart: SettingsWeekStartView()
+          case .appearance: SettingsAppearanceView()
+          case .appIcon: SettingsAppIconView()
+          case .language: SettingsLanguageView()
+          case .upcoming: SettingsUpcomingView()
+          case .cloud: SettingsCloudView()
+          case .erase: SettingsEraseView()
+          case .haptics: SettingsHapticsView()
+          case .featureLab: SettingsGoofyView()
+          case .numberEntry:
+            SettingsNumberEntryView()
+              .onAppear {
+                withAnimation(.easeOut.speed(1.5)) {
+                  tabBarManager.navigationHideTab()
+                }
+              }
+              .onDisappear {
+                withAnimation(.easeOut.speed(1.5)) {
+                  tabBarManager.navigationShowTab()
+                }
+              }
+          case .categories:
+            SettingsCategoryView()
+              .onAppear {
+                withAnimation(.easeOut.speed(1.5)) {
+                  tabBarManager.navigationHideTab()
+                }
+              }
+              .onDisappear {
+                withAnimation(.easeOut.speed(1.5)) {
+                  tabBarManager.navigationShowTab()
+                }
+              }
+          }
+      }
       .fullScreenCover(isPresented: $showImportGuide) {
         ImportDataView()
       }
@@ -551,7 +586,7 @@ struct SettingsView: View {
           .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
           .accessibilityHidden(true)
 
-        Text(LocalizedStringKey(text))
+        Text(String.appLocalized(String.LocalizationValue(text)))
           .font(.system(.body, design: .rounded).weight(.medium))
           .lineLimit(1)
           .foregroundStyle(Color.PrimaryText)
@@ -574,21 +609,9 @@ struct SettingsView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .accessibilityLabel(LocalizedStringKey(text))
+    .accessibilityLabel(String.appLocalized(String.LocalizationValue(text)))
+    .accessibilityValue(bool ? String.appLocalized("On") : String.appLocalized("Off"))
     .accessibilityAddTraits(bool ? [.isButton, .isSelected] : .isButton)
-  }
-
-  func shareSheet(url: String) {
-    let url = URL(string: url)
-    let activityView = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
-
-    let allScenes = UIApplication.shared.connectedScenes
-    let scene = allScenes.first { $0.activationState == .foregroundActive }
-
-    if let windowScene = scene as? UIWindowScene {
-      windowScene.keyWindow?.rootViewController?.present(
-        activityView, animated: true, completion: nil)
-    }
   }
 
   func exportData() {
@@ -663,7 +686,7 @@ struct SettingsRowView: View {
         )
         .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
 
-      Text(LocalizedStringKey(title))
+      Text(String.appLocalized(String.LocalizationValue(title)))
         .font(.system(.body, design: .rounded).weight(.medium))
 
         //                .font(.system(size: 17, weight: .medium, design: .rounded))
@@ -688,7 +711,6 @@ struct SettingsRowView: View {
         .foregroundStyle(Color.DarkIcon.opacity(0.6))
     }
     .frame(maxWidth: .infinity)
-    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 }
 

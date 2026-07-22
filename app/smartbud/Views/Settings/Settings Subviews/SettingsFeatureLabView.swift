@@ -33,9 +33,8 @@ struct SettingsGoofyView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Feature Lab")
+      Text(String.appLocalized("Feature Lab"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                .font(.system(size: 20, weight: .semibold, design: .rounded))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -50,45 +49,42 @@ struct SettingsGoofyView: View {
 
       ScrollView {
         VStack(spacing: 0) {
-          ToggleRow(text: "Celebrate Expenses", bool: $confetti, id: 1)
+          ToggleRow(text: String.appLocalized("Celebrate Expenses"), bool: $confetti, id: 1)
 
-          ToggleRow(text: "Show Line Graph", bool: $lineGraph, id: 2)
+          ToggleRow(text: String.appLocalized("Show Line Graph"), bool: $lineGraph, id: 2)
 
-          ToggleRow(text: "Budget Rows", bool: $budgetRows, id: 3)
+          ToggleRow(text: String.appLocalized("Budget Rows"), bool: $budgetRows, id: 3)
         }
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
-        Text("Experimental features - proceed with caution.")
+        Text(String.appLocalized("Experimental features - proceed with caution."))
           .font(.system(.caption, design: .rounded).weight(.medium))
-          .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
           //                    .font(.system(size: 12, weight: .medium, design: .rounded))
           .foregroundStyle(Color.SubtitleText)
           .padding(.horizontal, 15)
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.bottom, 30)
 
-        ToggleRow(text: "Replace Time Label", bool: $swapTimeLabel, id: 4)
+        ToggleRow(text: String.appLocalized("Replace Time Label"), bool: $swapTimeLabel, id: 4)
           .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
         Text(
-          "Swaps the time label of each transaction with its category name. However, if you do not manually input a note for each transaction - in which case the note is the category name by default - duplicate text will appear."
+          String.appLocalized("Swaps the time label of each transaction with its category name. However, if you do not manually input a note for each transaction - in which case the note is the category name by default - duplicate text will appear.")
         )
         .font(.system(.caption, design: .rounded).weight(.medium))
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                    .font(.system(size: 12, weight: .medium, design: .rounded))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 30)
 
-        ToggleRow(text: "Show Note Suggestions", bool: $showRecommendations, id: 5)
+        ToggleRow(text: String.appLocalized("Show Note Suggestions"), bool: $showRecommendations, id: 5)
           .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
         Text(
-          "Displays transaction suggestions whilst you type in the 'Note' field of the new transaction page."
+          String.appLocalized("Displays transaction suggestions whilst you type in the 'Note' field of the new transaction page.")
         )
         .font(.system(.caption, design: .rounded).weight(.medium))
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                    .font(.system(size: 12, weight: .medium, design: .rounded))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
@@ -117,9 +113,8 @@ struct SettingsGoofyView: View {
       }
     } label: {
       HStack {
-        Text(LocalizedStringKey(text))
+        Text(text)
           .font(.system(.body, design: .rounded))
-          .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
           //                .font(.system(size: 17, weight: .regular, design: .rounded))
           .foregroundStyle(Color.PrimaryText)
 

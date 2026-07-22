@@ -19,13 +19,13 @@ struct UpdateAlert: View {
     @State var opacity = 0.0
 
     let welcomeFeatures = [
-        WelcomeSheetFeatureRow(icon: "appclip", header: "Siri Shorcuts", subtitle: "3 new Siri shortcuts allow you to conveniently add new transactions or access insights."),
-        WelcomeSheetFeatureRow(icon: "arrow.down.doc.fill", header: "Data Import", subtitle: "Transfer pre-existing logs from other applications with a step-by-step guide."),
-        WelcomeSheetFeatureRow(icon: "sun.haze.fill", header: "Future Transactions", subtitle: "With date restrictions lifted, log and view upcoming expenses/incomes."),
-        WelcomeSheetFeatureRow(icon: "circle.grid.2x2.fill", header: "Re-designed Screens", subtitle: "Budget and category creation screens have been completely reworked."),
-        WelcomeSheetFeatureRow(icon: "swatchpalette.fill", header: "Custom Category Colors", subtitle: "Using the stock iOS color picker, give your categories a long-awaited aesthetic refresh."),
-        WelcomeSheetFeatureRow(icon: "exclamationmark.octagon.fill", header: "New Toasts", subtitle: "Similarly, alert toasts across the app have been re-designed."),
-        WelcomeSheetFeatureRow(icon: "calendar", header: "Custom Time Frames", subtitle: "Change the start of a month's cycle to align with payday.")
+        WelcomeSheetFeatureRow(icon: "appclip", header: String.appLocalized("Siri Shorcuts"), subtitle: String.appLocalized("3 new Siri shortcuts allow you to conveniently add new transactions or access insights.")),
+        WelcomeSheetFeatureRow(icon: "arrow.down.doc.fill", header: String.appLocalized("Data Import"), subtitle: String.appLocalized("Transfer pre-existing logs from other applications with a step-by-step guide.")),
+        WelcomeSheetFeatureRow(icon: "sun.haze.fill", header: String.appLocalized("Future Transactions"), subtitle: String.appLocalized("With date restrictions lifted, log and view upcoming expenses/incomes.")),
+        WelcomeSheetFeatureRow(icon: "circle.grid.2x2.fill", header: String.appLocalized("Re-designed Screens"), subtitle: String.appLocalized("Budget and category creation screens have been completely reworked.")),
+        WelcomeSheetFeatureRow(icon: "swatchpalette.fill", header: String.appLocalized("Custom Category Colors"), subtitle: String.appLocalized("Using the stock iOS color picker, give your categories a long-awaited aesthetic refresh.")),
+        WelcomeSheetFeatureRow(icon: "exclamationmark.octagon.fill", header: String.appLocalized("New Toasts"), subtitle: String.appLocalized("Similarly, alert toasts across the app have been re-designed.")),
+        WelcomeSheetFeatureRow(icon: "calendar", header: String.appLocalized("Custom Time Frames"), subtitle: String.appLocalized("Change the start of a month's cycle to align with payday."))
     ]
 
     var body: some View {
@@ -34,16 +34,13 @@ struct UpdateAlert: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        opacity = 0
-                        offset += 300
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        dismiss()
-                    }
+                    dismissSheet()
                 }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel(String.appLocalized("Close"))
                 .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(150))
                         withAnimation {
                             opacity = 0.4
                         }
@@ -75,13 +72,7 @@ struct UpdateAlert: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .overlay(alignment: .topTrailing) {
                     Button {
-                        withAnimation(.easeIn(duration: 0.15)) {
-                            opacity = 0
-                            offset += 300
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            dismiss()
-                        }
+                        dismissSheet()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
@@ -91,11 +82,12 @@ struct UpdateAlert: View {
                             .background(Color.SecondaryBackground, in: Circle())
                             .contentShape(Circle())
                     }
+                    .accessibilityLabel(String.appLocalized("Close"))
                     .offset(x: 5, y: -5)
                 }
                 .padding(.bottom, 15)
 
-                ScrollView(showsIndicators: false) {
+                ScrollView {
                     VStack(alignment: .leading, spacing: 22) {
                         ForEach(welcomeFeatures, id: \.self) { row in
                             HStack(alignment: .top, spacing: 15) {
@@ -124,6 +116,7 @@ struct UpdateAlert: View {
                     }
                     .padding(.horizontal, 10)
                 }
+                .scrollIndicators(.hidden)
                 .frame(height: 300)
 
                 Text(
@@ -154,5 +147,16 @@ struct UpdateAlert: View {
         string.link = URL(string: "https://yumiizumi.com/")
 
         return string
+    }
+
+    private func dismissSheet() {
+        withAnimation(.easeIn(duration: 0.15)) {
+            opacity = 0
+            offset += 300
+        }
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(150))
+            dismiss()
+        }
     }
 }

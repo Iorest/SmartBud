@@ -57,9 +57,10 @@ struct HomeView: View {
 
     @State var showPopup = false
 
-    // Hiding Native TabBar...
+    // Hiding Native TabBar is now done once in `SmartBudApp.init`
+    // (was previously set here, but ran every time this view was
+    // reconstructed).
     init(topEdge: CGFloat, bottomEdge: CGFloat) {
-        UITabBar.appearance().isHidden = true
         self.topEdge = topEdge
         self.bottomEdge = bottomEdge
     }
@@ -156,7 +157,8 @@ struct HomeView: View {
         .onChange(of: counter) { _, _ in showConfetti = true }
         .onAppear {
             if appLockVM.isAppLockEnabled && fromURL1 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
                     launchAdd.toggle()
                 }
 
@@ -166,7 +168,8 @@ struct HomeView: View {
             if appLockVM.isAppLockEnabled && fromURL2 {
                 currentTab = "Log"
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
                     launchSearch.toggle()
                 }
 

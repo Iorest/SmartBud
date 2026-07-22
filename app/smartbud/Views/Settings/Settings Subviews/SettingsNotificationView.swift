@@ -16,7 +16,8 @@ struct SettingsNotificationsView: View {
   var showNotifications: Bool = false
   @AppStorage("notificationsEnabled", store: .appGroup)
   var notificationsEnabled: Bool = true
-  @State var option = 1
+  @AppStorage("notificationOption", store: .appGroup)
+  var option: Int = 1
   @State var customTime = Date.now
 
   var center = UNUserNotificationCenter.current()
@@ -25,7 +26,7 @@ struct SettingsNotificationsView: View {
 
   var body: some View {
     VStack {
-      Text("Notifications")
+      Text(String.appLocalized("Notifications"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -81,7 +82,7 @@ struct SettingsNotificationsView: View {
           }
         } label: {
           HStack {
-            Text("Enable Notifications")
+            Text(String.appLocalized("Enable Notifications"))
               .font(.system(.body, design: .rounded))
               .foregroundStyle(Color.PrimaryText)
 
@@ -118,7 +119,7 @@ struct SettingsNotificationsView: View {
             }
           } label: {
             HStack {
-              Text("Every morning (8:00 AM)")
+              Text(String.appLocalized("Every morning (8:00 AM)"))
                 .font(.system(.body, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
@@ -148,7 +149,7 @@ struct SettingsNotificationsView: View {
             }
           } label: {
             HStack {
-              Text("Every evening (8:00 PM)")
+              Text(String.appLocalized("Every evening (8:00 PM)"))
                 .font(.system(.body, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
@@ -178,7 +179,7 @@ struct SettingsNotificationsView: View {
             }
           } label: {
             HStack {
-              Text("Custom Time")
+              Text(String.appLocalized("Custom Time"))
                 .font(.system(.body, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
@@ -186,7 +187,7 @@ struct SettingsNotificationsView: View {
 
               if option == 3 {
                 DatePicker(
-                  "Custom notification time", selection: $customTime,
+                  String.appLocalized("Custom notification time"), selection: $customTime,
                   displayedComponents: .hourAndMinute
                 )
                 .labelsHidden()
@@ -208,50 +209,40 @@ struct SettingsNotificationsView: View {
         .padding(.horizontal, 15)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
         .onChange(of: option) { _, newValue in
-          let defaults = UserDefaults.appGroup
-          defaults.set(
-            option, forKey: "notificationOption")
-
           if newValue == 3 {
             let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
-            defaults.set(
-              components.hour!, forKey: "customHour")
-            defaults.set(
-              components.minute!, forKey: "customMinute")
+            UserDefaults.appGroup.set(
+              components.hour ?? 0, forKey: "customHour")
+            UserDefaults.appGroup.set(
+              components.minute ?? 0, forKey: "customMinute")
           }
 
           newNotification()
         }
         .onChange(of: customTime) { _, _ in
-          let defaults = UserDefaults.appGroup
           let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)
 
-          defaults.set(
-            components.hour!, forKey: "customHour")
-          defaults.set(
-            components.minute!, forKey: "customMinute")
+          UserDefaults.appGroup.set(
+            components.hour ?? 0, forKey: "customHour")
+          UserDefaults.appGroup.set(
+            components.minute ?? 0, forKey: "customMinute")
 
           newNotification()
         }
         .onAppear {
           let defaults = UserDefaults.appGroup
-          if defaults.object(
-            forKey: "notificationOption") != nil {
-            option = defaults.integer(
-              forKey: "notificationOption")
-          }
-
-          if defaults.object(forKey: "customHour")
-            != nil
-            && defaults.object(forKey: "customMinute")
-              != nil {
+          if defaults.object(forKey: "customHour") != nil
+            && defaults.object(forKey: "customMinute") != nil
+          {
             var components = DateComponents()
             components.hour = defaults.integer(
               forKey: "customHour")
             components.minute = defaults.integer(
               forKey: "customMinute")
-            customTime = Calendar.current.date(from: components)!
+            if let date = Calendar.current.date(from: components) {
+              customTime = date
+            }
           }
         }
       }

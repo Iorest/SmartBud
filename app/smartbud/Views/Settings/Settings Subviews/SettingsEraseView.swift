@@ -15,7 +15,7 @@ struct SettingsEraseView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Erase Data")
+      Text(String.appLocalized("Erase Data"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -31,8 +31,8 @@ struct SettingsEraseView: View {
       Button {
         showAlert = true
       } label: {
-        Text("Permanently Delete Everythin'")
-          .font(.system(.body, design: .rounded))
+            Text(String.appLocalized("Permanently Delete Everythin'"))
+              .font(.system(.body, design: .rounded))
           .foregroundStyle(Color.PrimaryText)
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.vertical, 12)
@@ -41,7 +41,7 @@ struct SettingsEraseView: View {
       }
 
       Text(
-        "This action would delete all existing transactions, categories, and budgets, and cannot be undone."
+        String.appLocalized("This action would delete all existing transactions, categories, and budgets, and cannot be undone.")
       )
       .font(.system(.caption, design: .rounded).weight(.medium))
       .multilineTextAlignment(.leading)
@@ -97,12 +97,12 @@ struct DeleteAllAlert: View {
           Image(systemName: "exclamationmark.triangle.fill")
             .font(.system(.callout, design: .rounded).weight(.medium))
 
-          Text("Danger Zone")
+          Text(String.appLocalized("Danger Zone"))
             .font(.system(.title2, design: .rounded).weight(.medium))
         }
         .foregroundStyle(Color.PrimaryText)
 
-        Text("This action genuinely cannot be undone. Long press to confirm.")
+        Text(String.appLocalized("This action genuinely cannot be undone. Long press to confirm."))
           .font(.system(.title3, design: .rounded).weight(.medium))
           .foregroundStyle(Color.SubtitleText)
           .padding(.bottom, 15)
@@ -119,7 +119,7 @@ struct DeleteAllAlert: View {
               .offset(x: completedLongPress ? 0 : (isDetectingLongPress ? 0 : -(proxy.size.width)))
               .animation(.easeInOut(duration: 2), value: isDetectingLongPress)
 
-            Text("Delete Literally Everything")
+            Text(String.appLocalized("Delete Literally Everything"))
               .font(.system(.title3, design: .rounded).weight(.semibold))
               .foregroundStyle(.white)
               .frame(width: proxy.size.width, alignment: .center)
@@ -146,7 +146,8 @@ struct DeleteAllAlert: View {
           if completedLongPress {
             heavyHaptic &+= 1
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Task { @MainActor in
+              try? await Task.sleep(for: .milliseconds(500))
               settingsVM.eraseAllData()
 
               dismiss()
@@ -161,7 +162,7 @@ struct DeleteAllAlert: View {
           }
 
         } label: {
-            DeleteButton(text: "Back Out", red: false)
+            DeleteButton(text: String.appLocalized("Back Out"), red: false)
         }
       }
       .padding(13)
@@ -198,6 +199,5 @@ struct DeleteAllAlert: View {
     }
     .ignoresSafeArea(.all)
     .background(BackgroundBlurView())
-    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 }

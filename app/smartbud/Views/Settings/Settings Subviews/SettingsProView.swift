@@ -27,12 +27,12 @@ struct SettingsProView: View {
     ]
 
     private let features: [(icon: String, color: String, title: String, subtitle: String)] = [
-        ("icloud.fill", "111", "iCloud Sync", "Sync your data across all your Apple devices"),
-        ("doc.text.viewfinder", "112", "Batch Recognition", "Import multiple transactions from a single receipt photo"),
-        ("chart.bar.xaxis", "103", "Advanced Insights", "Deeper breakdowns, custom date ranges, exportable charts"),
-        ("paintpalette.fill", "100", "Exclusive Themes", "Additional app icons and accent colors"),
-        ("bell.badge.fill", "102", "Smart Reminders", "Customizable notification schedules and quiet hours"),
-        ("lock.shield.fill", "105", "Priority Support", "Direct access to the development team for help")
+        ("icloud.fill", "111", String.appLocalized("iCloud Sync"), String.appLocalized("Sync your data across all your Apple devices")),
+        ("doc.text.viewfinder", "112", String.appLocalized("Batch Recognition"), String.appLocalized("Import multiple transactions from a single receipt photo")),
+        ("chart.bar.xaxis", "103", String.appLocalized("Advanced Insights"), String.appLocalized("Deeper breakdowns, custom date ranges, exportable charts")),
+        ("paintpalette.fill", "100", String.appLocalized("Exclusive Themes"), String.appLocalized("Additional app icons and accent colors")),
+        ("bell.badge.fill", "102", String.appLocalized("Smart Reminders"), String.appLocalized("Customizable notification schedules and quiet hours")),
+        ("lock.shield.fill", "105", String.appLocalized("Priority Support"), String.appLocalized("Direct access to the development team for help"))
     ]
 
     var body: some View {
@@ -52,7 +52,7 @@ struct SettingsProView: View {
             }
             .padding(.bottom, 20)
 
-            ScrollView(showsIndicators: false) {
+            ScrollView {
                 VStack(spacing: 24) {
                     header
                     if isProSubscriber {
@@ -65,6 +65,7 @@ struct SettingsProView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .scrollIndicators(.hidden)
         }
         .modifier(SettingsSubviewModifier())
         .task {

@@ -567,7 +567,8 @@ struct TimePickerView: View {
 
                         timeframe = index + 1
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(400))
                             showMenu = false
                         }
                     }
@@ -639,7 +640,8 @@ struct FilterPickerView: View {
                             filterType = filter
                         }
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(500))
                             showMenu = false
                         }
                     }
@@ -793,7 +795,7 @@ struct ListView: View {
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(String(format: String.appLocalized("%@%@ was spent %@"), currencySymbol, totalString, dateConverterAccessibilityLabel(date: day.day)))
+                        .accessibilityLabel(String(localized: "\(currencySymbol)\(totalString) was spent \(dateConverterAccessibilityLabel(date: day.day))"))
 
                         Line()
                             .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -1149,7 +1151,7 @@ struct SingleTransactionView: View {
             }
             .offset(x: offset)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(format: String.appLocalized("%@, %@%@, Transaction Category: %@, Transaction made at %@"), transaction.wrappedNote, currencySymbol, transactionAmountAccessibilityString, transaction.category?.wrappedName ?? String.appLocalized("Unknown"), timeConverterAccessibilityLabel(date: transaction.wrappedDate)))
+            .accessibilityLabel(String(localized: "\(transaction.wrappedNote), \(currencySymbol)\(transactionAmountAccessibilityString), Transaction Category: \(transaction.category?.wrappedName ?? String.appLocalized("Unknown")), Transaction made at \(timeConverterAccessibilityLabel(date: transaction.wrappedDate))"))
         }
         .onChange(of: deletePopup) { _, _ in
             if deletePopup {
@@ -1182,13 +1184,15 @@ struct SingleTransactionView: View {
                         }
 
                         if future, transaction.wrappedDate < Date.now, transaction.recurringType > 0 {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            Task { @MainActor in
+                                try? await Task.sleep(for: .milliseconds(400))
                                 withAnimation(.easeInOut(duration: 0.5)) {
                                     transactionVM.stopRecurring(transaction)
                                 }
                             }
                         } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            Task { @MainActor in
+                                try? await Task.sleep(for: .milliseconds(400))
                                 withAnimation {
                                     transactionVM.stageDelete(transaction)
                                     transactionManager.showToast = true
@@ -1329,12 +1333,12 @@ struct DeleteTransactionAlert: View {
     var body: some View {
         if let unwrappedToDelete = transactionManager.toDelete {
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String(format: String.appLocalized("Delete '%@'?"), unwrappedToDelete.wrappedNote))
+                Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String(localized: "Delete '\(unwrappedToDelete.wrappedNote)'?"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                    .font(.system(size: 25, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
-                    .accessibilityLabel(String(format: String.appLocalized("Delete %@ transaction confirmation. This action cannot be undone."), unwrappedToDelete.wrappedNote))
+                    .accessibilityLabel(String(localized: "Delete \(unwrappedToDelete.wrappedNote) transaction confirmation. This action cannot be undone."))
 
                 Text(String.appLocalized(stopRecurring ? "The transaction will no longer be automatically logged." : "This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
@@ -1770,7 +1774,7 @@ struct IncomeFilterToggleView: View {
                     }
                 }
 
-            Text("filter-picker-income")
+            Text(String.appLocalized("filter-picker-income"))
 //                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .font(.system(.body, design: .rounded).weight(.semibold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -1836,7 +1840,7 @@ struct DateStepperView: View {
                 .font(.system(.title3, design: .rounded).weight(.bold))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .accessibilityLabel(String(format: String.appLocalized("showing transactions on %@"), dateString))
+                .accessibilityLabel(String(localized: "showing transactions on \(dateString)"))
 
             Spacer()
 
@@ -1899,7 +1903,7 @@ struct WeekStepperView: View {
         let endComponents = DateComponents(day: 7, second: -1)
         let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
 
-        return String(format: String.appLocalized("showing transactions from %@ to %@"), dateFormatter.string(from: showingDate), dateFormatter.string(from: endWeekDate))
+        return String(localized: "showing transactions from \(dateFormatter.string(from: showingDate)) to \(dateFormatter.string(from: endWeekDate))")
     }
 
     var body: some View {
@@ -1998,7 +2002,7 @@ struct MonthStepperView: View {
 
             Text(dateString)
                 .font(.system(.title3, design: .rounded).weight(.bold))
-                .accessibilityLabel(String(format: String.appLocalized("showing transactions in %@"), dateString))
+                .accessibilityLabel(String(localized: "showing transactions in \(dateString)"))
 
             Spacer()
 
@@ -2078,7 +2082,7 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
 
         dateFormatter.dateFormat = "EEE, d MMM yyyy"
 
-        return String(format: String.appLocalized("on %@"), dateFormatter.string(from: date))
+        return String(localized: "on \(dateFormatter.string(from: date))")
     }
 }
 

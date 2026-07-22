@@ -129,11 +129,16 @@ extension String {
     ) -> String {
         let code = UserDefaults.appGroup.string(forKey: AppDefaultsKey.appLanguage) ?? ""
         let target = appChildBundle(forLanguageCode: code) ?? bundle ?? .main
-        return String(
+        let result = String(
             localized: key,
             table: table,
             bundle: target,
             comment: comment
         )
+        let keyString = "\(key)"
+        if keyString == "Currency" || keyString == "Time Frames" || keyString == "App Icon" || keyString == "Notifications" || keyString == "Theme" {
+            NSLog("[appLocalized LV] key=%@ appLanguage=%@ bundle=%@ result=%@", keyString, code, target.bundlePath, result)
+        }
+        return result
     }
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct SmartBudApp: App {
@@ -21,6 +22,14 @@ struct SmartBudApp: App {
     @State private var settingsVM = SettingsViewModel.shared
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    init() {
+        // The app uses a fully custom `TabBar` view instead of SwiftUI's
+        // native `TabView`, so hide the system tab bar once at launch
+        // (previously this ran inside `HomeView.init`, which fires every
+        // time the view was reconstructed).
+        UITabBar.appearance().isHidden = true
+    }
 
     var body: some Scene {
         WindowGroup {

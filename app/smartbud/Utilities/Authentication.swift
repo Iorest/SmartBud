@@ -72,19 +72,17 @@ class AppLockViewModel{
 
             laContext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
                 if success {
-                    if appLockState {
-                        DispatchQueue.main.async {
+                    Task { @MainActor in
+                        if appLockState {
                             self.enableAppLock()
                             self.isAppUnLocked = true
-                        }
-                    } else {
-                        DispatchQueue.main.async {
+                        } else {
                             self.disableAppLock()
                             self.isAppUnLocked = true
                         }
                     }
                 } else if error != nil {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         // Surface auth failure (e.g. user cancel, lockout)
                         // to the UI via the existing enrollmentError flag.
                         self.enrollmentError = true
@@ -105,11 +103,11 @@ class AppLockViewModel{
             let reason = "Enable App Lock"
             laContext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
                 if success {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self.isAppUnLocked = true
                     }
                 } else if error != nil {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         // Surface auth failure to the UI so the user
                         // can see why unlock did not succeed.
                         self.enrollmentError = true

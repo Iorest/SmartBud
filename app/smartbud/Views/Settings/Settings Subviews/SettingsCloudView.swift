@@ -15,9 +15,8 @@ struct SettingsCloudView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("iCloud Sync")
+      Text(String.appLocalized("iCloud Sync"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         //                .font(.system(size: 20, weight: .semibold, design: .rounded))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -35,7 +34,7 @@ struct SettingsCloudView: View {
           iCloudStorage.toggle()
         } label: {
           HStack {
-            Text("Enable Sync")
+            Text(String.appLocalized("Enable Sync"))
               .font(.system(.body, design: .rounded))
               .foregroundStyle(Color.PrimaryText)
 
@@ -66,7 +65,7 @@ struct SettingsCloudView: View {
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
-      Text("Close and reload app for change to take effect.")
+      Text(String.appLocalized("Close and reload app for change to take effect."))
         .font(.system(.caption, design: .rounded).weight(.medium))
         .multilineTextAlignment(.leading)
         .foregroundStyle(Color.SubtitleText)

@@ -201,12 +201,11 @@ struct TemplateTransactionView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    DispatchQueue.main.async {
-                                        withAnimation(.easeIn(duration: 0.15)) {
-                                            income = false
-                                            category = nil
-                                        }
+                                    withAnimation(.easeIn(duration: 0.15)) {
+                                        income = false
+                                        category = nil
                                     }
+
                                 }
 
                             Text("transaction-view-income-picker")
@@ -223,12 +222,11 @@ struct TemplateTransactionView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    DispatchQueue.main.async {
-                                        withAnimation(.easeIn(duration: 0.15)) {
-                                            income = true
-                                            category = nil
-                                        }
+                                    withAnimation(.easeIn(duration: 0.15)) {
+                                        income = true
+                                        category = nil
                                     }
+
                                 }
                         }
                         .padding(3)
@@ -531,31 +529,31 @@ struct TemplateTransactionView: View {
         .ignoresSafeArea(.all)
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
         }
         .onAppear {
             categoryVM.load()
-            DispatchQueue.main.async {
-                if let transaction = toEdit {
-                    let string = transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))
+            if let transaction = toEdit {
+                let string = transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))
 
-                    var stringArray = string.compactMap { String($0) }
+                var stringArray = string.compactMap { String($0) }
 
-                    numbers = stringArray.compactMap { Int($0) }
+                numbers = stringArray.compactMap { Int($0) }
 
-                    if round(transaction.wrappedAmount) == transaction.wrappedAmount {
-                        stringArray.removeLast()
-                        stringArray.removeLast()
-                        stringArray.removeLast()
-                        numbers1 = stringArray
-                    } else {
-                        numbers1 = stringArray
-                    }
+                if round(transaction.wrappedAmount) == transaction.wrappedAmount {
+                    stringArray.removeLast()
+                    stringArray.removeLast()
+                    stringArray.removeLast()
+                    numbers1 = stringArray
+                } else {
+                    numbers1 = stringArray
                 }
             }
+
         }
         .sheet(isPresented: $showCategorySheet) {
             CategoryView(mode: .transaction, income: income)
@@ -757,7 +755,7 @@ struct CategoryRowPickerView: View {
             } else {
                 GeometryReader { gp in
                     ZStack {
-                        ScrollView(.horizontal, showsIndicators: false) {
+                        ScrollView(.horizontal) {
                             ScrollViewReader { value in
                                 HStack(spacing: 8) {
                                     ForEach(income ? categoryVM.incomeCategories : categoryVM.expenseCategories, id: \.self) { item in
@@ -807,6 +805,7 @@ struct CategoryRowPickerView: View {
                                 }
                             }
                         }
+                        .scrollIndicators(.hidden)
                         .clipped()
 
                         // inject gradient at right side only

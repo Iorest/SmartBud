@@ -99,11 +99,9 @@ struct CategoryBreakdownView: View {
     }
 
     private func formattedAmount(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = showCents ? 2 : 0
-        formatter.currencySymbol = currencySymbol
-        return formatter.string(from: NSNumber(value: abs(amount))) ?? "0"
+        abs(amount).formatted(
+            .currency(code: currencySymbol)
+                .precision(.fractionLength(showCents ? 2 : 0))
+        )
     }
 }

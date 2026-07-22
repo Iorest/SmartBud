@@ -359,9 +359,9 @@ final class InsightsViewModel{
 
     private func formatNumber(showCents: Bool, number: Double) -> String {
         if showCents {
-            return String(format: "%.2f", number)
+            return number.formatted(.number.precision(.fractionLength(2)))
         } else {
-            return String(format: "%d", Int(floor(number)))
+            return Int(floor(number)).formatted(.number)
         }
     }
 

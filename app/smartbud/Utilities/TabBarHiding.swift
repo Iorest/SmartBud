@@ -8,9 +8,9 @@
 import Foundation
 import Observation
 
+@MainActor
 @Observable
-
-class TabBarManager{
+final class TabBarManager {
     var hideTab = false
     var inNavigationLink = false
 

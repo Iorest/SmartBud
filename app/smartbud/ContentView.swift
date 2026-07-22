@@ -3,41 +3,39 @@
 //
 //  Created by Iorest on 3/6/22.
 //
+//  Thin shell over `ContentViewModel`. The view no longer holds the 13
+//  `@AppStorage` values, the first-run defaults block, the iCloud
+//  currency migration, the update-sheet scheduling, or the duplicated
+//  notification-authorization reconciliation — those all live in
+//  `ContentViewModel`. `AppLock` stays here because the lock/unlock
+//  transitions need to fire on the same scene-phase events that drive
+//  `.task` / `.onChange(of: scenePhase)`.
+//
 
 import SwiftUI
 import WidgetKit
 
+// `appLanguage` and `colourScheme` are declared here as direct
+// `@AppStorage` even though `ContentViewModel` already mirrors them. The
+// copies on the view model are `@ObservationIgnored` (see
+// `ContentViewModel.swift:34-39` for the Swift 6 redeclaration reason),
+// so they do NOT trigger view updates on change. These two declarations
+// are the observation anchor that makes `.environment(\.locale, …)` and
+// `.preferredColorScheme(…)` re-evaluate when the user picks a new
+// language or theme in Settings. The values stay in sync with
+// `contentVM` because both sides read the same App Group key.
+
 struct ContentView: View {
     @Environment(AppLockViewModel.self) var appLockVM
-
-    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
     @Environment(\.scenePhase) var scenePhase
-    @AppStorage("showNotifications", store: .appGroup) var showNotifications: Bool = false
-    @AppStorage("notificationsEnabled", store: .appGroup) var notificationsEnabled: Bool = true
-
-    @AppStorage("firstLaunch", store: .appGroup) var firstLaunch: Bool = true
-
-    // adds category orders
-    @AppStorage("dataMigration1", store: .appGroup) var dataMigration1: Bool = true
-
-    // converts category colors to hex codes
-    @AppStorage("dataMigration2", store: .appGroup) var dataMigration2: Bool = true
-
-    @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
-
-    @State var showIntro: Bool = false
-    @State var showUpdate: Bool = false
-
-    @AppStorage("topEdge", store: .appGroup) var savedTopEdge: Double = 30
-    @AppStorage("bottomEdge", store: .appGroup) var savedBottomEdge: Double = 15
-
-    @AppStorage("previousVersion", store: .appGroup) var previousVersionString: String = "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"
-
-    @AppStorage("showUpdateSheet", store: .appGroup) var showUpdateSheet: Bool = true
+    @State private var contentVM = ContentViewModel()
 
     @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
+    @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
 
     var body: some View {
+        @Bindable var contentVM = contentVM
+
         GeometryReader { proxy in
             let topEdge = proxy.safeAreaInsets.top
             let bottomEdge = proxy.safeAreaInsets.bottom
@@ -49,120 +47,33 @@ struct ContentView: View {
                 .onChange(of: appLanguage) { _, _ in
                     WidgetCenter.shared.reloadAllTimelines()
                 }
-                .fullScreenCover(isPresented: $showIntro) {
+                .fullScreenCover(isPresented: $contentVM.showIntro) {
                     WelcomeSheetView()
                 }
-                .fullScreenCover(isPresented: $showUpdate) {
+                .fullScreenCover(isPresented: $contentVM.showUpdate) {
                     UpdateAlert()
                 }
                 .onAppear {
-                    savedTopEdge = topEdge
-                    savedBottomEdge = bottomEdge
+                    contentVM.updateInsets(top: topEdge, bottom: bottomEdge)
                 }
         }
         .ignoresSafeArea(.keyboard)
-        .onAppear {
+        .task {
             if appLockVM.isAppLockEnabled {
                 appLockVM.appLockValidation()
             }
-
-            // "Follow system" is the default — picker shows a "System" row that
-            // maps to the empty string. Users can always opt into zh-Hans/zh-Hant.
-
-            let defaults = UserDefaults.appGroup
-
-            if defaults.object(forKey: "firstDayOfMonth") == nil {
-                defaults.set(1, forKey: "firstDayOfMonth")
-            }
-
-            if firstLaunch {
-                showIntro = true
-                firstLaunch = false
-                showUpdateSheet = false
-                dataMigration1 = false
-                dataMigration2 = false
-
-                defaults.set(1, forKey: "firstWeekday")
-                defaults.set(1, forKey: "haptics")
-                defaults.set(1, forKey: "firstDayOfMonth")
-                defaults.set(1, forKey: "notificationOption")
-                defaults.set(false, forKey: "confetti")
-                defaults.set(false, forKey: "chromatic")
-                defaults.set(true, forKey: "showCents")
-                defaults.set(true, forKey: "animated")
-
-                if NSUbiquitousKeyValueStore.default.string(forKey: "currency") == nil {
-                    NSUbiquitousKeyValueStore.default.set(Locale.current.currency?.identifier ?? "USD", forKey: "currency")
-                } else {
-                    currency = NSUbiquitousKeyValueStore.default.string(forKey: "currency")!
-                }
-
-                defaults.set(2, forKey: "numberEntryType")
-            } else {
-                if let holdingCurrency = NSUbiquitousKeyValueStore.default.string(forKey: "currency") {
-                    currency = holdingCurrency
-                } else {
-                    currency = Locale.current.currency?.identifier ?? "USD"
-                    NSUbiquitousKeyValueStore.default.set(Locale.current.currency?.identifier ?? "USD", forKey: "currency")
-                }
-            }
-
-            // Skip CoreData-specific migrations - SwiftData models don't need them
-            dataMigration1 = false
-            dataMigration2 = false
-
-            if showUpdateSheet {
-                showUpdate = true
-                showUpdateSheet = false
-            }
-
-            UNUserNotificationCenter.current().getNotificationSettings { settings in
-                if settings.authorizationStatus == .authorized {
-                    Task { @MainActor in
-                        if !showNotifications && notificationsEnabled == false {
-                            showNotifications = true
-                            notificationsEnabled = true
-                            newNotification()
-                        }
-                    }
-                } else if settings.authorizationStatus == .denied {
-                    Task { @MainActor in
-                        notificationsEnabled = false
-
-                        if showNotifications {
-                            showNotifications = false
-                            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-                        }
-                    }
-                }
-            }
+            contentVM.bootstrap()
         }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .background || newPhase == .inactive {
+            switch newPhase {
+            case .background, .inactive:
                 if appLockVM.isAppLockEnabled {
                     appLockVM.isAppUnLocked = false
                 }
-            } else if newPhase == .active {
-                UNUserNotificationCenter.current().getNotificationSettings { settings in
-                    if settings.authorizationStatus == .authorized {
-                        Task { @MainActor in
-                            if !showNotifications && notificationsEnabled == false {
-                                showNotifications = true
-                                notificationsEnabled = true
-                                newNotification()
-                            }
-                        }
-                    } else if settings.authorizationStatus == .denied {
-                        Task { @MainActor in
-                            notificationsEnabled = false
-
-                            if showNotifications {
-                                showNotifications = false
-                                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-                            }
-                        }
-                    }
-                }
+            case .active:
+                contentVM.handleSceneBecameActive()
+            @unknown default:
+                break
             }
         }
     }

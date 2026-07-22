@@ -63,7 +63,7 @@ struct SettingsAppIconView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("App Icon")
+      Text(String.appLocalized("App Icon"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)

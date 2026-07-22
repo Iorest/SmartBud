@@ -35,15 +35,6 @@ struct Provider: AppIntentTimelineProvider {
 
     public typealias Entry = RecentWidgetEntry
 
-    static let container: ModelContainer = {
-        let schema = Schema([
-            TransactionModel.self,
-            CategoryModel.self
-        ])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
-
     func placeholder(in _: Context) -> RecentWidgetEntry {
         RecentWidgetEntry(date: Date(), amount: loadAmount(type: .week, insightsType: .net), transactions: loadTransactions(type: .week, count: 9), duration: .week, type: .net)
     }
@@ -62,7 +53,7 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     func loadAmount(type: TimePeriod, insightsType: InsightsType) -> Double {
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
         let calendar = Calendar(identifier: .gregorian)
 
@@ -113,7 +104,7 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     func loadTransactions(type: TimePeriod, count: Int) -> [HoldingTransaction] {
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
 
         var calendar = Calendar(identifier: .gregorian)
@@ -183,12 +174,12 @@ struct ExpenditureWidgetEntryView: View {
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "MMM"
-            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now))
+            return String(localized: "in \(formatter.string(from: Date.now))")
         case .year:
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now))
+            return String(localized: "in \(formatter.string(from: Date.now))")
         }
     }
 
@@ -468,9 +459,15 @@ struct ExpenditureWidgetEntryView: View {
             entry.transactions.forEach { transaction in
                 let amountText: String
                 if showCents && transaction.amount < 100 {
-                    amountText = currencySymbol + String(format: "%.2f", transaction.amount)
+                    amountText = currencySymbol + transaction.amount.formatted(
+                        .number.locale(Locale(identifier: "en_US_POSIX"))
+                            .precision(.fractionLength(2))
+                    )
                 } else {
-                    amountText = currencySymbol + String(format: "%.0f", transaction.amount)
+                    amountText = currencySymbol + transaction.amount.formatted(
+                        .number.locale(Locale(identifier: "en_US_POSIX"))
+                            .precision(.fractionLength(0))
+                    )
                 }
 
                 let holding = transaction.note.widthOfRoundedString(size: fontSize, weight: .semibold) + amountText.widthOfRoundedString(size: fontSize, weight: .regular) + 8

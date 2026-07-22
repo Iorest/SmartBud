@@ -64,7 +64,8 @@ struct ConfettiModifier: ViewModifier {
                 }
                 .allowsHitTesting(false)
                 .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(1500))
                         withAnimation(.easeOut(duration: 0.5)) {
                             isActive = false
                         }
@@ -92,36 +93,4 @@ extension HorizontalAlignment {
     }
 
     static let moneySubtitle = HorizontalAlignment(MoneySubtitle.self)
-}
-
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-
-    public func gestureRecognizerShouldBegin(_: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
-    }
-}
-
-@MainActor
-class Utilities {
-    @AppStorage("colourScheme") var selectedAppearance = 0
-    var userInterfaceStyle: ColorScheme? = .dark
-
-    func overrideDisplayMode() {
-        var userInterfaceStyle: UIUserInterfaceStyle
-
-        if selectedAppearance == 2 {
-            userInterfaceStyle = .dark
-        } else if selectedAppearance == 1 {
-            userInterfaceStyle = .light
-        } else {
-            userInterfaceStyle = .unspecified
-        }
-
-        (UIApplication.shared.connectedScenes.first as?
-            UIWindowScene)?.windows.first!.overrideUserInterfaceStyle = userInterfaceStyle
-    }
 }

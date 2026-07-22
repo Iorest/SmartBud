@@ -334,7 +334,7 @@ struct BrandNewBudgetView: View {
                         .frame(maxHeight: .infinity)
 
                     } else {
-                        ScrollView(showsIndicators: false) {
+                        ScrollView {
                             VStack(spacing: 10) {
                                 ForEach(getRows(), id: \.self) { rows in
 
@@ -349,6 +349,7 @@ struct BrandNewBudgetView: View {
                             }
                             .padding(15)
                         }
+                        .scrollIndicators(.hidden)
                         .frame(maxWidth: .infinity)
                         .padding(.bottom, 15)
                     }
@@ -400,7 +401,7 @@ struct BrandNewBudgetView: View {
                     case .day:
                         EmptyView()
                     case .week:
-                        ScrollView(showsIndicators: false) {
+                        ScrollView {
                             ScrollViewReader { value in
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(Array(weekdays.enumerated()), id: \.element) { index, day in
@@ -416,10 +417,11 @@ struct BrandNewBudgetView: View {
                                 }
                             }
                         }
+                        .scrollIndicators(.hidden)
                         .modifier(PickerStyle(colorScheme: colorScheme))
                         .frame(height: min(heightOfPicker, 250))
                     case .month:
-                        ScrollView(showsIndicators: false) {
+                        ScrollView {
                             ScrollViewReader { value in
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(1 ..< 29) { day in
@@ -461,6 +463,7 @@ struct BrandNewBudgetView: View {
                                 }
                             }
                         }
+                        .scrollIndicators(.hidden)
                         .modifier(PickerStyle(colorScheme: colorScheme))
                         .frame(height: min(heightOfPicker, 250))
                     case .year:
@@ -555,31 +558,30 @@ struct BrandNewBudgetView: View {
             // Sync the pad VM with the AppStorage flags on first appearance.
             // Subsequent changes are picked up by the `onChange` below.
             padVM.numberEntryType = numberEntryType
-            DispatchQueue.main.async {
-                if let unwrappedEditedBudget = toEditBudget {
-                    selectedCategory = unwrappedEditedBudget.category
-                    switch unwrappedEditedBudget.type {
-                    case 1:
-                        budgetTimeFrame = .day
-                    case 2:
-                        budgetTimeFrame = .week
-                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedBudget.startDate).weekday!
-                    case 3:
-                        budgetTimeFrame = .month
-                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedBudget.startDate).day!
-                    case 4:
-                        budgetTimeFrame = .year
-                        chosenDayYear = unwrappedEditedBudget.startDate
-                    default:
-                        budgetTimeFrame = .week
-                    }
+            if let unwrappedEditedBudget = toEditBudget {
+                selectedCategory = unwrappedEditedBudget.category
+                switch unwrappedEditedBudget.type {
+                case 1:
+                    budgetTimeFrame = .day
+                case 2:
+                    budgetTimeFrame = .week
+                    chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedBudget.startDate).weekday!
+                case 3:
+                    budgetTimeFrame = .month
+                    chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedBudget.startDate).day!
+                case 4:
+                    budgetTimeFrame = .year
+                    chosenDayYear = unwrappedEditedBudget.startDate
+                default:
+                    budgetTimeFrame = .week
+                }
 
-                    padVM.price = unwrappedEditedBudget.amount
+                padVM.price = unwrappedEditedBudget.amount
 
-                    if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        padVM.isEditingDecimal = true
-                        padVM.decimalValuesAssigned = .second
-                    }
+                if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
+                    padVM.isEditingDecimal = true
+                    padVM.decimalValuesAssigned = .second
+                }
 //                    let string = String(format: "%.2f", unwrappedEditedBudget.amount)
 //
 //                    var stringArray = string.compactMap { String($0) }
@@ -595,34 +597,34 @@ struct BrandNewBudgetView: View {
 //                    } else {
 //                        numbers1 = stringArray
 //                    }
-                } else {
-                    chosenDayWeek = firstWeekday
-                    chosenDayMonth = firstDayOfMonth
+            } else {
+                chosenDayWeek = firstWeekday
+                chosenDayMonth = firstDayOfMonth
+            }
+
+            if let unwrappedEditedMainBudget = toEditMainBudget {
+                switch unwrappedEditedMainBudget.type {
+                case 1:
+                    budgetTimeFrame = .day
+                case 2:
+                    budgetTimeFrame = .week
+                    chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedMainBudget.startDate).weekday!
+                case 3:
+                    budgetTimeFrame = .month
+                    chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedMainBudget.startDate).day!
+                case 4:
+                    budgetTimeFrame = .year
+                    chosenDayYear = unwrappedEditedMainBudget.startDate
+                default:
+                    budgetTimeFrame = .week
                 }
 
-                if let unwrappedEditedMainBudget = toEditMainBudget {
-                    switch unwrappedEditedMainBudget.type {
-                    case 1:
-                        budgetTimeFrame = .day
-                    case 2:
-                        budgetTimeFrame = .week
-                        chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedMainBudget.startDate).weekday!
-                    case 3:
-                        budgetTimeFrame = .month
-                        chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedMainBudget.startDate).day!
-                    case 4:
-                        budgetTimeFrame = .year
-                        chosenDayYear = unwrappedEditedMainBudget.startDate
-                    default:
-                        budgetTimeFrame = .week
-                    }
+                padVM.price = unwrappedEditedMainBudget.amount
 
-                    padVM.price = unwrappedEditedMainBudget.amount
-
-                    if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        padVM.isEditingDecimal = true
-                        padVM.decimalValuesAssigned = .second
-                    }
+                if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
+                    padVM.isEditingDecimal = true
+                    padVM.decimalValuesAssigned = .second
+                }
 //                    let string = String(format: "%.2f", unwrappedEditedMainBudget.amount)
 //
 //                    var stringArray = string.compactMap { String($0) }
@@ -637,11 +639,11 @@ struct BrandNewBudgetView: View {
 //                    } else {
 //                        numbers1 = stringArray
 //                    }
-                } else {
-                    chosenDayWeek = firstWeekday
-                    chosenDayMonth = firstDayOfMonth
-                }
+            } else {
+                chosenDayWeek = firstWeekday
+                chosenDayMonth = firstDayOfMonth
             }
+
         }
         .sheet(isPresented: $showingCategoryView) {
                 NewCategoryAlert(income: Binding.constant(false), bottomSpacers: false, budgetMode: true)
@@ -653,7 +655,8 @@ struct BrandNewBudgetView: View {
         }
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
@@ -823,7 +826,7 @@ struct BrandNewBudgetView: View {
         formatter.locale = Locale.appLocale
         formatter.numberStyle = .ordinal
 
-        return formatter.string(from: number as NSNumber)!.replacingOccurrences(of: ".", with: "")
+        return formatter.string(from: number as NSNumber)!.replacing(".", with: "")
     }
 
     func getBudgetTypeInteger(_ budget: BudgetTimeFrame) -> Int {

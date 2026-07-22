@@ -273,9 +273,9 @@ struct LineGraphDataPoint: Equatable, Identifiable {
 
     var amountString: String {
         if abs(amount) < 1000 {
-            return String(format: "%.2f", amount)
+            return amount.formatted(.number.precision(.fractionLength(2)))
         } else {
-            return String(format: "%.0f", amount)
+            return amount.formatted(.number.precision(.fractionLength(0)))
         }
     }
 }

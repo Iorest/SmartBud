@@ -29,12 +29,6 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     public typealias Entry = InsightsWidgetEntry
 
-    static let container: ModelContainer = {
-        let schema = Schema([TransactionModel.self, CategoryModel.self])
-        let config = ModelConfiguration("MainModel", groupContainer: .identifier("group.com.iorest.smartbud"))
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
-
     func placeholder(in _: Context) -> InsightsWidgetEntry {
         let results = loadData(type: .week, income: true)
 
@@ -60,7 +54,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     func loadData(type: InsightsTimePeriod, income: Bool) -> (amount: Double, maximum: Double, average: Double, numberOfDays: Int, dates: [Date], dateDictionary: [Date: Double], categories: [HoldingCategory]) {
 //        let dataController = DataController()
-        let context = ModelContext(Self.container)
+        let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
         var cal = Calendar(identifier: .gregorian)
         cal.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
@@ -70,13 +64,19 @@ struct InsightsProvider: AppIntentTimelineProvider {
         switch type {
         case .week:
             let comps = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
-            startDate = cal.date(from: comps)!
+            guard let date = cal.date(from: comps) else {
+                return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
+            }
+            startDate = date
         case .month:
             let sday = UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
             startDate = getStartOfMonth(startDay: sday)
         case .year:
             let comps = cal.dateComponents([.year], from: now)
-            startDate = cal.date(from: comps)!
+            guard let date = cal.date(from: comps) else {
+                return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
+            }
+            startDate = date
         case .unknown:
             return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
         }
@@ -106,7 +106,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             var numberOfDays = 0
 
             for _ in 1 ... 7 {
-                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate)!
+                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate) ?? iterativeDate
 
                 let holding = transactions.filter {
                     $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
@@ -162,7 +162,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
                 lhs.percent > rhs.percent
             })
 
-            return (totalForWeek, maximum, totalForWeek / Double((numberOfDaysPast.day! + 1)), numberOfDays, dates, dictionary, holdingCat)
+            return (totalForWeek, maximum, totalForWeek / Double((numberOfDaysPast.day ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
         case .unknown:
             return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
         case .month:
@@ -178,7 +178,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             var numberOfDays = 0
 
             for _ in 1 ... range.count {
-                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate)!
+                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate) ?? iterativeDate
 
                 let holding = transactions.filter {
                     $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
@@ -234,7 +234,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
                 lhs.percent > rhs.percent
             })
 
-            return (totalForMonth, maximum, totalForMonth / Double((numDays.day! + 1)), numberOfDays, dates, dictionary, holdingCat)
+            return (totalForMonth, maximum, totalForMonth / Double((numDays.day ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
         case .year:
             // trackin dates
             var dates = [Date]()
@@ -248,7 +248,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             var numberOfDays = 0
 
             for _ in 1 ... 12 {
-                nextDate = calendar.date(byAdding: .month, value: 1, to: iterativeDate)!
+                nextDate = calendar.date(byAdding: .month, value: 1, to: iterativeDate) ?? iterativeDate
 
                 let holding = transactions.filter {
                     $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
@@ -304,7 +304,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
                 lhs.percent > rhs.percent
             })
 
-            return (totalForYear, maximum, totalForYear / Double((numDays.month! + 1)), numberOfDays, dates, dictionary, holdingCat)
+            return (totalForYear, maximum, totalForYear / Double((numDays.month ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
         }
     }
 }
@@ -357,9 +357,9 @@ struct InsightsWidgetEntryView: View {
 
     var dollarText: String {
         if entry.amount < 10000 && showCents {
-            return "\(String(format: "%.2f", entry.amount))"
+            return entry.amount.formatted(.number.precision(.fractionLength(2)))
         } else {
-            return "\(Int(round(entry.amount)))"
+            return Int(round(entry.amount)).formatted(.number)
         }
     }
 
@@ -375,7 +375,7 @@ struct InsightsWidgetEntryView: View {
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(format: String.appLocalized("in %@"), formatter.string(from: Date.now)).uppercased()
+            return String(localized: "in \\(formatter.string(from: Date.now))").uppercased()
         }
     }
 
@@ -441,7 +441,7 @@ struct InsightsWidgetEntryView: View {
                                                         .frame(height: proxy.size.height * 0.85)
 
                                                     RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-                                                        .frame(height: getBarHeight(point: entry.dictionary[day]!, size: proxy.size))
+                                                        .frame(height: getBarHeight(point: entry.dictionary[day] ?? 0, size: proxy.size))
                                                 }
 
                                                 Text(getWeekday(day: day).prefix(1))
@@ -462,7 +462,7 @@ struct InsightsWidgetEntryView: View {
                                                     .frame(height: proxy.size.height * 0.85)
 
                                                 Capsule()
-                                                    .frame(height: getBarHeight(point: entry.dictionary[day]!, size: proxy.size))
+                                                    .frame(height: getBarHeight(point: entry.dictionary[day] ?? 0, size: proxy.size))
                                                     .overlay(alignment: .bottom) {
                                                         if numberArray.contains((entry.dates.firstIndex(of: day) ?? -1) + 1) && firstDayOfMonth == 1 {
                                                             Text("\((entry.dates.firstIndex(of: day) ?? -1) + 1)")
@@ -488,7 +488,7 @@ struct InsightsWidgetEntryView: View {
                                                     .frame(height: proxy.size.height * 0.85)
 
                                                 RoundedRectangle(cornerRadius: 2.7, style: .continuous)
-                                                    .frame(height: getBarHeight(point: entry.dictionary[day]!, size: proxy.size))
+                                                    .frame(height: getBarHeight(point: entry.dictionary[day] ?? 0, size: proxy.size))
                                                     .overlay(alignment: .bottom) {
                                                         if monthNumberArray.contains((entry.dates.firstIndex(of: day) ?? -1) + 1) {
                                                             Text(LocalizedStringKey(monthNames[(entry.dates.firstIndex(of: day)! + 1)] ?? ""))
@@ -729,7 +729,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             } else {
-                Text(String(format: String.appLocalized("NO TRANSACTIONS\n%@"), subtitleText1))
+                Text(String(localized: "NO TRANSACTIONS\n\\(subtitleText1)"))
                     .font(.system(size: 10,
                                   weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)

@@ -20,6 +20,5 @@ struct SettingsSubviewModifier: ViewModifier {
             // own gradient here so the `glassCard` / `glassChip` surfaces
             // have colour to refract.
             .background(AppGlassBackground())
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }

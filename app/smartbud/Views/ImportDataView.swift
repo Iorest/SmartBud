@@ -541,7 +541,7 @@ struct ImportDataView: View {
                     }
                 } else if progress == 7 {
                     VStack(spacing: 10) {
-                        Text(String(format: String.appLocalized("%lld/^[%lld category](inflect: true) linked"), numberOfLinkedCategories, uniqueCategories.count))
+                        Text(String(localized: "\(numberOfLinkedCategories)/^[\(uniqueCategories.count) category](inflect: true) linked"))
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
 
 //                            .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -748,7 +748,8 @@ struct ImportDataView: View {
                                     }
 
                                     columnSelectionCompleted = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    Task { @MainActor in
+                                        try? await Task.sleep(for: .milliseconds(500))
                                         withAnimation {
                                             progress += 1
                                         }
@@ -823,14 +824,16 @@ struct ImportDataView: View {
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
         }
         .onChange(of: processingState) { _, newValue in
             if newValue == .success {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(1500))
                     dismiss()
                 }
             }
@@ -920,30 +923,27 @@ struct ImportDataView: View {
             uniquingKeysWith: { first, _ in first }
         )
 
-        rows.forEach { row in
-//            let rowCategory = categoryDictionary[row[categoryColumnIndex]]
-            if let transactionDate = dateFormatter.date(from: row[dateColumnIndex]) {
-                if let rowCategory = categoryDictionary[row[categoryColumnIndex]] {
-                    if let transactionAmount = Double(row[amountColumnIndex]) {
-                        transactionVM.create(note: row[noteColumnIndex], category: rowCategory, income: rowCategory.income, amount: abs(transactionAmount), date: transactionDate, repeatType: 0, repeatCoefficient: 1)
-                    } else {
-                        processingState = .error
-                        errorMessage = "Invalid values in amount column."
-                        return
-                    }
-                } else {
-                    processingState = .error
-                    errorMessage = "Error occurred while matching categories."
-                    return
-                }
-            } else {
+        for row in rows {
+            guard let transactionDate = dateFormatter.date(from: row[dateColumnIndex]) else {
                 processingState = .error
-                errorMessage = "Invalid dates in date column."
+                errorMessage = String.appLocalized("Invalid dates in date column.")
                 return
             }
+            guard let rowCategory = categoryDictionary[row[categoryColumnIndex]] else {
+                processingState = .error
+                errorMessage = String.appLocalized("Error occurred while matching categories.")
+                return
+            }
+            guard let transactionAmount = Double(row[amountColumnIndex]) else {
+                processingState = .error
+                errorMessage = String.appLocalized("Invalid values in amount column.")
+                return
+            }
+            transactionVM.create(note: row[noteColumnIndex], category: rowCategory, income: rowCategory.income, amount: abs(transactionAmount), date: transactionDate, repeatType: 0, repeatCoefficient: 1)
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
             withAnimation {
                 processingState = .success
                 confettiNumber += 1
@@ -1141,7 +1141,8 @@ struct MatchCategoryStepperView: View {
                 category = categoryInput
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(600))
                 withAnimation {
                     // remember to check for cap
                     if pageIndex < maxIndex - 1 {

@@ -41,7 +41,7 @@ struct IncomeCategoryQuery: EntityStringQuery {
         await MainActor.run {
             CategoryViewModel.shared.getAllCategories(income: true)
                 .filter {
-                    $0.wrappedName.localizedCaseInsensitiveContains(query) || $0.wrappedEmoji.localizedCaseInsensitiveContains(query)
+                    $0.wrappedName.localizedStandardContains(query) || $0.wrappedEmoji.localizedStandardContains(query)
                 }
                 .map {
                     IncomeCategoryEntity(id: $0.id, name: $0.wrappedName, emoji: $0.wrappedEmoji, income: $0.income)
@@ -103,7 +103,7 @@ struct ExpenseCategoryQuery: EntityStringQuery {
         await MainActor.run {
             CategoryViewModel.shared.getAllCategories(income: false)
                 .filter {
-                    $0.wrappedName.localizedCaseInsensitiveContains(query) || $0.wrappedEmoji.localizedCaseInsensitiveContains(query)
+                    $0.wrappedName.localizedStandardContains(query) || $0.wrappedEmoji.localizedStandardContains(query)
                 }
                 .map {
                     ExpenseCategoryEntity(id: $0.id, name: $0.wrappedName, emoji: $0.wrappedEmoji, income: $0.income)
@@ -161,7 +161,7 @@ struct BudgetQuery: EntityStringQuery {
         await MainActor.run {
             BudgetViewModel.shared.getAllBudgets()
                 .filter {
-                    $0.wrappedName.localizedCaseInsensitiveContains(query) || $0.wrappedEmoji.localizedCaseInsensitiveContains(query)
+                    $0.wrappedName.localizedStandardContains(query) || $0.wrappedEmoji.localizedStandardContains(query)
                 }
                 .map {
                     BudgetEntity(id: $0.id, name: $0.wrappedName, emoji: $0.wrappedEmoji)

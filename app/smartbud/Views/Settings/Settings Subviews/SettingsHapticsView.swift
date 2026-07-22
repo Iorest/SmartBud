@@ -13,7 +13,7 @@ struct SettingsHapticsView: View {
     var hapticType: Int = 1
     @Environment(\.dismiss) var dismiss
 
-    let options = ["None", "Subtle", "Excessive"]
+    let options = [String.appLocalized("None"), String.appLocalized("Subtle"), String.appLocalized("Excessive")]
 
     @Namespace var animation
 
@@ -27,7 +27,7 @@ struct SettingsHapticsView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Text("Haptic Feedback")
+            Text(String.appLocalized("Haptic Feedback"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity)
@@ -48,7 +48,7 @@ struct SettingsHapticsView: View {
                         }
                     } label: {
                         HStack {
-                            Text(LocalizedStringKey(options[option]))
+                            Text(options[option])
                                 .font(.system(.body, design: .rounded))
                                 .foregroundStyle(Color.PrimaryText)
 
@@ -81,7 +81,7 @@ struct SettingsHapticsView: View {
             .offset(x: shake ? -5 : 5)
             .offset(x: alternateShake ? 0 : -5)
 
-            Text("The 'Excessive' mode makes the entire numpad haptic.")
+            Text(String.appLocalized("The 'Excessive' mode makes the entire numpad haptic."))
                 .font(.system(.caption, design: .rounded).weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
                 .padding(.horizontal, 15)
@@ -98,7 +98,8 @@ struct SettingsHapticsView: View {
                 withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
                     shake = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
                     withAnimation(.easeInOut(duration: 0.1)) {
                         shake = false
                         alternateShake = false
@@ -110,7 +111,8 @@ struct SettingsHapticsView: View {
                 withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
                     wordShake = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
                     withAnimation(.easeInOut(duration: 0.1)) {
                         wordShake = false
                     }

@@ -20,7 +20,7 @@ struct SettingsCurrencyView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Currencies")
+      Text(String.appLocalized("Currencies"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -33,7 +33,7 @@ struct SettingsCurrencyView: View {
         }
         .padding(.bottom, 10)
 
-      ScrollView(showsIndicators: false) {
+      ScrollView {
         ScrollViewReader { value in
           VStack(spacing: 0) {
             ForEach(currencies, id: \.self) { currency in
@@ -44,7 +44,8 @@ struct SettingsCurrencyView: View {
 
                 NSUbiquitousKeyValueStore.default.set(currency.code, forKey: "currency")
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                Task { @MainActor in
+                  try? await Task.sleep(for: .milliseconds(400))
                   dismiss()
                 }
               } label: {
@@ -93,6 +94,7 @@ struct SettingsCurrencyView: View {
           }
         }
       }
+      .scrollIndicators(.hidden)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     .modifier(SettingsSubviewModifier())

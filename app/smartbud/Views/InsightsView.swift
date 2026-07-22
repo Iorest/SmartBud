@@ -297,22 +297,15 @@ struct InsightsView: View {
     }
 
     private func format(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currency
-        formatter.maximumFractionDigits = showCents ? 2 : 0
-        return formatter.string(from: NSNumber(value: abs(amount))) ?? "0"
+        abs(amount).formatted(
+            .currency(code: currency)
+                .precision(.fractionLength(showCents ? 2 : 0))
+        )
     }
 
     private func sectionAmountString(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currency
-        formatter.maximumFractionDigits = showCents ? 2 : 0
         let sign = amount >= 0 ? "+" : "-"
-        return "\(sign)\(formatter.string(from: NSNumber(value: abs(amount))) ?? "0")"
+        return "\(sign)\(format(amount))"
     }
 
     private func sectionAmountColor(_ amount: Double) -> Color {
@@ -400,19 +393,15 @@ private struct InsightsTransactionRow: View {
     }
 
     private var amountString: String {
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currencySymbol == "$" ? "USD" : currencySymbol
-        formatter.maximumFractionDigits = showCents ? 2 : 0
-        let base = formatter.string(from: NSNumber(value: abs(transaction.amount))) ?? "0"
+        let base = abs(transaction.amount).formatted(
+            .currency(code: currencySymbol == "$" ? "USD" : currencySymbol)
+                .precision(.fractionLength(showCents ? 2 : 0))
+        )
         return transaction.income ? "+\(base)" : "-\(base)"
     }
 
     private func timeLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "j:mm", options: 0, locale: .current) ?? "h:mm a"
-        return formatter.string(from: date)
+        date.formatted(date: .omitted, time: .shortened)
     }
 }
 

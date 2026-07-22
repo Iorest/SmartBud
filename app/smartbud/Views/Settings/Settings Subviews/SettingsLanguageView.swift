@@ -41,7 +41,8 @@ struct SettingsLanguageView: View {
                         withAnimation(.easeIn(duration: 0.15)) {
                             appLanguage = code
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(300))
                             dismiss()
                         }
                     } label: {

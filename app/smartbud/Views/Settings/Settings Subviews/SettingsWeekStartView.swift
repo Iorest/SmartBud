@@ -15,7 +15,7 @@ struct SettingsWeekStartView: View {
   var firstDayOfMonth: Int = 1
   @Environment(\.dismiss) var dismiss
 
-  let options = ["Sunday", "Monday"]
+  let options = [String.appLocalized("Sunday"), String.appLocalized("Monday")]
 
   @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
@@ -48,7 +48,7 @@ struct SettingsWeekStartView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text("Time Frames")
+      Text(String.appLocalized("Time Frames"))
         .font(.system(.title3, design: .rounded).weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
@@ -61,7 +61,7 @@ struct SettingsWeekStartView: View {
         }
         .padding(.bottom, 20)
 
-      Text("Start of Week")
+      Text(String.appLocalized("Start of Week"))
         .font(.system(.body, design: .rounded).weight(.medium))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
@@ -70,18 +70,16 @@ struct SettingsWeekStartView: View {
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { option in
           Button {
-            DispatchQueue.main.async {
-              withAnimation(.easeIn(duration: 0.15)) {
-                firstWeekday = (option + 1)
-              }
+            withAnimation(.easeIn(duration: 0.15)) {
+              firstWeekday = (option + 1)
             }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            Task { @MainActor in
+              try? await Task.sleep(for: .milliseconds(400))
               dismiss()
             }
           } label: {
             HStack {
-              Text(LocalizedStringKey(options[option]))
+              Text(options[option])
                 .font(.system(.body, design: .rounded))
                 .foregroundStyle(Color.PrimaryText)
 
@@ -112,7 +110,7 @@ struct SettingsWeekStartView: View {
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
       .padding(.bottom, 30)
 
-      Text("Start of Month")
+      Text(String.appLocalized("Start of Month"))
         .font(.system(.body, design: .rounded).weight(.medium))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)
@@ -123,19 +121,17 @@ struct SettingsWeekStartView: View {
           VStack(alignment: .leading, spacing: 0) {
             ForEach(1..<29) { day in
               Button {
-                DispatchQueue.main.async {
-                  withAnimation(.easeIn(duration: 0.15)) {
-                    firstDayOfMonth = day
-                  }
+                withAnimation(.easeIn(duration: 0.15)) {
+                  firstDayOfMonth = day
                 }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                Task { @MainActor in
+                  try? await Task.sleep(for: .milliseconds(400))
                   dismiss()
                 }
               } label: {
                 HStack {
                   Text(
-                    String(format: String.appLocalized("%@ of month"), getOrdinal(day))
+                    String(localized: "\(getOrdinal(day)) of month")
                   )
                     .font(.system(.body, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
@@ -174,7 +170,7 @@ struct SettingsWeekStartView: View {
       .frame(height: scrollViewHeight)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
 
-      Text("Close and reload app for change to take effect.")
+      Text(String.appLocalized("Close and reload app for change to take effect."))
         .font(.system(.caption, design: .rounded).weight(.medium))
         .foregroundStyle(Color.SubtitleText)
         .padding(.horizontal, 15)

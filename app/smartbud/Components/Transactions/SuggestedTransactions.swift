@@ -17,11 +17,14 @@ struct SuggestedTransactions: View {
     var suggestedTransactions: [TransactionModel]
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        ScrollView(.horizontal) {
             HStack(spacing: 8) {
                 ForEach(suggestedTransactions, id: \.self) { transaction in
                     Button {
-                        let string = String(format: "%.2f", transaction.wrappedAmount)
+                        let string = transaction.wrappedAmount.formatted(
+                            .number.locale(Locale(identifier: "en_US_POSIX"))
+                                .precision(.fractionLength(2))
+                        )
                         var stringArray = string.compactMap { String($0) }
                         note = transaction.wrappedNote
 
@@ -70,6 +73,7 @@ struct SuggestedTransactions: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
         .padding(.bottom, 5)
     }
 }

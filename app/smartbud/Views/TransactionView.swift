@@ -154,7 +154,7 @@ struct TransactionView: View {
     var dateDisplayText: some View {
         let dateStr = getDateString(date: date)
         if isDateToday(date: date) {
-            Text(String(format: String.appLocalized("Today, %@"), dateStr))
+            Text(String(localized: "Today, \(dateStr)"))
                 .lineLimit(1)
         } else {
             Text(dateStr)
@@ -460,7 +460,8 @@ struct TransactionView: View {
     }
 
     func handleDateChanged() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
             showingDatePicker = false
         }
 
@@ -925,7 +926,8 @@ struct TransactionView: View {
         .ignoresSafeArea(.all)
         .onChange(of: showToast) { _, newValue in
             if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
                     showToast = false
                 }
             }
@@ -1039,7 +1041,8 @@ struct TransactionView: View {
             withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
                 shake = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(500))
                 withAnimation(.easeInOut(duration: 0.1)) {
                     shake = false
                 }
@@ -1319,7 +1322,8 @@ struct RecurringPickerView: View {
                             repeatCoefficient = 1
                         }
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(400))
                             showMenu = false
                         }
                     }
@@ -1381,7 +1385,8 @@ struct RecurringPickerView: View {
             .onChange(of: showPicker) { _, newValue in
                 // holdingType != repeatType || holdingCoefficient != repeatCoefficient
                 if !newValue {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .milliseconds(400))
                         showMenu = false
                     }
                 }
@@ -1531,11 +1536,11 @@ struct CustomRecurringView: View {
 
                     Group {
                         if holdingType == 1 {
-                            Text(String(format: String.appLocalized("%lld days"), holdingCoefficient))
+                            Text(String(localized: "^[\(holdingCoefficient) days](inflect: true)"))
                         } else if holdingType == 2 {
-                            Text(String(format: String.appLocalized("%lld weeks"), holdingCoefficient))
+                            Text(String(localized: "^[\(holdingCoefficient) weeks](inflect: true)"))
                         } else if holdingType == 3 {
-                            Text(String(format: String.appLocalized("%lld months"), holdingCoefficient))
+                            Text(String(localized: "^[\(holdingCoefficient) months](inflect: true)"))
                         }
                     }
                     .font(.system(size: 23, weight: .medium, design: .rounded))

@@ -24,7 +24,7 @@ struct NewCategoryPickerView: View {
     ]
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
+        ScrollView {
             LazyVGrid(columns: layout, spacing: 10) {
                 ForEach(categories) { item in
                     Button {
@@ -32,7 +32,8 @@ struct NewCategoryPickerView: View {
                             category = item
                         }
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(500))
                             withAnimation {
                                 showPicker = false
                             }
@@ -72,6 +73,7 @@ struct NewCategoryPickerView: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
         .keyboardAwareHeight(showToolbar: false)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .overlay(alignment: .bottom) {

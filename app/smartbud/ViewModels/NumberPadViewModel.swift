@@ -59,19 +59,19 @@ final class NumberPadViewModel {
     var amountString: String {
         let mode = NumberEntryMode(rawValue: numberEntryType) ?? .preDotted
         if mode == .preDotted {
-            return String(format: "%.2f", price)
+            return price.formatted(.number.precision(.fractionLength(2)))
         }
         if isEditingDecimal {
             switch decimalValuesAssigned {
             case .none:
-                return String(format: "%.0f", price) + "."
+                return price.formatted(.number.precision(.fractionLength(0))) + "."
             case .first:
-                return String(format: "%.1f", price)
+                return price.formatted(.number.precision(.fractionLength(1)))
             case .second:
-                return String(format: "%.2f", price)
+                return price.formatted(.number.precision(.fractionLength(2)))
             }
         }
-        return String(format: "%.0f", price)
+        return price.formatted(.number.precision(.fractionLength(0)))
     }
 
     /// True while the user is editing cents; `NumberPadTextView` uses this to
