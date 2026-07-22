@@ -90,7 +90,7 @@ struct SettingsAppIconView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 70, height: 70)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .clipShape(RoundedRectangle(cornerRadius: GlassRadius.card))
                 .shadow(color: .black.opacity(0.15), radius: 5, x: 5, y: 5)
                 .accessibilityHidden(true)
 
@@ -131,7 +131,7 @@ struct SettingsAppIconView: View {
         }
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
       .onChange(of: activeIcon) { _, newValue in
         UIApplication.shared.setAlternateIconName(newValue == "AppIcon" ? nil : newValue)
       }

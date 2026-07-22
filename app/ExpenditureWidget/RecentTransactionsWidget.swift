@@ -281,7 +281,7 @@ struct ExpenditureWidgetEntryView: View {
                             }
                             .padding(.vertical, 5)
                             .frame(maxWidth: .infinity)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.SecondaryBackground))
+                            .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(Color.SecondaryBackground))
                             .frame(maxHeight: .infinity, alignment: .bottom)
                         }
                         .padding(.top, 12)
@@ -331,7 +331,7 @@ struct ExpenditureWidgetEntryView: View {
                                 }
                                 .padding(.vertical, 5)
                                 .frame(maxWidth: .infinity)
-                                .background(RoundedRectangle(cornerRadius: 8).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(Color.SecondaryBackground))
                                 .frame(maxHeight: .infinity, alignment: .bottom)
                             }
                         }
@@ -381,7 +381,7 @@ struct ExpenditureWidgetEntryView: View {
                                 }
                                 .padding(.vertical, 6)
                                 .frame(width: 200)
-                                .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous).fill(Color.SecondaryBackground))
                             }
                         }
                         .frame(maxHeight: .infinity)
@@ -394,7 +394,7 @@ struct ExpenditureWidgetEntryView: View {
 
                             ForEach(entry.transactions, id: \.self) { transaction in
                                 HStack(spacing: 8) {
-                                    RoundedRectangle(cornerRadius: 5)
+                                    RoundedRectangle(cornerRadius: GlassRadius.chip)
                                         .fill(Color(hex: transaction.colour))
                                         .frame(width: 15, height: 15)
 
@@ -432,7 +432,7 @@ struct ExpenditureWidgetEntryView: View {
                                     }
                                     .padding(.vertical, 6)
                                     .frame(width: 200)
-                                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.SecondaryBackground))
+                                    .background(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous).fill(Color.SecondaryBackground))
                                 }
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                             }

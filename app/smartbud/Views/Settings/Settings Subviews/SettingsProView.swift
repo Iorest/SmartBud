@@ -46,7 +46,7 @@ struct SettingsProView: View {
                 Spacer()
             }
             .overlay(alignment: .center) {
-                Text(String.appLocalized("SmartBud Pro"))
+                Text(String.appLocalized(SettingsKey.proTitle))
                     .font(.system(.title3, design: .rounded).weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
             }
@@ -123,7 +123,7 @@ struct SettingsProView: View {
                         .font(.system(.body, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(width: 36, height: 36)
-                        .background(Color(feature.color), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .background(Color(feature.color), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(LocalizedStringKey(feature.title))
                             .font(.system(.body, design: .rounded).weight(.semibold))
@@ -141,7 +141,7 @@ struct SettingsProView: View {
                 }
             }
         }
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card))
     }
 
     @ViewBuilder
@@ -158,7 +158,7 @@ struct SettingsProView: View {
             }
             .padding(20)
             .frame(maxWidth: .infinity)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 12))
+            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card))
         } else {
             VStack(spacing: 12) {
                 ForEach(loadedProducts) { product in

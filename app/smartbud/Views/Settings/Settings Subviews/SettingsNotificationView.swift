@@ -18,6 +18,7 @@ struct SettingsNotificationsView: View {
   var notificationsEnabled: Bool = true
   @AppStorage("notificationOption", store: .appGroup)
   var option: Int = 1
+
   @State var customTime = Date.now
 
   var center = UNUserNotificationCenter.current()
@@ -108,7 +109,7 @@ struct SettingsNotificationsView: View {
         .accessibilityAddTraits(showNotifications ? [.isButton, .isSelected] : .isButton)
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
       .padding(.bottom, 20)
 
       if showNotifications {
@@ -207,7 +208,7 @@ struct SettingsNotificationsView: View {
           .accessibilityAddTraits(option == 3 ? [.isButton, .isSelected] : .isButton)
         }
         .padding(.horizontal, 15)
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
         .onChange(of: option) { _, newValue in
           if newValue == 3 {
             let components = Calendar.current.dateComponents([.hour, .minute], from: customTime)

@@ -15,48 +15,54 @@
 //  Keep using `Locale.current` for the *device's actual currency*
 //  (`Locale.current.currency?.identifier`) — that is not a language concern.
 //
-//  ## Why child bundles
+//  ## Why explicit `localizations:` on Bundle.main
 //
-//  `String(localized:defaultValue:table:bundle:locale:comment:)` accepts an
-//  explicit `locale:` but in practice resolves through the *bundle's*
-//  `preferredLocalizations` array, which is fixed at app launch and
-//  dominated by `Locale.current` (the device locale). Passing
-//  `Locale(identifier: "en")` does not redirect the lookup. So the only
-//  way to get an English string for an in-app language override on iOS 26
-//  is to look it up in a *child bundle* rooted at `<app>/en.lproj/`, whose
-//  own `preferredLocalizations` is just `["en"]`. The Xcode build emits one
-//  `.lproj` directory per locale listed in the String Catalog, so we can
-//  resolve them with `Bundle(path: …lproj)` and look up via
-//  `Bundle.localizedString(forKey:value:table:)` (or, for
-//  `String.LocalizationValue` keys, via the matching
-//  `String(localized:bundle:)` overload, which honours the bundle's
-//  `preferredLocalizations`).
+//  An earlier design used `Bundle(path: "<app>/en.lproj")` as a "child
+//  bundle" for in-app English lookups, and an even earlier one swizzled
+//  the main bundle's `localizedString(forKey:value:table:)` (iOS 26 ABI
+//  crash 2026-07-20). Both were wrong: a child bundle built from an
+//  `.lproj` directory has no `Info.plist`, so its `localizations` is
+//  empty and its lookup falls back to the parent main bundle's
+//  `preferredLocalizations`, which is dominated by the **device** locale
+//  (e.g. zh-Hans). Result: in-app English still resolved to the device's
+//  Chinese translations — the same bug now reproduced on iOS 26.5.
+//
+//  `String(localized:locale:)` has the same problem: the `locale:` arg
+//  is honoured only when it can be satisfied by the receiver bundle's
+//  `localizations` list, and that list on a child `.lproj` bundle is
+//  effectively "follow the device's preferredLocalizations".
+//
+//  The working pattern is to call
+//  `Bundle.main.localizedString(forKey:value:table:localizations:)` with
+//  an explicit list of preferred language codes:
+//    1. the in-app pick (e.g. `"en"` or `"zh-Hans"`),
+//    2. the source language (`"en"`) as a safety net for source keys,
+//    3. the device's `preferredLocalizations` for any key only present
+//       in some other locale (e.g. zh-Hant on a zh-Hans device).
+//  Foundation's localization engine picks the first match against the
+//  main bundle's `localizations = ["zh-Hans", "en", "Base", "zh-Hant"]`,
+//  so passing `["en", "zh-Hans", ...]` is enough to force English
+//  regardless of device locale.
 //
 
 import Foundation
 
-/// Languages with a compiled `.lproj` directory in the app bundle.
+/// Languages with a compiled `.lproj` directory in the app bundle. The
+/// `appSupportedLanguageCodes` list used to gate `appChildBundle`; the
+/// child-bundle mechanism is gone, but this constant stays as the source
+/// of truth for "what languages the String Catalog compiles for".
 private let appSupportedLanguageCodes: [String] = ["en", "zh-Hans", "zh-Hant"]
 
-/// One-time lookup of child `Bundle`s rooted at each `<app>/<code>.lproj`.
-/// `nil` entries mean the `.lproj` is missing for that code; the caller
-/// should then fall back to the main bundle (which uses the device locale).
-private let appChildBundleCache: [String: Bundle] = {
-    var result: [String: Bundle] = [:]
-    for code in appSupportedLanguageCodes {
-        if let path = Bundle.main.path(forResource: code, ofType: "lproj"),
-           let bundle = Bundle(path: path) {
-            result[code] = bundle
-        }
-    }
-    return result
-}()
+/// Languages the in-app language picker can set `appLanguage` to. The
+/// empty string `""` means "follow system locale".
+private let appLanguageCodeCandidates: [String] = ["", "en", "zh-Hans", "zh-Hant"]
 
-/// Return the child bundle for the in-app language code, or `nil` if the
-/// code is empty (`""` = follow system) or has no compiled `.lproj`.
-private func appChildBundle(forLanguageCode code: String) -> Bundle? {
-    guard !code.isEmpty else { return nil }
-    return appChildBundleCache[code]
+/// Resolves the active in-app language code. An unknown value (e.g.
+/// a stale entry from a previous app version) is normalised to `""`
+/// (Follow system) rather than passed through.
+private func resolvedAppLanguageCode() -> String {
+    let raw = UserDefaults.appGroup.string(forKey: AppDefaultsKey.appLanguage) ?? ""
+    return appLanguageCodeCandidates.contains(raw) ? raw : ""
 }
 
 extension Locale {
@@ -68,7 +74,7 @@ extension Locale {
     /// accessor is the bridge for non-SwiftUI code paths (formatters,
     /// currency-symbol lookups) that can't read the `\.locale` environment.
     static var appLocale: Locale {
-        let code = UserDefaults.appGroup.string(forKey: AppDefaultsKey.appLanguage) ?? ""
+        let code = resolvedAppLanguageCode()
         return code.isEmpty ? Locale.current : Locale(identifier: code)
     }
 
@@ -88,16 +94,36 @@ extension Locale {
     }
 }
 
+/// Builds the ordered list of `Locale.Language` values that the
+/// `Bundle.main.localizedString(...localizations:)` API uses to pick
+/// which `.lproj` to read from.
+///
+/// Order matters: Foundation picks the first localization in this list
+/// that is present in the main bundle's `localizations` array. So the
+/// in-app language is always tried first, then the source language
+/// (`en`) as a safety net, then the device's preferred localizations so
+/// that a zh-Hant user on a zh-Hans device still finds zh-Hant strings
+/// for any key that hasn't been translated into the in-app language.
+private func appLookupLanguages(forAppLanguageCode code: String) -> [Locale.Language] {
+    let devicePreferred = Bundle.main.preferredLocalizations.map { Locale.Language(identifier: $0) }
+    if code.isEmpty {
+        // Follow system: device preferred only, in the order the user
+        // configured on the device.
+        return devicePreferred
+    }
+    // Explicit in-app language: user pick first, then en, then device
+    // preferred (deduped, source en kept in the middle as a safety net).
+    var langs: [Locale.Language] = [Locale.Language(identifier: code), Locale.Language(identifier: "en")]
+    for lang in devicePreferred where !langs.contains(lang) {
+        langs.append(lang)
+    }
+    return langs
+}
+
 extension String {
     /// In-app language-aware replacement for `String(localized:)`. Resolves
     /// through the user's `appLanguage` pick (UserDefaults.appGroup), falling
     /// back to the device locale when "Follow system" is chosen.
-    ///
-    /// Replaces the Bundle swizzle that lived in `LanguageBundle.swift` and
-    /// the prior `String(localized:locale:)` form (whose `locale:` argument
-    /// is ignored on iOS 26 when the bundle's `preferredLocalizations` is
-    /// fixed at launch). Looks up the key in a per-language child bundle so
-    /// the result actually matches the user's pick.
     ///
     /// The `key` parameter is `StaticString` so that existing
     /// `String(localized: "key")` call sites — which currently pass a string
@@ -110,35 +136,50 @@ extension String {
         bundle: Bundle? = nil,
         comment: StaticString? = nil
     ) -> String {
-        let code = UserDefaults.appGroup.string(forKey: AppDefaultsKey.appLanguage) ?? ""
         let keyString = key.withUTF8Buffer { String(decoding: $0, as: UTF8.self) }
-        let target = appChildBundle(forLanguageCode: code) ?? bundle ?? .main
-        return target.localizedString(forKey: keyString, value: keyString, table: table)
+        let code = resolvedAppLanguageCode()
+        let target = bundle ?? .main
+        let languages = appLookupLanguages(forAppLanguageCode: code)
+        return target.localizedString(forKey: keyString, value: keyString, table: table, localizations: languages)
+    }
+
+    /// Overload for runtime String keys (e.g. `SettingsKey.rowCurrency`).
+    /// `StaticString` can't be created from a non-literal, so call sites
+    /// that pass a String constant need this entry point. The implementation
+    /// is identical to the StaticString overload — the StaticString
+    /// parameter only exists to keep zero-cost literal semantics at
+    /// `String.appLocalized("literal")` sites.
+    static func appLocalized(
+        _ key: String,
+        table: String? = nil,
+        bundle: Bundle? = nil
+    ) -> String {
+        let code = resolvedAppLanguageCode()
+        let target = bundle ?? .main
+        let languages = appLookupLanguages(forAppLanguageCode: code)
+        return target.localizedString(forKey: key, value: key, table: table, localizations: languages)
     }
 
     /// Overload for `String(appLocalized: "...\(var)...")`-style call sites
-    /// that interpolate runtime values into the key. `StaticString` cannot
-    /// carry interpolation, so the interpolated form must go through
-    /// `String.LocalizationValue`, matching the
-    /// `String(localized:String.LocalizationValue, …)` Foundation overload.
+    /// that wrap a String in `String.LocalizationValue`. Kept for parity
+    /// with the original Foundation-style API; current call sites all
+    /// pass plain Strings via the overload above. Uses `Mirror` to extract
+    /// the underlying string, because `String.LocalizationValue` does not
+    /// expose its storage as a public `value` property in this Swift
+    /// version and `"\(key)"` returns the struct's debug description
+    /// (e.g. `"LocalizationValue(arguments: [])"`).
     static func appLocalized(
         _ key: String.LocalizationValue,
         table: String? = nil,
         bundle: Bundle? = nil,
         comment: StaticString? = nil
     ) -> String {
-        let code = UserDefaults.appGroup.string(forKey: AppDefaultsKey.appLanguage) ?? ""
-        let target = appChildBundle(forLanguageCode: code) ?? bundle ?? .main
-        let result = String(
-            localized: key,
-            table: table,
-            bundle: target,
-            comment: comment
-        )
-        let keyString = "\(key)"
-        if keyString == "Currency" || keyString == "Time Frames" || keyString == "App Icon" || keyString == "Notifications" || keyString == "Theme" {
-            NSLog("[appLocalized LV] key=%@ appLanguage=%@ bundle=%@ result=%@", keyString, code, target.bundlePath, result)
-        }
-        return result
+        let keyString = Mirror(reflecting: key).children
+            .first(where: { $0.label == "value" || $0.label == "_value" })
+            .map { "\($0.value)" } ?? ""
+        let code = resolvedAppLanguageCode()
+        let target = bundle ?? .main
+        let languages = appLookupLanguages(forAppLanguageCode: code)
+        return target.localizedString(forKey: keyString, value: keyString, table: table, localizations: languages)
     }
 }

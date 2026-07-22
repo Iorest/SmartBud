@@ -40,11 +40,11 @@ struct SettingsView: View {
   var colourScheme: Int = 0
   var colourSchemeString: String {
     if colourScheme == 1 {
-      return String.appLocalized("Light")
+      return String.appLocalized(SettingsKey.themeLight)
     } else if colourScheme == 2 {
-      return String.appLocalized("Dark")
+      return String.appLocalized(SettingsKey.themeDark)
     } else {
-      return String.appLocalized("System")
+      return String.appLocalized(SettingsKey.themeSystem)
     }
   }
 
@@ -57,14 +57,14 @@ struct SettingsView: View {
   var activeIcon: String = "AppIcon"
   var appIconString: String {
     switch activeIcon {
-    case "AppIcon":  return String.appLocalized("Deep Sea · 深青")
-    case "AppIcon1": return String.appLocalized("Midnight · 紫袋辉光")
-    case "AppIcon2": return String.appLocalized("Plum · 紫袋")
-    case "AppIcon3": return String.appLocalized("Indigo · 深紫")
-    case "AppIcon4": return String.appLocalized("Sky · 浅蓝")
-    case "AppIcon5": return String.appLocalized("Sunset · 黄昏")
-    case "AppIcon6": return String.appLocalized("Aqua · 浅青辉光")
-    default:         return String.appLocalized("Deep Sea · 深青")
+    case "AppIcon":  return String.appLocalized(SettingsKey.iconDeepSea)
+    case "AppIcon1": return String.appLocalized(SettingsKey.iconMidnight)
+    case "AppIcon2": return String.appLocalized(SettingsKey.iconPlum)
+    case "AppIcon3": return String.appLocalized(SettingsKey.iconIndigo)
+    case "AppIcon4": return String.appLocalized(SettingsKey.iconSky)
+    case "AppIcon5": return String.appLocalized(SettingsKey.iconSunset)
+    case "AppIcon6": return String.appLocalized(SettingsKey.iconAqua)
+    default:         return String.appLocalized(SettingsKey.iconDeepSea)
     }
   }
 
@@ -72,9 +72,9 @@ struct SettingsView: View {
   var firstWeekday: Int = 1
   var firstWeekdayString: String {
     if firstWeekday == 1 {
-      return String.appLocalized("Sunday")
+      return String.appLocalized(SettingsKey.weekdaySunday)
     } else {
-      return String.appLocalized("Monday")
+      return String.appLocalized(SettingsKey.weekdayMonday)
     }
   }
 
@@ -85,14 +85,14 @@ struct SettingsView: View {
   var notificationString: String {
     if showNotifications {
       if option == 1 {
-        return String.appLocalized("Mornings")
+        return String.appLocalized(SettingsKey.notificationMornings)
       } else if option == 2 {
-        return String.appLocalized("Evenings")
+        return String.appLocalized(SettingsKey.notificationEvenings)
       } else {
-        return String.appLocalized("Custom")
+        return String.appLocalized(SettingsKey.notificationCustom)
       }
     } else {
-      return String.appLocalized("Off")
+      return String.appLocalized(SettingsKey.toggleOff)
     }
   }
 
@@ -101,9 +101,9 @@ struct SettingsView: View {
 
   var iCloudString: String {
     if NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-      return String.appLocalized("On")
+      return String.appLocalized(SettingsKey.toggleOn)
     } else {
-      return String.appLocalized("Off")
+      return String.appLocalized(SettingsKey.toggleOff)
     }
   }
 
@@ -117,9 +117,9 @@ struct SettingsView: View {
 
   var numberEntryString: String {
     if numberEntryType == 1 {
-      return String.appLocalized("Type 1")
+      return String.appLocalized(SettingsKey.numberEntryType1)
     } else {
-      return String.appLocalized("Type 2")
+      return String.appLocalized(SettingsKey.numberEntryType2)
     }
   }
 
@@ -144,9 +144,9 @@ struct SettingsView: View {
 
   var upcomingString: String {
     if showUpcoming {
-      return String.appLocalized("Shown")
+      return String.appLocalized(SettingsKey.upcomingShown)
     } else {
-      return String.appLocalized("Hidden")
+      return String.appLocalized(SettingsKey.upcomingHidden)
     }
   }
 
@@ -155,11 +155,11 @@ struct SettingsView: View {
 
     var hapticString: String {
       if hapticType == 0 {
-        return String.appLocalized("None")
+        return String.appLocalized(SettingsKey.hapticsNone)
       } else if hapticType == 1 {
-        return String.appLocalized("Subtle")
+        return String.appLocalized(SettingsKey.hapticsSubtle)
       } else {
-        return String.appLocalized("Excessive")
+        return String.appLocalized(SettingsKey.hapticsExcessive)
       }
     }
 
@@ -194,7 +194,7 @@ struct SettingsView: View {
       NavigationStack {
       VStack {
         HStack {
-          Text(String.appLocalized("Settings"))
+          Text(String.appLocalized(SettingsKey.title))
             .font(.system(.title, design: .rounded).weight(.semibold))
 
             //                        .font(.system(size: 25, weight: .semibold, design: .rounded))
@@ -207,7 +207,7 @@ struct SettingsView: View {
 
         ScrollView {
           VStack(spacing: 5) {
-            Text(String.appLocalized("PRO"))
+            Text(String.appLocalized(SettingsKey.sectionPro))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
               .foregroundStyle(Color.SubtitleText)
               .padding(.horizontal, 10)
@@ -224,10 +224,10 @@ struct SettingsView: View {
                       height: dynamicTypeSize > .xLarge ? 40 : 30,
                       alignment: .center
                     )
-                    .background(Color("200"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .background(Color("200"), in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
 
                   VStack(alignment: .leading, spacing: 2) {
-                    Text(String.appLocalized("SmartBud Pro"))
+                    Text(String.appLocalized(SettingsKey.proTitle))
                       .font(.system(.body, design: .rounded).weight(.semibold))
                       .foregroundStyle(Color.PrimaryText)
                       .lineLimit(1)
@@ -257,7 +257,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text(String.appLocalized("GENERAL"))
+            Text(String.appLocalized(SettingsKey.sectionGeneral))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -269,31 +269,37 @@ struct SettingsView: View {
 
               NavigationLink(value: SettingsRoute.notifications) {
                 SettingsRowView(
-                  systemImage: "bell.fill", title: "Notifications", colour: 102,
+                  systemImage: "bell.fill",
+                  title: SettingsKey.rowNotifications,
+                  colour: 102,
                   optionalText: notificationString)
               }
 
               NavigationLink(value: SettingsRoute.currency) {
                 SettingsRowView(
-                  systemImage: "coloncurrencysign.square.fill", title: "Currency", colour: 103,
+                  systemImage: "coloncurrencysign.square.fill",
+                  title: SettingsKey.rowCurrency,
+                  colour: 103,
                   optionalText: currency)
               }
 
               NavigationLink(value: SettingsRoute.numberEntry) {
                 SettingsRowView(
-                  systemImage: "keyboard.fill", title: "Number Entry", colour: 104,
+                  systemImage: "keyboard.fill",
+                  title: SettingsKey.rowNumberEntry,
+                  colour: 104,
                   optionalText: numberEntryString)
               }
 
               ToggleRow(
-                icon: "faceid", color: "105", text: "Authentication",
+                icon: "faceid", color: "105", text: SettingsKey.rowAuthentication,
                 bool: appLockVM.isAppLockEnabled,
                 onTap: {
                   appLockVM.appLockStateChange(appLockState: !appLockVM.isAppLockEnabled)
                 })
 
               ToggleRow(
-                icon: "banknote.fill", color: "106", text: "Income Tracking", bool: incomeTracking,
+                icon: "banknote.fill", color: "106", text: SettingsKey.rowIncomeTracking, bool: incomeTracking,
                 onTap: {
                   incomeTracking.toggle()
 
@@ -306,7 +312,10 @@ struct SettingsView: View {
                 })
 
               NavigationLink(value: SettingsRoute.weekStart) {
-                SettingsRowView(systemImage: "calendar", title: "Time Frames", colour: 109)
+                SettingsRowView(
+                  systemImage: "calendar",
+                  title: SettingsKey.rowTimeFrames,
+                  colour: 109)
               }
 
             }
@@ -329,7 +338,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text(String.appLocalized("APPEARANCE"))
+            Text(String.appLocalized(SettingsKey.sectionAppearance))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -340,42 +349,50 @@ struct SettingsView: View {
             VStack(spacing: 13) {
               NavigationLink(value: SettingsRoute.appearance) {
                 SettingsRowView(
-                  systemImage: "circle.righthalf.filled", title: "Theme", colour: 100,
+                  systemImage: "circle.righthalf.filled",
+                  title: SettingsKey.rowTheme,
+                  colour: 100,
                   optionalText: colourSchemeString)
               }
 
               NavigationLink(value: SettingsRoute.appIcon) {
                 SettingsRowView(
-                  systemImage: "app.badge.fill", title: "App Icon", colour: 101,
+                  systemImage: "app.badge.fill",
+                  title: SettingsKey.rowAppIcon,
+                  colour: 101,
                   optionalText: appIconString)
               }
 
               NavigationLink(value: SettingsRoute.language) {
                 SettingsRowView(
-                  systemImage: "globe", title: "Language", colour: 132,
+                  systemImage: "globe",
+                  title: SettingsKey.rowLanguage,
+                  colour: 132,
                   optionalText: appLanguageString)
               }
 
               ToggleRow(
-                icon: "centsign.circle.fill", color: "107", text: "Display Cents", bool: showCents,
+                icon: "centsign.circle.fill", color: "107", text: SettingsKey.rowDisplayCents, bool: showCents,
                 onTap: {
                   showCents.toggle()
                 })
 
               NavigationLink(value: SettingsRoute.upcoming) {
                 SettingsRowView(
-                  systemImage: "sun.min.fill", title: "Upcoming Logs", colour: 108,
+                  systemImage: "sun.min.fill",
+                  title: SettingsKey.rowUpcomingLogs,
+                  colour: 108,
                   optionalText: upcomingString)
               }
 
               ToggleRow(
-                icon: "plusminus", color: "123", text: "Display +/- Symbol", bool: showExpenseOrIncomeSign,
+                icon: "plusminus", color: "123", text: SettingsKey.rowDisplaySign, bool: showExpenseOrIncomeSign,
                 onTap: {
                     showExpenseOrIncomeSign.toggle()
                 })
 
               ToggleRow(
-                icon: "hare.fill", color: "121", text: "Animated Charts", bool: animated, smaller: true,
+                icon: "hare.fill", color: "121", text: SettingsKey.rowAnimatedCharts, bool: animated, smaller: true,
                 onTap: {
                   animated.toggle()
                 })
@@ -400,7 +417,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text(String.appLocalized("DATA"))
+            Text(String.appLocalized(SettingsKey.sectionData))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -411,12 +428,16 @@ struct SettingsView: View {
             VStack(spacing: 13) {
               NavigationLink(value: SettingsRoute.categories) {
                 SettingsRowView(
-                  systemImage: "rectangle.grid.2x2.fill", title: "Categories", colour: 110)
+                  systemImage: "rectangle.grid.2x2.fill",
+                  title: SettingsKey.rowCategories,
+                  colour: 110)
               }
 
               NavigationLink(value: SettingsRoute.cloud) {
                 SettingsRowView(
-                  systemImage: "icloud.fill", title: "iCloud Sync", colour: 111,
+                  systemImage: "icloud.fill",
+                  title: SettingsKey.rowICloudSync,
+                  colour: 111,
                   optionalText: iCloudString)
               }
 
@@ -429,18 +450,25 @@ struct SettingsView: View {
                 showImportGuide = true
               } label: {
                 SettingsRowView(
-                  systemImage: "square.and.arrow.down.fill", title: "Import Data", colour: 112)
+                  systemImage: "square.and.arrow.down.fill",
+                  title: SettingsKey.rowImportData,
+                  colour: 112)
               }
 
               Button {
                 exportData()
               } label: {
                 SettingsRowView(
-                  systemImage: "square.and.arrow.up.fill", title: "Export Data", colour: 113)
+                  systemImage: "square.and.arrow.up.fill",
+                  title: SettingsKey.rowExportData,
+                  colour: 113)
               }
 
               NavigationLink(value: SettingsRoute.erase) {
-                SettingsRowView(systemImage: "xmark.bin.fill", title: "Erase Data", colour: 114)
+                SettingsRowView(
+                  systemImage: "xmark.bin.fill",
+                  title: SettingsKey.rowEraseData,
+                  colour: 114)
               }
             }
             .padding(10)
@@ -453,7 +481,7 @@ struct SettingsView: View {
           }
 
           VStack(spacing: 5) {
-            Text(String.appLocalized("OTHERS"))
+            Text(String.appLocalized(SettingsKey.sectionOthers))
               .font(.system(.footnote, design: .rounded).weight(.semibold))
 
               //                            .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -465,25 +493,35 @@ struct SettingsView: View {
 
                 NavigationLink(value: SettingsRoute.haptics) {
                   SettingsRowView(
-                    systemImage: "hand.tap.fill", title: "Haptics", colour: 100,
+                    systemImage: "hand.tap.fill",
+                    title: SettingsKey.rowHaptics,
+                    colour: 100,
                     optionalText: hapticString)
                 }
 
               NavigationLink(value: SettingsRoute.featureLab) {
-                SettingsRowView(systemImage: "flame.fill", title: "Feature Lab", colour: 122)
+                SettingsRowView(
+                  systemImage: "flame.fill",
+                  title: SettingsKey.rowFeatureLab,
+                  colour: 122)
               }
 
               Button {
                 supportEmail.send(openURL: openURL)
               } label: {
-                SettingsRowView(systemImage: "ladybug.fill", title: "Report Bug", colour: 124)
+                SettingsRowView(
+                  systemImage: "ladybug.fill",
+                  title: SettingsKey.rowReportBug,
+                  colour: 124)
               }
 
               Button {
                 featureRequestEmail.send(openURL: openURL)
               } label: {
                 SettingsRowView(
-                  systemImage: "hand.wave.fill", title: "Feature Request", colour: 125)
+                  systemImage: "hand.wave.fill",
+                  title: SettingsKey.rowFeatureRequest,
+                  colour: 125)
               }
 
               Button {
@@ -495,7 +533,10 @@ struct SettingsView: View {
                   openURL(writeReviewURL)
                 }
               } label: {
-                SettingsRowView(systemImage: "star.fill", title: "Rate on App Store", colour: 126)
+                SettingsRowView(
+                  systemImage: "star.fill",
+                  title: SettingsKey.rowRateAppStore,
+                  colour: 126)
               }
 
             }
@@ -559,8 +600,8 @@ struct SettingsView: View {
       .fullScreenCover(isPresented: .constant(CommandLine.arguments.contains("-openPro"))) {
         NavigationStack { SettingsProView() }
       }
-      .alert(String.appLocalized("Export Failed"), isPresented: $showExportError) {
-        Button(String.appLocalized("OK"), role: .cancel) {}
+      .alert(String.appLocalized(L10n.exportFailed), isPresented: $showExportError) {
+        Button(String.appLocalized(L10n.alertOk), role: .cancel) {}
       } message: {
         Text(exportErrorMessage)
       }
@@ -583,10 +624,10 @@ struct SettingsView: View {
             width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
             alignment: .center
           )
-          .background(Color(color), in: RoundedRectangle(cornerRadius: 6))
+          .background(Color(color), in: RoundedRectangle(cornerRadius: GlassRadius.pill))
           .accessibilityHidden(true)
 
-        Text(String.appLocalized(String.LocalizationValue(text)))
+        Text(String.appLocalized(text))
           .font(.system(.body, design: .rounded).weight(.medium))
           .lineLimit(1)
           .foregroundStyle(Color.PrimaryText)
@@ -609,8 +650,8 @@ struct SettingsView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .accessibilityLabel(String.appLocalized(String.LocalizationValue(text)))
-    .accessibilityValue(bool ? String.appLocalized("On") : String.appLocalized("Off"))
+    .accessibilityLabel(String.appLocalized(text))
+    .accessibilityValue(bool ? String.appLocalized(SettingsKey.toggleOn) : String.appLocalized(SettingsKey.toggleOff))
     .accessibilityAddTraits(bool ? [.isButton, .isSelected] : .isButton)
   }
 
@@ -619,16 +660,16 @@ struct SettingsView: View {
 
     let fileName = "export.csv"
     let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    var csvText = String.appLocalized("Date,Note,Amount,Category,Type\n")
+    var csvText = String.appLocalized(L10n.exportCsvHeader)
 
     for transaction in transactions {
       var string = transaction.wrappedNote
       let type: String
 
       if transaction.income {
-        type = String.appLocalized("Income")
+        type = String.appLocalized(L10n.exportTypeIncome)
       } else {
-        type = String.appLocalized("Expense")
+        type = String.appLocalized(L10n.exportTypeExpense)
       }
 
       string.removeAll(where: { $0 == "," })
@@ -684,9 +725,9 @@ struct SettingsRowView: View {
           width: dynamicTypeSize > .xLarge ? 40 : 30, height: dynamicTypeSize > .xLarge ? 40 : 30,
           alignment: .center
         )
-        .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+        .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
 
-      Text(String.appLocalized(String.LocalizationValue(title)))
+      Text(String.appLocalized(title))
         .font(.system(.body, design: .rounded).weight(.medium))
 
         //                .font(.system(size: 17, weight: .medium, design: .rounded))

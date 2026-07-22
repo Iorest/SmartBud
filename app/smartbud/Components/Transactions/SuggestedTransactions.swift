@@ -61,14 +61,14 @@ struct SuggestedTransactions: View {
                                 .padding(.horizontal, 5)
                                 .background(
                                     Color(hex: transaction.wrappedColour).opacity(0.23),
-                                    in: RoundedRectangle(cornerRadius: 6.5, style: .continuous)
+                                    in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                                 )
                         }
                         .padding(5)
                         .background(
-                            RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
+                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous).fill(.clear)
                         )
-                        .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+                        .glassChip(in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
                     }
                 }
             }

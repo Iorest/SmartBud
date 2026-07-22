@@ -403,8 +403,8 @@ struct MainBudgetView: View {
         }
         .padding(.bottom)
         .frame(width: width + 30, height: soloBudget ? 230 : 200, alignment: .bottom)
-        .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 13))
+        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
         .contextMenu {
             Button {
                 toEdit = budget
@@ -590,10 +590,10 @@ struct SingleBudgetView: View {
                     HStack {
                         HStack(spacing: 10) {
                             ZStack {
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                     .fill(.white)
 
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                     .fill(Color(hex: budget.wrappedColour).opacity(0.3))
                             }
                             .frame(width: 40, height: 40)
@@ -628,8 +628,8 @@ struct SingleBudgetView: View {
                         }
                     }
                     .padding(10)
-                    .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    .contentShape(RoundedRectangle(cornerRadius: 13))
+                    .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                    .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
                     .contextMenu {
                         Button {
                             toEdit = budget
@@ -755,7 +755,7 @@ struct SingleBudgetView: View {
 
                     GeometryReader { proxy in
                         ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                                 .fill(Color.SecondaryBackground)
                                 .frame(width: proxy.size.width)
 
@@ -780,8 +780,8 @@ struct SingleBudgetView: View {
                 }
                 .padding(15)
                 .frame(width: width + 30)
-                .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .contentShape(RoundedRectangle(cornerRadius: 13))
+                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
                 .contextMenu {
                     Button {
                         toEdit = budget
@@ -992,8 +992,8 @@ struct DeleteBudgetAlert: View {
                 }
             }
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()
@@ -1075,8 +1075,8 @@ struct DeleteMainBudgetAlert: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()
@@ -1490,7 +1490,7 @@ struct TimeBudgetView: View {
             VStack(spacing: 5) {
                 GeometryReader { proxy in
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                             .fill(Color.SecondaryBackground)
                             .frame(width: proxy.size.width)
 
@@ -2014,7 +2014,7 @@ struct TimeMainBudgetView: View {
             VStack(spacing: 5) {
                 GeometryReader { proxy in
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                             .fill(Color.SecondaryBackground)
                             .frame(width: proxy.size.width)
 
@@ -2074,7 +2074,7 @@ struct AnimatedHorizontalBarGraphBudget: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .foregroundStyle(Color(hex: category.wrappedColour))
                 .frame(width: showBar ? nil : 0, alignment: .leading)
 
@@ -2100,7 +2100,7 @@ struct AnimatedHorizontalBarGraphMainBudget: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .fill(Color.DarkBackground)
                 .frame(width: showBar ? nil : 0, alignment: .leading)
 

@@ -270,7 +270,7 @@ struct ImportDataView: View {
                                 .foregroundStyle(Color.AlertRed)
                         }
                         .padding(8)
-                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(width: 250)
                     }
@@ -351,7 +351,7 @@ struct ImportDataView: View {
                     }
                     .padding(12)
                     .foregroundStyle(Color.IncomeGreen)
-                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                     .padding(.bottom, 20)
 
                     ScrollView(showsIndicators: false) {
@@ -492,7 +492,7 @@ struct ImportDataView: View {
                             .foregroundStyle(Color.PrimaryText)
                             .frame(width: 300, height: 40)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                                RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                                     .stroke(Color.Outline, lineWidth: 2)
                             )
                             .padding(.bottom, 30)
@@ -524,9 +524,9 @@ struct ImportDataView: View {
                         .padding(.horizontal, 10)
                         .frame(width: 300, height: 40)
                         .background {
-                            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                                 .stroke(Color.SubtitleText, lineWidth: 2)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
                         }
                         .onChange(of: dateFormatString) { _, newValue in
                             let dateFormatter = DateFormatter()
@@ -561,7 +561,7 @@ struct ImportDataView: View {
                                             .padding(.vertical, 6)
                                             .padding(.horizontal, 10)
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                                     .strokeBorder(Color.Outline, lineWidth: 2)
                                             )
                                             .minimumScaleFactor(0.7)
@@ -589,7 +589,7 @@ struct ImportDataView: View {
                                                 .padding(.horizontal, 10)
 //                                                .frame(height: 36)
                                                 .foregroundStyle(Color(hex: unwrappedCategory.wrappedColour))
-                                                .background(Color(hex: unwrappedCategory.wrappedColour).opacity(0.35), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                                .background(Color(hex: unwrappedCategory.wrappedColour).opacity(0.35), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                                                 .minimumScaleFactor(0.7)
                                             }
                                             .transition(.opacity)
@@ -602,14 +602,14 @@ struct ImportDataView: View {
                                             let income = uniqueCategories[categoryIndex].income
 
                                             ZStack {
-                                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                                     .fill(Color.PrimaryBackground)
 
                                                 Image(systemName: income ? "plus" : "minus")
                                                     .font(.system(size: 18, weight: .semibold))
                                                     .foregroundStyle(income ? Color.IncomeGreen : Color.AlertRed)
                                                     .frame(width: 30, height: 30)
-                                                    .background(income ? Color.IncomeGreen.opacity(0.23) : Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                                    .background(income ? Color.IncomeGreen.opacity(0.23) : Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                                             }
                                             .frame(width: 30, height: 30)
                                             .contentShape(Rectangle())
@@ -654,7 +654,7 @@ struct ImportDataView: View {
                             .frame(height: 50)
                             .frame(maxWidth: .infinity)
                             .foregroundStyle(Color.LightIcon)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                         }
                         .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
 
@@ -767,7 +767,7 @@ struct ImportDataView: View {
                             .frame(height: 50)
                             .frame(maxWidth: .infinity)
                             .foregroundStyle(Color.LightIcon)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                     }
                     .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
                 }
@@ -1086,9 +1086,9 @@ struct MatchCategoryStepperView: View {
         }
         .padding(15)
         .frame(height: 250)
-        .background(Color.Outline.opacity(0.3), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .background(Color.Outline.opacity(0.3), in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .stroke(Color.Outline, lineWidth: 2)
         }
 //        .background(Color.PrimaryBackground, in: )
@@ -1165,10 +1165,10 @@ struct MatchCategoryStepperView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .foregroundStyle(category == categoryInput ? Color(hex: categoryInput.wrappedColour) : Color.PrimaryText)
-            .background(category == categoryInput ? Color(hex: categoryInput.wrappedColour).opacity(0.35) : Color.PrimaryBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(category == categoryInput ? Color(hex: categoryInput.wrappedColour).opacity(0.35) : Color.PrimaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
             .overlay {
                 if category != categoryInput {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                         .strokeBorder(Color.Outline,
                                       style: StrokeStyle(lineWidth: 1.5))
                 }

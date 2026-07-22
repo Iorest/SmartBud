@@ -13,6 +13,7 @@ struct SettingsWeekStartView: View {
   var firstWeekday: Int = 1
   @AppStorage("firstDayOfMonth", store: .appGroup)
   var firstDayOfMonth: Int = 1
+
   @Environment(\.dismiss) var dismiss
 
   let options = [String.appLocalized("Sunday"), String.appLocalized("Monday")]
@@ -107,7 +108,7 @@ struct SettingsWeekStartView: View {
         }
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
       .padding(.bottom, 30)
 
       Text(String.appLocalized("Start of Month"))
@@ -168,7 +169,7 @@ struct SettingsWeekStartView: View {
       }
       .padding(.horizontal, 15)
       .frame(height: scrollViewHeight)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
       Text(String.appLocalized("Close and reload app for change to take effect."))
         .font(.system(.caption, design: .rounded).weight(.medium))

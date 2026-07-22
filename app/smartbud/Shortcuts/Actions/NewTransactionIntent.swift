@@ -203,7 +203,7 @@ struct ShortcutTransactionView: View {
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(Color.DarkIcon)
                             .padding(3)
-                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6))
+                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill))
                             .offset(x: 5, y: 5)
                     }
                 }

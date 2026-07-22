@@ -130,8 +130,8 @@ struct UpdateAlert: View {
                     .multilineTextAlignment(.center)
             }
             .padding(18)
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)

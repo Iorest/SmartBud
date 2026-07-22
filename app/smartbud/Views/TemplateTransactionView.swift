@@ -182,7 +182,7 @@ struct TemplateTransactionView: View {
                                 .foregroundStyle(Color.AlertRed)
                         }
                         .padding(8)
-                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
@@ -378,7 +378,7 @@ struct TemplateTransactionView: View {
                                         .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                         .background(Color.DarkBackground)
                                         .foregroundStyle(Color.LightIcon)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                        .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                                 }
                                 .buttonStyle(NumPadButton())
                             } else {
@@ -397,7 +397,7 @@ struct TemplateTransactionView: View {
                                         .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                         .background(Color.SecondaryBackground)
                                         .foregroundStyle(Color.PrimaryText)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                        .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                                         .opacity(numbers1.contains(".") ? 0.6 : 1)
                                 }
                                 .disabled(numbers1.contains("."))
@@ -418,7 +418,7 @@ struct TemplateTransactionView: View {
                                 }
                                 .frame(width: proxy.size.width * 0.3, height: proxy.size.height * 0.22)
                                 .foregroundStyle(Color.LightIcon)
-                                .background(Color.accentColor.opacity(canSubmit ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .background(Color.accentColor.opacity(canSubmit ? 1 : 0.4), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                             }
                             .buttonStyle(NumPadButton())
                             .disabled(!canSubmit)
@@ -472,7 +472,7 @@ struct TemplateTransactionView: View {
                                 .foregroundStyle(.white)
                                 .frame(height: 45)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         }
                         .padding(.bottom, 8)
 
@@ -488,12 +488,12 @@ struct TemplateTransactionView: View {
                                 .foregroundStyle(Color.PrimaryText.opacity(0.9))
                                 .frame(height: 45)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         }
                     }
                     .padding(13)
-                    .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+                    .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
                     .offset(y: offset)
                     .gesture(
                         DragGesture()
@@ -619,7 +619,7 @@ struct TemplateTransactionView: View {
                 .frame(width: size.width * 0.3, height: size.height * 0.22)
                 .background(Color.SecondaryBackground)
                 .foregroundStyle(Color.PrimaryText)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                 .opacity(numberArrayCount == 9 ? 0.6 : 1)
         }
         .disabled(numberArrayCount == 9)
@@ -748,7 +748,7 @@ struct CategoryRowPickerView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .frame(height: 36)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                             .stroke(Color.Outline, lineWidth: 1.5)
                     )
 
@@ -769,10 +769,10 @@ struct CategoryRowPickerView: View {
                                         .padding(.horizontal, 10)
                                         .frame(height: 36)
                                         .foregroundStyle(selectedCategory == item ? (item.income ? Color.IncomeGreen : Color(hex: item.wrappedColour)) : Color.PrimaryText)
-                                        .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                        .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                                         .overlay {
                                             if selectedCategory != item {
-                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                                     .strokeBorder(Color.Outline,
                                                                   style: StrokeStyle(lineWidth: 1.5))
                                             }
@@ -843,9 +843,9 @@ struct CategoryRowPickerView: View {
             }
             .padding(.horizontal, 9)
             .frame(height: 36)
-            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
 //                    .overlay(
-//                        RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+//                        RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
 //                            .stroke(Color.Outline, lineWidth: 1.5)
 //                    )
             .onTapGesture {
@@ -945,8 +945,8 @@ struct SettingsQuickAddWidgetDraggingView: View {
                         .font(.system(size: 25, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(RoundedRectangle(cornerRadius: 15).fill(Color.SecondaryBackground).shadow(color: gridData.gridItems[index].transaction == nil ? Color.gray.opacity(0.25) : Color.clear, radius: 6))
-                        .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.Outline, lineWidth: 1.3))
+                        .background(RoundedRectangle(cornerRadius: GlassRadius.card).fill(Color.SecondaryBackground).shadow(color: gridData.gridItems[index].transaction == nil ? Color.gray.opacity(0.25) : Color.clear, radius: 6))
+                        .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(Color.Outline, lineWidth: 1.3))
                         .frame(height: 100)
                 }
             })
@@ -958,10 +958,10 @@ struct SettingsQuickAddWidgetDraggingView: View {
                         if let transaction = grid.transaction {
                             if grid.id == gridData.currentGrid?.id && gridData.dragging {
                                 ZStack {
-                                    RoundedRectangle(cornerRadius: 15)
+                                    RoundedRectangle(cornerRadius: GlassRadius.card)
                                         .fill(blend(over: Color(hex: transaction.wrappedColour), withAlpha: 0.7))
 
-                                    RoundedRectangle(cornerRadius: 15)
+                                    RoundedRectangle(cornerRadius: GlassRadius.card)
                                         .strokeBorder(Color.DarkIcon, lineWidth: 2)
                                 }
                             } else {
@@ -976,7 +976,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
                     }
                     .frame(height: 100)
                     .transition(.opacity)
-                    .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 15))
+                    .contentShape(.dragPreview, RoundedRectangle(cornerRadius: GlassRadius.card))
                     .onDrag({
                         gridData.currentGrid = grid
                         return NSItemProvider(object: String(grid.index) as NSString)
@@ -984,7 +984,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
                         if let transaction = grid.transaction {
                             SingleTemplateButton(transaction: transaction, showCents: showCents, currencySymbol: currencySymbol)
                                 .frame(width: 100, height: 100)
-                                .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 15))
+                                .contentShape(.dragPreview, RoundedRectangle(cornerRadius: GlassRadius.card))
                         }
                     })
                     .onDrop(of: [.text], delegate: DropViewDelegate(grid: grid, gridData: gridData))
@@ -1005,7 +1005,7 @@ struct SettingsQuickAddWidgetDraggingView: View {
         }
         .padding(15)
         .frame(width: 245)
-        .background(RoundedRectangle(cornerRadius: 25).fill(Color.PrimaryBackground).shadow(color: Color.gray.opacity(0.2), radius: 12))
+        .background(RoundedRectangle(cornerRadius: GlassRadius.surface).fill(Color.PrimaryBackground).shadow(color: Color.gray.opacity(0.2), radius: 12))
         .fullScreenCover(item: $selectedItem, onDismiss: {
             gridData.reset()
             refreshID = UUID()
@@ -1058,7 +1058,7 @@ struct SingleTemplateButton: View {
             Text(transaction.wrappedEmoji)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .padding(5)
-                .background(blend(over: transactionColor, withAlpha: 0.3), in: RoundedRectangle(cornerRadius: 8))
+                .background(blend(over: transactionColor, withAlpha: 0.3), in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
             Spacer()
 
@@ -1081,7 +1081,7 @@ struct SingleTemplateButton: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        .background(blend(over: transactionColor, withAlpha: 0.8), in: RoundedRectangle(cornerRadius: 15))
+        .background(blend(over: transactionColor, withAlpha: 0.8), in: RoundedRectangle(cornerRadius: GlassRadius.card))
         .shadow(color: transactionColor.opacity(0.8), radius: 6)
     }
 

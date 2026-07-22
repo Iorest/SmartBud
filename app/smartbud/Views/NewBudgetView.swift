@@ -14,9 +14,9 @@ struct PickerStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(5)
-            .background(RoundedRectangle(cornerRadius: 9).fill(.clear))
-            .overlay(RoundedRectangle(cornerRadius: 9).stroke(colorScheme == .light ? Color.clear : Color.Outline.opacity(0.4), lineWidth: 1.3))
-            .glassCard(in: RoundedRectangle(cornerRadius: 9))
+            .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(.clear))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(colorScheme == .light ? Color.clear : Color.Outline.opacity(0.4), lineWidth: 1.3))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.chip))
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 30)
     }
@@ -210,7 +210,7 @@ struct BrandNewBudgetView: View {
                             .foregroundStyle(Color.AlertRed)
                     }
                     .padding(8)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .frame(width: 250)
                 }
@@ -270,7 +270,7 @@ struct BrandNewBudgetView: View {
                             .padding(8)
                             .background {
                                 if !categoryBudget {
-                                    RoundedRectangle(cornerRadius: 6)
+                                    RoundedRectangle(cornerRadius: GlassRadius.pill)
                                         .fill(Color.SecondaryBackground)
                                         .matchedGeometryEffect(id: "TAB1", in: animation)
                                 }
@@ -298,7 +298,7 @@ struct BrandNewBudgetView: View {
                             .padding(8)
                             .background {
                                 if categoryBudget {
-                                    RoundedRectangle(cornerRadius: 6)
+                                    RoundedRectangle(cornerRadius: GlassRadius.pill)
                                         .fill(Color.SecondaryBackground)
                                         .matchedGeometryEffect(id: "TAB1", in: animation)
                                 }
@@ -380,7 +380,7 @@ struct BrandNewBudgetView: View {
                                 .padding(8)
                                 .background {
                                     if time == budgetTimeFrame {
-                                        RoundedRectangle(cornerRadius: 6)
+                                        RoundedRectangle(cornerRadius: GlassRadius.pill)
                                             .fill(Color.SecondaryBackground)
                                             .matchedGeometryEffect(id: "TAB2", in: animation)
                                     }
@@ -539,10 +539,10 @@ struct BrandNewBudgetView: View {
                         .padding(.vertical, 12)
                         .frame(maxWidth: .infinity)
                         .foregroundStyle((selectedCategory == nil && progress == 2) ? Color.SubtitleText : Color.LightIcon)
-                        .background((selectedCategory == nil && progress == 2) ? Color.clear : Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                        .background((selectedCategory == nil && progress == 2) ? Color.clear : Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                         .overlay {
                             if selectedCategory == nil && progress == 2 {
-                                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                     .stroke(Color.Outline, lineWidth: 1.3)
                             }
                         }
@@ -804,10 +804,10 @@ struct BrandNewBudgetView: View {
             .padding(.horizontal, 11)
             .padding(.vertical, 7)
             .foregroundStyle(selectedCategory == category ? Color(hex: category.wrappedColour) : Color.PrimaryText)
-            .background(selectedCategory == category ? Color(hex: category.wrappedColour).opacity(0.35) : Color.clear, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(selectedCategory == category ? Color(hex: category.wrappedColour).opacity(0.35) : Color.clear, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
             .overlay {
                 if selectedCategory != category {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                         .strokeBorder(Color.Outline,
                                       style: StrokeStyle(lineWidth: 1.5))
                 }
@@ -874,7 +874,7 @@ struct BrandNewBudgetView: View {
     @ViewBuilder
     private func dayRowBackground(isSelected: Bool) -> some View {
         if isSelected {
-            RoundedRectangle(cornerRadius: 6)
+            RoundedRectangle(cornerRadius: GlassRadius.pill)
                 .fill(Color.SecondaryBackground)
         }
     }
@@ -973,7 +973,7 @@ private struct WeekdayPickerRow: View {
             .padding(8)
             .background {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: GlassRadius.pill)
                         .fill(Color.SecondaryBackground)
                 }
             }

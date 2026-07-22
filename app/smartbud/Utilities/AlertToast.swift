@@ -279,7 +279,7 @@ public struct AlertToast: View {
             .padding()
             .frame(maxWidth: 400, alignment: .leading)
             .alertBackground(style?.backgroundColor ?? nil)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
             .padding([.horizontal, .bottom])
         }
     }
@@ -413,7 +413,7 @@ public struct AlertToast: View {
         .padding()
         .withFrame(type != .regular && type != .loading)
         .alertBackground(style?.backgroundColor ?? nil)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
     }
 
     /// Body init determine by `displayMode`

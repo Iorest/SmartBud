@@ -748,7 +748,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                 }
                 .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)
-                .background(RoundedRectangle(cornerRadius: 5).fill(ios17 ? Color.SecondaryBackground : Color.PrimaryBackground))
+                .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(ios17 ? Color.SecondaryBackground : Color.PrimaryBackground))
             }
         }
     }

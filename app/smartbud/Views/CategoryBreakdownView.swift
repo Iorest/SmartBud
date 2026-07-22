@@ -50,7 +50,7 @@ struct CategoryBreakdownView: View {
             HStack(spacing: proxy.size.width * 0.015) {
                 ForEach(Array(categories.enumerated()), id: \.element.id) { index, category in
                     if category.percent >= 0.005 {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                             .fill(colorForCategory(category, index: index))
                             .frame(width: max(8, usableWidth * category.percent))
                     }
@@ -79,7 +79,7 @@ struct CategoryBreakdownView: View {
                 .foregroundStyle(color)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 6)
-                .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
         }
         .frame(maxWidth: .infinity)
     }

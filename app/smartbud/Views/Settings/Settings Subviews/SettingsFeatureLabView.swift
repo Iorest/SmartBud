@@ -55,7 +55,7 @@ struct SettingsGoofyView: View {
 
           ToggleRow(text: String.appLocalized("Budget Rows"), bool: $budgetRows, id: 3)
         }
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
         Text(String.appLocalized("Experimental features - proceed with caution."))
           .font(.system(.caption, design: .rounded).weight(.medium))
@@ -66,7 +66,7 @@ struct SettingsGoofyView: View {
           .padding(.bottom, 30)
 
         ToggleRow(text: String.appLocalized("Replace Time Label"), bool: $swapTimeLabel, id: 4)
-          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
         Text(
           String.appLocalized("Swaps the time label of each transaction with its category name. However, if you do not manually input a note for each transaction - in which case the note is the category name by default - duplicate text will appear.")
@@ -79,7 +79,7 @@ struct SettingsGoofyView: View {
         .padding(.bottom, 30)
 
         ToggleRow(text: String.appLocalized("Show Note Suggestions"), bool: $showRecommendations, id: 5)
-          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
         Text(
           String.appLocalized("Displays transaction suggestions whilst you type in the 'Note' field of the new transaction page.")
@@ -93,7 +93,7 @@ struct SettingsGoofyView: View {
       }
 
       //            ToggleRow(text: "Miles-Morales Effect", bool: $chromatic, id: 5)
-      //            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      //            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
       //
       //            Text("Enables a chromatic abberation effect on the 'New Transaction' page when a future date is set.")
       //                .font(.system(size: 12, weight: .medium, design: .rounded))

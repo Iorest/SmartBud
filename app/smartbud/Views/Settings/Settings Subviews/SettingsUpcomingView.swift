@@ -100,7 +100,7 @@ struct SettingsUpcomingView: View {
         .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
       Text(
         String.appLocalized("Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here.")

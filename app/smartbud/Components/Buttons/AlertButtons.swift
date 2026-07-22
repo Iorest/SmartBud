@@ -27,7 +27,7 @@ struct DeleteButton: View {
             }
             .glassEffect(
                 red ? Glass.regular.tint(Color.AlertRed) : .regular,
-                in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
             )
     }
 }

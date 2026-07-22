@@ -37,7 +37,7 @@ struct SettingsEraseView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.vertical, 12)
           .padding(.horizontal, 15)
-          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
       }
 
       Text(
@@ -125,7 +125,7 @@ struct DeleteAllAlert: View {
               .frame(width: proxy.size.width, alignment: .center)
           }
           .frame(height: proxy.size.height)
-          .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+          .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
         }
         .frame(height: 45)
         .frame(maxWidth: .infinity)
@@ -167,11 +167,11 @@ struct DeleteAllAlert: View {
       }
       .padding(13)
       .background(
-        RoundedRectangle(cornerRadius: 13).fill(Color.PrimaryBackground).shadow(
+        RoundedRectangle(cornerRadius: GlassRadius.card).fill(Color.PrimaryBackground).shadow(
           color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6)
       )
       .overlay(
-        RoundedRectangle(cornerRadius: 13).stroke(
+        RoundedRectangle(cornerRadius: GlassRadius.card).stroke(
           systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
       )
       .offset(y: offset)

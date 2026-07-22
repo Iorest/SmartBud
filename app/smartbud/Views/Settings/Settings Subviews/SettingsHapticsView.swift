@@ -12,7 +12,6 @@ struct SettingsHapticsView: View {
     @AppStorage("haptics", store: .appGroup)
     var hapticType: Int = 1
     @Environment(\.dismiss) var dismiss
-
     let options = [String.appLocalized("None"), String.appLocalized("Subtle"), String.appLocalized("Excessive")]
 
     @Namespace var animation
@@ -77,7 +76,7 @@ struct SettingsHapticsView: View {
                 }
             }
             .padding(.horizontal, 15)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
             .offset(x: shake ? -5 : 5)
             .offset(x: alternateShake ? 0 : -5)
 

@@ -97,7 +97,7 @@ struct LogView: View {
                                 .padding(5)
                                 .contentShape(Rectangle())
                                 .background {
-                                    RoundedRectangle(cornerRadius: 7)
+                                    RoundedRectangle(cornerRadius: GlassRadius.chip)
                                         .fill(Color.SecondaryBackground)
                                         .scaleEffect(progress == 1 ? 1.5 : 1.0)
                                         .opacity(progress)
@@ -143,11 +143,11 @@ struct LogView: View {
                                 .contentShape(Rectangle())
                                 .background {
                                     if showFilter {
-                                        RoundedRectangle(cornerRadius: 7)
+                                        RoundedRectangle(cornerRadius: GlassRadius.chip)
                                             .fill(Color.SecondaryBackground)
                                     }
 //                                    if pullStatus == .filter || showFilter {
-//                                        RoundedRectangle(cornerRadius: 7)
+//                                        RoundedRectangle(cornerRadius: GlassRadius.chip)
 //                                            .fill(Color.SecondaryBackground)
 //                                            .scaleEffect(released == .filter ? 1.2 : 1.0)
 //                                            .opacity(released  == .filter ? 0.5 : 1.0)
@@ -246,7 +246,7 @@ struct LogView: View {
         }
         .padding(4)
         .padding(.horizontal, 6)
-        .glassCard(in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
 //        .font(.system(size: 17, weight: .medium, design: .rounded))
         .foregroundStyle(Color.PrimaryText)
     }
@@ -449,7 +449,7 @@ struct SearchView: View {
                 }
                 .padding(6)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .glassCard(in: RoundedRectangle(cornerRadius: 8))
+                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
                 Button {
                     dismiss()
@@ -592,7 +592,7 @@ struct TimePickerView: View {
                     .padding(5)
                     .background {
                         if holdingTimeframe == index + 1 {
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: GlassRadius.pill)
                                 .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
                                 .matchedGeometryEffect(id: "TAB", in: animation)
                         }
@@ -606,8 +606,8 @@ struct TimePickerView: View {
         .foregroundStyle(darkMode ? Color("AlwaysLightBackground") : Color("AlwaysDarkBackground"))
         .padding(4)
         .frame(width: dynamicTypeSize > .xxLarge ? 185 : 160)
-        .background(RoundedRectangle(cornerRadius: 9).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
-        .overlay(RoundedRectangle(cornerRadius: 9).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+        .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
         .onAppear {
             holdingTimeframe = timeframe
         }
@@ -670,7 +670,7 @@ struct FilterPickerView: View {
                     .padding(5)
                     .background {
                         if filterType == filter {
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: GlassRadius.pill)
                                 .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
                                 .matchedGeometryEffect(id: "TAB", in: animation)
                         }
@@ -684,8 +684,8 @@ struct FilterPickerView: View {
         .foregroundStyle(darkMode ? Color("AlwaysLightBackground") : Color("AlwaysDarkBackground"))
         .padding(4)
         .frame(width: dynamicTypeSize > .xLarge ? 220 : 190)
-        .background(RoundedRectangle(cornerRadius: 9).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
-        .overlay(RoundedRectangle(cornerRadius: 9).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+        .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 }
 
@@ -807,7 +807,7 @@ struct ListView: View {
                         SingleTransactionView(transaction: transaction, showCents: showCents, currencySymbol: currencySymbol, currency: currency, swapTimeLabel: swapTimeLabel, future: false, showExpenseOrIncomeSign: showExpenseOrIncomeSign)
                     }
                 }
-                .contentShape(RoundedRectangle(cornerRadius: 10))
+                .contentShape(RoundedRectangle(cornerRadius: GlassRadius.chip))
                 .contextMenu {
                         Button {
                             guard let image = ImageRenderer(content: SingleDayPhotoView(amountText: filtered.string, dateText: dateText, transactions: filtered.transactions, showCents: showCents, currencySymbol: currencySymbol, currency: currency, swapTimeLabel: swapTimeLabel, future: false)).uiImage else {
@@ -1075,7 +1075,7 @@ struct SingleTransactionView: View {
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(Color.DarkIcon)
                                 .padding(3)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill))
                                 .offset(x: 5, y: 5)
                         }
                     }
@@ -1117,7 +1117,7 @@ struct SingleTransactionView: View {
             .id(refreshID)
             .padding(.vertical, 8)
             .padding(.horizontal, 10)
-            .contentShape(RoundedRectangle(cornerRadius: 10))
+            .contentShape(RoundedRectangle(cornerRadius: GlassRadius.chip))
             .onTapGesture {
                 transactionManager.toEdit = transaction
             }
@@ -1280,16 +1280,16 @@ struct EmojiLogView: View {
     var body: some View {
         ZStack {
             if future {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                     .stroke(Color(hex: colour).opacity(0.73), lineWidth: 2)
                     .foregroundStyle(.clear)
             } else {
-                RoundedRectangle(cornerRadius: huge ? 20 : 9, style: .continuous)
+                RoundedRectangle(cornerRadius: huge ? 20 : GlassRadius.chip, style: .continuous)
                     .fill(blend(over: Color(hex: colour), withAlpha: 0.73))
-//                RoundedRectangle(cornerRadius: 9, style: .continuous)
+//                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
 //                    .fill(Color.white)
 //
-//                RoundedRectangle(cornerRadius: 9, style: .continuous)
+//                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
 //                    .fill(Color(hex: colour).opacity(0.73))
             }
 
@@ -1373,9 +1373,9 @@ struct DeleteTransactionAlert: View {
                 }
             }
             .padding(13)
-            //            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            //            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
 //            .offset(y: offset)
 //            .gesture(
 //                DragGesture()
@@ -1639,7 +1639,7 @@ struct CategoryStepperView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(1.0, contentMode: .fit)
 //                    .frame(width: 36, height: 36)
-                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if expenseCategories.isEmpty {
@@ -1659,7 +1659,7 @@ struct CategoryStepperView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(1.0, contentMode: .fit)
 //                    .frame(width: 36, height: 36)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if incomeCategories.isEmpty {
@@ -1691,10 +1691,10 @@ struct CategoryStepperView: View {
                             .fixedSize(horizontal: false, vertical: true)
 //                            .frame(height: 36)
                             .foregroundStyle(categoryFilter == item ? Color(hex: item.wrappedColour) : Color.PrimaryText)
-                            .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                             .overlay {
                                 if categoryFilter != item {
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                         .strokeBorder(Color.Outline,
                                                       style: StrokeStyle(lineWidth: 1.5))
                                 }

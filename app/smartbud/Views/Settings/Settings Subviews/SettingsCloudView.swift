@@ -11,6 +11,7 @@ import SwiftUI
 struct SettingsCloudView: View {
   @Environment(\.dismiss) var dismiss
   @State private var iCloudStorage: Bool = false
+
   @Namespace var animation
 
   var body: some View {
@@ -63,7 +64,7 @@ struct SettingsCloudView: View {
         }
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: 9))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
 
       Text(String.appLocalized("Close and reload app for change to take effect."))
         .font(.system(.caption, design: .rounded).weight(.medium))

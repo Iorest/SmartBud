@@ -660,26 +660,38 @@ final class InsightsViewModel{
 
     /// Period text shown above the totals: "5 FEB - 11 FEB" / "1 - 30 APR" / "2024".
     /// Matches the GitHub reference design which renders the month abbreviation uppercase.
+    ///
+    /// The `"d MMM"` template only reads correctly in Latin-script locales where
+    /// `MMM` is a 3-letter month abbreviation ("FEB", "JUL"). In `zh-Hans` /
+    /// `zh-Hant` the same template renders "17 7月" — `MMM` becomes the full
+    /// month-with-suffix form, and the unspaced layout collapses to "17月" in
+    /// the small header. Branch the template per locale so CJK users see the
+    /// natural "M月d日 - M月d日" order instead.
     func getDateRangeText(for period: Int) -> String {
         let cal = configuredCalendar
         let (start, end) = getPeriodDateRange(for: period)
+        let isCJK = Locale.appLocale.identifier.hasPrefix("zh")
         let dayMonth = DateFormatter()
         dayMonth.locale = Locale.appLocale
-        dayMonth.dateFormat = "d MMM"
+        dayMonth.dateFormat = isCJK ? "M月d日" : "d MMM"
         dayMonth.calendar = cal
         let yearOnly = DateFormatter()
         yearOnly.locale = Locale.appLocale
         yearOnly.dateFormat = "yyyy"
         yearOnly.calendar = cal
+        let formatRange: (Date) -> String = { date in
+            let s = dayMonth.string(from: date)
+            return isCJK ? s : s.uppercased()
+        }
         switch period {
         case 1:
             let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
-            return "\(dayMonth.string(from: start).uppercased()) - \(dayMonth.string(from: endInclusive).uppercased())"
+            return "\(formatRange(start)) - \(formatRange(endInclusive))"
         case 3:
             return yearOnly.string(from: start)
         default:
             let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
-            return "\(dayMonth.string(from: start).uppercased()) - \(dayMonth.string(from: endInclusive).uppercased())"
+            return "\(formatRange(start)) - \(formatRange(endInclusive))"
         }
     }
 

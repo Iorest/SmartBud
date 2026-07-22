@@ -54,11 +54,11 @@ struct NewCategoryPickerView: View {
                         .foregroundStyle(Color(hex: item.wrappedColour))
                         .background(
                             Color(hex: item.wrappedColour).opacity(0.35),
-                            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                         )
                         .overlay {
                             if item == category {
-                                RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                                RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                                     .strokeBorder(Color(hex: item.wrappedColour),
                                                   style: StrokeStyle(lineWidth: 2))
                             }
@@ -92,9 +92,9 @@ struct NewCategoryPickerView: View {
                 .padding(.horizontal, 18)
                 .foregroundStyle(Color.SubtitleText)
                 .background {
-                    RoundedRectangle(cornerRadius: 11.5, style: .continuous).fill(.clear)
+                    RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous).fill(.clear)
                 }
-                .glassChip(in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+                .glassChip(in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

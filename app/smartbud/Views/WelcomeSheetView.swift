@@ -97,7 +97,7 @@ struct WelcomeSheetView: View {
                             .foregroundStyle(Color.LightIcon)
                             .padding(.vertical, 12)
                             .frame(maxWidth: .infinity)
-                            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.DarkBackground))
+                            .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.DarkBackground))
                     }
                 }
                 .padding(30)

@@ -77,6 +77,7 @@
 		F1A2B3C4D5E6F708192A3B4C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F708192A3B4C5 /* SceneDelegate.swift */; };
 		53A4147D28B7C70D008C30E7 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147C28B7C70D008C30E7 /* AppVersion.swift */; };
 		53A4147F28B7C70D008C30E7 /* AppLocale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4147E28B7C70D008C30E7 /* AppLocale.swift */; };
+		53A4148128B7C70D008C30E7 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4148028B7C70D008C30E7 /* SettingsKeys.swift */; };
 		D6A1B2C3D4E5F6071829A0B1 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */; };
 		D6A1B2C3D4E5F6071829A0B3 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */; };
 		D6A1B2C3D4E5F6071829A0C1 /* LanguageBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */; };
@@ -146,6 +147,7 @@
 		CAE04EC8E928480C9BA367A9 /* TransactionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */; };
 		CF42FFB1F9D04BBCB7112646 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69F2676652B477A97938CFD /* InsightsViewModel.swift */; };
 		D1550AA12D26000000000002 /* GlassTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1550AA02D26000000000001 /* GlassTheme.swift */; };
+		D1550AA12D26000000000003 /* GlassTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1550AA02D26000000000001 /* GlassTheme.swift */; };
 		D1CE5701500000000000B001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1CE5701500000000000B002 /* InfoPlist.strings */; };
 		D63B20542D8728C300CAFB20 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		D63B205C2D8728C300CAFB31 /* BarGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205C2D8728C300CAFB30 /* BarGraph.swift */; };
@@ -245,6 +247,7 @@
 		F1A2B3C4D5E6F708192A3B4C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		53A4147C28B7C70D008C30E7 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		53A4147E28B7C70D008C30E7 /* AppLocale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocale.swift; sourceTree = "<group>"; };
+		53A4148028B7C70D008C30E7 /* SettingsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsKeys.swift; sourceTree = "<group>"; };
 		D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageBundle.swift; sourceTree = "<group>"; };
 		53A839C028D732E1006F227C /* TabBarHiding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarHiding.swift; sourceTree = "<group>"; };
@@ -430,6 +433,7 @@
 				53B1D1A4289383B100E28062 /* FontExtension.swift */,
 				53A4147C28B7C70D008C30E7 /* AppVersion.swift */,
 				53A4147E28B7C70D008C30E7 /* AppLocale.swift */,
+				53A4148028B7C70D008C30E7 /* SettingsKeys.swift */,
 				D6A1B2C3D4E5F6071829A0B2 /* AppLanguage.swift */,
 				D6A1B2C3D4E5F6071829A0C2 /* LanguageBundle.swift */,
 				534973D528CB5A75000201F9 /* URLExtension.swift */,
@@ -825,6 +829,7 @@
 				AECE7F9E2AED1A6800B57267 /* SuggestedTransactions.swift in Sources */,
 				53A4147D28B7C70D008C30E7 /* AppVersion.swift in Sources */,
 				53A4147F28B7C70D008C30E7 /* AppLocale.swift in Sources */,
+				53A4148128B7C70D008C30E7 /* SettingsKeys.swift in Sources */,
 				D6A1B2C3D4E5F6071829A0B1 /* AppLanguage.swift in Sources */,
 				D6A1B2C3D4E5F6071829A0C1 /* LanguageBundle.swift in Sources */,
 				53D6BDC82AF73B4800F5728E /* SettingsAppearanceView.swift in Sources */,
@@ -881,6 +886,7 @@
 				52B7CA77A02B43F38B4778ED /* BudgetViewModel.swift in Sources */,
 				5E3EC41EDEB94B5AB21CBC20 /* SwiftDataCore.swift in Sources */,
 				7A1B2C3D4E5F6071829A0BC2 /* WidgetModelContainer.swift in Sources */,
+				D1550AA12D26000000000003 /* GlassTheme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

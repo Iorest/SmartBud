@@ -99,7 +99,7 @@ struct LineGraph: View {
             }
             .frame(height: 33)
             .padding(.horizontal, 7)
-            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6))
+            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill))
             .padding(.bottom, 4)
 
             Rectangle()

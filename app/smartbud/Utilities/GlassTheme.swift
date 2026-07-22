@@ -162,12 +162,14 @@ extension View {
 // MARK: - Standard corner radii
 
 enum GlassRadius {
+    /// Smallest UI: segmented control selected, color swatches, day-of-week pills.
+    static let pill: CGFloat = 6
+    /// Small buttons, tags, badges — the most common radius.
+    static let chip: CGFloat = 10
+    /// Text input fields, text rows, narrow form controls.
+    static let input: CGFloat = 12
     /// Cards inside lists (SettingsView groups, summary blocks, etc.).
     static let card: CGFloat = 16
     /// Big surfaces (tab bar pill, primary transaction entry).
     static let surface: CGFloat = 28
-    /// Small buttons / chips.
-    static let chip: CGFloat = 10
-    /// Circle button.
-    static let circle: CGFloat = 16
 }

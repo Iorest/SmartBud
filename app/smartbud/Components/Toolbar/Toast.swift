@@ -22,7 +22,7 @@ struct Toast: View {
             }
             .padding(8)
             .background(
-                toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
             )
             .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
             .frame(maxWidth: 250)

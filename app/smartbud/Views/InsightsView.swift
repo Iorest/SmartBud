@@ -89,56 +89,46 @@ struct InsightsView: View {
                 .font(.system(.title, design: .rounded).weight(.bold))
                 .foregroundStyle(Color.PrimaryText)
             Spacer()
-            periodPickerChip
+            periodSegmented
         }
         .padding(.horizontal, 30)
         .padding(.top, 20)
         .padding(.bottom, 20)
     }
 
-    private var periodPickerChip: some View {
-        Menu {
-            Button {
-                period = 1
-            } label: {
-                if period == 1 {
-                    Label("week", systemImage: "checkmark")
-                } else {
-                    Text("week")
-                }
-            }
-            Button {
-                period = 2
-            } label: {
-                if period == 2 {
-                    Label("month", systemImage: "checkmark")
-                } else {
-                    Text("month")
-                }
-            }
-            Button {
-                period = 3
-            } label: {
-                if period == 3 {
-                    Label("year", systemImage: "checkmark")
-                } else {
-                    Text("year")
-                }
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Text(periodTitle)
-                    .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .foregroundStyle(Color.PrimaryText)
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color.SubtitleText)
-            }
-            .padding(.vertical, 3)
-            .padding(.horizontal, 8)
-            .background(Color.Outline, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    private var periodSegmented: some View {
+        HStack(spacing: 0) {
+            periodSegmentButton(label: "week", value: 1)
+            periodSegmentButton(label: "month", value: 2)
+            periodSegmentButton(label: "year", value: 3)
         }
-        .fixedSize()
+        .frame(maxWidth: 220)
+        .background(Color.Outline, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                .stroke(Color.SubtitleText.opacity(0.25), lineWidth: 0.5)
+        )
+    }
+
+    private func periodSegmentButton(label: String, value: Int) -> some View {
+        let isSelected = period == value
+        return Button {
+            period = value
+        } label: {
+            Text(String.appLocalized(label))
+                .font(.system(.footnote, design: .rounded).weight(.semibold))
+                .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(
+                    isSelected ? Color.PrimaryText.opacity(0.18) : Color.clear,
+                    in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                )
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Date range row
@@ -288,14 +278,6 @@ struct InsightsView: View {
 
     // MARK: - Helpers
 
-    private var periodTitle: String {
-        switch period {
-        case 1: return String.appLocalized("week", comment: "Period picker: week")
-        case 3: return String.appLocalized("year", comment: "Period picker: year")
-        default: return String.appLocalized("month", comment: "Period picker: month")
-        }
-    }
-
     private func format(_ amount: Double) -> String {
         abs(amount).formatted(
             .currency(code: currency)
@@ -425,21 +407,7 @@ struct FilteredCategoryInsightsView: View {
                 .foregroundStyle(Color.SubtitleText)
         }
         .padding(12)
-        .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-}
-
-struct FilteredDateInsightsView: View {
-    let date: Date
-    let income: Bool
-
-    var body: some View {
-        HStack {
-            Text(date, format: .dateTime.day().month().year())
-            Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
-                .foregroundStyle(income ? Color.IncomeGreen : Color.AlertRed)
-        }
-        .font(.system(.subheadline, design: .rounded))
+        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
     }
 }
 

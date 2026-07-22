@@ -26,7 +26,7 @@ struct InsightsSummaryBlockView: View {
                     .foregroundStyle(color)
                     .padding(5)
                     .frame(width: 30, height: 30)
-                    .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     .padding(.horizontal, 3)
                     .accessibilityHidden(true)
 
@@ -48,10 +48,10 @@ struct InsightsSummaryBlockView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .glassCard(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
         .overlay {
             if showOverlay {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                     .stroke(Color.SubtitleText.opacity(0.7), lineWidth: 1.3)
             }
         }

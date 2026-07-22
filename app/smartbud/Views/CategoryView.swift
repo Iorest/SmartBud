@@ -218,7 +218,7 @@ struct CategoryListView: View {
                         .foregroundStyle(toastColor)
                 }
                 .padding(8)
-                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                 .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                 .frame(maxWidth: 250)
                 .frame(height: 35)
@@ -484,7 +484,7 @@ struct CategoryListView: View {
                                         Spacer()
 
                                         if !income {
-                                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                                 .fill(Color(hex: category.wrappedColour))
                                                 .frame(width: 20, height: 20)
                                         }
@@ -576,7 +576,7 @@ struct CategoryListView: View {
                             .foregroundStyle(.white)
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
-                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     }
                     .padding(.bottom, 8)
 
@@ -592,13 +592,13 @@ struct CategoryListView: View {
                             .foregroundStyle(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
-                            //                        .background(Color("13").opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                            //                        .background(Color("13").opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                     }
                 }
                 .padding(13)
-                .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
                 .offset(y: offset)
                 .gesture(
                     DragGesture()
@@ -735,7 +735,7 @@ struct NewCategoryAlert: View {
                                 .foregroundStyle(toastColor)
                         }
                         .padding(6)
-                        .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
@@ -842,9 +842,9 @@ struct NewCategoryAlert: View {
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)
                         .background {
-                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .emoji && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     if newEmoji == "" {
@@ -863,14 +863,14 @@ struct NewCategoryAlert: View {
                         Button {
                             showingColourPicker = true
                         } label: {
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                 .fill(Color(hex: selectedColour))
                                 .padding(8)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                                 .frame(width: 50, height: 50)
                                 .overlay {
                                     if showingColourPicker {
-                                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                        RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                             .stroke(Color.SubtitleText, lineWidth: 2.2)
                                     }
                                 }
@@ -887,9 +887,9 @@ struct NewCategoryAlert: View {
 
                         .frame(height: 50)
                         .background {
-                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .name && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
                     //
                     Button {
@@ -901,7 +901,7 @@ struct NewCategoryAlert: View {
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                     }
                 }
             }
@@ -1129,7 +1129,7 @@ struct EditCategoryAlert: View {
                                 .foregroundStyle(Color.AlertRed)
                         }
                         .padding(6)
-                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
@@ -1172,9 +1172,9 @@ struct EditCategoryAlert: View {
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)
                         .background {
-                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .emoji && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     if newEmoji == "" {
@@ -1193,14 +1193,14 @@ struct EditCategoryAlert: View {
                         Button {
                             showingColourPicker = true
                         } label: {
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                 .fill(Color(hex: selectedColour))
                                 .padding(8)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                                 .frame(width: 50, height: 50)
                                 .overlay {
                                     if showingColourPicker {
-                                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                        RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                             .stroke(Color.SubtitleText, lineWidth: 2.2)
                                     }
                                 }
@@ -1217,9 +1217,9 @@ struct EditCategoryAlert: View {
                         .frame(height: 50)
                         .foregroundStyle(Color.PrimaryText)
                         .background {
-                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .name && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     Button {
@@ -1231,7 +1231,7 @@ struct EditCategoryAlert: View {
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
                     }
                 }
             }
@@ -1391,7 +1391,7 @@ struct DeleteCategoryAlert: View {
                         .foregroundStyle(.white)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
-                        .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                 }
                 .padding(.bottom, 8)
 
@@ -1408,13 +1408,13 @@ struct DeleteCategoryAlert: View {
                         .foregroundStyle(Color.PrimaryText.opacity(0.9))
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
-                        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
                 }
             }
             .padding(13)
-//            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+//            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()
@@ -1728,10 +1728,10 @@ struct ColourPickerView: View {
                         showNativePicker = true
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 9)
+                            RoundedRectangle(cornerRadius: GlassRadius.chip)
                                 .fill(AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]), center: .center))
 
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: GlassRadius.pill)
                                 .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
                                 .padding(4)
 
@@ -1763,7 +1763,7 @@ struct ColourPickerView: View {
                             }
                         }
                     } label: {
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                             .fill(Color(hex: suggestedColor))
                             .frame(height: 40)
                             .opacity(selectedColours.contains(suggestedColor) ? 0.2 : 1)
@@ -1781,8 +1781,8 @@ struct ColourPickerView: View {
         }
         .padding(6)
         .frame(width: 282)
-        .background(RoundedRectangle(cornerRadius: 9).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
-        .overlay(RoundedRectangle(cornerRadius: 9).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+        .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 
     init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>, expenseCategories: [CategoryModel], toEdit: CategoryModel? = nil) {

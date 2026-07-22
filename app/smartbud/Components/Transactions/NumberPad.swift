@@ -36,7 +36,7 @@ struct NumberPad: View {
     var submit: () -> Void = {}
 
     private let numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    private let rowShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+    private let rowShape = RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
 
     /// Fixed row height (was `frame(maxHeight: .infinity)` in the previous
     /// rewrite — that made each row greedy and the bottom row clipped off-screen

@@ -27,10 +27,10 @@ final class SettingsViewModel{
     /// "logo" icon on the Settings row, not by country flags.
     func displayName(for code: String) -> String {
         switch code {
-        case "":        return String.appLocalized("System")
-        case "en":      return String.appLocalized("English")
-        case "zh-Hans": return String.appLocalized("Simplified Chinese")
-        case "zh-Hant": return String.appLocalized("Traditional Chinese")
+        case "":        return String.appLocalized(L10n.languageSystem)
+        case "en":      return String.appLocalized(L10n.languageEnglish)
+        case "zh-Hans": return String.appLocalized(L10n.languageSimplifiedChinese)
+        case "zh-Hant": return String.appLocalized(L10n.languageTraditionalChinese)
         default:        return code
         }
     }
@@ -40,6 +40,6 @@ final class SettingsViewModel{
     /// Subtitle shown in the PRO section of `SettingsView`. Localized so it
     /// follows the in-app language switch in `SettingsLanguageView`.
     var proCardSubtitle: String {
-        String.appLocalized("Unlock all Pro features")
+        String.appLocalized(SettingsKey.proSubtitle)
     }
 }

@@ -134,7 +134,7 @@ struct TransactionView: View {
         .padding(5)
         .background(
             Color.SecondaryBackground,
-            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous))
+            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
     }
 
     @ViewBuilder
@@ -147,7 +147,7 @@ struct TransactionView: View {
             .padding(.horizontal, 5)
             .background(
                 color.opacity(0.23),
-                in: RoundedRectangle(cornerRadius: 6.5, style: .continuous))
+                in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
     }
 
     @ViewBuilder
@@ -170,7 +170,7 @@ struct TransactionView: View {
             .frame(height: 45)
             .frame(maxWidth: .infinity)
             .background(
-                color, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                color, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
     }
 
     @ViewBuilder
@@ -182,7 +182,7 @@ struct TransactionView: View {
             .frame(maxWidth: .infinity)
             .background(
                 Color.SecondaryBackground,
-                in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
     }
 
     @ViewBuilder
@@ -334,7 +334,7 @@ struct TransactionView: View {
                 .padding(8)
                 .background(
                     Color.AlertRed.opacity(0.23),
-                    in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                 )
                 .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                 .frame(maxWidth: dynamicTypeSize > .xLarge ? 250 : 200)
@@ -446,7 +446,7 @@ struct TransactionView: View {
                 .datePickerStyle(.graphical)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
-                .glassCard(in: RoundedRectangle(cornerRadius: 13))
+                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card))
                 .padding(17)
                 .onChange(of: dateString) { _, _ in
                     handleDateChanged()
@@ -506,7 +506,7 @@ struct TransactionView: View {
         .animation(.default, value: isDateToday(date: date))
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .strokeBorder(Color.Outline, lineWidth: 1.5)
         )
         .contentShape(Rectangle())
@@ -533,7 +533,7 @@ struct TransactionView: View {
                     .frame(width: widthOfCategoryButton)
                     .foregroundStyle(Color.AlertRed)
                     .background(Color.AlertRed.opacity(0.23),
-                        in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+                        in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                     )
                 } else {
                     if let unwrappedCategory = category {
@@ -569,7 +569,7 @@ struct TransactionView: View {
         .foregroundStyle(color)
         .background(
             color.opacity(0.35),
-            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -592,11 +592,11 @@ struct TransactionView: View {
         .foregroundStyle(categoryButtonTextColor)
         .background(
             categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
         )
         .contentShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
         )
         .drawingGroup()
@@ -626,10 +626,10 @@ struct TransactionView: View {
         .foregroundStyle(categoryButtonTextColor)
         .background(
             categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
         )
         .drawingGroup()
@@ -733,9 +733,9 @@ struct TransactionView: View {
                 }
             }
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 13).stroke(
+                RoundedRectangle(cornerRadius: GlassRadius.card).stroke(
                     systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
             )
             .offset(y: offset)
@@ -1246,7 +1246,7 @@ struct NoteView: View {
         .padding(.vertical, 7)
         .padding(.horizontal, 10)
         .overlay(
-            RoundedRectangle(cornerRadius: 11.5, style: .continuous)
+            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
                 .stroke(Color.Outline, lineWidth: 1.5)
         )
         .onChange(of: textFocused) { _, newValue in
@@ -1304,7 +1304,7 @@ struct RecurringPickerView: View {
                 .padding(5)
                 .background {
                     if repeatType == index && repeatCoefficient == 1 {
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: GlassRadius.pill)
                             .fill(
                                 darkMode
                                 ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground")
@@ -1360,7 +1360,7 @@ struct RecurringPickerView: View {
             .padding(5)
             .background {
                 if repeatCoefficient > 1 {
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: GlassRadius.pill)
                         .fill(
                             darkMode
                             ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground")
@@ -1396,12 +1396,12 @@ struct RecurringPickerView: View {
         .padding(4)
         .frame(width: 150)
         .background(
-            RoundedRectangle(cornerRadius: 9).fill(
+            RoundedRectangle(cornerRadius: GlassRadius.chip).fill(
                 darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")
             ).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 9).stroke(
+            RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(
                 darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 }
@@ -1486,7 +1486,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 30 ? 0.25 : 1)
@@ -1497,7 +1497,7 @@ struct CustomRecurringView: View {
                         .font(.system(size: 23, weight: .medium, design: .rounded))
                         .padding(7)
                         .background {
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                                 .fill(Color.SecondaryBackground)
                                 .frame(width: 40, height: 40)
                         }
@@ -1510,7 +1510,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 2 ? 0.25 : 1)
@@ -1527,7 +1527,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 1 ? 0.25 : 1)
@@ -1546,7 +1546,7 @@ struct CustomRecurringView: View {
                     .font(.system(size: 23, weight: .medium, design: .rounded))
                     .padding(7)
                     .background {
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
                             .fill(Color.SecondaryBackground)
                             .frame(height: 40)
                     }
@@ -1559,7 +1559,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 3 ? 0.25 : 1)
@@ -1589,6 +1589,6 @@ struct ButtonView: View {
             .frame(width: size.width * 0.3, height: size.height * 0.22)
             .background(Color.SecondaryBackground)
             .foregroundStyle(Color.PrimaryText)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip))
     }
 }

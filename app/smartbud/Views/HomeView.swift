@@ -223,7 +223,7 @@ struct AppLockView: View {
                 .padding(.horizontal, 40)
                 .padding(.vertical, 15)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 13)
+                    RoundedRectangle(cornerRadius: GlassRadius.card)
                         .stroke(Color.Outline)
                 }
             }
