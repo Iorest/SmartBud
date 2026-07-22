@@ -15857,6 +15857,30 @@
           }
         }
       }
+    },
+    "PleaseReopenApp" : {
+      "comment" : "Shown after the user picks a new language. iOS does not allow an app to relaunch itself, so the user must close and reopen the app manually.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved. Please reopen the app to apply."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已保存。请重新打开 App 以生效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存。請重新開啟 App 以生效。"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"

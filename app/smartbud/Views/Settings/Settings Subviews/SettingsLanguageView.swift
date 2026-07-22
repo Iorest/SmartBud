@@ -10,10 +10,13 @@
 //  and bypasses the `\.locale` environment, so the only reliable way to switch
 //  every visible string is a full process restart.
 //
-//  Restart is done via `UIApplication.perform(#selector(NSXPCConnection.suspend))`
-//  — a private selector that crashes the process gracefully; SpringBoard
-//  immediately relaunches it, so the user stays inside the app (no home-screen
-//  round trip) instead of being kicked out by `exit(0)`.
+//  Restart is attempted via `UIApplication.perform(#selector(NSXPCConnection.suspend))`
+//  — a private selector that historically caused the OS to terminate and
+//  immediately re-spawn the app, keeping the user in-app. On iOS 26+ this
+//  trick is neutered (selector resolves but no crash), so we also schedule
+//  an `exit(0)` fallback 2.5s later: the user lands on the home screen and
+//  can tap the icon to reopen with the new language. Not in-place, but
+//  recoverable instead of being stuck on the "Restarting…" overlay.
 //
 //  Empty string means "follow system locale".
 //
@@ -31,9 +34,11 @@ struct SettingsLanguageView: View {
 
     @Namespace var animation
 
-    /// When `true`, the view shows a brief "Restarting…" overlay before
-    /// calling `exit(0)`. We can't just exit immediately because the user
-    /// needs visual feedback that the language change was accepted.
+    /// When `true`, the view shows a "Saved. Please reopen the app." overlay
+    /// with a checkmark while we wait for the 2.5s `exit(0)` timer to fire.
+    /// iOS does not let an app relaunch itself, so the user has to tap the
+    /// app icon to come back. The overlay is honest about this rather than
+    /// pretending an automatic restart is happening.
     @State private var isRestarting = false
 
     var body: some View {
@@ -94,11 +99,13 @@ struct SettingsLanguageView: View {
 
             if isRestarting {
                 VStack(spacing: 12) {
-                    ProgressView()
-                        .controlSize(.large)
-                    Text(String.appLocalized("Restarting…"))
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(Color.IncomeGreen)
+                    Text(String.appLocalized("PleaseReopenApp"))
                         .font(.system(.callout, design: .rounded).weight(.semibold))
                         .foregroundStyle(Color.PrimaryText)
+                        .multilineTextAlignment(.center)
                 }
                 .padding(28)
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
@@ -121,11 +128,27 @@ struct SettingsLanguageView: View {
             appLanguage = code
             isRestarting = true
         }
-        // Give SwiftUI a tick to commit the animation, then trigger the
-        // graceful crash → relaunch.
+
+        // Strategy:
+        // 1) Try the standard iOS "self-relaunch" trick first — a private
+        //    selector that crashes the process gracefully; SpringBoard
+        //    then immediately re-spawns the app and the user stays in-app.
+        // 2) On iOS 26+ Apple has silently neutered `NSXPCConnection.suspend`
+        //    — `perform(...)` returns without effect, and the app would sit
+        //    on the "Restarting…" overlay forever. After 2.5s, fall back to
+        //    `exit(0)`: the user lands on the home screen, then taps the
+        //    app icon to reopen with the new language applied. Not as nice
+        //    as in-place relaunch, but at least the user can recover.
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             #if canImport(UIKit)
                 UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+            #endif
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            #if canImport(UIKit)
+                exit(0)
             #endif
         }
     }
