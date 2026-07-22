@@ -117,52 +117,6 @@
       },
       "shouldTranslate" : false
     },
-    "\"Cent-less\"" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\"Cent-less\""
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“无小数”"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「無小數」"
-          }
-        }
-      }
-    },
-    "\"Pre-dotted\"" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\"Pre-dotted\""
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "“预加小数点”"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「預設小數點」"
-          }
-        }
-      }
-    },
     "/day" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -852,12 +806,6 @@
           }
         }
       }
-    },
-    "%lld%%" : {
-
-    },
-    "%lld%% spent" : {
-
     },
     "%lldd left" : {
       "extractionState" : "manual",
@@ -1825,30 +1773,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appearance"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "外观"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "外觀"
-          }
-        }
-      }
-    },
-    "APPEARANCE" : {
-      "comment" : "Additional keys for hardcoded strings found in source code",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APPEARANCE"
           }
         },
         "zh-Hans" : {
@@ -3671,29 +3595,6 @@
         }
       }
     },
-    "Custom" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Custom"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自定义"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自訂"
-          }
-        }
-      }
-    },
     "Custom Category Colors" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -3948,29 +3849,6 @@
         }
       }
     },
-    "DATA" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DATA"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "数据"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "資料"
-          }
-        }
-      }
-    },
     "Data Import" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -4035,30 +3913,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日期格式"
-          }
-        }
-      }
-    },
-    "Date,Note,Amount,Category,Type\n" : {
-      "comment" : "CSV Export",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Date,Note,Amount,Category,Type\n"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日期,备注,金额,类别,类型\n"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日期,備註,金額,類別,類型\n"
           }
         }
       }
@@ -5055,29 +4909,6 @@
         }
       }
     },
-    "Evenings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Evenings"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "傍晚"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "傍晚"
-          }
-        }
-      }
-    },
     "Every evening (8:00 PM)" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5417,29 +5248,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "匯出資料"
-          }
-        }
-      }
-    },
-    "Export Failed" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export Failed"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "导出失败"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "導出失敗"
           }
         }
       }
@@ -6104,29 +5912,6 @@
         }
       }
     },
-    "GENERAL" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GENERAL"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "通用"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一般"
-          }
-        }
-      }
-    },
     "Get Budget Insights" : {
       "localizations" : {
         "en" : {
@@ -6397,29 +6182,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "給你！"
-          }
-        }
-      }
-    },
-    "Hidden" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hidden"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隐藏"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隱藏"
           }
         }
       }
@@ -8514,29 +8276,6 @@
         }
       }
     },
-    "Mornings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mornings"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "早晨"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "早晨"
-          }
-        }
-      }
-    },
     "Name" : {
       "localizations" : {
         "en" : {
@@ -9484,75 +9223,6 @@
         }
       }
     },
-    "Off" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Off"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "關閉"
-          }
-        }
-      }
-    },
-    "OK" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "确定"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "確定"
-          }
-        }
-      }
-    },
-    "On" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开启"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開啟"
-          }
-        }
-      }
-    },
     "on %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9595,29 +9265,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "經典款設計，深紫袋身配以琥珀色發光領結。"
-          }
-        }
-      }
-    },
-    "OTHERS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OTHERS"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "其他"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "其他"
           }
         }
       }
@@ -12979,29 +12626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示 %@ 當天的交易"
-          }
-        }
-      }
-    },
-    "Shown" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shown"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示"
           }
         }
       }

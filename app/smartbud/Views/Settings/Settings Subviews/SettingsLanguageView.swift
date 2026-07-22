@@ -3,12 +3,17 @@
 //  smartbud
 //
 //  Lets the user pick the in-app display language. The selected code is stored
-//  in `appLanguage` (UserDefaults). On pick, the view terminates the process
-//  via `exit(0)` so the next cold launch reads the new `appLanguage` and
-//  every `String.appLocalized(...)` call resolves to it. The app does NOT
-//  try to refresh in-place because `String.appLocalized` reads UserDefaults
-//  directly and bypasses the `\.locale` environment, so the only reliable
-//  way to switch every visible string is a full process restart.
+//  in `appLanguage` (UserDefaults). On pick, the view triggers a process
+//  restart so the next cold launch reads the new `appLanguage` and every
+//  `String.appLocalized(...)` call resolves to it. The app does NOT try to
+//  refresh in-place because `String.appLocalized` reads UserDefaults directly
+//  and bypasses the `\.locale` environment, so the only reliable way to switch
+//  every visible string is a full process restart.
+//
+//  Restart is done via `UIApplication.perform(#selector(NSXPCConnection.suspend))`
+//  — a private selector that crashes the process gracefully; SpringBoard
+//  immediately relaunches it, so the user stays inside the app (no home-screen
+//  round trip) instead of being kicked out by `exit(0)`.
 //
 //  Empty string means "follow system locale".
 //
@@ -102,9 +107,11 @@ struct SettingsLanguageView: View {
     }
 
     /// Persist the new pick, flash a "Restarting…" overlay so the user
-    /// gets visual feedback, then `exit(0)`. iOS will show the home
-    /// screen; the next launch reads the new `appLanguage` and every
-    /// `String.appLocalized(...)` call resolves to it.
+    /// gets visual feedback, then ask SpringBoard to relaunch the process.
+    /// `NSXPCConnection.suspend` is a private selector that causes the OS
+    /// to terminate and immediately re-spawn the app — the user stays in
+    /// the app rather than being dumped to the home screen as `exit(0)`
+    /// would do.
     private func selectLanguage(_ code: String) {
         guard code != appLanguage else {
             dismiss()
@@ -114,10 +121,11 @@ struct SettingsLanguageView: View {
             appLanguage = code
             isRestarting = true
         }
-        // Give SwiftUI a tick to commit the animation, then kill the process.
+        // Give SwiftUI a tick to commit the animation, then trigger the
+        // graceful crash → relaunch.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             #if canImport(UIKit)
-                exit(0)
+                UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
             #endif
         }
     }
