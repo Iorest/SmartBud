@@ -62,8 +62,8 @@ struct UpdateAlert: View {
                     Text(
                         String(
                             format: String.appLocalized("Version %@ (%@) · 18 Sep 2023"),
-                            UIApplication.appVersion ?? "",
-                            UIApplication.buildNumber ?? "")
+                            UIApplication.appVersion,
+                            UIApplication.buildNumber)
                     )
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
 //                        .font(.system(size: 15, weight: .medium, design: .rounded))

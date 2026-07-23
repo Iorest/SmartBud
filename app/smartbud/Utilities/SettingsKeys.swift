@@ -34,6 +34,57 @@ enum SettingsKey {
     static let proTitle = "settings.pro.title"
     static let proSubtitle = "settings.pro.subtitle"
 
+    // Subscription screen — required disclosures for App Store Guideline 3.1.2.
+    // `proLegalBody` and `proLegalAgree` are kept as single strings (no
+    // inline link markup) so the view can lay out the two legal links
+    // (Terms of Use / Privacy Policy) as proper tappable SwiftUI `Text`
+    // segments rather than parsing a Markdown blob at runtime.
+    static let proLegalBody = "settings.pro.legal.body"
+    static let proLegalAgree = "settings.pro.legal.agree"
+    static let proTermsOfUse = "settings.pro.termsOfUse"
+    static let proPrivacyPolicy = "settings.pro.privacyPolicy"
+    static let proManageSubscription = "settings.pro.manage"
+    static let proErrorTitle = "settings.pro.error.title"
+    static let proErrorPurchase = "settings.pro.error.purchase"
+    static let proErrorPending = "settings.pro.error.pending"
+    static let proErrorRestore = "settings.pro.error.restore"
+    static let proErrorDismiss = "settings.pro.error.dismiss"
+    static let proLimitedFreeTitle = "settings.pro.limitedFreeTitle"
+    static let proLimitedFreeSubtitle = "settings.pro.limitedFreeSubtitle"
+
+    // Subscription screen — group headers and the lifetime-specific
+    // disclosures. The auto-renewal text in `proLegalBody` covers the
+    // three subscription SKUs; the lifetime section needs its own one-
+    // line disclosure because non-consumable IAPs have no auto-renewal
+    // and no subscription to manage.
+    static let proSectionSubscriptions = "settings.pro.section.subscriptions"
+    static let proSectionLifetime = "settings.pro.section.lifetime"
+    static let proLifetimeOneTime = "settings.pro.lifetime.oneTime"
+    static let proLifetimeLegalBody = "settings.pro.lifetime.legal.body"
+
+    // MARK: - Erase all data
+
+    static let eraseTitle = "settings.erase.title"
+    static let eraseProgress = "settings.erase.progress"
+    static let eraseSuccess = "settings.erase.success"
+    static let erasePartial = "settings.erase.partial"
+    static let eraseFailure = "settings.erase.failure"
+
+    // MARK: - Export data (GDPR Article 20)
+
+    static let exportTitle = "settings.export.title"
+    static let exportSubtitle = "settings.export.subtitle"
+    static let exportAction = "settings.export.action"
+    static let exportProgress = "settings.export.progress"
+    static let exportSuccess = "settings.export.success"
+    static let exportFailure = "settings.export.failure"
+    static let exportEmpty = "settings.export.empty"
+
+    // MARK: - Banner (offline / fallback mode)
+
+    static let bannerFallbackTitle = "settings.banner.fallbackTitle"
+    static let bannerFallbackBody = "settings.banner.fallbackBody"
+
     // MARK: - Row titles (General)
 
     static let rowNotifications = "settings.row.notifications"

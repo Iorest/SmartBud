@@ -23,7 +23,6 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 
 ## Why You'll Love SmartBud
 
-- 100% free forever, with no paywall or ads.
 - Beautifully iOS-centric design, with simplicity at its core.
 - Insightful expenditure breakdowns over various time periods.
 - Create budgets based on expense categories and stick to them.
@@ -34,6 +33,7 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - Home screen quick actions make capturing new expenses a breeze.
 - A gorgeous night theme for dark mode fanatics.
 - Informative home and lock screen widgets keep you updated at a glance.
+- **SmartBud Pro** unlocks Batch Recognition, Advanced Insights, Exclusive Themes, Smart Reminders and Priority Support. Pick a monthly, half-yearly, or yearly auto-renewing subscription, or unlock everything forever with a one-time lifetime purchase. iCloud sync is available for free for all users.
 
 ## How to help
 

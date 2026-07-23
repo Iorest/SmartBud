@@ -42,7 +42,7 @@ struct WelcomeSheetView: View {
                                 .font(.system(size: 30, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color.PrimaryText)
 
-                            Text(String(localized: "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"))
+                            Text(String(localized: "Version \(UIApplication.appVersion) (\(UIApplication.buildNumber))"))
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(.bottom, 15)

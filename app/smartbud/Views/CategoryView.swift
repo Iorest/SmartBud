@@ -1260,7 +1260,6 @@ struct EditCategoryAlert: View {
             }
         }
         .onChange(of: customSelectedColor) { _, _ in
-            print("changed")
             selectedColour = customSelectedColor.toHex() ?? "#FFFFFF"
         }
         .colorPickerSheet(isPresented: $showNativePicker, selection: $customSelectedColor, supportsAlpha: false, title: "")

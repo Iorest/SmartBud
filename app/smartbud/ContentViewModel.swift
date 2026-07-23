@@ -47,7 +47,7 @@ final class ContentViewModel {
     @ObservationIgnored @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     @ObservationIgnored @AppStorage("topEdge", store: .appGroup) var savedTopEdge: Double = 30
     @ObservationIgnored @AppStorage("bottomEdge", store: .appGroup) var savedBottomEdge: Double = 15
-    @ObservationIgnored @AppStorage("previousVersion", store: .appGroup) var previousVersionString: String = "Version \(UIApplication.appVersion ?? "") (\(UIApplication.buildNumber ?? ""))"
+    @ObservationIgnored @AppStorage("previousVersion", store: .appGroup) var previousVersionString: String = "Version \(UIApplication.appVersion) (\(UIApplication.buildNumber))"
     @ObservationIgnored @AppStorage("showUpdateSheet", store: .appGroup) var showUpdateSheet: Bool = true
     @ObservationIgnored @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
 

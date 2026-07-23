@@ -117,6 +117,30 @@
       },
       "shouldTranslate" : false
     },
+    "·" : {
+      "comment" : "Middle-dot separator between legal links in SettingsProView; not actually passed to String(localized:) but extracted by the build's localisation pass.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "·"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "·"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "·"
+          }
+        }
+      }
+    },
     "/day" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -255,10 +279,52 @@
       }
     },
     "%@ SPENT" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ SPENT"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用 %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用 %@"
+          }
+        }
+      }
     },
     "%@ tab" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ tab"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 标签页"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 標籤頁"
+          }
+        }
+      }
     },
     "%@, %@" : {
       "localizations" : {
@@ -506,7 +572,28 @@
       }
     },
     "%lld hours left" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hours left"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 小时后到期"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 小時後到期"
+          }
+        }
+      }
     },
     "%lld months" : {
       "extractionState" : "manual",
@@ -807,6 +894,54 @@
         }
       }
     },
+    "%lld%%" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
+    },
+    "%lld%% spent" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% spent"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已花 %lld%%"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已花 %lld%%"
+          }
+        }
+      }
+    },
     "%lldd left" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -900,16 +1035,148 @@
       }
     },
     "^[%lld days](inflect: true)" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天"
+          }
+        }
+      }
     },
     "^[%lld hours left](inflect: true)" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hour left"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hours left"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 小时后到期"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 小時後到期"
+          }
+        }
+      }
     },
     "^[%lld months](inflect: true)" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld month"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld months"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 个月"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 個月"
+          }
+        }
+      }
     },
     "^[%lld weeks](inflect: true)" : {
-
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld week"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weeks"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 周"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 週"
+          }
+        }
+      }
     },
     "+%@" : {
       "localizations" : {
@@ -4886,6 +5153,30 @@
         }
       }
     },
+    "Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers." : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此操作会同时从 iCloud 删除你的数据。如果当前未登录 iCloud，下次联网同步时数据会从 Apple 服务器上清除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此操作會同時從 iCloud 刪除你的資料。如果目前未登入 iCloud，下次連線同步時資料會從 Apple 伺服器上清除。"
+          }
+        }
+      }
+    },
     "Error occurred while matching categories." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6521,13 +6812,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 %@ 中"
+            "value" : "在 %@"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 %@ 中"
+            "value" : "在 %@"
           }
         }
       }
@@ -8804,6 +9095,30 @@
     "NO TRANSACTIONS\n\\(subtitleText1)" : {
 
     },
+    "NO TRANSACTIONS\n%@" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NO TRANSACTIONS\n%@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无交易\n%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暫無交易\n%@"
+          }
+        }
+      }
+    },
     "no_expense_categories" : {
       "localizations" : {
         "en" : {
@@ -9789,6 +10104,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請稍候，我們正在處理你的新交易。"
+          }
+        }
+      }
+    },
+    "PleaseReopenApp" : {
+      "comment" : "Shown after the user picks a new language. iOS does not allow an app to relaunch itself, so the user must close and reopen the app manually.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved. Please reopen the app to apply."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已保存。请重新打开 App 以生效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已儲存。請重新開啟 App 以生效。"
           }
         }
       }
@@ -11114,6 +11453,342 @@
         }
       }
     },
+    "settings.banner.fallbackBody" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud and App Group storage are unreachable. New data won't sync until you relaunch with a working connection."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 和 App Group 暂不可用。新数据将不同步，下次正常启动后恢复。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 和 App Group 暫時無法使用。新資料將不同步，下次正常啟動後恢復。"
+          }
+        }
+      }
+    },
+    "settings.banner.fallbackTitle" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Working in offline mode"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前为离线模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前為離線模式"
+          }
+        }
+      }
+    },
+    "settings.erase.failure" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not erase all data. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法清除所有数据，请重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法清除所有資料，請重試。"
+          }
+        }
+      }
+    },
+    "settings.erase.partial" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local data erased, but iCloud wipe encountered an issue. The data on iCloud will be removed the next time this device is online."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地数据已清除，但 iCloud 清除遇到问题。数据将在本设备下次联网时从 iCloud 移除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本機資料已清除，但 iCloud 清除遇到問題。資料將在本裝置下次連線時從 iCloud 移除。"
+          }
+        }
+      }
+    },
+    "settings.erase.progress" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erasing…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在清除…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在清除…"
+          }
+        }
+      }
+    },
+    "settings.erase.success" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All data has been erased from this device and from iCloud."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有数据已从本设备和 iCloud 中清除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有資料已從本裝置和 iCloud 中清除。"
+          }
+        }
+      }
+    },
+    "settings.erase.title" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erase All Data"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有資料"
+          }
+        }
+      }
+    },
+    "settings.export.action" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generate Export"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成导出文件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "產生匯出檔案"
+          }
+        }
+      }
+    },
+    "settings.export.empty" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don't have any data to export yet."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你还没有数据可导出。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你還沒有資料可匯出。"
+          }
+        }
+      }
+    },
+    "settings.export.failure" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not generate the export. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法生成导出文件，请重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法產生匯出檔案，請重試。"
+          }
+        }
+      }
+    },
+    "settings.export.progress" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing your data…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备数据…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在準備資料…"
+          }
+        }
+      }
+    },
+    "settings.export.subtitle" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save a copy of your transactions, categories, budgets and templates as a JSON file. You can keep it for your records, move it to another app, or send it to us if you need help with your data."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将你的交易、分类、预算和模板另存为 JSON 文件。你可以保存为备份、迁移到其他应用，或在需要帮助时发送给我们。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將你的交易、分類、預算和範本另存為 JSON 檔案。你可以保存為備份、遷移到其他應用，或在需要協助時發送給我們。"
+          }
+        }
+      }
+    },
+    "settings.export.success" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export ready. Use the share sheet to save or send it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出文件已就绪，请用分享面板保存或发送。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯出檔案已就緒，請用分享面板儲存或傳送。"
+          }
+        }
+      }
+    },
+    "settings.export.title" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export My Data"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出我的数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯出我的資料"
+          }
+        }
+      }
+    },
     "settings.haptics.excessive" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11551,6 +12226,390 @@
         }
       }
     },
+    "settings.pro.error.dismiss" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉"
+          }
+        }
+      }
+    },
+    "settings.pro.error.manageUnavailable" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not open subscription management. Please try again from App Store Settings."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法打开订阅管理，请前往 App Store 设置重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法開啟訂閱管理，請前往 App Store 設定重試。"
+          }
+        }
+      }
+    },
+    "settings.pro.error.pending" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your purchase is pending approval."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买正在等待批准。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買正在等待批准。"
+          }
+        }
+      }
+    },
+    "settings.pro.error.purchase" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase failed. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买失败，请重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買失敗，請重試。"
+          }
+        }
+      }
+    },
+    "settings.pro.error.restore" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not restore purchases. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法恢复购买，请重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法恢復購買，請重試。"
+          }
+        }
+      }
+    },
+    "settings.pro.error.title" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出错了"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出錯了"
+          }
+        }
+      }
+    },
+    "settings.pro.legal.agree" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By subscribing, you agree to our Terms of Use and Privacy Policy."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅即表示您同意我们的服务条款和隐私政策。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訂閱即表示您同意我們的服務條款和隱私政策。"
+          }
+        }
+      }
+    },
+    "settings.pro.legal.body" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment will be charged to your Apple ID account upon confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions in your App Store account settings."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买确认后将通过您的 Apple ID 扣款。除非在当前周期结束前至少 24 小时关闭自动续订，否则订阅会自动续订。当前周期结束前 24 小时内会从您的账户扣款续订。您可在 App Store 账户设置中管理和取消订阅。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購買確認後將透過您的 Apple ID 扣款。除非在當前週期結束前至少 24 小時關閉自動續訂，否則訂閱會自動續訂。當前週期結束前 24 小時內會從您的帳戶扣款續訂。您可在 App Store 帳戶設定中管理和取消訂閱。"
+          }
+        }
+      }
+    },
+    "settings.pro.lifetime.legal.body" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lifetime plan is a one-time payment with no auto-renewal. Restore it on a new device with Restore Purchases."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久买断为一次性付款，不自动续订。换设备时可通过「恢复购买」找回。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久買斷為一次性付款，不自動續訂。換裝置時可透過「恢復購買」找回。"
+          }
+        }
+      }
+    },
+    "settings.pro.lifetime.oneTime" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-time purchase, no subscription"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性购买，无订阅"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性購買，無訂閱"
+          }
+        }
+      }
+    },
+    "settings.pro.limitedFreeSubtitle" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Pro features are unlocked for everyone during the launch period. Enjoy!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发布期间，所有 Pro 功能对所有用户免费开放，敬请体验。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發佈期間，所有 Pro 功能對所有使用者免費開放，敬請體驗。"
+          }
+        }
+      }
+    },
+    "settings.pro.limitedFreeTitle" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limited-Time Free"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "限时免费"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "限時免費"
+          }
+        }
+      }
+    },
+    "settings.pro.manage" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Subscription"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理订阅"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理訂閱"
+          }
+        }
+      }
+    },
+    "settings.pro.privacyPolicy" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐私政策"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱私政策"
+          }
+        }
+      }
+    },
+    "settings.pro.section.lifetime" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久买断"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "永久買斷"
+          }
+        }
+      }
+    },
+    "settings.pro.section.subscriptions" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訂閱"
+          }
+        }
+      }
+    },
     "settings.pro.subtitle" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11570,6 +12629,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "解鎖全部 Pro 功能"
+          }
+        }
+      }
+    },
+    "settings.pro.termsOfUse" : {
+      "comment" : "",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务条款"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服務條款"
           }
         }
       }
@@ -11782,24 +12865,25 @@
       }
     },
     "settings.row.exportData" : {
-      "extractionState" : "stale",
+      "comment" : "",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export Data"
+            "value" : "Export My Data"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导出数据"
+            "value" : "导出我的数据"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "導出資料"
+            "value" : "匯出我的資料"
           }
         }
       }
@@ -15854,30 +16938,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暫無記錄"
-          }
-        }
-      }
-    },
-    "PleaseReopenApp" : {
-      "comment" : "Shown after the user picks a new language. iOS does not allow an app to relaunch itself, so the user must close and reopen the app manually.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved. Please reopen the app to apply."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已保存。请重新打开 App 以生效。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已儲存。請重新開啟 App 以生效。"
           }
         }
       }

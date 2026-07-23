@@ -19,6 +19,12 @@ final class TransactionViewModel{
         repo.insert(txn)
         if repeatType > 0 { processRecurring(txn) }
         repo.save()
+        // Fire-in-app review prompt at the 3rd, 10th, and 25th
+        // transaction. Apple's StoreKit caps the prompt itself at
+        // 3x/year; `ReviewRequester` adds a per-version dedup so
+        // each app version asks at most once even if the user hits
+        // all three thresholds within it.
+        ReviewRequester.recordTransactionCreated()
         return txn
     }
 

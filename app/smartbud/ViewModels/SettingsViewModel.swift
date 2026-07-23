@@ -16,6 +16,13 @@ final class SettingsViewModel{
         repo.deleteAll()
     }
 
+    /// "Erase All Data" — wipes local records AND the CloudKit zone
+    /// for App Store Guideline 5.1.1(v) compliance. See
+    /// `DataRepository.wipeEverything()` for the full path.
+    func wipeAllData() async -> DataRepository.WipeOutcome {
+        await repo.wipeEverything()
+    }
+
     // MARK: - In-app language
 
     /// Supported in-app language codes. `nil` means "follow system".

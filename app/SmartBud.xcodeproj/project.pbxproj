@@ -163,6 +163,12 @@
 		EA73CF5EB74E4812BEFC8A76 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */; };
 		EAD8E5794121478C9198DC1C /* SwiftDataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12072D557564B5B9E98F56D /* SwiftDataCore.swift */; };
 		FCCEDDC1F83742EC8CE62204 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */; };
+		AAAA00000000000000000002 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000001 /* PrivacyInfo.xcprivacy */; };
+		AAAA00000000000000000004 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000003 /* PrivacyInfo.xcprivacy */; };
+		AAAA00000000000000000011 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000010 /* SubscriptionManager.swift */; };
+		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* ReviewRequester.swift */; };
+		AAAA00000000000000000031 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
+		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -314,6 +320,12 @@
 		F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
 		F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionViewModel.swift; sourceTree = "<group>"; };
 		F69F2676652B477A97938CFD /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AAAA00000000000000000003 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AAAA00000000000000000010 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SubscriptionManager.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000020 /* ReviewRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequester.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000030 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataExporter.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -387,6 +399,7 @@
 		5327D285287C697400F76ADF /* SmartBud */ = {
 			isa = PBXGroup;
 			children = (
+				AAAA00000000000000000001 /* PrivacyInfo.xcprivacy */,
 				5327D2E8287C6DF700F76ADF /* SmartBud.entitlements */,
 				5327D2E7287C6DC200F76ADF /* Info.plist */,
 				53756F622AC3C25E0065D0C2 /* sample.csv */,
@@ -406,6 +419,8 @@
 				5327D28C287C697C00F76ADF /* Preview Content */,
 				AE30A1522AE7D95200E516B3 /* Components */,
 				042918746E7F49F48130B5AB /* ViewModels */,
+				AAAA00000000000000000010 /* SubscriptionManager.swift */,
+				AAAA00000000000000000030 /* DataExporter.swift */,
 			);
 			path = smartbud;
 			sourceTree = "<group>";
@@ -440,6 +455,7 @@
 				536A2A142A59C47400D81E02 /* Wiggle.swift */,
 				533D1C3B2AE7BB6900894764 /* DynamicType.swift */,
 				D63B205E2D8728C300CAFB20 /* ScreenSize.swift */,
+				AAAA00000000000000000020 /* ReviewRequester.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -519,6 +535,7 @@
 		53B1D18F288ED7E500E28062 /* ExpenditureWidget */ = {
 			isa = PBXGroup;
 			children = (
+				AAAA00000000000000000003 /* PrivacyInfo.xcprivacy */,
 				7A1B2C3D4E5F6071829A0BC1 /* WidgetModelContainer.swift */,
 				53B1D190288ED7E500E28062 /* ExpenditureWidget.swift */,
 				7A0B1C2D3E4F5061718192AA /* WidgetGlassBackground.swift */,
@@ -584,6 +601,7 @@
 				53D6BDE02AF73FAB00F5728E /* SettingsSubviewModifier.swift */,
 				D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */,
 				395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */,
+				AAAA00000000000000000040 /* SettingsExportView.swift */,
 			);
 			path = "Settings Subviews";
 			sourceTree = "<group>";
@@ -706,6 +724,7 @@
 				E1E7AEE5300B627F00E5B3E1 /* Localizable.xcstrings in Resources */,
 				D1CE5701500000000000B001 /* InfoPlist.strings in Resources */,
 				5327D2E0287C6B7D00F76ADF /* DeviceModels.json in Resources */,
+				AAAA00000000000000000002 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,6 +736,7 @@
 				53B1D193288ED87000E28062 /* Assets.xcassets in Resources */,
 				D63B20542D8728C300CAFB20 /* (null) in Resources */,
 				D6A1B2C3D4E5F6071829A0C6 /* Localizable.xcstrings in Resources */,
+				AAAA00000000000000000004 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -759,7 +779,11 @@
 				EAD8E5794121478C9198DC1C /* SwiftDataCore.swift in Sources */,
 				536A2A152A59C47400D81E02 /* Wiggle.swift in Sources */,
 				AEADEF742AE94DC3006EB614 /* ToolbarButton.swift in Sources */,
-				53D6BDCE2AF73BDA00F5728E /* SettingsWeekStartView.swift in Sources */,
+		53D6BDCE2AF73BDA00F5728E /* SettingsWeekStartView.swift in Sources */,
+		AAAA00000000000000000011 /* SubscriptionManager.swift in Sources */,
+		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */,
+		AAAA00000000000000000031 /* DataExporter.swift in Sources */,
+		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */,
 				53D6BDCA2AF73B7A00F5728E /* SettingsAppIconView.swift in Sources */,
 				5327D2D9287C6B5F00F76ADF /* HomeView.swift in Sources */,
 				53D6BDCC2AF73BC800F5728E /* SettingsCurrencyView.swift in Sources */,
@@ -1055,6 +1079,7 @@
 				INFOPLIST_FILE = smartbud/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SmartBud;
 				INFOPLIST_KEY_CFBundleLocalizations = "en zh-Hans zh-Hant";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save an image of a transaction for sharing.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1099,6 +1124,7 @@
 				INFOPLIST_FILE = smartbud/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SmartBud;
 				INFOPLIST_KEY_CFBundleLocalizations = "en zh-Hans zh-Hant";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save an image of a transaction for sharing.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

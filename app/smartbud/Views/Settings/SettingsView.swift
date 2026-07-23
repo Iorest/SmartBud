@@ -27,6 +27,7 @@ enum SettingsRoute: Hashable {
     case upcoming
     case cloud
     case erase
+    case export
     case haptics
     case featureLab
     case numberEntry
@@ -166,8 +167,6 @@ struct SettingsView: View {
   // popups
 
   @State var showImportGuide = false
-  @State var showExportError = false
-  @State var exportErrorMessage = ""
 
   @Environment(TabBarManager.self) var tabBarManager
 
@@ -455,9 +454,7 @@ struct SettingsView: View {
                   colour: 112)
               }
 
-              Button {
-                exportData()
-              } label: {
+              NavigationLink(value: SettingsRoute.export) {
                 SettingsRowView(
                   systemImage: "square.and.arrow.up.fill",
                   title: SettingsKey.rowExportData,
@@ -566,6 +563,7 @@ struct SettingsView: View {
           case .upcoming: SettingsUpcomingView()
           case .cloud: SettingsCloudView()
           case .erase: SettingsEraseView()
+          case .export: SettingsExportView()
           case .haptics: SettingsHapticsView()
           case .featureLab: SettingsGoofyView()
           case .numberEntry:
@@ -599,11 +597,6 @@ struct SettingsView: View {
       }
       .fullScreenCover(isPresented: .constant(CommandLine.arguments.contains("-openPro"))) {
         NavigationStack { SettingsProView() }
-      }
-      .alert(String.appLocalized(L10n.exportFailed), isPresented: $showExportError) {
-        Button(String.appLocalized(L10n.alertOk), role: .cancel) {}
-      } message: {
-        Text(exportErrorMessage)
       }
     }
   }
@@ -656,52 +649,11 @@ struct SettingsView: View {
   }
 
   func exportData() {
-    let transactions = settingsVM.fetchAllTransactions()
-
-    let fileName = "export.csv"
-    let path = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
-    var csvText = String.appLocalized(L10n.exportCsvHeader)
-
-    for transaction in transactions {
-      var string = transaction.wrappedNote
-      let type: String
-
-      if transaction.income {
-        type = String.appLocalized(L10n.exportTypeIncome)
-      } else {
-        type = String.appLocalized(L10n.exportTypeExpense)
-      }
-
-      string.removeAll(where: { $0 == "," })
-
-      csvText +=
-        "\(transaction.wrappedDate),\(string),\(transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))),\(transaction.category?.wrappedName ?? ""),\(type)\n"
-    }
-
-    var writeSucceeded = false
-    do {
-        try csvText.write(to: path!, atomically: true, encoding: String.Encoding.utf8)
-        writeSucceeded = true
-    } catch {
-        exportErrorMessage = error.localizedDescription
-        showExportError = true
-    }
-
-    guard writeSucceeded else {
-        return
-    }
-
-    var filesToShare = [Any]()
-    filesToShare.append(path!)
-
-    let av = UIActivityViewController(activityItems: filesToShare, applicationActivities: nil)
-
-    let allScenes = UIApplication.shared.connectedScenes
-    let scene = allScenes.first { $0.activationState == .foregroundActive }
-
-    if let windowScene = scene as? UIWindowScene {
-      windowScene.keyWindow?.rootViewController?.present(av, animated: true, completion: nil)
-    }
+    // Replaced by SettingsExportView (GDPR Article 20 — full JSON
+    // export including categories, budgets and templates; not just
+    // the transaction CSV this function used to produce). The row
+    // in the Settings data section now navigates to that view
+    // instead of calling this stub.
   }
 }
 

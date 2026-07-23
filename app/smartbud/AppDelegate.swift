@@ -21,8 +21,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        NSLog("[AppDelegate] didFinishLaunching")
-
         // Note: in-app language switching is handled by
         // `String.appLocalized(...)` in `AppLocale.swift`, which resolves
         // through the user's `appLanguage` pick on every call. The

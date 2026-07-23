@@ -1,8 +1,19 @@
 //
 //  EmailExtensions.swift
-//  Bonsai
+//  smartbud
 //
 //  Created by Iorest on 8/7/22.
+//
+//  UIDevice + Bundle helpers specific to the email / support flow:
+//    * `UIDevice.DeviceModel` decodes the iPhone/iPad model table
+//      bundled at `DeviceModels.json`.
+//    * `UIDevice.modelName` resolves the current device's model
+//      identifier (e.g. "iPhone16,1") to a human-readable name
+//      ("iPhone 15 Pro") using that table.
+//    * `Bundle.decode<T>(…)` is a tiny JSON loader used by the
+//      support email body.
+//
+//  Version / build / display-name accessors live in `AppVersion.swift`.
 //
 
 import Foundation
@@ -34,18 +45,6 @@ extension UIDevice {
 }
 
 extension Bundle {
-    var displayName: String {
-        object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Could not determine the application name"
-    }
-
-    var appBuild: String {
-        object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Could not determine the application build number"
-    }
-
-    var appVersion: String {
-        object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Could not determine the application version"
-    }
-
     func decode<T: Decodable>(_: T.Type,
                               from file: String,
                               dateDecodingStategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,

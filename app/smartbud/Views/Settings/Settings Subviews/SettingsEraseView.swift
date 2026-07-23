@@ -4,6 +4,13 @@
 //
 //  Created by Iorest on 5/11/23.
 //
+//  "Erase All Data" screen. The long-press confirmation calls
+//  `SettingsViewModel.wipeAllData()`, which deletes the local store
+//  AND the CloudKit record zone — required for App Store Guideline
+//  5.1.1(v), since the data lives in the user's iCloud private
+//  database and would otherwise linger there even after the local
+//  copy is gone.
+//
 
 import Foundation
 import SwiftUI
@@ -48,6 +55,17 @@ struct SettingsEraseView: View {
       .foregroundStyle(Color.SubtitleText)
       .padding(.horizontal, 15)
       .frame(maxWidth: .infinity, alignment: .leading)
+
+      // 5.1.1(v) hint: data also lives in the user's iCloud.
+      Text(
+        String.appLocalized("Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers.")
+      )
+      .font(.system(.caption, design: .rounded).weight(.regular))
+      .multilineTextAlignment(.leading)
+      .foregroundStyle(Color.SubtitleText.opacity(0.85))
+      .padding(.horizontal, 15)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.top, 4)
     }
     .modifier(SettingsSubviewModifier())
     .fullScreenCover(isPresented: $showAlert) {
@@ -70,6 +88,8 @@ struct DeleteAllAlert: View {
   @GestureState var isDetectingLongPress = false
   @State var completedLongPress = false
   @State private var heavyHaptic = 0
+  @State private var isWiping = false
+  @State private var wipeResult: DataRepository.WipeOutcome?
 
   var longPress: some Gesture {
     LongPressGesture(minimumDuration: 2)
@@ -89,7 +109,7 @@ struct DeleteAllAlert: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {
-          dismiss()
+          if !isWiping { dismiss() }
         }
 
       VStack(alignment: .leading, spacing: 1.5) {
@@ -119,10 +139,17 @@ struct DeleteAllAlert: View {
               .offset(x: completedLongPress ? 0 : (isDetectingLongPress ? 0 : -(proxy.size.width)))
               .animation(.easeInOut(duration: 2), value: isDetectingLongPress)
 
-            Text(String.appLocalized("Delete Literally Everything"))
-              .font(.system(.title3, design: .rounded).weight(.semibold))
-              .foregroundStyle(.white)
-              .frame(width: proxy.size.width, alignment: .center)
+            if isWiping {
+              ProgressView()
+                .progressViewStyle(.circular)
+                .tint(.white)
+                .frame(width: proxy.size.width, alignment: .center)
+            } else {
+              Text(String.appLocalized("Delete Literally Everything"))
+                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(width: proxy.size.width, alignment: .center)
+            }
           }
           .frame(height: proxy.size.height)
           .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
@@ -143,13 +170,13 @@ struct DeleteAllAlert: View {
             }
         )
         .onChange(of: completedLongPress) { _, _ in
-          if completedLongPress {
+          if completedLongPress && !isWiping {
             heavyHaptic &+= 1
-
+            isWiping = true
             Task { @MainActor in
-              try? await Task.sleep(for: .milliseconds(500))
-              settingsVM.eraseAllData()
-
+              let outcome = await settingsVM.wipeAllData()
+              wipeResult = outcome
+              isWiping = false
               dismiss()
             }
           }
@@ -157,8 +184,10 @@ struct DeleteAllAlert: View {
         .sensoryFeedback(.impact(weight: .heavy), trigger: heavyHaptic)
 
         Button {
-          withAnimation(.easeOut(duration: 0.7)) {
-            dismiss()
+          if !isWiping {
+            withAnimation(.easeOut(duration: 0.7)) {
+              dismiss()
+            }
           }
 
         } label: {
@@ -178,14 +207,14 @@ struct DeleteAllAlert: View {
       .gesture(
         DragGesture()
           .onChanged { gesture in
-            if gesture.translation.height < 0 {
+            if !isWiping, gesture.translation.height < 0 {
               offset = gesture.translation.height / 3
-            } else {
+            } else if !isWiping {
               offset = gesture.translation.height
             }
           }
           .onEnded { value in
-            if value.translation.height > 20 {
+            if !isWiping, value.translation.height > 20 {
               dismiss()
             } else {
               withAnimation {
@@ -199,5 +228,40 @@ struct DeleteAllAlert: View {
     }
     .ignoresSafeArea(.all)
     .background(BackgroundBlurView())
+    .alert(
+      wipeResultTitle,
+      isPresented: Binding(
+        get: { wipeResult != nil },
+        set: { if !$0 { wipeResult = nil } }
+      ),
+      actions: {
+        Button(String.appLocalized("alert.ok"), role: .cancel) {
+          wipeResult = nil
+        }
+      },
+      message: { Text(wipeResultBody) }
+    )
+  }
+
+  private var wipeResultTitle: String {
+    switch wipeResult {
+    case .complete, .partial:
+      String.appLocalized(SettingsKey.eraseTitle)
+    case .localFailed, .none:
+      String.appLocalized(SettingsKey.proErrorTitle)
+    }
+  }
+
+  private var wipeResultBody: String {
+    switch wipeResult {
+    case .complete:
+      String.appLocalized(SettingsKey.eraseSuccess)
+    case .partial:
+      String.appLocalized(SettingsKey.erasePartial)
+    case .localFailed:
+      String.appLocalized(SettingsKey.eraseFailure)
+    case .none:
+      ""
+    }
   }
 }

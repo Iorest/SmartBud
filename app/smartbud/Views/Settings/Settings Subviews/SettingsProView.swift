@@ -3,63 +3,72 @@
 //  smartbud
 //
 //  SmartBud Pro subscription view. Shows the premium feature list and a
-//  StoreKit 2 ProductView for purchasing. When no products are configured
-//  (e.g. development build without App Store Connect setup), falls back to
-//  a "Coming Soon" placeholder so the screen still renders correctly.
+//  StoreKit 2 `ProductView` for purchasing, plus the disclosures required
+//  by App Store Guideline 3.1.2 (auto-renewal terms, links to Terms of
+//  Use / Privacy Policy, an in-app Manage Subscription entry per
+//  Guideline 3.1.5).
+//
+//  All StoreKit work is delegated to `SubscriptionManager`. The view is
+//  intentionally free of `Product.products(for:)` and `AppStore.sync()`
+//  calls so the entitlement lifecycle has exactly one implementation.
 //
 
-import SwiftUI
 import StoreKit
+import SwiftUI
+import UIKit
 
 struct SettingsProView: View {
-    @Environment(\.dismiss) var dismiss
-    @State var settingsVM = SettingsViewModel.shared
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
-    @AppStorage("isProSubscriber", store: .appGroup)
-    var isProSubscriber: Bool = false
+    @State private var subscription = SubscriptionManager.shared
+    @State private var settingsVM = SettingsViewModel.shared
 
-    @State private var loadedProducts: [Product] = []
-    @State private var isLoadingProducts: Bool = false
+    @State private var isPresentingError: Bool = false
+    @State private var pendingErrorMessage: String = ""
 
-    private let productIDs: [String] = [
-        "com.iorest.smartbud.pro.monthly",
-        "com.iorest.smartbud.pro.yearly"
-    ]
-
-    private let features: [(icon: String, color: String, title: String, subtitle: String)] = [
-        ("icloud.fill", "111", String.appLocalized("iCloud Sync"), String.appLocalized("Sync your data across all your Apple devices")),
-        ("doc.text.viewfinder", "112", String.appLocalized("Batch Recognition"), String.appLocalized("Import multiple transactions from a single receipt photo")),
-        ("chart.bar.xaxis", "103", String.appLocalized("Advanced Insights"), String.appLocalized("Deeper breakdowns, custom date ranges, exportable charts")),
-        ("paintpalette.fill", "100", String.appLocalized("Exclusive Themes"), String.appLocalized("Additional app icons and accent colors")),
-        ("bell.badge.fill", "102", String.appLocalized("Smart Reminders"), String.appLocalized("Customizable notification schedules and quiet hours")),
-        ("lock.shield.fill", "105", String.appLocalized("Priority Support"), String.appLocalized("Direct access to the development team for help"))
+    // Note: `iCloud Sync` was removed from `features` because all users
+    // already get it for free via the CloudKit-backed SwiftData store
+    // (`SwiftDataCore.swift`). Charging for it as a Pro feature is
+    // misleading advertising and a likely 3.1.1 reviewer flag.
+    //
+    // Note: `Batch Recognition` (OCR import from receipt photos) is
+    // also not in this list — the underlying Vision pipeline is not
+    // shipped yet, so advertising it would be a 3.1.1 violation
+    // (misleading). Add it back here when the implementation lands.
+    private let features: [(icon: String, color: String, titleKey: String, subtitleKey: String)] = [
+        ("chart.bar.xaxis", "103", "Advanced Insights", "Deeper breakdowns, custom date ranges, exportable charts"),
+        ("paintpalette.fill", "100", "Exclusive Themes", "Additional app icons and accent colors"),
+        ("bell.badge.fill", "102", "Smart Reminders", "Customizable notification schedules and quiet hours"),
+        ("lock.shield.fill", "105", "Priority Support", "Direct access to the development team for help"),
     ]
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    SettingsBackButton()
-                }
-                Spacer()
-            }
-            .overlay(alignment: .center) {
-                Text(String.appLocalized(SettingsKey.proTitle))
-                    .font(.system(.title3, design: .rounded).weight(.semibold))
-                    .foregroundStyle(Color.PrimaryText)
-            }
-            .padding(.bottom, 20)
-
+            headerBar
             ScrollView {
                 VStack(spacing: 24) {
-                    header
-                    if isProSubscriber {
-                        proActiveBadge
+                    // `hasActualProEntitlement` is the verified-storekit
+                    // entitlement only — independent of the
+                    // `isLimitedTimeFree` flag. This means:
+                    //   * Unlimited-time-free + never paid → subscribe
+                    //     state, with a banner up top, so the reviewer
+                    //     (and the user) can still see and tap prices.
+                    //   * Unlimited-time-free + already paid → active
+                    //     state, the "you already have Pro" UI.
+                    //   * Limited-time-free off + paid → active state.
+                    //   * Limited-time-free off + never paid → subscribe
+                    //     state, plain pricing, no banner.
+                    // Previously this branched on `isProSubscriber`,
+                    // which folds the promo flag in — so under the
+                    // default `isLimitedTimeFree = true` we were
+                    // permanently on the active branch and never showed
+                    // any product. That was a Guideline 2.1 / 2.3
+                    // rejection risk (no IAPs visible to the reviewer).
+                    if subscription.hasActualProEntitlement {
+                        activeState
                     } else {
-                        featuresList
-                        subscribeSection
+                        subscribeState
                     }
                     Spacer().frame(height: 40)
                 }
@@ -69,17 +78,50 @@ struct SettingsProView: View {
         }
         .modifier(SettingsSubviewModifier())
         .task {
-            await loadProducts()
+            await subscription.bootstrap()
         }
+        .onChange(of: subscription.lastError) { _, newError in
+            guard let newError else { return }
+            pendingErrorMessage = newError.errorDescription
+                ?? String.appLocalized(SettingsKey.proErrorPurchase)
+            isPresentingError = true
+            subscription.clearError()
+        }
+        .alert(
+            String.appLocalized(SettingsKey.proErrorTitle),
+            isPresented: $isPresentingError,
+            actions: {
+                Button(String.appLocalized(SettingsKey.proErrorDismiss), role: .cancel) {}
+            },
+            message: { Text(pendingErrorMessage) }
+        )
     }
 
-    private var header: some View {
+    // MARK: - Header
+
+    private var headerBar: some View {
+        HStack {
+            Button { dismiss() } label: { SettingsBackButton() }
+            Spacer()
+        }
+        .overlay(alignment: .center) {
+            Text(String.appLocalized(SettingsKey.proTitle))
+                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .foregroundStyle(Color.PrimaryText)
+        }
+        .padding(.bottom, 20)
+    }
+
+    private var hero: some View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
                     .fill(Color(red: 0.95, green: 0.78, blue: 0.31))
                     .frame(width: 80, height: 80)
-                    .shadow(color: Color(red: 0.95, green: 0.78, blue: 0.31).opacity(0.4), radius: 12, y: 4)
+                    .shadow(
+                        color: Color(red: 0.95, green: 0.78, blue: 0.31).opacity(0.4),
+                        radius: 12, y: 4
+                    )
                 Image(systemName: "crown.fill")
                     .font(.system(size: 38, weight: .bold))
                     .foregroundStyle(.white)
@@ -90,13 +132,50 @@ struct SettingsProView: View {
                 .font(.system(.title2, design: .rounded).weight(.bold))
                 .foregroundStyle(Color.PrimaryText)
                 .multilineTextAlignment(.center)
-
-            Text(String.appLocalized("iCloud Sync, Batch Recognition and more"))
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(Color.SubtitleText)
-                .multilineTextAlignment(.center)
         }
         .padding(.top, 4)
+    }
+
+    // MARK: - States
+
+    private var activeState: some View {
+        // We only reach this branch when the user has a verified
+        // StoreKit entitlement — so the limited-time-free flag is
+        // irrelevant here. (Free-but-never-paid users land on
+        // `subscribeState`, where the banner handles the promo
+        // messaging.)
+        VStack(spacing: 24) {
+            hero
+            if subscription.userOwnsLifetime {
+                // Lifetime owner has no subscription to manage — show
+                // the Pro badge plus a Restore button in case they
+                // switch devices. Keep the auto-renew legal block out
+                // (replaced by the lifetime one below).
+                proActiveBadge
+                restorePurchasesButton
+            } else {
+                proActiveBadge
+                manageSubscriptionButton
+                restorePurchasesButton
+            }
+            legalBlock
+        }
+    }
+
+    private var subscribeState: some View {
+        VStack(spacing: 24) {
+            hero
+            // Show the limited-time-free banner only when the user
+            // hasn't paid AND the promo flag is on. After the flag is
+            // flipped to `false` (see `SubscriptionManager.isLimitedTimeFree`),
+            // the banner disappears automatically — no UI change needed.
+            if subscription.isLimitedTimeFree {
+                limitedTimeFreeBanner
+            }
+            featuresList
+            subscribeSection
+            legalBlock
+        }
     }
 
     private var proActiveBadge: some View {
@@ -115,6 +194,37 @@ struct SettingsProView: View {
         .padding(.vertical, 30)
     }
 
+    /// Compact "Limited-Time Free" notice shown at the top of the
+    /// pricing screen during the launch / promo period
+    /// (`SubscriptionManager.isLimitedTimeFree == true`). Tells the
+    /// user that Pro features are free for now and they can buy
+    /// early-access anyway if they want to lock in lifetime.
+    ///
+    /// Kept as a small inline banner so it doesn't visually compete
+    /// with the price list and feature list below it.
+    private var limitedTimeFreeBanner: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: "gift.fill")
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(Color.IncomeGreen)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String.appLocalized(SettingsKey.proLimitedFreeTitle))
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(Color.PrimaryText)
+                Text(String.appLocalized(SettingsKey.proLimitedFreeSubtitle))
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(Color.SubtitleText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+        }
+        .padding(14)
+        .background(
+            Color.SettingsBackground,
+            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+        )
+    }
+
     private var featuresList: some View {
         VStack(spacing: 0) {
             ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
@@ -123,12 +233,15 @@ struct SettingsProView: View {
                         .font(.system(.body, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(width: 36, height: 36)
-                        .background(Color(feature.color), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                        .background(
+                            Color(feature.color),
+                            in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                        )
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(LocalizedStringKey(feature.title))
+                        Text(LocalizedStringKey(feature.titleKey))
                             .font(.system(.body, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.PrimaryText)
-                        Text(LocalizedStringKey(feature.subtitle))
+                        Text(LocalizedStringKey(feature.subtitleKey))
                             .font(.system(.footnote, design: .rounded))
                             .foregroundStyle(Color.SubtitleText)
                     }
@@ -141,12 +254,15 @@ struct SettingsProView: View {
                 }
             }
         }
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card))
+        .background(
+            Color.SettingsBackground,
+            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+        )
     }
 
     @ViewBuilder
     private var subscribeSection: some View {
-        if loadedProducts.isEmpty {
+        if subscription.loadedProducts.isEmpty {
             VStack(spacing: 8) {
                 Text(String.appLocalized("Coming Soon"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
@@ -158,55 +274,174 @@ struct SettingsProView: View {
             }
             .padding(20)
             .frame(maxWidth: .infinity)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card))
+            .background(
+                Color.SettingsBackground,
+                in: RoundedRectangle(cornerRadius: GlassRadius.card)
+            )
         } else {
+            VStack(spacing: 20) {
+                if !subscription.subscriptionProducts.isEmpty {
+                    subscriptionsGroup
+                }
+                if subscription.lifetimeProduct != nil {
+                    lifetimeGroup
+                }
+                restorePurchasesButton
+            }
+        }
+    }
+
+    /// Renders the three auto-renewable subscription SKUs (monthly /
+    /// half-yearly / yearly) under a "SUBSCRIPTIONS" header. Empty
+    /// list is fine — the `subscribeSection` outer guard handles
+    /// "no products at all", but a Store can return only the lifetime
+    /// product, in which case this group is omitted.
+    private var subscriptionsGroup: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionHeader(SettingsKey.proSectionSubscriptions)
             VStack(spacing: 12) {
-                ForEach(loadedProducts) { product in
+                ForEach(subscription.subscriptionProducts) { product in
                     ProductView(product)
                         .productViewStyle(.compact)
                         .onInAppPurchaseCompletion { _, result in
-                            if case .success = result {
-                                isProSubscriber = true
+                            // `result` is `Result<Product.PurchaseResult, Error>`.
+                            // The ProductView handles the actual StoreKit
+                            // call and verification; we just need to
+                            // re-read `Transaction.currentEntitlements`
+                            // so `isProSubscriber` flips on this device.
+                            Task { await subscription.refreshEntitlements() }
+                            if case .failure(let error) = result {
+                                pendingErrorMessage = error.localizedDescription
+                                isPresentingError = true
                             }
                         }
-                }
-
-                Button {
-                    Task { await restorePurchases() }
-                } label: {
-                    Text(String.appLocalized("Restore Purchases"))
-                        .font(.system(.subheadline, design: .rounded).weight(.medium))
-                        .foregroundStyle(Color.SubtitleText)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
                 }
             }
         }
     }
 
-    @MainActor
-    private func loadProducts() async {
-        guard !isLoadingProducts else { return }
-        isLoadingProducts = true
-        defer { isLoadingProducts = false }
-        do {
-            let products = try await Product.products(for: productIDs)
-            loadedProducts = products.sorted { $0.price < $1.price }
-        } catch {
-            loadedProducts = []
+    /// Renders the non-consumable lifetime SKU under a "LIFETIME"
+    /// header, with a one-line "One-time purchase" caption so the
+    /// user can tell it apart from the auto-renewing plans above.
+    /// The @ViewBuilder lets us return `EmptyView` cleanly when the
+    /// Store didn't return the lifetime product (e.g. a sandbox that
+    /// only has subscriptions configured).
+    @ViewBuilder
+    private var lifetimeGroup: some View {
+        if let lifetime = subscription.lifetimeProduct {
+            VStack(alignment: .leading, spacing: 10) {
+                sectionHeader(SettingsKey.proSectionLifetime)
+                VStack(spacing: 4) {
+                    ProductView(lifetime)
+                        .productViewStyle(.compact)
+                        .onInAppPurchaseCompletion { _, result in
+                            Task { await subscription.refreshEntitlements() }
+                            if case .failure(let error) = result {
+                                pendingErrorMessage = error.localizedDescription
+                                isPresentingError = true
+                            }
+                        }
+                    Text(String.appLocalized(SettingsKey.proLifetimeOneTime))
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundStyle(Color.SubtitleText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
     }
 
-    @MainActor
-    private func restorePurchases() async {
-        do {
-            try await AppStore.sync()
-            // After sync, the ProductView's onInAppPurchaseCompletion will
-            // fire for any restored transactions. For a development build
-            // without configured products, AppStore.sync() succeeds silently
-            // and we just keep the current isProSubscriber state.
-        } catch {
-            // Silent failure — StoreKit shows its own error UI
+    /// Small uppercase label used to head each product group on the
+    /// Pro screen. Kept as a separate helper so the visual style stays
+    /// consistent if the grouping expands in the future.
+    private func sectionHeader(_ key: String) -> some View {
+        Text(String.appLocalized(key).uppercased())
+            .font(.system(.caption2, design: .rounded).weight(.semibold))
+            .foregroundStyle(Color.SubtitleText)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
+    }
+
+    // MARK: - Legal block (Guideline 3.1.2 / 3.1.5)
+
+    @ViewBuilder
+    private var legalBlock: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Lifetime owners have no auto-renewal — the subscription
+            // body (which describes how to turn off auto-renew, when
+            // the account is charged, etc.) would be misleading. Show
+            // the lifetime body instead. Limited-time-free users and
+            // active subscribers both still see the standard auto-
+            // renewal disclosure.
+            Text(String.appLocalized(
+                subscription.userOwnsLifetime
+                    ? SettingsKey.proLifetimeLegalBody
+                    : SettingsKey.proLegalBody
+            ))
+            .font(.system(.caption, design: .rounded))
+            .foregroundStyle(Color.SubtitleText)
+            .fixedSize(horizontal: false, vertical: true)
+
+            legalAgreementLinks
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Color.SettingsBackground.opacity(0.6),
+            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+        )
+    }
+
+    /// Renders the "By subscribing, you agree to our [Terms] · [Privacy]."
+    /// line as separate `Text` + `Link` views. Two separate `Link`s are
+    /// preferred over a Markdown blob inside `Text` so the URLs are
+    /// bound at runtime from `SubscriptionManager.termsOfServiceURL` /
+    /// `.privacyPolicyURL` (both are TODOs before App Store submission
+    /// — see the `TODO(hosting)` note on `SubscriptionManager`).
+    private var legalAgreementLinks: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(String.appLocalized(SettingsKey.proLegalAgree) + " ")
+            Link(
+                String.appLocalized(SettingsKey.proTermsOfUse),
+                destination: SubscriptionManager.termsOfServiceURL
+            )
+            Text("·")
+                .foregroundStyle(Color.SubtitleText.opacity(0.6))
+            Link(
+                String.appLocalized(SettingsKey.proPrivacyPolicy),
+                destination: SubscriptionManager.privacyPolicyURL
+            )
+            Text(".")
+        }
+        .font(.system(.caption, design: .rounded))
+        .foregroundStyle(Color.SubtitleText)
+    }
+
+    // MARK: - Action buttons
+
+    private var manageSubscriptionButton: some View {
+        Button {
+            Task { await subscription.showManageSubscriptions() }
+        } label: {
+            HStack {
+                Image(systemName: "gearshape.fill")
+                Text(String.appLocalized(SettingsKey.proManageSubscription))
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.borderedProminent)
+    }
+
+    private var restorePurchasesButton: some View {
+        Button {
+            Task { await subscription.restorePurchases() }
+        } label: {
+            Text(String.appLocalized("Restore Purchases"))
+                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .foregroundStyle(Color.SubtitleText)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
         }
     }
 }

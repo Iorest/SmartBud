@@ -29,6 +29,7 @@ struct ContentView: View {
     @Environment(AppLockViewModel.self) var appLockVM
     @Environment(\.scenePhase) var scenePhase
     @State private var contentVM = ContentViewModel()
+    @State private var dataRepo = DataRepository.shared
 
     @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
     @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
@@ -38,24 +39,33 @@ struct ContentView: View {
 
         GeometryReader { proxy in
             let topEdge = proxy.safeAreaInsets.top
-            let bottomEdge = proxy.safeAreaInsets.bottom
+            let bottomEdge = proxy.safeAreaInsets.bottom == 0 ? 15 : proxy.safeAreaInsets.bottom
 
-            HomeView(topEdge: topEdge, bottomEdge: bottomEdge == 0 ? 15 : bottomEdge)
-                .ignoresSafeArea(.all, edges: .bottom)
-                .preferredColorScheme(colourScheme == 1 ? .light : colourScheme == 2 ? .dark : nil)
-                .environment(\.locale, appLanguage.isEmpty ? Locale.current : Locale(identifier: appLanguage))
-                .onChange(of: appLanguage) { _, _ in
-                    WidgetCenter.shared.reloadAllTimelines()
+            ZStack(alignment: .top) {
+                HomeView(topEdge: topEdge, bottomEdge: bottomEdge)
+                    .ignoresSafeArea(.all, edges: .bottom)
+                    .preferredColorScheme(colourScheme == 1 ? .light : colourScheme == 2 ? .dark : nil)
+                    .environment(\.locale, appLanguage.isEmpty ? Locale.current : Locale(identifier: appLanguage))
+                    .onChange(of: appLanguage) { _, _ in
+                        WidgetCenter.shared.reloadAllTimelines()
+                    }
+                    .fullScreenCover(isPresented: $contentVM.showIntro) {
+                        WelcomeSheetView()
+                    }
+                    .fullScreenCover(isPresented: $contentVM.showUpdate) {
+                        UpdateAlert()
+                    }
+                    .onAppear {
+                        contentVM.updateInsets(top: topEdge, bottom: bottomEdge)
+                    }
+
+                if dataRepo.isInFallbackMode {
+                    fallbackBanner
+                        .padding(.horizontal, 14)
+                        .padding(.top, topEdge + 6)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
-                .fullScreenCover(isPresented: $contentVM.showIntro) {
-                    WelcomeSheetView()
-                }
-                .fullScreenCover(isPresented: $contentVM.showUpdate) {
-                    UpdateAlert()
-                }
-                .onAppear {
-                    contentVM.updateInsets(top: topEdge, bottom: bottomEdge)
-                }
+            }
         }
         .ignoresSafeArea(.keyboard)
         .task {
@@ -63,6 +73,16 @@ struct ContentView: View {
                 appLockVM.appLockValidation()
             }
             contentVM.bootstrap()
+            // Verify Pro entitlement + load SK2 products on launch so the
+            // first time the user opens the Pro screen it's already
+            // correct (no "Not Pro" flash on a valid subscriber, no
+            // "Coming Soon" placeholder on a configured build).
+            await SubscriptionManager.shared.bootstrap()
+            // Stamp first-launch date; the actual review prompt is
+            // fired by `ReviewRequester.recordTransactionCreated()` at
+            // the 3rd, 10th, and 25th transaction rather than here, so
+            // the user is asked *after* they have something to rate.
+            ReviewRequester.recordAppLaunch()
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -76,5 +96,32 @@ struct ContentView: View {
                 break
             }
         }
+    }
+
+    /// Non-blocking banner shown when the SwiftData container booted in
+    /// a degraded mode (no App Group, no CloudKit, or a corrupted
+    /// on-disk store). The user can keep using the app locally; the
+    /// banner just makes it clear that nothing is syncing to iCloud.
+    private var fallbackBanner: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "icloud.slash.fill")
+                .font(.system(.body, design: .rounded).weight(.semibold))
+                .foregroundStyle(.white)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String.appLocalized(SettingsKey.bannerFallbackTitle))
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(String.appLocalized(SettingsKey.bannerFallbackBody))
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.92))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                .fill(Color.orange.opacity(0.92))
+        )
     }
 }
