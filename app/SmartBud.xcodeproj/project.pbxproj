@@ -169,6 +169,10 @@
 		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* ReviewRequester.swift */; };
 		AAAA00000000000000000031 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
 		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
+		B0A0F00000000000000000A2 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
+		B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
+		B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000B1 /* BudgetLogicTests.swift */; };
+		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -326,6 +330,9 @@
 		AAAA00000000000000000020 /* ReviewRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequester.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000030 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataExporter.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
+		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
+		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
+		B0A0F00000000000000000C5 /* SmartBudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -349,6 +356,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B0A0F00000000000000000A0 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				B0A0F00000000000000000A1 /* BudgetLogic.swift */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+		B0A0F00000000000000000B0 /* SmartBudTests */ = {
+			isa = PBXGroup;
+			children = (
+				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
+			);
+			path = SmartBudTests;
+			sourceTree = "<group>";
+		};
 		042918746E7F49F48130B5AB /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -380,6 +403,7 @@
 				53EB931028A65F670026BE28 /* ExpenditureWidgetExtension.entitlements */,
 				5327D285287C697400F76ADF /* SmartBud */,
 				53B1D18F288ED7E500E28062 /* ExpenditureWidget */,
+				B0A0F00000000000000000B0 /* SmartBudTests */,
 				5327D284287C697400F76ADF /* Products */,
 				5383D85C287D9A0100D1B9BA /* Frameworks */,
 				08D7462C838073F70EB4B0F5 /* WidgetEnums.swift */,
@@ -392,6 +416,7 @@
 			children = (
 				5327D283287C697400F76ADF /* SmartBud.app */,
 				53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */,
+				B0A0F00000000000000000C5 /* SmartBudTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -416,6 +441,7 @@
 				5327D299287C69C100F76ADF /* Models */,
 				5327D297287C69A900F76ADF /* Data */,
 				5327D296287C69A400F76ADF /* Utilities */,
+				B0A0F00000000000000000A0 /* Logic */,
 				5327D28C287C697C00F76ADF /* Preview Content */,
 				AE30A1522AE7D95200E516B3 /* Components */,
 				042918746E7F49F48130B5AB /* ViewModels */,
@@ -675,6 +701,21 @@
 			productReference = 53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		B0A0F00000000000000000C0 /* SmartBudTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B0A0F00000000000000000C4 /* Build configuration list for PBXNativeTarget "SmartBudTests" */;
+			buildPhases = (
+				B0A0F00000000000000000C1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SmartBudTests;
+			productName = SmartBudTests;
+			productReference = B0A0F00000000000000000C5 /* SmartBudTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -710,6 +751,7 @@
 			targets = (
 				5327D282287C697400F76ADF /* SmartBud */,
 				53B1D189288ED7E400E28062 /* ExpenditureWidgetExtension */,
+				B0A0F00000000000000000C0 /* SmartBudTests */,
 			);
 		};
 /* End PBXProject section */
@@ -875,6 +917,7 @@
 				DC1A413685F24A9FE8B7507D /* WidgetEnums.swift in Sources */,
 				D9EC4FFE9AD4139968DC41B7 /* WidgetConfigurationIntents.swift in Sources */,
 				7A1B2C3D4E5F6071829A0BC3 /* WidgetModelContainer.swift in Sources */,
+				B0A0F00000000000000000A2 /* BudgetLogic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -911,6 +954,16 @@
 				5E3EC41EDEB94B5AB21CBC20 /* SwiftDataCore.swift in Sources */,
 				7A1B2C3D4E5F6071829A0BC2 /* WidgetModelContainer.swift in Sources */,
 				D1550AA12D26000000000003 /* GlassTheme.swift in Sources */,
+				B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B0A0F00000000000000000C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */,
+				B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1213,6 +1266,36 @@
 			};
 			name = Release;
 		};
+		B0A0F00000000000000000C2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5UNNTHMF44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iorest.smartbud.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B0A0F00000000000000000C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5UNNTHMF44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iorest.smartbud.LogicTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */		5327D27E287C697400F76ADF /* Build configuration list for PBXProject "SmartBud" */ = {
@@ -1238,6 +1321,15 @@
 			buildConfigurations = (
 				53B1D199288ED87000E28062 /* Debug */,
 				53B1D19A288ED87000E28062 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B0A0F00000000000000000C4 /* Build configuration list for PBXNativeTarget "SmartBudTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0A0F00000000000000000C2 /* Debug */,
+				B0A0F00000000000000000C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
