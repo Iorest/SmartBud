@@ -29,8 +29,18 @@ struct TransactionView: View {
     /// Non-empty draft → Cancel asks before discarding (HIG error tolerance).
     @State private var showDiscardConfirmation = false
 
+    /// True when closing would throw away work. New entries count once any
+    /// field is filled; edits count only once a field actually changed, so
+    /// opening and closing an existing transaction never nags.
     private var hasDraft: Bool {
-        padVM.price > 0 || !note.isEmpty || category != nil
+        if let toEdit {
+            return padVM.price != toEdit.wrappedAmount
+                || note != toEdit.wrappedNote
+                || category?.id != toEdit.category?.id
+                || income != toEdit.income
+                || date != toEdit.wrappedDate
+        }
+        return padVM.price > 0 || !note.isEmpty || category != nil
     }
     @State private var repeatType = 0
     @State private var repeatCoefficient = 1
@@ -1005,7 +1015,14 @@ struct TransactionView: View {
             }
         }
         .sheet(isPresented: $showCategorySheet) {
-            CategoryView(mode: .transaction, income: income)
+            CategoryView(mode: .transaction, income: income) { selected in
+                category = selected
+                // Picking a category also clears a pending "missing
+                // category" highlight left over from a failed submit.
+                categoryButtonTextColor = Color.SubtitleText
+                categoryButtonBackgroundColor = Color.clear
+                categoryButtonOutlineColor = Color.Outline
+            }
         }
         .sheet(isPresented: $showSmartEntry) {
             SmartEntrySheet(

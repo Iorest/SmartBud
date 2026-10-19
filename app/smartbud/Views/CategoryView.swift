@@ -16,6 +16,11 @@ enum CategoryViewMode {
 
 struct CategoryView: View {
     var mode: CategoryViewMode
+    /// Transaction mode only: called with the tapped category, then the sheet
+    /// dismisses. Without this, tapping a row opened the editor and there was
+    /// no way to actually pick a category for the transaction.
+    var onSelect: ((CategoryModel) -> Void)? = nil
+    @Environment(\.dismiss) var dismiss
 //    @Environment(\.colorScheme) var colorScheme
     @State var income = false
     @Namespace var animation
@@ -33,9 +38,20 @@ struct CategoryView: View {
         income == false && categoryVM.expenseCategories.count >= 24
     }
 
+    init(mode: CategoryViewMode, income: Bool = false, onSelect: ((CategoryModel) -> Void)? = nil) {
+        self.mode = mode
+        _income = State(initialValue: income)
+        self.onSelect = onSelect
+    }
+
     var body: some View {
         VStack(spacing: 5) {
-            CategoryListView(income: $income, mode: mode, showToast: $showToast, toastTitle: $toastTitle, toastImage: $toastImage, positive: $positive)
+            CategoryListView(income: $income, mode: mode,
+                             onSelect: onSelect == nil ? nil : { category in
+                                 onSelect?(category)
+                                 dismiss()
+                             },
+                             showToast: $showToast, toastTitle: $toastTitle, toastImage: $toastImage, positive: $positive)
 
             HStack {
                 HStack(spacing: 0) {

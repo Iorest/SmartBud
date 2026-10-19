@@ -222,25 +222,28 @@ struct NumberPadTextView: View {
     }
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 1) {
-            Text(currencySymbol)
-                .font(.system(.largeTitle, design: .rounded))
-                .foregroundStyle(Color.SubtitleText)
+        // Amount and the backspace sit in one centred row, so the delete key
+        // stays next to the number it edits instead of floating at the screen
+        // edge (HIG: destructive/edit affordances belong with their target).
+        HStack(spacing: 10) {
+            HStack(alignment: .lastTextBaseline, spacing: 1) {
+                Text(currencySymbol)
+                    .font(.system(.largeTitle, design: .rounded))
+                    .foregroundStyle(Color.SubtitleText)
 
-            Text(vm.amountString)
-                .font(.system(size: fontSize, weight: .regular, design: .rounded))
-                .foregroundStyle(Color.PrimaryText)
-                .contentTransition(.numericText())
-        }
-        .minimumScaleFactor(0.5)
-        .lineLimit(1)
-        .padding(.horizontal, vm.showsTrailingDelete ? 40 : 0)
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .trailing) {
+                Text(vm.amountString)
+                    .font(.system(size: fontSize, weight: .regular, design: .rounded))
+                    .foregroundStyle(Color.PrimaryText)
+                    .contentTransition(.numericText())
+            }
+            .minimumScaleFactor(0.5)
+            .lineLimit(1)
+
             if vm.showsTrailingDelete {
                 trailingDelete
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -251,8 +254,8 @@ struct NumberPadTextView: View {
             Image(systemName: "delete.left.fill")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.SubtitleText)
-                .padding(7)
-                .background(Circle().fill(.clear))
+                // 44pt minimum touch target (was 35×32).
+                .frame(width: 44, height: 44)
                 .glassChip(in: Circle())
                 .contentShape(Circle())
         }

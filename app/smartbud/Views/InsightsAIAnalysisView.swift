@@ -72,28 +72,25 @@ struct InsightsAIAnalysisView: View {
     }
 
     private var footer: some View {
-        HStack(spacing: 10) {
-            if errorMessage != nil {
-                SettingsRouteLink()
-            }
-            Button {
-                Task { await analyze() }
-            } label: {
-                Text(String.appLocalized("重新分析"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(isLoading)
+        Button {
+            Task { await analyze() }
+        } label: {
+            Text(String.appLocalized("重新分析"))
+                .font(.system(.body, design: .rounded).weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
         }
+        .buttonStyle(.borderedProminent)
+        .disabled(isLoading || !LLMConfig.load().isConfigured)
     }
 
     private func analyze() async {
         errorMessage = nil
         let config = LLMConfig.load()
         guard config.isConfigured else {
-            errorMessage = LLMClient.Failure.notConfigured.localizedDescription
+            // One clear message; the error text alone already tells the user
+            // where to configure it.
+            errorMessage = String.appLocalized("请先到 设置 → AI 服务 配置服务地址、模型和 API Key。")
             return
         }
         isLoading = true
@@ -124,14 +121,5 @@ struct InsightsAIAnalysisView: View {
             topCategories: Array(categoryTotals),
             language: Locale.appLocale.identifier
         )
-    }
-}
-
-/// Small hint shown when the LLM is not configured yet.
-private struct SettingsRouteLink: View {
-    var body: some View {
-        Text(String.appLocalized("请先到 设置 → AI 服务 配置服务地址、模型和 API Key。"))
-            .font(.system(.caption, design: .rounded))
-            .foregroundStyle(Color.SubtitleText)
     }
 }

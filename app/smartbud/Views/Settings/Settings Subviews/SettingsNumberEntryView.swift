@@ -26,7 +26,8 @@ struct SettingsNumberEntryView: View {
     /// the VM's lifetime; `@Observable` gives automatic dependency tracking.
     @State private var vm = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
-    let options = [String.appLocalized("Type 1"), String.appLocalized("Type 2")]
+    let options = [String.appLocalized(SettingsKey.numberEntryType1),
+                   String.appLocalized(SettingsKey.numberEntryType2)]
 
     @Namespace var animation
 
@@ -86,23 +87,23 @@ struct SettingsNumberEntryView: View {
 
             VStack(spacing: 10) {
                 if numberEntryType == 1 {
-                    Text(String.appLocalized("\"Pre-dotted\""))
+                    Text(options[0])
                         .font(.system(.title2, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text(String.appLocalized("If you're too lazy to add a decimal point, I gotchu covered."))
+                    Text(String.appLocalized("Type the digits and the last two become cents automatically."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.SubtitleText)
                 } else {
-                    Text(String.appLocalized("\"Cent-less\""))
+                    Text(options[1])
                         .font(.system(.title2, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text(String.appLocalized("If your transactions usually amount to whole numbers - this one is for you."))
+                    Text(String.appLocalized("Enter whole numbers; tap the decimal point only when you need cents."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .multilineTextAlignment(.center)
@@ -122,6 +123,11 @@ struct SettingsNumberEntryView: View {
             }
         }
         .modifier(SettingsSubviewModifier())
+        .onAppear {
+            // The demo pad used to start in mode 1 even when the stored
+            // preference was mode 2, so the preview lied until the user tapped.
+            vm.numberEntryType = numberEntryType
+        }
         .onChange(of: numberEntryType) { _, new in
             vm.numberEntryType = new
         }

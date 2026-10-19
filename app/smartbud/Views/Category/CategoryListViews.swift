@@ -6,6 +6,9 @@ import UIKit
 struct CategoryListView: View {
     @Binding var income: Bool
     var mode: CategoryViewMode
+    /// When set (transaction mode), a row tap picks the category instead of
+    /// opening the edit sheet. Editing stays available via swipe actions.
+    var onSelect: ((CategoryModel) -> Void)?
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var systemColorScheme
@@ -355,7 +358,11 @@ struct CategoryListView: View {
                                     .listRowSeparatorTint(Color.Outline)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        toEdit = category
+                                        if let onSelect {
+                                            onSelect(category)
+                                        } else {
+                                            toEdit = category
+                                        }
                                     }
                                     .accessibilityAddTraits(.isButton)
                                     .swipeActions(edge: .trailing) {
@@ -515,13 +522,15 @@ struct CategoryListView: View {
         categoryVM.reorder(from: sets, to: destination, income: income)
     }
 
-    init(income: Binding<Bool>, mode: CategoryViewMode, showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
+    init(income: Binding<Bool>, mode: CategoryViewMode, onSelect: ((CategoryModel) -> Void)? = nil,
+         showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
         _income = income
         _showToast = showToast
         _toastTitle = toastTitle
         _toastImage = toastImage
         _positive = positive
         self.mode = mode
+        self.onSelect = onSelect
     }
 }
 

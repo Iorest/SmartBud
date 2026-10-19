@@ -1,6 +1,94 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Undo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復原"
+          }
+        }
+      }
+    },
+    "You can undo right after deleting." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can undo right after deleting."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除后可在提示中撤销。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除後可在提示中復原。"
+          }
+        }
+      }
+    },
+    "Type the digits and the last two become cents automatically." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type the digits and the last two become cents automatically."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直接输入数字，最后两位自动作为小数。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直接輸入數字，最後兩位自動作為小數。"
+          }
+        }
+      }
+    },
+    "Enter whole numbers; tap the decimal point only when you need cents." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter whole numbers; tap the decimal point only when you need cents."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认输入整数，需要角分时再点小数点。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預設輸入整數，需要角分時再點小數點。"
+          }
+        }
+      }
+    },
     "Record your first expense or income to get started" : {
       "localizations" : {
         "en" : {
@@ -12362,19 +12450,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type 1"
+            "value" : "Auto decimal"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "方式 1"
+            "value" : "自动小数"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "方式 1"
+            "value" : "自動小數"
           }
         }
       }
@@ -12385,19 +12473,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type 2"
+            "value" : "Whole numbers"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "方式 2"
+            "value" : "整数输入"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "方式 2"
+            "value" : "整數輸入"
           }
         }
       }
