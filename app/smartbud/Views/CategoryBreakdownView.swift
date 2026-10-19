@@ -14,16 +14,9 @@ struct CategoryBreakdownView: View {
     let currencySymbol: String
     let showCents: Bool
 
-    /// Stable 6-color palette: red, magenta, blue, orange, green, purple. Mirrors the
-    /// GitHub legacy design's color order for the most common breakdown buckets.
-    private let palette: [Color] = [
-        Color(red: 0.92, green: 0.26, blue: 0.39),
-        Color(red: 0.85, green: 0.20, blue: 0.65),
-        Color(red: 0.25, green: 0.55, blue: 0.95),
-        Color(red: 0.95, green: 0.55, blue: 0.20),
-        Color(red: 0.30, green: 0.75, blue: 0.45),
-        Color(red: 0.55, green: 0.35, blue: 0.85)
-    ]
+    /// Stable 6-color palette: red, magenta, blue, orange, green, purple.
+    /// Sourced from `Theme.Palette.chartSwatches`.
+    private let palette: [Color] = Theme.Palette.chartColors()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

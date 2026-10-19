@@ -121,7 +121,7 @@ struct ContentView: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-                .fill(Color.orange.opacity(0.92))
+                .fill(Theme.Brand.warning.opacity(0.92))
         )
     }
 }

@@ -121,7 +121,7 @@ struct MyButtonStyle: ButtonStyle {
             .frame(width: 58, height: 58)
             .background(
                 Circle()
-                    .fill(Color(red: 0.0, green: 0.48, blue: 1.0))
+                    .fill(Theme.Brand.accent)
             )
             .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 3)
             .scaleEffect(configuration.isPressed ? 0.92 : 1)

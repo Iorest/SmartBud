@@ -178,6 +178,8 @@
 		B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */; };
 		B0A0F00000000000000000D6 /* NumberPadViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */; };
 		B0A0F00000000000000000D7 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
+		B0A0F00000000000000000E2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
+		B0A0F00000000000000000E3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -340,6 +342,7 @@
 		B0A0F00000000000000000C5 /* SmartBudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0A0F00000000000000000D1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModelTests.swift; sourceTree = "<group>"; };
+		B0A0F00000000000000000E1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -473,6 +476,7 @@
 			children = (
 				5358E9182AC885E3003E8CA9 /* AlertToast.swift */,
 				D1550AA02D26000000000001 /* GlassTheme.swift */,
+				B0A0F00000000000000000E1 /* Theme.swift */,
 				53A839C028D732E1006F227C /* TabBarHiding.swift */,
 				5327D2AF287C6AFB00F76ADF /* Authentication.swift */,
 				5327D2B0287C6AFB00F76ADF /* KeyboardHeightHelper.swift */,
@@ -842,6 +846,7 @@
 				53B9079F2AE818B90001F496 /* Ring.swift in Sources */,
 				5358E9192AC885E3003E8CA9 /* AlertToast.swift in Sources */,
 				D1550AA12D26000000000002 /* GlassTheme.swift in Sources */,
+				B0A0F00000000000000000E2 /* Theme.swift in Sources */,
 				5327D2C4287C6B2500F76ADF /* TimeFrame.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
@@ -966,6 +971,7 @@
 				D1550AA12D26000000000003 /* GlassTheme.swift in Sources */,
 				B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */,
 				B0A0F00000000000000000D7 /* Money.swift in Sources */,
+				B0A0F00000000000000000E3 /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

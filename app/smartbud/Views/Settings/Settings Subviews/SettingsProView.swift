@@ -116,10 +116,10 @@ struct SettingsProView: View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color(red: 0.95, green: 0.78, blue: 0.31))
+                    .fill(Theme.Brand.premium)
                     .frame(width: 80, height: 80)
                     .shadow(
-                        color: Color(red: 0.95, green: 0.78, blue: 0.31).opacity(0.4),
+                        color: Theme.Brand.premium.opacity(0.4),
                         radius: 12, y: 4
                     )
                 Image(systemName: "crown.fill")
