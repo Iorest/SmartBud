@@ -39,7 +39,6 @@ struct HomeView: View {
     @Environment(TransactionViewModel.self) var transactionVM
 
     @State var currentTab = "Log"
-
     var topEdge: CGFloat
     var bottomEdge: CGFloat
 
@@ -69,6 +68,14 @@ struct HomeView: View {
     init(topEdge: CGFloat, bottomEdge: CGFloat) {
         self.topEdge = topEdge
         self.bottomEdge = bottomEdge
+        #if DEBUG
+        // QA hook: `SIMCTL_CHILD_START_TAB=Insights` opens straight on a tab
+        // for screenshot/UI verification. Debug builds only.
+        if let tab = ProcessInfo.processInfo.environment["START_TAB"],
+           ["Log", "Insights", "Budget", "Settings"].contains(tab) {
+            _currentTab = State(initialValue: tab)
+        }
+        #endif
     }
 
     var body: some View {
@@ -78,7 +85,8 @@ struct HomeView: View {
             // Native TabView: one navigation shell that adapts to iPhone,
             // iPad and Mac (Designed for iPad) without a custom tab bar.
             TabView(selection: $currentTab) {
-                LogView(topEdge: topEdge, bottomEdge: bottomEdge, launchSearch: launchSearch)
+                LogView(topEdge: topEdge, bottomEdge: bottomEdge, launchSearch: launchSearch,
+                        onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
                     .background(AppGlassBackground())
@@ -118,18 +126,22 @@ struct HomeView: View {
             .environment(toastPresenter)
             .environment(transactionManager)
 
-            Button {
-                lightHaptic &+= 1
-                transactionCountBeforeAdd = transactions.count
-                addTransaction = true
-            } label: {
-                Image(systemName: "plus")
+            // The add button is only meaningful on data screens; on Settings
+            // it used to overlap the last rows and steal their taps.
+            if currentTab != "Settings" {
+                Button {
+                    lightHaptic &+= 1
+                    transactionCountBeforeAdd = transactions.count
+                    addTransaction = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .buttonStyle(MyButtonStyle())
+                .padding(.trailing, 22)
+                .padding(.bottom, bottomEdge + 46)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .accessibilityLabel(String.appLocalized("Add New Transaction"))
             }
-            .buttonStyle(MyButtonStyle())
-            .padding(.trailing, 22)
-            .padding(.bottom, bottomEdge + 46)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            .accessibilityLabel(String.appLocalized("Add New Transaction"))
 
             if showPopup {
                 Rectangle()
@@ -208,6 +220,11 @@ struct HomeView: View {
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }
         .onAppear {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["START_CREATE"] == "1" {
+                addTransaction = true
+            }
+            #endif
             if appLockVM.isAppLockEnabled && fromURL1 {
                 Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(500))

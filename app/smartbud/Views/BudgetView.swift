@@ -159,9 +159,19 @@ struct ActualBudgetView: View {
 
                             Text("Add your first budget today!")
                                 .font(.system(.body, design: .rounded).weight(.medium))
-//                                .font(.system(size: 18, weight: .medium, design: .rounded))
                                 .multilineTextAlignment(.center)
-                                .foregroundStyle(Color.SubtitleText.opacity(0.7))
+                                .foregroundStyle(Color.SubtitleText)
+
+                            Button {
+                                newBudget = true
+                            } label: {
+                                Text(String.appLocalized("New Budget"))
+                                    .font(.system(.body, design: .rounded).weight(.semibold))
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding(.top, 6)
 
                             Spacer()
                             Spacer()

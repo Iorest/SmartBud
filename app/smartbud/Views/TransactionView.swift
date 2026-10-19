@@ -26,6 +26,12 @@ struct TransactionView: View {
     @State var category: CategoryModel?
     @State private var date = Date.now
     @State private var showSmartEntry = false
+    /// Non-empty draft → Cancel asks before discarding (HIG error tolerance).
+    @State private var showDiscardConfirmation = false
+
+    private var hasDraft: Bool {
+        padVM.price > 0 || !note.isEmpty || category != nil
+    }
     @State private var repeatType = 0
     @State private var repeatCoefficient = 1
     @State private var showRecurring = false
@@ -201,17 +207,6 @@ struct TransactionView: View {
     }
 
     @ViewBuilder
-    var closeButtonIcon: some View {
-        Image(systemName: "xmark")
-            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-            .foregroundStyle(Color.SubtitleText)
-            .padding(7)
-            .background(Color.SecondaryBackground, in: Circle())
-            .contentShape(Circle())
-    }
-
-    @ViewBuilder
     var deleteButtonIcon: some View {
         Image(systemName: "trash.fill")
             .font(.system(.subheadline, design: .rounded).weight(.semibold))
@@ -225,11 +220,23 @@ struct TransactionView: View {
     @ViewBuilder
     var topBarButtons: some View {
         HStack {
+            // HIG: modals with user input get an explicit Cancel, not "×".
+            // Accidental dismissal of a draft asks before discarding.
             Button {
-                dismiss()
+                if hasDraft {
+                    showDiscardConfirmation = true
+                } else {
+                    dismiss()
+                }
             } label: {
-                closeButtonIcon
+                Text(String.appLocalized("Cancel"))
+                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .foregroundStyle(Color.PrimaryText)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 4)
+                    .contentShape(Rectangle())
             }
+            .accessibilityLabel(Text(String.appLocalized("Cancel")))
 
             Spacer()
 
@@ -368,14 +375,18 @@ struct TransactionView: View {
                     Button {
                         showSmartEntry = true
                     } label: {
-                        Image(systemName: "sparkles")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                            .foregroundStyle(Color.SubtitleText)
-                            .padding(7)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
-                                    .stroke(Color.Outline, lineWidth: 1.5)
-                            )
+                        HStack(spacing: 4) {
+                            Image(systemName: "sparkles")
+                            Text(String.appLocalized("智能"))
+                                .font(.system(.caption, design: .rounded).weight(.semibold))
+                        }
+                        .foregroundStyle(Color.SubtitleText)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 7)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+                                .stroke(Color.Outline, lineWidth: 1.5)
+                        )
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text(String.appLocalized("智能记账")))
@@ -1003,6 +1014,10 @@ struct TransactionView: View {
             ) { parsed in
                 applyParsed(parsed)
             }
+        }
+        .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
+            Button(String.appLocalized("Keep Editing"), role: .cancel) {}
+            Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
         }
         .sheet(isPresented: $showPicker) {
                 CustomRecurringView(

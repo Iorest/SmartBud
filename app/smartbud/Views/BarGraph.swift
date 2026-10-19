@@ -49,6 +49,28 @@ struct BarGraph: View {
     }
 
     var body: some View {
+        if hasData {
+            chart
+        } else {
+            // An empty chart used to render bare "1.0 / 0" axis labels
+            // floating in whitespace — looks broken. Show an explicit
+            // empty state instead.
+            VStack(spacing: 8) {
+                Image(systemName: "chart.bar.xaxis")
+                    .font(.system(size: 28, weight: .regular))
+                Text(String.appLocalized("本期暂无支出"))
+                    .font(.system(.footnote, design: .rounded))
+            }
+            .foregroundStyle(Color.SubtitleText)
+            .frame(maxWidth: .infinity, minHeight: 185)
+        }
+    }
+
+    private var hasData: Bool {
+        data.contains { $0.amount > 0 }
+    }
+
+    private var chart: some View {
         Chart(Array(data.indices), id: \.self) { index in
             BarMark(
                 x: .value("Slot", index),

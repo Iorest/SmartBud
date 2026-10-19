@@ -97,11 +97,15 @@ struct InsightsView: View {
             Button {
                 showAIAnalysis = true
             } label: {
-                Image(systemName: "sparkles")
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                    .foregroundStyle(Color.PrimaryText)
-                    .frame(width: 34, height: 34)
-                    .background(Color.Outline, in: Circle())
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                    Text(String.appLocalized("AI"))
+                        .font(.system(.caption, design: .rounded).weight(.semibold))
+                }
+                .foregroundStyle(Color.PrimaryText)
+                .padding(.horizontal, 10)
+                .frame(height: 34)
+                .background(Color.Outline, in: Capsule())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))

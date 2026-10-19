@@ -550,7 +550,8 @@ struct SettingsView: View {
             .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
           }
           .padding(.horizontal, 20)
-          .padding(.bottom, 15)
+          // Clears the native tab bar so the last rows stay tappable.
+          .padding(.bottom, 110)
           .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in
               cardMaxWidthFrame(width: width)
           }

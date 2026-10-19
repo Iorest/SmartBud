@@ -48,6 +48,8 @@ struct LogView: View {
     // to show/hide tab bar
     var bottomEdge: CGFloat
     var launchSearch: Bool
+    /// Invoked by the empty state's primary button ("Add entry").
+    var onAdd: () -> Void = {}
 
     // drag to open
 //    enum PullToReach {
@@ -71,11 +73,21 @@ struct LogView: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.PrimaryText.opacity(0.8))
 
-                Text(String.appLocalized("Press the plus button\nto add your first entry"))
+                Text(String.appLocalized("Record your first expense or income to get started"))
                     .font(.system(.body, design: .rounded).weight(.medium))
-//                    .font(.system(size: 18, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.SubtitleText.opacity(0.7))
+                    // Full-strength secondary text: the old 0.7 opacity sat
+                    // below the 4.5:1 contrast floor on the gradient.
+                    .foregroundStyle(Color.SubtitleText)
+
+                Button(action: onAdd) {
+                    Text(String.appLocalized("Add Entry"))
+                        .font(.system(.body, design: .rounded).weight(.semibold))
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 6)
             }
             .padding(.horizontal, 30)
             .frame(height: 250, alignment: .top)
