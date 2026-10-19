@@ -25,6 +25,7 @@ struct TransactionView: View {
     @State private var note = ""
     @State var category: CategoryModel?
     @State private var date = Date.now
+    @State private var showSmartEntry = false
     @State private var repeatType = 0
     @State private var repeatCoefficient = 1
     @State private var showRecurring = false
@@ -359,11 +360,26 @@ struct TransactionView: View {
     }
 
     @ViewBuilder
-    var swipeAndNumberPadArea: some View {
-        VStack(spacing: 0) {
+    var swipeAndNumberPadArea: some View {        VStack(spacing: 0) {
             VStack(spacing: 8) {
                 NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
-                NoteView(note: $note, focused: $textFieldFocused)
+                HStack(spacing: 8) {
+                    NoteView(note: $note, focused: $textFieldFocused)
+                    Button {
+                        showSmartEntry = true
+                    } label: {
+                        Image(systemName: "sparkles")
+                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .foregroundStyle(Color.SubtitleText)
+                            .padding(7)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+                                    .stroke(Color.Outline, lineWidth: 1.5)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(String.appLocalized("智能记账")))
+                }
             }
             // Bottom spacer absorbs every remaining point in the parent VStack
             // so the date row + number pad get pinned to the screen edge.
@@ -977,6 +993,14 @@ struct TransactionView: View {
         .sheet(isPresented: $showCategorySheet) {
             CategoryView(mode: .transaction, income: income)
         }
+        .sheet(isPresented: $showSmartEntry) {
+            SmartEntrySheet(
+                expenseCategories: categoryVM.expenseCategories,
+                incomeCategories: categoryVM.incomeCategories
+            ) { parsed in
+                applyParsed(parsed)
+            }
+        }
         .sheet(isPresented: $showPicker) {
                 CustomRecurringView(
                     repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker
@@ -1053,6 +1077,20 @@ struct TransactionView: View {
             }
         }
 
+    }
+
+    /// Fills the form from a smart-entry parse result. Nothing is saved here —
+    /// the user still submits the form themselves.
+    private func applyParsed(_ parsed: ParsedExpense) {
+        income = parsed.isIncome
+        padVM.price = Money.double(parsed.amount)
+        if note.isEmpty, let merchant = parsed.merchant {
+            note = merchant
+        }
+        let pool = parsed.isIncome ? categoryVM.incomeCategories : categoryVM.expenseCategories
+        if let match = ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool) {
+            category = match
+        }
     }
 
     func submit() {

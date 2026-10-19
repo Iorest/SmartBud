@@ -198,6 +198,11 @@
 		B0A0F0000000000000000134 /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000133 /* LLMClient.swift */; };
 		B0A0F0000000000000000136 /* SettingsLLMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000135 /* SettingsLLMView.swift */; };
 		B0A0F0000000000000000138 /* InsightsAIAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */; };
+		B0A0F0000000000000000202 /* ExpenseTextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000201 /* ExpenseTextParser.swift */; };
+		B0A0F0000000000000000204 /* AlipayWechatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000203 /* AlipayWechatParser.swift */; };
+		B0A0F0000000000000000206 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000205 /* OCRService.swift */; };
+		B0A0F0000000000000000208 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000207 /* SpeechService.swift */; };
+		B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000209 /* SmartEntrySheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -379,6 +384,11 @@
 		B0A0F0000000000000000133 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LLM/LLMClient.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000135 /* SettingsLLMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLLMView.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsAIAnalysisView.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000201 /* ExpenseTextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/ExpenseTextParser.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000203 /* AlipayWechatParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/AlipayWechatParser.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000205 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/OCRService.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000207 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/SpeechService.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000209 /* SmartEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/SmartEntrySheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -524,6 +534,10 @@
 				AAAA00000000000000000010 /* SubscriptionManager.swift */,
 				AAAA00000000000000000030 /* DataExporter.swift */,
 				B0A0F0000000000000000133 /* LLMClient.swift */,
+				B0A0F0000000000000000201 /* ExpenseTextParser.swift */,
+				B0A0F0000000000000000203 /* AlipayWechatParser.swift */,
+				B0A0F0000000000000000205 /* OCRService.swift */,
+				B0A0F0000000000000000207 /* SpeechService.swift */,
 			);
 			path = smartbud;
 			sourceTree = "<group>";
@@ -592,6 +606,7 @@
 				536CC385293106180081E401 /* LineGraph.swift */,
 				5327D2D4287C6B5E00F76ADF /* InsightsView.swift */,
 				B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */,
+				B0A0F0000000000000000209 /* SmartEntrySheet.swift */,
 				5327D2D3287C6B5E00F76ADF /* BudgetView.swift */,
 				532C58BB2A629C3900DA2C81 /* NewBudgetView.swift */,
 				5327D2D5287C6B5E00F76ADF /* CustomTabBar.swift */,
@@ -935,6 +950,11 @@
 				B0A0F0000000000000000134 /* LLMClient.swift in Sources */,
 				B0A0F0000000000000000136 /* SettingsLLMView.swift in Sources */,
 				B0A0F0000000000000000138 /* InsightsAIAnalysisView.swift in Sources */,
+				B0A0F0000000000000000202 /* ExpenseTextParser.swift in Sources */,
+				B0A0F0000000000000000204 /* AlipayWechatParser.swift in Sources */,
+				B0A0F0000000000000000206 /* OCRService.swift in Sources */,
+				B0A0F0000000000000000208 /* SpeechService.swift in Sources */,
+				B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */,
 				5327D2C4287C6B2500F76ADF /* TimeFrame.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
@@ -1242,6 +1262,8 @@
 				INFOPLIST_KEY_CFBundleLocalizations = "en zh-Hans zh-Hant";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dictate a transaction instead of typing it.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Convert your spoken transaction into a draft entry.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save an image of a transaction for sharing.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1287,6 +1309,8 @@
 				INFOPLIST_KEY_CFBundleLocalizations = "en zh-Hans zh-Hant";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We need to unlock your data.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dictate a transaction instead of typing it.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Convert your spoken transaction into a draft entry.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save an image of a transaction for sharing.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
