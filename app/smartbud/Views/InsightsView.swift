@@ -49,6 +49,7 @@ struct InsightsView: View {
     private var showCents: Bool = true
 
     @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)
+    @State private var showAIAnalysis = false
 
     var body: some View {
         ScrollView {
@@ -79,6 +80,10 @@ struct InsightsView: View {
             insightsVM.setPeriod(newValue)
             insightsVM.refreshAll()
         }
+        .sheet(isPresented: $showAIAnalysis) {
+            InsightsAIAnalysisView()
+                .environment(insightsVM)
+        }
     }
 
     // MARK: - Header
@@ -89,6 +94,17 @@ struct InsightsView: View {
                 .font(.system(.title, design: .rounded).weight(.bold))
                 .foregroundStyle(Color.PrimaryText)
             Spacer()
+            Button {
+                showAIAnalysis = true
+            } label: {
+                Image(systemName: "sparkles")
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(Color.PrimaryText)
+                    .frame(width: 34, height: 34)
+                    .background(Color.Outline, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
             periodSegmented
         }
         .padding(.horizontal, 30)

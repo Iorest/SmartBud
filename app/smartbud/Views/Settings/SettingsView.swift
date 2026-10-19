@@ -32,6 +32,7 @@ enum SettingsRoute: Hashable {
     case featureLab
     case numberEntry
     case categories
+    case llm
 }
 
 struct SettingsView: View {
@@ -384,6 +385,14 @@ struct SettingsView: View {
                   optionalText: upcomingString)
               }
 
+              NavigationLink(value: SettingsRoute.llm) {
+                SettingsRowView(
+                  systemImage: "sparkles",
+                  title: "AI 服务",
+                  colour: 110,
+                  optionalText: nil)
+              }
+
               ToggleRow(
                 icon: "plusminus", color: "123", text: SettingsKey.rowDisplaySign, bool: showExpenseOrIncomeSign,
                 onTap: {
@@ -566,6 +575,7 @@ struct SettingsView: View {
           case .export: SettingsExportView()
           case .haptics: SettingsHapticsView()
           case .featureLab: SettingsGoofyView()
+          case .llm: SettingsLLMView()
           case .numberEntry:
             SettingsNumberEntryView()
               .onAppear {
