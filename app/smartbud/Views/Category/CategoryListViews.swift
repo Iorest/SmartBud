@@ -1,0 +1,527 @@
+import CoreHaptics
+import Foundation
+import SwiftUI
+import UIKit
+
+struct CategoryListView: View {
+    @Binding var income: Bool
+    var mode: CategoryViewMode
+
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var systemColorScheme
+    @Environment(CategoryViewModel.self) var categoryVM
+
+    @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
+
+    @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true
+    @State var suggestionsToast = false
+
+    @State private var offset: CGFloat = 0
+
+    var categories: [CategoryModel] {
+        income ? categoryVM.incomeCategories : categoryVM.expenseCategories
+    }
+
+    @State var isEditing = false
+
+    var allCategories: [CategoryModel] {
+        categoryVM.incomeCategories + categoryVM.expenseCategories
+    }
+
+    // delete mode
+    @State private var deleteMode = false
+    @State private var toDelete: CategoryModel?
+    var alertMessage: String {
+        String.localizedStringWithFormat(
+            String.appLocalized("Delete '%@'?"),
+            toDelete?.wrappedName ?? ""
+        )
+    }
+
+    // edit mode
+    @State private var toEdit: CategoryModel?
+
+    // toasts
+    @Binding var showToast: Bool
+    @Binding var toastTitle: String
+    @Binding var toastImage: String
+    @Binding var positive: Bool
+
+    var toastColor: Color {
+        positive ? Color.IncomeGreen : Color.AlertRed
+    }
+
+    var sectionHeader: LocalizedStringKey {
+        if income {
+            return "INCOME CATEGORIES"
+        } else {
+            return "EXPENSE CATEGORIES"
+        }
+    }
+
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+
+    var body: some View {
+        VStack(spacing: 5) {
+            if showToast {
+                HStack(spacing: 6.5) {
+                    Image(systemName: toastImage)
+                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(toastColor)
+
+                    Text(toastTitle)
+                        .font(.system(.body, design: .rounded).weight(.semibold))
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        .lineLimit(1)
+//                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(toastColor)
+                }
+                .padding(8)
+                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                .frame(maxWidth: 250)
+                .frame(height: 35)
+                .padding(20)
+            } else {
+                if mode == .welcome {
+                    HStack(spacing: 8) {
+                        if categories.count > 1 {
+                            if isEditing {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(Color.IncomeGreen)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Done"))
+                            } else {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                .foregroundStyle(Color.SubtitleText)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
+                            }
+                        }
+
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String.appLocalized("Show suggestions"))
+
+                        Spacer()
+
+                        Button {
+                            if allCategories.count > 0 {
+                                dismiss()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(!allCategories.isEmpty ? Color.IncomeGreen.opacity(0.23) : Color.clear)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    ZStack {
+                                        Image(systemName: "arrow.right")
+                                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
+
+                                        if allCategories.count == 0 {
+                                            Circle()
+                                                .stroke(Color.Outline.opacity(0.4), lineWidth: 1.3)
+                                                .frame(width: 33, height: 33)
+                                        }
+                                    }
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String.appLocalized("Continue"))
+                    }
+                    .frame(height: 35)
+                    .frame(maxWidth: .infinity)
+                    .overlay {
+                        Text(String.appLocalized("Categories"))
+                            .font(.system(.title3, design: .rounded).weight(.medium))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                            .font(.system(size: 20, weight: .medium, design: .rounded))
+                    }
+                    .padding(20)
+
+                } else {
+                    HStack(spacing: 8) {
+                        if mode == .settings {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Circle()
+                                    .fill(Color.SecondaryBackground)
+                                    .frame(width: 33, height: 33)
+                                    .overlay {
+                                        Image(systemName: "chevron.left")
+                                            .font(.system(.body, design: .rounded).weight(.semibold))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                        .font(.system(size: 18, weight: .semibold))
+                                            .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String.appLocalized("Back"))
+                        } else {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Circle()
+                                    .fill(Color.SecondaryBackground)
+                                    .frame(width: 33, height: 33)
+                                    .overlay {
+                                        Image(systemName: "chevron.down")
+                                            .font(.system(.body, design: .rounded).weight(.semibold))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String.appLocalized("Close"))
+                        }
+
+                        Spacer()
+
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                    .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String.appLocalized("Show suggestions"))
+
+                        if categories.count > 1 {
+                            if isEditing {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(Color.IncomeGreen)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Done"))
+                            } else {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(Color.SubtitleText)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
+                            }
+                        }
+                    }
+                    .frame(height: 35)
+                    .frame(maxWidth: .infinity)
+                    .overlay {
+                        Text(String.appLocalized("Categories"))
+                            .font(.system(.title3, design: .rounded).weight(mode == .settings ? .semibold : .medium))
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                            .font(.system(size: 20, weight: mode == .settings ? .semibold : .medium, design: .rounded))
+                    }
+                    .padding(20)
+                }
+            }
+
+            VStack {
+                    List {
+                        Section(header: Text(sectionHeader).foregroundStyle(Color.SubtitleText)) {
+                            if categories.isEmpty {
+                                VStack(spacing: 10) {
+                                    Image(systemName: "tray")
+                                        .font(.system(.largeTitle, design: .rounded).weight(.light))
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                        .font(.system(size: 37, weight: .light))
+                                        .foregroundStyle(Color.SubtitleText)
+
+                                    Group {
+                                        if income {
+                                            Text(LocalizedStringKey("no_income_categories"))
+                                        } else {
+                                            Text(LocalizedStringKey("no_expense_categories"))
+                                        }
+                                    }
+                                    .font(.system(.body, design: .rounded).weight(.medium))
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                    .font(.system(size: 17, weight: .medium, design: .rounded))
+                                    .italic()
+                                    .multilineTextAlignment(.center)
+                                    .foregroundStyle(Color.SubtitleText)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 37)
+                                .listRowBackground(Color.SettingsBackground)
+                            } else {
+                                ForEach(categories) { category in
+                                    HStack(spacing: 10) {
+                                        Text(category.wrappedEmoji)
+                                            .font(.system(.subheadline, design: .rounded))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 15))
+                                        Text(category.wrappedName)
+                                            .font(.system(.body, design: .rounded))
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
+                                            .lineLimit(1)
+                                            .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
+
+                                        Spacer()
+
+                                        if !income {
+                                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                                                .fill(Color(hex: category.wrappedColour))
+                                                .frame(width: 20, height: 20)
+                                        }
+                                    }
+                                    .padding(.vertical, 5)
+                                    .listRowBackground(Color.SettingsBackground)
+                                    .listRowSeparatorTint(Color.Outline)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        toEdit = category
+                                    }
+                                    .accessibilityAddTraits(.isButton)
+                                    .swipeActions(edge: .trailing) {
+                                        Button {
+                                            toDelete = category
+                                        } label: {
+                                            Image(systemName: "trash.fill")
+                                        }
+                                        .tint(Color.AlertRed)
+                                    }
+                                    .swipeActions(edge: .leading) {
+                                        Button {
+                                            toEdit = category
+                                        } label: {
+                                            Image(systemName: "pencil")
+                                        }
+                                        .tint(Color("Yellow"))
+                                    }
+                                }
+                                .onMove(perform: moveItem)
+                            }
+
+//                                .onDelete(perform: deleteItem)
+                        }
+
+                        if showSuggestions {
+                            SuggestedCategoriesView(income: income)
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
+                    .environment(\.editMode, .constant(self.isEditing ? EditMode.active : EditMode.inactive))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(.clear)
+        .animation(.easeOut(duration: 0.2), value: showToast)
+        .onChange(of: toDelete) { _, _ in
+            if toDelete != nil {
+                deleteMode = true
+            }
+        }
+        .fullScreenCover(isPresented: $deleteMode, onDismiss: {
+            toDelete = nil
+        }) {
+            ZStack(alignment: .bottom) {
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        deleteMode = false
+                    }
+                    .accessibilityAddTraits(.isButton)
+
+                VStack(alignment: .leading, spacing: 1.5) {
+                    let deleteName = toDelete?.wrappedName ?? ""
+                    Text(String(localized: "Delete '\(deleteName)'?"))
+                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color.PrimaryText)
+
+                    Text(String(localized: "This action cannot be undone, and all \(deleteName) transactions would be deleted."))
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color.SubtitleText)
+                        .padding(.bottom, 15)
+
+                    Button {
+                        withAnimation {
+                            if let gonnaDelete = toDelete {
+                                categoryVM.delete(gonnaDelete)
+                            }
+                        }
+
+                        toDelete = nil
+                        deleteMode = false
+
+                    } label: {
+                        Text(String.appLocalized("Delete"))
+                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .frame(height: 45)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                    }
+                    .padding(.bottom, 8)
+
+                    Button {
+                        withAnimation(.easeOut(duration: 0.7)) {
+                            deleteMode = false
+                            offset = 0
+                        }
+
+                    } label: {
+                        Text(String.appLocalized("Cancel"))
+                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color.PrimaryText.opacity(0.9))
+                            .frame(height: 45)
+                            .frame(maxWidth: .infinity)
+                            //                        .background(Color("13").opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                    }
+                }
+                .padding(13)
+                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+                .offset(y: offset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            if gesture.translation.height < 0 {
+                                offset = gesture.translation.height / 3
+                            } else {
+                                offset = gesture.translation.height
+                            }
+                        }
+                        .onEnded { value in
+                            if value.translation.height > 20 {
+                                deleteMode = false
+                                offset = 0
+                            } else {
+                                withAnimation {
+                                    offset = 0
+                                }
+                            }
+                        }
+                )
+                .padding(.horizontal, 17)
+                .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
+            }
+            .ignoresSafeArea(.all)
+            .background(BackgroundBlurView())
+        }
+        .sheet(item: $toEdit, onDismiss: {
+            toEdit = nil
+        }) { category in
+                EditCategoryAlert(toEdit: category, showRootToast: $showToast, rootToastTitle: $toastTitle, rootToastImage: $toastImage, positive: $positive, bottomSpacers: false)
+                    .presentationDetents([.height(270)])
+        }
+        .onChange(of: showToast) { _, newValue in
+            if newValue {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
+                    showToast = false
+                }
+            }
+        }
+        .onChange(of: showSuggestions) { _, newValue in
+            if !newValue {
+                toastTitle = String.appLocalized("Suggestions Hidden")
+                toastImage = "eye.slash"
+                showToast = true
+                positive = true
+            }
+        }
+    }
+
+    private func moveItem(at sets: IndexSet, destination: Int) {
+        categoryVM.reorder(from: sets, to: destination, income: income)
+    }
+
+    init(income: Binding<Bool>, mode: CategoryViewMode, showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
+        _income = income
+        _showToast = showToast
+        _toastTitle = toastTitle
+        _toastImage = toastImage
+        _positive = positive
+        self.mode = mode
+    }
+}
+

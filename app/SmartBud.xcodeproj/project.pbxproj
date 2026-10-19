@@ -203,6 +203,15 @@
 		B0A0F0000000000000000206 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000205 /* OCRService.swift */; };
 		B0A0F0000000000000000208 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000207 /* SpeechService.swift */; };
 		B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000209 /* SmartEntrySheet.swift */; };
+		B0A0F0000000000000000301 /* CategoryListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000302 /* CategoryListViews.swift */; };
+		B0A0F0000000000000000303 /* CategoryEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000304 /* CategoryEditorViews.swift */; };
+		B0A0F0000000000000000305 /* CategoryDeleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000306 /* CategoryDeleteView.swift */; };
+		B0A0F0000000000000000307 /* CategorySuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000308 /* CategorySuggestions.swift */; };
+		B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030A /* CategoryInputViews.swift */; };
+		B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030C /* CategoryColourPicker.swift */; };
+		B0A0F000000000000000030D /* TransactionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030E /* TransactionComponents.swift */; };
+		B0A0F000000000000000030F /* TransactionRecurringViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000310 /* TransactionRecurringViews.swift */; };
+		B0A0F0000000000000000311 /* TransactionCustomRecurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -389,6 +398,15 @@
 		B0A0F0000000000000000205 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/OCRService.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000207 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/Parsing/SpeechService.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000209 /* SmartEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/SmartEntrySheet.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000302 /* CategoryListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000304 /* CategoryEditorViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryEditorViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000306 /* CategoryDeleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryDeleteView.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000308 /* CategorySuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySuggestions.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000030A /* CategoryInputViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryInputViews.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000030C /* CategoryColourPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColourPicker.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000030E /* TransactionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionComponents.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000310 /* TransactionRecurringViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionRecurringViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionCustomRecurringView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -443,6 +461,19 @@
 				B0A0F000000000000000010F /* BudgetSteppers.swift */,
 			);
 			path = Budget;
+			sourceTree = "<group>";
+		};
+		B0A0F00000000000000000F2 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				B0A0F0000000000000000302 /* CategoryListViews.swift */,
+				B0A0F0000000000000000304 /* CategoryEditorViews.swift */,
+				B0A0F0000000000000000306 /* CategoryDeleteView.swift */,
+				B0A0F0000000000000000308 /* CategorySuggestions.swift */,
+				B0A0F000000000000000030A /* CategoryInputViews.swift */,
+				B0A0F000000000000000030C /* CategoryColourPicker.swift */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 		B0A0F00000000000000000F1 /* Log */ = {
@@ -594,6 +625,7 @@
 				53D6BDC62AF73B1D00F5728E /* Settings */,
 				B0A0F00000000000000000F0 /* Budget */,
 				B0A0F00000000000000000F1 /* Log */,
+				B0A0F00000000000000000F2 /* Category */,
 				53B907972AE817D50001F496 /* Shapes */,
 				5327D2CD287C6B5E00F76ADF /* CategoryView.swift */,
 				53A4147628B3B559008C30E7 /* WelcomeSheetView.swift */,
@@ -607,6 +639,9 @@
 				5327D2D4287C6B5E00F76ADF /* InsightsView.swift */,
 				B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */,
 				B0A0F0000000000000000209 /* SmartEntrySheet.swift */,
+				B0A0F000000000000000030E /* TransactionComponents.swift */,
+				B0A0F0000000000000000310 /* TransactionRecurringViews.swift */,
+				B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */,
 				5327D2D3287C6B5E00F76ADF /* BudgetView.swift */,
 				532C58BB2A629C3900DA2C81 /* NewBudgetView.swift */,
 				5327D2D5287C6B5E00F76ADF /* CustomTabBar.swift */,
@@ -955,6 +990,15 @@
 				B0A0F0000000000000000206 /* OCRService.swift in Sources */,
 				B0A0F0000000000000000208 /* SpeechService.swift in Sources */,
 				B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */,
+				B0A0F0000000000000000301 /* CategoryListViews.swift in Sources */,
+				B0A0F0000000000000000303 /* CategoryEditorViews.swift in Sources */,
+				B0A0F0000000000000000305 /* CategoryDeleteView.swift in Sources */,
+				B0A0F0000000000000000307 /* CategorySuggestions.swift in Sources */,
+				B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */,
+				B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */,
+				B0A0F000000000000000030D /* TransactionComponents.swift in Sources */,
+				B0A0F000000000000000030F /* TransactionRecurringViews.swift in Sources */,
+				B0A0F0000000000000000311 /* TransactionCustomRecurringView.swift in Sources */,
 				5327D2C4287C6B2500F76ADF /* TimeFrame.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
