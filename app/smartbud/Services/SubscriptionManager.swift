@@ -45,7 +45,13 @@ final class SubscriptionManager {
     ///
     /// TODO(promo): set to `false` when the limited-time-free period
     /// ends. Mark the cut-over in a CHANGELOG entry.
-    var isLimitedTimeFree: Bool = true
+    ///
+    /// Read from the app-group defaults (`limitedTimeFree`) so the promo can
+    /// be switched off without shipping a build; defaults to `true` while
+    /// the promo is running.
+    var isLimitedTimeFree: Bool {
+        UserDefaults.appGroup.object(forKey: "limitedTimeFree") as? Bool ?? true
+    }
 
     /// `true` when the user has a verified (and non-revoked) StoreKit
     /// transaction for any product in `productIDs`. Independent of

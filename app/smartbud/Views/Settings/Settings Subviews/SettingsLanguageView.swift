@@ -3,20 +3,11 @@
 //  smartbud
 //
 //  Lets the user pick the in-app display language. The selected code is stored
-//  in `appLanguage` (UserDefaults). On pick, the view triggers a process
-//  restart so the next cold launch reads the new `appLanguage` and every
-//  `String.appLocalized(...)` call resolves to it. The app does NOT try to
-//  refresh in-place because `String.appLocalized` reads UserDefaults directly
-//  and bypasses the `\.locale` environment, so the only reliable way to switch
-//  every visible string is a full process restart.
-//
-//  Restart is attempted via `UIApplication.perform(#selector(NSXPCConnection.suspend))`
-//  — a private selector that historically caused the OS to terminate and
-//  immediately re-spawn the app, keeping the user in-app. On iOS 26+ this
-//  trick is neutered (selector resolves but no crash), so we also schedule
-//  an `exit(0)` fallback 2.5s later: the user lands on the home screen and
-//  can tap the icon to reopen with the new language. Not in-place, but
-//  recoverable instead of being stuck on the "Restarting…" overlay.
+//  in `appLanguage` (UserDefaults). `String.appLocalized` reads that value
+//  directly and bypasses the `\.locale` environment, so the change takes
+//  effect on the next cold launch; the view tells the user to reopen the app
+//  rather than terminating itself (an `exit(0)` restart is an App Review
+//  risk and has no supported API).
 //
 //  Empty string means "follow system locale".
 //
@@ -34,11 +25,9 @@ struct SettingsLanguageView: View {
 
     @Namespace var animation
 
-    /// When `true`, the view shows a "Saved. Please reopen the app." overlay
-    /// with a checkmark while we wait for the 2.5s `exit(0)` timer to fire.
-    /// iOS does not let an app relaunch itself, so the user has to tap the
-    /// app icon to come back. The overlay is honest about this rather than
-    /// pretending an automatic restart is happening.
+    /// Shows the "Saved. Please reopen the app." overlay briefly, then
+    /// dismisses back to Settings. iOS does not let an app relaunch itself,
+    /// so the overlay is honest about what the user has to do.
     @State private var isRestarting = false
 
     var body: some View {
@@ -113,12 +102,10 @@ struct SettingsLanguageView: View {
         }
     }
 
-    /// Persist the new pick, flash a "Restarting…" overlay so the user
-    /// gets visual feedback, then ask SpringBoard to relaunch the process.
-    /// `NSXPCConnection.suspend` is a private selector that causes the OS
-    /// to terminate and immediately re-spawn the app — the user stays in
-    /// the app rather than being dumped to the home screen as `exit(0)`
-    /// would do.
+    /// Persist the new pick and show an overlay telling the user to reopen
+    /// the app. Deliberately does NOT terminate the process: `exit(0)` and
+    /// the `NSXPCConnection.suspend` private selector are App Review risks,
+    /// and iOS gives no supported way to relaunch in place.
     private func selectLanguage(_ code: String) {
         guard code != appLanguage else {
             dismiss()
@@ -129,27 +116,11 @@ struct SettingsLanguageView: View {
             isRestarting = true
         }
 
-        // Strategy:
-        // 1) Try the standard iOS "self-relaunch" trick first — a private
-        //    selector that crashes the process gracefully; SpringBoard
-        //    then immediately re-spawns the app and the user stays in-app.
-        // 2) On iOS 26+ Apple has silently neutered `NSXPCConnection.suspend`
-        //    — `perform(...)` returns without effect, and the app would sit
-        //    on the "Restarting…" overlay forever. After 2.5s, fall back to
-        //    `exit(0)`: the user lands on the home screen, then taps the
-        //    app icon to reopen with the new language applied. Not as nice
-        //    as in-place relaunch, but at least the user can recover.
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            #if canImport(UIKit)
-                UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-            #endif
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            #if canImport(UIKit)
-                exit(0)
-            #endif
+        // Let the confirmation register, then return to Settings so the user
+        // can close the app from the app switcher.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            isRestarting = false
+            dismiss()
         }
     }
 }

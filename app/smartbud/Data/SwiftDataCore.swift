@@ -3,6 +3,9 @@ import SwiftData
 import WidgetKit
 import CloudKit
 import Observation
+import os
+
+private let dataLogger = Logger(subsystem: "com.iorest.smartbud", category: "data")
 
 // @Model types (TransactionModel, CategoryModel, etc.) defined in Helper.swift
 
@@ -139,7 +142,12 @@ final class DataRepository {
 
     func save() {
         guard context.hasChanges else { return }
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            // Swallowing this used to hide failed writes entirely.
+            dataLogger.error("SwiftData save failed: \(error.localizedDescription, privacy: .public)")
+        }
         WidgetCenter.shared.reloadAllTimelines()
     }
 
@@ -186,7 +194,11 @@ final class DataRepository {
         for c in fetch(CategoryModel.self) { context.delete(c) }
         for b in fetch(BudgetModel.self) { context.delete(b) }
         for m in fetch(MainBudgetModel.self) { context.delete(m) }
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            dataLogger.error("SwiftData deleteAll failed: \(error.localizedDescription, privacy: .public)")
+        }
         WidgetCenter.shared.reloadAllTimelines()
     }
 
