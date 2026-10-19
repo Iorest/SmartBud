@@ -580,7 +580,6 @@ struct BrandNewBudgetView: View {
 
                 if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
                     padVM.isEditingDecimal = true
-                    padVM.decimalValuesAssigned = .second
                 }
 //                    let string = String(format: "%.2f", unwrappedEditedBudget.amount)
 //
@@ -623,7 +622,6 @@ struct BrandNewBudgetView: View {
 
                 if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
                     padVM.isEditingDecimal = true
-                    padVM.decimalValuesAssigned = .second
                 }
 //                    let string = String(format: "%.2f", unwrappedEditedMainBudget.amount)
 //

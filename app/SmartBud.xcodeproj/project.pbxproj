@@ -173,6 +173,11 @@
 		B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000B1 /* BudgetLogicTests.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
+		B0A0F00000000000000000D2 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
+		B0A0F00000000000000000D3 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
+		B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */; };
+		B0A0F00000000000000000D6 /* NumberPadViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */; };
+		B0A0F00000000000000000D7 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -333,6 +338,8 @@
 		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000C5 /* SmartBudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0A0F00000000000000000D1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
+		B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -360,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				B0A0F00000000000000000A1 /* BudgetLogic.swift */,
+				B0A0F00000000000000000D1 /* Money.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -368,6 +376,7 @@
 			isa = PBXGroup;
 			children = (
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
+				B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */,
 			);
 			path = SmartBudTests;
 			sourceTree = "<group>";
@@ -918,6 +927,7 @@
 				D9EC4FFE9AD4139968DC41B7 /* WidgetConfigurationIntents.swift in Sources */,
 				7A1B2C3D4E5F6071829A0BC3 /* WidgetModelContainer.swift in Sources */,
 				B0A0F00000000000000000A2 /* BudgetLogic.swift in Sources */,
+				B0A0F00000000000000000D2 /* Money.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +965,7 @@
 				7A1B2C3D4E5F6071829A0BC2 /* WidgetModelContainer.swift in Sources */,
 				D1550AA12D26000000000003 /* GlassTheme.swift in Sources */,
 				B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */,
+				B0A0F00000000000000000D7 /* Money.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -964,6 +975,9 @@
 			files = (
 				B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */,
 				B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */,
+				B0A0F00000000000000000D3 /* Money.swift in Sources */,
+				B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */,
+				B0A0F00000000000000000D6 /* NumberPadViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

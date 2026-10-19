@@ -966,7 +966,6 @@ struct TransactionView: View {
 
                     if transaction.wrappedAmount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
                         padVM.isEditingDecimal = true
-                        padVM.decimalValuesAssigned = .second
                     }
 
                     if transaction.wrappedDate > Date.now {

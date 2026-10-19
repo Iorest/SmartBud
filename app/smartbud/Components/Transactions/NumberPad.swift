@@ -19,10 +19,6 @@
 
 import SwiftUI
 
-enum AssignedDecimal {
-    case none, first, second
-}
-
 struct NumberPad: View {
     @Bindable var vm: NumberPadViewModel
     var showingNotePicker: Bool = false

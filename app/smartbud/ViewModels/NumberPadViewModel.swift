@@ -3,13 +3,12 @@
 //  smartbud
 //
 //  Owns the numeric-entry state shared between `NumberPad` (the digit keypad)
-//  and `NumberPadTextView` (the amount display). Extracted from the old
-//  NumberPad.swift so the SwiftUI views only describe layout; the iOS 26
-//  digit-handling, decimal-point logic, and haptics live here.
+//  and `NumberPadTextView` (the amount display).
 //
-//  Marked `@Observable` (iOS 17+) so the views can react to mutations of
-//  `price` / `isEditingDecimal` / `decimalValuesAssigned` without manual
-//  `@Published` plumbing.
+//  The entry is stored as typed digits, never as a floating-point value: the
+//  old implementation did `price *= 10` and `Int(price * 10)` on a Double,
+//  which drifted (0.1 + 0.2 cases) and truncated on backspace. The decimal
+//  point is derived from the digit position, so every edit is exact.
 //
 
 import Foundation
@@ -29,12 +28,15 @@ enum NumberEntryMode: Int {
 @MainActor
 @Observable
 final class NumberPadViewModel {
-    /// The numeric value being entered. `0` means "empty".
-    var price: Double = 0
+    /// Type 1 ("pre-dotted") digit stream: the last two digits are the cents.
+    private var digits: String = ""
+    /// Type 2 integer part ("cent-less" mode).
+    private var integerDigits: String = ""
+    /// Type 2 cents part (max 2 digits).
+    private var fractionDigits: String = ""
+
     /// True while the user is editing the cents part of the number (Type 2).
     var isEditingDecimal: Bool = false
-    /// Tracks which decimal digit position we're in (Type 2 only).
-    var decimalValuesAssigned: AssignedDecimal = .none
 
     /// Entry mode. Mirrors the `numberEntryType` UserDefaults flag, injected
     /// so this VM stays UserDefaults-free and is easy to test.
@@ -45,40 +47,93 @@ final class NumberPadViewModel {
     var submitTrigger: Int = 0
 
     private let hapticType: Int
-    private var disabled: Bool { price >= 100_000_000 }
+
+    /// Upper bound for a single amount, kept so the display stays legible.
+    private static let maxAmount = Decimal(100_000_000)
+    /// Largest value that still fits under `maxAmount` with cents
+    /// (99,999,999.99). Computed from integers so no floating literal enters.
+    private static let maxCentsValue = Decimal(9_999_999_999) / 100
 
     init(numberEntryType: Int, hapticType: Int) {
         self.numberEntryType = numberEntryType
         self.hapticType = hapticType
     }
 
-    // MARK: - Display
+    private var mode: NumberEntryMode {
+        NumberEntryMode(rawValue: numberEntryType) ?? .preDotted
+    }
 
-    /// Human-readable amount string for `NumberPadTextView`. Matches the old
-    /// computed `amount` verbatim so the visual is unchanged.
-    var amountString: String {
-        let mode = NumberEntryMode(rawValue: numberEntryType) ?? .preDotted
-        if mode == .preDotted {
-            return price.formatted(.number.precision(.fractionLength(2)))
+    // MARK: - Value
+
+    /// Exact value represented by the current entry.
+    var amount: Decimal {
+        switch mode {
+        case .preDotted:
+            guard !digits.isEmpty else { return 0 }
+            return (Decimal(string: digits) ?? 0) / 100
+        case .centless:
+            let whole = integerDigits.isEmpty ? "0" : integerDigits
+            guard !fractionDigits.isEmpty else { return Decimal(string: whole) ?? 0 }
+            return Decimal(string: whole + "." + fractionDigits) ?? 0
         }
-        if isEditingDecimal {
-            switch decimalValuesAssigned {
-            case .none:
-                return price.formatted(.number.precision(.fractionLength(0))) + "."
-            case .first:
-                return price.formatted(.number.precision(.fractionLength(1)))
-            case .second:
-                return price.formatted(.number.precision(.fractionLength(2)))
+    }
+
+    /// Double view of `amount` for callers that still take a Double.
+    /// The conversion happens once, at the boundary — no arithmetic on it.
+    var price: Double {
+        get { NSDecimalNumber(decimal: amount).doubleValue }
+        set { load(newValue) }
+    }
+
+    /// Seeds the entry from an existing amount (edit mode). Rounds to cents
+    /// before splitting the digits so 12.299… loads as 12.30.
+    private func load(_ value: Double) {
+        var source = Decimal(value) * 100
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &source, 0, .plain)
+        let cents = NSDecimalNumber(decimal: rounded).intValue
+
+        switch mode {
+        case .preDotted:
+            digits = cents == 0 ? "" : String(cents)
+        case .centless:
+            integerDigits = cents / 100 == 0 ? "" : String(cents / 100)
+            let fraction = abs(cents % 100)
+            if fraction == 0 {
+                fractionDigits = ""
+            } else if fraction % 10 == 0 {
+                fractionDigits = String(fraction / 10)
+            } else {
+                fractionDigits = String(format: "%02d", fraction)
             }
         }
-        return price.formatted(.number.precision(.fractionLength(0)))
+    }
+
+    // MARK: - Display
+
+    /// Human-readable amount string for `NumberPadTextView`.
+    var amountString: String {
+        switch mode {
+        case .preDotted:
+            return amount.formatted(.number.precision(.fractionLength(2)))
+        case .centless:
+            guard isEditingDecimal else {
+                return amount.formatted(.number.precision(.fractionLength(0)))
+            }
+            switch fractionDigits.count {
+            case 0:
+                return amount.formatted(.number.precision(.fractionLength(0))) + "."
+            case 1:
+                return amount.formatted(.number.precision(.fractionLength(1)))
+            default:
+                return amount.formatted(.number.precision(.fractionLength(2)))
+            }
+        }
     }
 
     /// True while the user is editing cents; `NumberPadTextView` uses this to
     /// show its trailing delete button.
-    var showsTrailingDelete: Bool {
-        NumberEntryMode(rawValue: numberEntryType) == .centless
-    }
+    var showsTrailingDelete: Bool { mode == .centless }
 
     // MARK: - Haptics
 
@@ -96,75 +151,70 @@ final class NumberPadViewModel {
 
     // MARK: - Actions
 
-    /// Apply a digit tap. Originally inline in `NumberPad.swift` `NumberButton`.
+    /// Apply a digit tap. A leading zero is ignored (matches the old
+    /// Double arithmetic, where it left the value unchanged).
     func tap(_ digit: Int) {
-        if disabled { return }
-        let mode = NumberEntryMode(rawValue: numberEntryType) ?? .preDotted
-        if mode == .preDotted {
-            price *= 10
-            price += Double(digit) / 100
-        } else {
+        switch mode {
+        case .preDotted:
+            guard !(digits.isEmpty && digit == 0) else { return }
+            let candidate = digits + String(digit)
+            guard candidateCents(candidate) < Self.maxAmount else { return }
+            digits = candidate
+        case .centless:
             if isEditingDecimal {
-                switch decimalValuesAssigned {
-                case .none:
-                    price += Double(digit) / 10
-                    decimalValuesAssigned = .first
-                case .first:
-                    price += Double(digit) / 100
-                    decimalValuesAssigned = .second
-                case .second:
-                    return
-                }
+                guard fractionDigits.count < 2 else { return }
+                fractionDigits.append(String(digit))
             } else {
-                price *= 10
-                price += Double(digit)
+                guard !(integerDigits.isEmpty && digit == 0) else { return }
+                let candidate = integerDigits + String(digit)
+                guard (Decimal(string: candidate) ?? 0) < Self.maxAmount else { return }
+                integerDigits = candidate
             }
         }
     }
 
-    /// Backspace behaviour. Identical logic to the old `deleteLastDigit()` in
-    /// both `NumberPad` and `NumberPadTextView`.
+    private func candidateCents(_ digits: String) -> Decimal {
+        (Decimal(string: digits) ?? 0) / 100
+    }
+
+    /// Backspace behaviour: removes the last typed digit in the current part.
     func deleteLast() {
-        let mode = NumberEntryMode(rawValue: numberEntryType) ?? .preDotted
-        if mode == .preDotted {
-            price = Double(Int(price * 10)) / 100
-        } else if !isEditingDecimal {
-            price = Double(Int(price / 10))
-        } else {
-            switch decimalValuesAssigned {
-            case .none:
-                isEditingDecimal = false
-                return
-            case .first:
-                price = Double(Int(price))
-                decimalValuesAssigned = .none
-            case .second:
-                price = Double(Int(price * 10)) / 10
-                decimalValuesAssigned = .first
+        switch mode {
+        case .preDotted:
+            if !digits.isEmpty { digits.removeLast() }
+        case .centless:
+            if isEditingDecimal {
+                if !fractionDigits.isEmpty {
+                    fractionDigits.removeLast()
+                } else {
+                    isEditingDecimal = false
+                }
+            } else if !integerDigits.isEmpty {
+                integerDigits.removeLast()
             }
         }
     }
 
     /// Enter cents-editing mode (the Type 2 decimal key). No-op in Type 1.
     func enterDecimal() {
-        guard NumberEntryMode(rawValue: numberEntryType) == .centless else { return }
+        guard mode == .centless else { return }
         isEditingDecimal = true
     }
 
     /// Commit the current entry. The SwiftUI view can react to the cleared
-    /// price (and to `submitTrigger` if it wants to fire haptics). This
+    /// entry (and to `submitTrigger` if it wants to fire haptics). This
     /// intentionally does *not* trigger a `dataRepository.save()` — the
     /// caller (TransactionView) owns the actual commit semantics.
     func submit() {
-        price = 0
+        digits = ""
+        integerDigits = ""
+        fractionDigits = ""
         isEditingDecimal = false
-        decimalValuesAssigned = .none
         submitTrigger &+= 1
     }
 
     // MARK: - Button enable / disable
 
-    /// Mirrors the old `disabled` flag on the number keys (price capped at
-    /// 100M to keep the display legible). Exposed so the view can dim keys.
-    var isInputDisabled: Bool { disabled }
+    /// Dims the number keys once no further digit can be appended.
+    var isInputDisabled: Bool { amount >= Self.maxCentsValue }
 }
