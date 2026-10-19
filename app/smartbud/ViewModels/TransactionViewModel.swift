@@ -218,4 +218,31 @@ final class TransactionViewModel{
     func rollback() {
         repo.rollback()
     }
+
+    /// Undo for the "deleted, tap to undo" toast.
+    ///
+    /// `context.rollback()` alone proved unreliable here (the delete could
+    /// already be committed by the time the user taps), so this drops any
+    /// pending change first and then verifies the row exists; if it doesn't,
+    /// it re-inserts a copy of the snapshot.
+    func undoDelete(_ txn: TransactionModel) {
+        let id = txn.id
+        let note = txn.wrappedNote
+        let amount = txn.amount
+        let date = txn.wrappedDate
+        let category = txn.category
+        let income = txn.income
+        repo.rollback()
+        if repo.fetchOne(TransactionModel.self, predicate: #Predicate { $0.id == id }) == nil {
+            let copy = TransactionModel(
+                note: note,
+                category: category,
+                income: income,
+                amount: amount,
+                date: date
+            )
+            repo.insert(copy)
+            repo.save()
+        }
+    }
 }

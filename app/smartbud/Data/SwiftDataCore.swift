@@ -129,6 +129,10 @@ final class DataRepository {
         guard let container else {
             fatalError("DataRepository: every ModelContainer init attempt failed")
         }
+        // Staged deletes rely on `rollback()` to restore a row. Autosave would
+        // commit the pending delete behind our back (usually before the user
+        // taps "Undo"), so persistence must be explicit via `save()`.
+        container.mainContext.autosaveEnabled = false
         self.container = container
         self.fallbackReason = reason
     }

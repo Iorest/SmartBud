@@ -125,6 +125,9 @@ struct HomeView: View {
             .allowsHitTesting(showPopup ? false : true)
             .environment(toastPresenter)
             .environment(transactionManager)
+            // Light selection feedback when switching tabs (HIG: every
+            // interaction gets feedback).
+            .sensoryFeedback(.selection, trigger: currentTab)
 
             // The add button is only meaningful on data screens; on Settings
             // it used to overlap the last rows and steal their taps.
@@ -141,6 +144,20 @@ struct HomeView: View {
                 .padding(.bottom, bottomEdge + 46)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 .accessibilityLabel(String.appLocalized("Add New Transaction"))
+            }
+
+            if transactionManager.showToast, let deleted = transactionManager.toDelete {
+                undoBanner(deleted)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 58)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .task(id: deleted.id) {
+                        try? await Task.sleep(for: .seconds(4))
+                        guard transactionManager.showToast else { return }
+                        transactionVM.commitPendingChanges()
+                        transactionManager.toDelete = nil
+                        withAnimation { transactionManager.showToast = false }
+                    }
             }
 
             if showPopup {
@@ -174,19 +191,8 @@ struct HomeView: View {
                     }
             }
         }
-        .toast(isPresenting: $toastPresenter.showToast, duration: 4, tapToDismiss: true, offsetY: 12, alert: {
+        .toast(isPresenting: $toastPresenter.showToast, duration: 4, tapToDismiss: true, offsetY: 64, alert: {
             AlertToast(displayMode: .hud, type: .systemImage("checkmark.circle.fill", Color.IncomeGreen), title: String.appLocalized("Image Saved"), subTitle: String.appLocalized("Check it out in Photos"))
-        })
-        .toast(isPresenting: $transactionManager.showToast, duration: 4, tapToDismiss: true, offsetY: 12, alert: {
-            AlertToast(displayMode: .hud, type: .systemImage("arrow.uturn.backward.circle.fill", Color.AlertRed), title: String.appLocalized("Log Deleted"), subTitle: String.appLocalized("Tap to Undo"))
-        }, onTap: {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                transactionVM.rollback()
-            }
-            transactionManager.toDelete = nil
-        }, completion: {
-            transactionVM.commitPendingChanges()
-            transactionManager.toDelete = nil
         })
         .onChange(of: transactionManager.showPopup) { _, newValue in
             withAnimation {
@@ -263,10 +269,49 @@ struct HomeView: View {
             }
         }
     }
+    /// Explicit undo affordance for a staged delete. Replaces the previous
+    /// AlertToast, whose tap handler was swallowed on iOS 26 so "undo" only
+    /// dismissed the toast and the deletion stuck.
+    @ViewBuilder
+    private func undoBanner(_ deleted: TransactionModel) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "trash.fill")
+                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .foregroundStyle(Color.AlertRed)
+
+            Text(String.appLocalized("Log Deleted"))
+                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .foregroundStyle(Color.PrimaryText)
+                .lineLimit(1)
+
+            Spacer(minLength: 12)
+
+            Button {
+                transactionVM.undoDelete(deleted)
+                transactionManager.toDelete = nil
+                withAnimation { transactionManager.showToast = false }
+            } label: {
+                Text(String.appLocalized("Undo"))
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(Color.PrimaryText)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.SecondaryBackground, in: Capsule())
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(String.appLocalized("Undo")))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().stroke(Color.Outline.opacity(0.5), lineWidth: 0.5))
+        .padding(.horizontal, 20)
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+    }
 }
 
-struct AppLockView: View {
-    @Environment(AppLockViewModel.self) var appLockVM
+struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
 
     var body: some View {
         VStack(spacing: 15) {
