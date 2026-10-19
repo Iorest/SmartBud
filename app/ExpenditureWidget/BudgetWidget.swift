@@ -78,7 +78,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
         }
 
-        let holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+        let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedAmount)))
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,

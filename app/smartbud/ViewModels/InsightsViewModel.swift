@@ -33,20 +33,22 @@ final class InsightsViewModel{
         let avgDivisor: Double
         switch selectedPeriod {
         case 1:
-            start = cal.date(byAdding: .day, value: -7, to: now)!
+            start = cal.date(byAdding: .day, value: -7, to: now) ?? now
             avgDivisor = 7
         case 3:
-            start = cal.date(byAdding: .year, value: -1, to: now)!
+            start = cal.date(byAdding: .year, value: -1, to: now) ?? now
             avgDivisor = 12
         default:
-            start = cal.date(byAdding: .month, value: -1, to: now)!
+            start = cal.date(byAdding: .month, value: -1, to: now) ?? now
             avgDivisor = Double(cal.range(of: .day, in: .month, for: now)?.count ?? 30)
         }
         let filtered = all.filter { ($0.date ?? .distantPast) >= start }
-        let spent = filtered.filter { !$0.income }.reduce(0) { $0 + $1.amount }
-        let income = filtered.filter(\.income).reduce(0) { $0 + $1.amount }
+        let spent = Money.sum(filtered.filter { !$0.income }.map(\.amount))
+        let income = Money.sum(filtered.filter(\.income).map(\.amount))
         let net = income - spent
-        summary = SummaryData(spent: spent, income: income, net: abs(net), positive: net >= 0, average: abs(net) / avgDivisor)
+        summary = SummaryData(spent: Money.double(spent), income: Money.double(income),
+                              net: Money.double(abs(net)), positive: net >= 0,
+                              average: Money.double(abs(net) / Decimal(avgDivisor)))
     }
 
     // MARK: Line Graph
@@ -59,16 +61,17 @@ final class InsightsViewModel{
         let step: Calendar.Component
         let periods: Int
         switch selectedPeriod {
-        case 1: start = cal.date(byAdding: .day, value: -7, to: today)!; step = .day; periods = 7
-        case 3: start = cal.date(byAdding: .month, value: -12, to: today)!; step = .month; periods = 12
-        default: start = cal.date(byAdding: .month, value: -1, to: today)!; step = .day; periods = cal.range(of: .day, in: .month, for: start)?.count ?? 30
+        case 1: start = cal.date(byAdding: .day, value: -7, to: today) ?? today; step = .day; periods = 7
+        case 3: start = cal.date(byAdding: .month, value: -12, to: today) ?? today; step = .month; periods = 12
+        default: start = cal.date(byAdding: .month, value: -1, to: today) ?? today; step = .day; periods = cal.range(of: .day, in: .month, for: start)?.count ?? 30
         }
         var result = [LineGraphDataPoint]()
         var cursor = start
         for _ in 0..<periods {
-            let next = cal.date(byAdding: step, value: 1, to: cursor)!
-            let sum = all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }.reduce(0) { $0 + ($1.income ? $1.amount : -$1.amount) }
-            result.append(LineGraphDataPoint(date: cursor, amount: sum))
+            let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
+            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }
+                .map { $0.income ? $0.amount : -$0.amount })
+            result.append(LineGraphDataPoint(date: cursor, amount: Money.double(sum)))
             cursor = next
         }
         lineGraphData = result
@@ -78,20 +81,19 @@ final class InsightsViewModel{
 
     func getTotalSpent(type: Int) -> Double {
         let all = repo.fetch(TransactionModel.self)
-        return all.filter { periodMatch($0, type: type) && !$0.income }.reduce(0) { $0 + $1.amount }
+        return Money.double(Money.sum(all.filter { periodMatch($0, type: type) && !$0.income }.map(\.amount)))
     }
 
     func getTotalIncome(type: Int) -> Double {
         let all = repo.fetch(TransactionModel.self)
-        return all.filter { periodMatch($0, type: type) && $0.income }.reduce(0) { $0 + $1.amount }
+        return Money.double(Money.sum(all.filter { periodMatch($0, type: type) && $0.income }.map(\.amount)))
     }
 
     func getTotalNet(type: Int) -> (value: Double, positive: Bool) {
         let all = repo.fetch(TransactionModel.self)
         let filtered = all.filter { periodMatch($0, type: type) }
-        var net = 0.0
-        for t in filtered { net += t.income ? t.amount : -t.amount }
-        return (abs(net), net >= 0)
+        let net = Money.sum(filtered.map { $0.income ? $0.amount : -$0.amount })
+        return (Money.double(abs(net)), net >= 0)
     }
 
     func getLineGraphDataNet(type: Int) -> [LineGraphDataPoint] {
@@ -100,16 +102,17 @@ final class InsightsViewModel{
         let today = cal.startOfDay(for: Date.now)
         let start: Date; let step: Calendar.Component; let count: Int
         switch type {
-        case 1, 2: start = cal.date(byAdding: .day, value: -7, to: today)!; step = .day; count = 7
-        case 3: start = cal.date(byAdding: .day, value: -30, to: today)!; step = .day; count = 30
-        default: start = cal.date(byAdding: .month, value: -12, to: today)!; step = .month; count = 12
+        case 1, 2: start = cal.date(byAdding: .day, value: -7, to: today) ?? today; step = .day; count = 7
+        case 3: start = cal.date(byAdding: .day, value: -30, to: today) ?? today; step = .day; count = 30
+        default: start = cal.date(byAdding: .month, value: -12, to: today) ?? today; step = .month; count = 12
         }
         var result = [LineGraphDataPoint]()
         var cursor = start
         for _ in 0..<count {
-            let next = cal.date(byAdding: step, value: 1, to: cursor)!
-            let sum = all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }.reduce(0) { $0 + ($1.income ? $1.amount : -$1.amount) }
-            result.append(LineGraphDataPoint(date: cursor, amount: sum))
+            let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
+            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }
+                .map { $0.income ? $0.amount : -$0.amount })
+            result.append(LineGraphDataPoint(date: cursor, amount: Money.double(sum)))
             cursor = next
         }
         return result
@@ -119,26 +122,37 @@ final class InsightsViewModel{
         let all = repo.fetch(TransactionModel.self).filter { ($0.date ?? .distantPast) >= date && $0.income == income }
         var iter = date; let cal = Calendar.current
         let count: Int
-        switch type { case 1: count = 7; case 2: count = cal.range(of: .day, in: .month, for: date)?.count ?? 30; default: count = 12 }
-        var dates = [Date](); var dict = [Date: Double](); var total = 0.0;     var maxAmount = 0.0; var days = 0
+        switch type {
+        case 1: count = 7
+        case 2: count = cal.range(of: .day, in: .month, for: date)?.count ?? 30
+        default: count = 12
+        }
+        var dates = [Date](); var dict = [Date: Double](); var total = Decimal.zero; var maxAmount = Decimal.zero; var days = 0
         let step: Calendar.Component = type == 3 ? .month : .day
         for _ in 0..<count {
-            let next = cal.date(byAdding: step, value: 1, to: iter)!
-            let sum = all.filter { ($0.date ?? .distantPast) >= iter && ($0.date ?? .distantPast) < next }.reduce(0) { $0 + $1.amount }
-            total += sum; dict[iter] = sum
+            let next = cal.date(byAdding: step, value: 1, to: iter) ?? iter
+            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= iter && ($0.date ?? .distantPast) < next }.map(\.amount))
+            total += sum; dict[iter] = Money.double(sum)
             if sum > maxAmount { maxAmount = sum }; if sum != 0 { days += 1 }
             dates.append(iter); iter = next
         }
-        return (total, maxAmount, total / Double(max(count, 1)), days, dates, dict)
+        return (Money.double(total), Money.double(maxAmount),
+                Money.double(total / Decimal(max(count, 1))), days, dates, dict)
     }
 
     func getInsightsSummary(type: Int, date: Date) -> (spent: Double, income: Double, net: Double, positive: Bool, average: Double) {
         let all = repo.fetch(TransactionModel.self).filter { ($0.date ?? .distantPast) >= date }
-        let spent = all.filter { !$0.income }.reduce(0) { $0 + $1.amount }
-        let inc = all.filter(\.income).reduce(0) { $0 + $1.amount }
+        let spent = Money.sum(all.filter { !$0.income }.map(\.amount))
+        let inc = Money.sum(all.filter(\.income).map(\.amount))
         let net = inc - spent
-        let count = max(1, type == 1 ? 7 : (type == 2 ? 30 : 12))
-        return (spent, inc, abs(net), net >= 0, abs(net) / Double(count))
+        // Month averages divide by the real day count (was hardcoded 30).
+        let divisor: Int = switch type {
+        case 1: 7
+        case 2: Calendar.current.range(of: .day, in: .month, for: date)?.count ?? 30
+        default: 12
+        }
+        return (Money.double(spent), Money.double(inc), Money.double(abs(net)), net >= 0,
+                Money.double(abs(net) / Decimal(max(1, divisor))))
     }
 
     private func periodMatch(_ txn: TransactionModel, type: Int) -> Bool {
@@ -147,9 +161,9 @@ final class InsightsViewModel{
         let now = Date.now
         switch type {
         case 1: return d >= cal.startOfDay(for: now)
-        case 2: return d >= cal.date(byAdding: .day, value: -7, to: now)!
-        case 3: return d >= cal.date(byAdding: .month, value: -1, to: now)!
-        default: return d >= cal.date(byAdding: .year, value: -1, to: now)!
+        case 2: return d >= (cal.date(byAdding: .day, value: -7, to: now) ?? now)
+        case 3: return d >= (cal.date(byAdding: .month, value: -1, to: now) ?? now)
+        default: return d >= (cal.date(byAdding: .year, value: -1, to: now) ?? now)
         }
     }
 
@@ -191,33 +205,34 @@ final class InsightsViewModel{
     }
 
     func getLogViewTotalSpent(type: Int) -> Double {
-        logViewTransactions(type: type, income: false).reduce(0) { $0 + $1.amount }
+        Money.double(Money.sum(logViewTransactions(type: type, income: false).map(\.amount)))
     }
 
     func getLogViewTotalIncome(type: Int) -> Double {
-        logViewTransactions(type: type, income: true).reduce(0) { $0 + $1.amount }
+        Money.double(Money.sum(logViewTransactions(type: type, income: true).map(\.amount)))
     }
 
     func getLogViewTotalNet(type: Int) -> (value: Double, positive: Bool) {
-        var net = 0.0
-        for t in logViewTransactions(type: type, income: nil) { net += t.income ? t.amount : -t.amount }
-        return (abs(net), net >= 0)
+        let net = Money.sum(logViewTransactions(type: type, income: nil)
+            .map { $0.income ? $0.amount : -$0.amount })
+        return (Money.double(abs(net)), net >= 0)
     }
 
-    /// A trailing window of buckets ending today, matching the legacy LogView graph:
-    /// timeframe 1/2 -> last 7 days, 3 -> last 30 days, 4 -> last 12 months, 5 (all time) -> none.
+    /// A trailing window of exactly `periods` buckets ending today:
+    /// timeframe 1/2 -> last 7 days, 3 -> last 30 days, 4 -> last 12 months,
+    /// 5 (all time) -> none. The old loop produced one extra bucket (8/31/13).
     private func logLineGraphBuckets(type: Int) -> (dates: [Date], step: Calendar.Component)? {
         guard type != 5 else { return nil }
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: .now)
         let step: Calendar.Component = type == 4 ? .month : .day
         let periods = type == 4 ? 12 : (type == 3 ? 30 : 7)
-        guard let start = calendar.date(byAdding: step, value: -periods, to: today) else { return nil }
+        guard let start = calendar.date(byAdding: step, value: -(periods - 1), to: today) else { return nil }
         var dates = [Date]()
         var cursor = start
-        while cursor <= today {
+        for _ in 0..<periods {
             dates.append(cursor)
-            cursor = calendar.date(byAdding: step, value: 1, to: cursor)!
+            cursor = calendar.date(byAdding: step, value: 1, to: cursor) ?? today
         }
         return (dates, step)
     }
@@ -227,13 +242,13 @@ final class InsightsViewModel{
         guard let (dates, step) = logLineGraphBuckets(type: type), let start = dates.first else { return [] }
         let calendar = Calendar.current
         let all = repo.fetch(TransactionModel.self)
-        var runningTotal = all.filter { ($0.date ?? .distantPast) < start }
-            .reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+        var runningTotal = Money.sum(all.filter { ($0.date ?? .distantPast) < start }
+            .map { $0.income ? $0.amount : -$0.amount })
         return dates.map { bucketStart in
-            let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart)!
-            runningTotal += all.filter { let d = $0.date ?? .distantPast; return d >= bucketStart && d < bucketEnd }
-                .reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
-            return LineGraphDataPoint(date: bucketStart, amount: runningTotal)
+            let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart) ?? bucketStart
+            runningTotal += Money.sum(all.filter { let d = $0.date ?? .distantPast; return d >= bucketStart && d < bucketEnd }
+                .map { $0.income ? $0.amount : -$0.amount })
+            return LineGraphDataPoint(date: bucketStart, amount: Money.double(runningTotal))
         }
     }
 
@@ -243,10 +258,10 @@ final class InsightsViewModel{
         let calendar = Calendar.current
         let all = repo.fetch(TransactionModel.self).filter { $0.income == income }
         return dates.map { bucketStart in
-            let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart)!
-            let total = all.filter { let d = $0.date ?? .distantPast; return d >= bucketStart && d < bucketEnd }
-                .reduce(0.0) { $0 + $1.amount }
-            return LineGraphDataPoint(date: bucketStart, amount: total)
+            let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart) ?? bucketStart
+            let total = Money.sum(all.filter { let d = $0.date ?? .distantPast; return d >= bucketStart && d < bucketEnd }
+                .map(\.amount))
+            return LineGraphDataPoint(date: bucketStart, amount: Money.double(total))
         }
     }
 
@@ -380,9 +395,9 @@ final class InsightsViewModel{
             txns = txns.filter { $0.category.map { ids.contains($0.id) } ?? false }
         }
         if type == 1 {
-            return txns.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+            return Money.double(Money.sum(txns.map { $0.income ? $0.amount : -$0.amount }))
         } else {
-            return txns.reduce(0.0) { $0 + $1.amount }
+            return Money.double(Money.sum(txns.map(\.amount)))
         }
     }
 
@@ -471,23 +486,23 @@ final class InsightsViewModel{
             guard let d = t.date else { return false }
             return d >= periodStart && d < periodEnd
         }
-        let spent = inPeriod.filter { !$0.income }.reduce(0.0) { $0 + $1.amount }
-        let inc = inPeriod.filter(\.income).reduce(0.0) { $0 + $1.amount }
+        let spent = Money.sum(inPeriod.filter { !$0.income }.map(\.amount))
+        let inc = Money.sum(inPeriod.filter(\.income).map(\.amount))
         let net = inc - spent
-        periodTotalSpent = spent
-        periodTotalIncome = inc
-        periodTotalNet = abs(net)
+        periodTotalSpent = Money.double(spent)
+        periodTotalIncome = Money.double(inc)
+        periodTotalNet = Money.double(abs(net))
         periodNetPositive = net >= 0
 
-        let divisor: Double
+        let divisor: Int
         switch selectedPeriod {
         case 1: divisor = 7
         case 3: divisor = 12
         default:
-            divisor = Double(configuredCalendar.range(of: .day, in: .month, for: periodStart)?.count ?? 30)
+            divisor = configuredCalendar.range(of: .day, in: .month, for: periodStart)?.count ?? 30
         }
-        periodAverage = abs(net) / max(1, divisor)
-        periodAverageIncome = inc / max(1, divisor)
+        periodAverage = Money.double(abs(net) / Decimal(max(1, divisor)))
+        periodAverageIncome = Money.double(inc / Decimal(max(1, divisor)))
 
         periodDateRangeText = getDateRangeText(for: selectedPeriod)
         periodDateRangeIncomeText = selectedPeriod == 3 ? String.appLocalized("AVG/MONTH", comment: "Insights avg per month") : String.appLocalized("AVG/DAY", comment: "Insights avg per day")
@@ -505,13 +520,13 @@ final class InsightsViewModel{
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         todayTransactions = todayTxns
         todayCount = todayTxns.count
-        todayTotal = todayTxns.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+        todayTotal = Money.double(Money.sum(todayTxns.map { $0.income ? $0.amount : -$0.amount }))
 
         let yesterdayTxns = inPeriod
             .filter { ($0.date ?? .distantPast) >= yesterday && ($0.date ?? .distantPast) < today }
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         yesterdayTransactions = yesterdayTxns
-        yesterdayTotal = yesterdayTxns.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+        yesterdayTotal = Money.double(Money.sum(yesterdayTxns.map { $0.income ? $0.amount : -$0.amount }))
     }
 
     /// Bar-chart buckets for the period. Week: 7 daily buckets, single-letter M T W T F S S labels.
@@ -539,10 +554,10 @@ final class InsightsViewModel{
         let monthLetters = cal.veryShortMonthSymbols      // ["J","F","M",...]
         for index in 0..<count {
             let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
-            let sum = all
+            let sum = Money.sum(all
                 .filter { !$0.income }
                 .filter { if let d = $0.date { return d >= cursor && d < next } else { return false } }
-                .reduce(0.0) { $0 + $1.amount }
+                .map(\.amount))
 
             let label: String
             switch period {
@@ -560,7 +575,7 @@ final class InsightsViewModel{
                     label = ""
                 }
             }
-            result.append(BarChartPoint(date: cursor, amount: sum, label: label))
+            result.append(BarChartPoint(date: cursor, amount: Money.double(sum), label: label))
             cursor = next
         }
         return result
@@ -574,18 +589,20 @@ final class InsightsViewModel{
             guard let d = t.date, !t.income, let cat = t.category else { return false }
             return d >= periodStart && d < periodEnd && !cat.income
         }
-        var amounts = [UUID: Double]()
+        var amounts = [UUID: Decimal]()
         var categories = [UUID: CategoryModel]()
         for t in txns {
             guard let cat = t.category else { continue }
-            amounts[cat.id, default: 0] += t.amount
+            amounts[cat.id, default: 0] += Money.cents(t.amount)
             categories[cat.id] = cat
         }
-        let total = amounts.values.reduce(0, +)
+        let total = amounts.values.reduce(Decimal.zero, +)
         guard total > 0 else { return [] }
         let entries: [PowerCategory] = amounts.compactMap { (id, amount) in
             guard let cat = categories[id] else { return nil }
-            return PowerCategory(id: id, category: cat, percent: min(1, amount / total), amount: amount)
+            return PowerCategory(id: id, category: cat,
+                                 percent: min(1, Money.double(amount / total)),
+                                 amount: Money.double(amount))
         }
         return entries.sorted { $0.percent > $1.percent }
     }
@@ -611,37 +628,37 @@ final class InsightsViewModel{
     func getPeriodAverage(for period: Int) -> Double {
         let (start, end) = getPeriodDateRange(for: period)
         let all = repo.fetch(TransactionModel.self).filter { if let d = $0.date { return d >= start && d < end } else { return false } }
-        let net = all.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
-        let divisor: Double
+        let net = Money.sum(all.map { $0.income ? $0.amount : -$0.amount })
+        let divisor: Int
         switch period {
         case 1: divisor = 7
         case 3: divisor = 12
         default:
             let cal = configuredCalendar
-            divisor = Double(cal.range(of: .day, in: .month, for: start)?.count ?? 30)
+            divisor = cal.range(of: .day, in: .month, for: start)?.count ?? 30
         }
-        return abs(net) / max(1, divisor)
+        return Money.double(abs(net) / Decimal(max(1, divisor)))
     }
 
     func getPeriodTotalIncome(for period: Int) -> Double {
         let (start, end) = getPeriodDateRange(for: period)
-        return repo.fetch(TransactionModel.self)
+        return Money.double(Money.sum(repo.fetch(TransactionModel.self)
             .filter { if let d = $0.date { return d >= start && d < end && $0.income } else { return false } }
-            .reduce(0.0) { $0 + $1.amount }
+            .map(\.amount)))
     }
 
     func getPeriodTotalSpent(for period: Int) -> Double {
         let (start, end) = getPeriodDateRange(for: period)
-        return repo.fetch(TransactionModel.self)
+        return Money.double(Money.sum(repo.fetch(TransactionModel.self)
             .filter { if let d = $0.date { return d >= start && d < end && !$0.income } else { return false } }
-            .reduce(0.0) { $0 + $1.amount }
+            .map(\.amount)))
     }
 
     func getPeriodTotalNet(for period: Int) -> (value: Double, positive: Bool) {
         let (start, end) = getPeriodDateRange(for: period)
         let all = repo.fetch(TransactionModel.self).filter { if let d = $0.date { return d >= start && d < end } else { return false } }
-        let net = all.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
-        return (abs(net), net >= 0)
+        let net = Money.sum(all.map { $0.income ? $0.amount : -$0.amount })
+        return (Money.double(abs(net)), net >= 0)
     }
 
     /// Formats `amount` using the current `currency` and `showCents` settings. Pass `sign` to force

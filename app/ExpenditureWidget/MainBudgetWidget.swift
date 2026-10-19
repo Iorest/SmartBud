@@ -70,7 +70,7 @@ struct MainBudgetWidgetProvider: TimelineProvider {
             !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
         }
 
-        let holdingTotal = filtered.reduce(0) { $0 + $1.wrappedAmount }
+        let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedAmount)))
 
         let percentageOfDays: Double
         let calendar = Calendar.current

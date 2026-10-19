@@ -18,10 +18,12 @@ final class HomeViewModel{
     func refresh() {
         let txns = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
         let filtered = filterByPeriod(txns, type: periodType)
-        totalSpent = filtered.filter { !$0.income }.reduce(0) { $0 + $1.amount }
-        totalIncome = filtered.filter(\.income).reduce(0) { $0 + $1.amount }
-        let net = totalIncome - totalSpent
-        netValue = abs(net)
+        let spent = Money.sum(filtered.filter { !$0.income }.map(\.amount))
+        let income = Money.sum(filtered.filter(\.income).map(\.amount))
+        let net = income - spent
+        totalSpent = Money.double(spent)
+        totalIncome = Money.double(income)
+        netValue = Money.double(abs(net))
         netPositive = net >= 0
         recentTransactions = Array(txns.prefix(10))
     }
@@ -34,9 +36,9 @@ final class HomeViewModel{
         let start: Date
         switch type {
         case 1: start = cal.startOfDay(for: now)
-        case 2: start = cal.date(byAdding: .day, value: -7, to: now)!
-        case 3: start = cal.date(byAdding: .month, value: -1, to: now)!
-        default: start = cal.date(byAdding: .year, value: -1, to: now)!
+        case 2: start = cal.date(byAdding: .day, value: -7, to: now) ?? now
+        case 3: start = cal.date(byAdding: .month, value: -1, to: now) ?? now
+        default: start = cal.date(byAdding: .year, value: -1, to: now) ?? now
         }
         return txns.filter { ($0.date ?? .distantPast) >= start }
     }

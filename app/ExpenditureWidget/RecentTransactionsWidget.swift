@@ -82,21 +82,17 @@ struct Provider: AppIntentTimelineProvider {
         case .net:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
             let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            var total = 0.0
-            for t in filtered {
-                total += t.income ? t.amount : -t.amount
-            }
-            return total
+            return Money.double(Money.sum(filtered.map { $0.income ? $0.amount : -$0.amount }))
 
         case .income:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
             let filtered = allTxns.filter { $0.income && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            return filtered.reduce(0) { $0 + $1.amount }
+            return Money.double(Money.sum(filtered.map(\.amount)))
 
         case .expense:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
             let filtered = allTxns.filter { !$0.income && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            return filtered.reduce(0) { $0 + $1.amount }
+            return Money.double(Money.sum(filtered.map(\.amount)))
 
         default:
             return 0
