@@ -14,6 +14,8 @@ import Observation
 @MainActor
 @Observable
 class AppLockViewModel{
+    private static let appLockKey = "appLockEnabled"
+
     // Publishing the applock state from user defaults
     var isAppLockEnabled: Bool = false
     // Publishing if the app is curretly unlocked or not
@@ -22,24 +24,35 @@ class AppLockViewModel{
     var enrollmentError: Bool = false
 
     init() {
+        migrateLegacyAppLockKey()
         getAppLockState()
+    }
+
+    /// One-time migration: App Lock used to be stored in
+    /// `UserDefaults.standard` while the rest of the app moved to the
+    /// app group suite. Move the old value over and remove it.
+    private func migrateLegacyAppLockKey() {
+        let standard = UserDefaults.standard
+        guard standard.object(forKey: Self.appLockKey) != nil else { return }
+        UserDefaults.appGroup.set(standard.bool(forKey: Self.appLockKey), forKey: Self.appLockKey)
+        standard.removeObject(forKey: Self.appLockKey)
     }
 
     // To enable the AppLock in UserDefaults
     func enableAppLock() {
-        UserDefaults.standard.set(true, forKey: "appLockEnabled")
+        UserDefaults.appGroup.set(true, forKey: Self.appLockKey)
         isAppLockEnabled = true
     }
 
     // To disable the AppLock in UserDefaults
     func disableAppLock() {
-        UserDefaults.standard.set(false, forKey: "appLockEnabled")
+        UserDefaults.appGroup.set(false, forKey: Self.appLockKey)
         isAppLockEnabled = false
     }
 
     // To Publish the AppLock state
     func getAppLockState() {
-        isAppLockEnabled = UserDefaults.standard.bool(forKey: "appLockEnabled")
+        isAppLockEnabled = UserDefaults.appGroup.bool(forKey: Self.appLockKey)
     }
 
     // Checking if the device is having BioMetric hardware and enrolled

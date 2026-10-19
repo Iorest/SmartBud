@@ -115,8 +115,12 @@ final class BudgetViewModel{
     }
 
     func updateDates() {
-        for b in budgets { while b.endDate <= Date.now { b.startDate = b.endDate } }
-        for m in mainBudgets { while m.endDate <= Date.now { m.startDate = m.endDate } }
+        for b in budgets {
+            if let start = BudgetRollover.roll(startDate: b.startDate, type: b.type) { b.startDate = start }
+        }
+        for m in mainBudgets {
+            if let start = BudgetRollover.roll(startDate: m.startDate, type: m.type) { m.startDate = start }
+        }
         repo.save()
     }
 

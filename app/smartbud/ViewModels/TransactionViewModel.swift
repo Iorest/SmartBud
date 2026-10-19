@@ -60,6 +60,7 @@ final class TransactionViewModel{
     /// Marks a transaction as no longer recurring (idempotent).
     func stopRecurring(_ txn: TransactionModel) {
         txn.recurringType = 0
+        txn.onceRecurring = false
         repo.save()
     }
 
@@ -74,12 +75,19 @@ final class TransactionViewModel{
         let today = Calendar.current.startOfDay(for: Date.now)
         if txn.nextTransactionDate < today {
             var d = txn.nextTransactionDate
-            while d <= today {
+            // `nextOccurrence` returns nil for an unusable recurrence
+            // (unknown type or coefficient <= 0), terminating the loop
+            // instead of spinning forever.
+            while d <= today,
+                  let next = Recurrence.nextOccurrence(
+                      after: Calendar.current.startOfDay(for: d),
+                      type: txn.recurringType,
+                      coefficient: txn.recurringCoefficient) {
                 let new = TransactionModel(note: txn.note ?? "", category: txn.category,
                                            income: txn.income, amount: txn.amount, date: d)
                 repo.insert(new)
                 new.onceRecurring = true
-                d = new.nextTransactionDate
+                d = next
             }
             txn.recurringType = 0
         } else if Calendar.current.isDateInToday(txn.nextTransactionDate) {
@@ -169,8 +177,12 @@ final class TransactionViewModel{
     // MARK: Budget Dates
 
     func updateBudgetDates() {
-        for b in repo.fetch(BudgetModel.self) { while b.endDate <= Date.now { b.startDate = b.endDate } }
-        for m in repo.fetch(MainBudgetModel.self) { while m.endDate <= Date.now { m.startDate = m.endDate } }
+        for b in repo.fetch(BudgetModel.self) {
+            if let start = BudgetRollover.roll(startDate: b.startDate, type: b.type) { b.startDate = start }
+        }
+        for m in repo.fetch(MainBudgetModel.self) {
+            if let start = BudgetRollover.roll(startDate: m.startDate, type: m.type) { m.startDate = start }
+        }
         repo.save()
     }
 
@@ -190,7 +202,10 @@ final class TransactionViewModel{
     // MARK: Staged delete (supports "undo" toast before the delete is committed)
 
     /// Marks a transaction for deletion without saving yet, so it can still be rolled back.
+    /// Unsaved edits are committed first so a later `rollback()` only reverts
+    /// the staged delete, not unrelated pending changes.
     func stageDelete(_ txn: TransactionModel) {
+        repo.save()
         repo.delete(txn)
     }
 
