@@ -11,12 +11,12 @@ struct Toast: View {
             HStack(spacing: 6.5) {
                 Image(systemName: toastImage)
                     .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
                     .foregroundStyle(toastColor)
 
                 Text(toastTitle)
                     .font(.system(.body, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
                     .lineLimit(1)
                     .foregroundStyle(toastColor)
             }

@@ -35,14 +35,14 @@ struct RecurringPickerView: View {
                 HStack {
                     Text(LocalizedStringKey(string))
                         .font(.system(.body, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .lineLimit(1)
                     Spacer()
 
                     if repeatType == index && repeatCoefficient == 1 {
                         Image(systemName: "checkmark")
                             .font(.system(.footnote, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
                         //                            .font(.system(size: 14, weight: .medium))
                     }
                 }
@@ -95,14 +95,14 @@ struct RecurringPickerView: View {
                 if repeatCoefficient > 1 {
                     Image(systemName: "checkmark")
                         .font(.system(.footnote, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                     //                        .font(.system(size: 14, weight: .medium))
                 }
             }
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
             .font(.system(.body, design: .rounded).weight(.medium))
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            
             //            .font(.system(size: 18, weight: .medium, design: .rounded))
             .padding(5)
             .background {

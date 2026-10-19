@@ -164,7 +164,7 @@ struct SingleBudgetView: View {
                             .frame(width: 40, height: 40)
                             .overlay {
                                 Text(budget.wrappedEmoji)
-                                    .font(.system(size: 20))
+                                    .font(.system(.title3))
                             }
 
                             VStack(alignment: .leading, spacing: -0.5) {

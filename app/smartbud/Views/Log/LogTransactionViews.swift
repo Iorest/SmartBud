@@ -37,6 +37,7 @@ struct SingleTransactionView: View {
 
     @State private var lightHaptic = 0
     @State private var mediumHaptic = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var imageSize: Double {
         let scale = min(1.5, 1 + (abs(offset + 40) / 100))
@@ -66,12 +67,39 @@ struct SingleTransactionView: View {
         transaction.wrappedAmount.formatted(.number.precision(.fractionLength(2)))
     }
 
+    private var nameAndTime: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(transaction.wrappedNote)
+                .font(.system(.body, design: .rounded).weight(.medium))
+                .foregroundStyle(future ? Color.SubtitleText : Color.PrimaryText)
+                .lineLimit(2)
+
+            Text(getSubtitle())
+                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .foregroundStyle(future ? Color.EvenLighterText : Color.SubtitleText)
+                .lineLimit(1)
+        }
+    }
+
+    private var amountLabel: some View {
+        Text(showExpenseOrIncomeSign
+             ? "\(transaction.income ? "+" : "-")\(transactionAmountString)"
+             : transactionAmountString)
+            .font(.system(.title3, design: .rounded).weight(.medium))
+            .foregroundStyle(transaction.income
+                             ? (future ? Color.SubtitleText : Color.IncomeGreen)
+                             : (future ? Color.SubtitleText : Color.PrimaryText))
+            .minimumScaleFactor(0.6)
+            .lineLimit(1)
+            .layoutPriority(1)
+    }
+
     var body: some View {
         ZStack(alignment: .trailing) {
             Image(systemName: "xmark")
 //                .font(.system(size: 13, weight: .bold))
                 .font(.system(.caption, design: .rounded).weight(.bold))
-                .dynamicTypeSize(...DynamicTypeSize.xLarge)
+                
                 .foregroundStyle(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
                 .padding(5)
                 .background(deleteConfirm ? Color.AlertRed.opacity(0.23) : Color.SecondaryBackground, in: Circle())
@@ -98,38 +126,18 @@ struct SingleTransactionView: View {
                         }
                     }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(transaction.wrappedNote)
-                        .font(.system(.body, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundStyle(future ? Color.SubtitleText : Color.PrimaryText)
-                        .lineLimit(1)
-
-                    Text(getSubtitle())
-                        .font(.system(.subheadline, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                        .foregroundStyle(future ? Color.EvenLighterText : Color.SubtitleText)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                if transaction.income {
-                    Text(showExpenseOrIncomeSign ? "+\(transactionAmountString)" : transactionAmountString)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundStyle(future ? Color.SubtitleText : Color.IncomeGreen)
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
-                        .layoutPriority(1)
-
+                if dynamicTypeSize.isAccessibilitySize {
+                    // Large text: amount gets its own row under the note so
+                    // neither the note nor the time truncates.
+                    VStack(alignment: .leading, spacing: 4) {
+                        nameAndTime
+                        amountLabel
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
                 } else {
-                    Text(showExpenseOrIncomeSign ? "-\(transactionAmountString)" : transactionAmountString)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundStyle(future ? Color.SubtitleText : Color.PrimaryText)
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
-                        .layoutPriority(1)
+                    nameAndTime
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    amountLabel
                 }
             }
             .id(refreshID)
@@ -314,7 +322,7 @@ struct EmojiLogView: View {
             Text(emoji)
                 .font(.system(huge ? .title : .title3))
                 // future ? .caption :
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                
                 .padding(8)
 //                .font(.system(size: huge ? 45 : future ? 16: 20))
         }
@@ -353,14 +361,14 @@ struct DeleteTransactionAlert: View {
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String(localized: "Delete '\(unwrappedToDelete.wrappedNote)'?"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 25, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
                     .accessibilityLabel(String(localized: "Delete \(unwrappedToDelete.wrappedNote) transaction confirmation. You can undo right after deleting."))
 
                 Text(String.appLocalized(stopRecurring ? "The transaction will no longer be automatically logged." : "You can undo right after deleting."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)

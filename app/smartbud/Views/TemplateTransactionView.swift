@@ -560,7 +560,7 @@ struct TemplateTransactionView: View {
         }
         .sheet(isPresented: $showPicker) {
                 CustomRecurringView(repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker)
-                    .presentationDetents([.height(230)])
+                    .presentationDetents([.medium, .large])
         }
         .sensoryFeedback(.error, trigger: errorHaptic)
         .sensoryFeedback(.success, trigger: successHaptic)

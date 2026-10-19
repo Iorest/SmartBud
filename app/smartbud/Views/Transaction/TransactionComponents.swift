@@ -57,7 +57,7 @@ struct NoteView: View {
         HStack(spacing: 7) {
             Image(systemName: "text.alignleft")
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
             //                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.SubtitleText)
 
@@ -77,7 +77,7 @@ struct NoteView: View {
                 }
             }
             .font(.system(.body, design: .rounded).weight(.semibold))
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            
             //            .font(.system(size: 16, weight: .semibold, design: .rounded))
             .frame(width: min(noteWidth, ScreenSize.width / 1.5), alignment: .center)
         }

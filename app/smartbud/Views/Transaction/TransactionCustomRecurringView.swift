@@ -29,7 +29,7 @@ struct CustomRecurringView: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                     //                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(7)
@@ -41,7 +41,7 @@ struct CustomRecurringView: View {
 
                 Text(String.appLocalized("Custom Interval"))
                     .font(.system(.body, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
                 //                    .font(.system(size: 18, weight: .semibold, design: .rounded))
 
                 Spacer()
@@ -57,7 +57,7 @@ struct CustomRecurringView: View {
                 } label: {
                     Image(systemName: "checkmark")
                         .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                     //                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.IncomeGreen)
                         .padding(7)

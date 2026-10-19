@@ -18,7 +18,7 @@ struct CategoryStepperView: View {
             if income {
                 Image(systemName: "plus")
                     .font(.system(.body, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.IncomeGreen)
                     .padding(7)
@@ -38,7 +38,7 @@ struct CategoryStepperView: View {
             } else {
                 Image(systemName: "minus")
                     .font(.system(.body, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.AlertRed)
                     .padding(7)
@@ -64,12 +64,12 @@ struct CategoryStepperView: View {
                             HStack(spacing: 5) {
                                 Text(item.wrappedEmoji)
                                     .font(.system(.footnote, design: .rounded).weight(.medium))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                    
 //                                    .font(.system(size: 13))
                                 Text(item.wrappedName)
 //                                    .font(.system(size: 17.5, weight: .medium, design: .rounded))
                                     .font(.system(.body, design: .rounded).weight(.medium))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                    
                             }
                             .id(item.id)
                             .padding(.horizontal, 11)
@@ -140,7 +140,7 @@ struct IncomeFilterToggleView: View {
             Text(String.appLocalized("Expense"))
 //                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .font(.system(.body, design: .rounded).weight(.semibold))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
                 .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
                 .padding(.horizontal, 8)
@@ -163,7 +163,7 @@ struct IncomeFilterToggleView: View {
             Text(String.appLocalized("filter-picker-income"))
 //                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .font(.system(.body, design: .rounded).weight(.semibold))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
                 .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
                 .padding(.horizontal, 8)
@@ -224,7 +224,7 @@ struct DateStepperView: View {
 
             Text(dateString)
                 .font(.system(.title3, design: .rounded).weight(.bold))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
 //                .font(.system(size: 20, weight: .bold, design: .rounded))
                 .accessibilityLabel(String(localized: "showing transactions on \(dateString)"))
 

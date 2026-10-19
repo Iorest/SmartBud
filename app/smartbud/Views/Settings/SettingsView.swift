@@ -230,12 +230,12 @@ struct SettingsView: View {
                     Text(String.appLocalized(SettingsKey.proTitle))
                       .font(.system(.body, design: .rounded).weight(.semibold))
                       .foregroundStyle(Color.PrimaryText)
-                      .lineLimit(1)
+                      .fixedSize(horizontal: false, vertical: true)
 
                     Text(settingsVM.proCardSubtitle)
                       .font(.system(.footnote, design: .rounded))
                       .foregroundStyle(Color.SubtitleText)
-                      .lineLimit(1)
+                      .fixedSize(horizontal: false, vertical: true)
                   }
 
                   Spacer()
@@ -676,6 +676,13 @@ struct SettingsRowView: View {
 
   @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
+  private var titleLabel: some View {
+    Text(String.appLocalized(title))
+      .font(.system(.body, design: .rounded).weight(.medium))
+      .foregroundStyle(Color.PrimaryText)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
   var body: some View {
     HStack(spacing: 12) {
       Image(systemName: systemImage)
@@ -690,23 +697,30 @@ struct SettingsRowView: View {
         )
         .background(Color("\(colour)"), in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
 
-      Text(String.appLocalized(title))
-        .font(.system(.body, design: .rounded).weight(.medium))
+      if dynamicTypeSize.isAccessibilitySize {
+        // Large text: value moves under the title so neither truncates.
+        VStack(alignment: .leading, spacing: 2) {
+          titleLabel
+          if let optionalText {
+            Text(optionalText)
+              .font(.system(.subheadline, design: .rounded))
+              .foregroundStyle(Color.DarkIcon.opacity(0.6))
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+      } else {
+        titleLabel
 
-        //                .font(.system(size: 17, weight: .medium, design: .rounded))
-        .lineLimit(1)
-        .foregroundStyle(Color.PrimaryText)
+        Spacer()
 
-      Spacer()
-
-      if optionalText != nil {
-        Text(optionalText!)
-          .font(.system(.body, design: .rounded))
-
-          //                    .font(.system(size: 17, weight: .regular, design: .rounded))
-          .foregroundStyle(Color.DarkIcon.opacity(0.6))
-          .layoutPriority(1)
-          .padding(.trailing, -8)
+        if optionalText != nil {
+          Text(optionalText!)
+            .font(.system(.body, design: .rounded))
+            .foregroundStyle(Color.DarkIcon.opacity(0.6))
+            .multilineTextAlignment(.trailing)
+            .layoutPriority(1)
+            .padding(.trailing, -8)
+        }
       }
 
       Image(systemName: "chevron.forward")

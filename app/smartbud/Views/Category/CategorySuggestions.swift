@@ -64,10 +64,10 @@ struct SuggestedCategoriesView: View {
                             Text(category.emoji)
 //                            .font(.system(size: 15))
                                 .font(.system(.subheadline, design: .rounded))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
                             Text(LocalizedStringKey(category.name))
                                 .font(.system(.body, design: .rounded))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
                                 .lineLimit(1)
 
@@ -75,7 +75,7 @@ struct SuggestedCategoriesView: View {
 
                             Image(systemName: "plus")
                                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                            .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(4)

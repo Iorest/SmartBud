@@ -57,7 +57,7 @@ struct BarGraph: View {
             // empty state instead.
             VStack(spacing: 8) {
                 Image(systemName: "chart.bar.xaxis")
-                    .font(.system(size: 28, weight: .regular))
+                    .font(.system(.title2, design: .rounded))
                 Text(String.appLocalized("本期暂无支出"))
                     .font(.system(.footnote, design: .rounded))
             }
@@ -96,7 +96,7 @@ struct BarGraph: View {
                 AxisValueLabel {
                     if let v = value.as(Double.self) {
                         Text(yAxisLabel(for: v))
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
+                            .font(.system(.caption2, design: .rounded))
                             .foregroundStyle(Color.SubtitleText)
                     }
                 }
@@ -108,7 +108,7 @@ struct BarGraph: View {
                 AxisValueLabel {
                     if let idx = value.as(Int.self), idx >= 0, idx < data.count {
                         Text(data[idx].label)
-                            .font(.system(size: period == 1 ? 12 : 10, weight: .bold, design: .rounded))
+                            .font(.system(period == 1 ? .caption : .caption2, design: .rounded).weight(.bold))
                             .foregroundStyle(Color.SubtitleText)
                             .opacity(labelOpacity(at: idx))
                     }
@@ -117,6 +117,9 @@ struct BarGraph: View {
         }
         .frame(height: 185)
         .padding(.horizontal, 4)
+        // Chart labels are graphics inside a fixed plot area; cap them at
+        // the first accessibility size so they stay legible without colliding.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .animation(animated ? .interactiveSpring(response: 0.6, dampingFraction: 0.8) : nil, value: data)
     }
 

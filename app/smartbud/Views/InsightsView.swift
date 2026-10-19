@@ -50,6 +50,7 @@ struct InsightsView: View {
 
     @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)
     @State private var showAIAnalysis = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         ScrollView {
@@ -89,31 +90,54 @@ struct InsightsView: View {
     // MARK: - Header
 
     private var header: some View {
-        HStack(alignment: .center) {
-            Text("Insights", comment: "Insights screen title")
-                .font(.system(.title, design: .rounded).weight(.bold))
-                .foregroundStyle(Color.PrimaryText)
-            Spacer()
-            Button {
-                showAIAnalysis = true
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "sparkles")
-                    Text(String.appLocalized("AI"))
-                        .font(.system(.caption, design: .rounded).weight(.semibold))
+        Group {
+            if typeSize.isAccessibilitySize {
+                // Title + AI on one row, period control full width below.
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .center) {
+                        titleText
+                        Spacer(minLength: 8)
+                        aiButton
+                    }
+                    periodSegmented
+                        .frame(maxWidth: .infinity)
                 }
-                .foregroundStyle(Color.PrimaryText)
-                .padding(.horizontal, 10)
-                .frame(height: 34)
-                .background(Color.Outline, in: Capsule())
+            } else {
+                HStack(alignment: .center) {
+                    titleText
+                    Spacer()
+                    aiButton
+                    periodSegmented
+                }
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
-            periodSegmented
         }
         .padding(.horizontal, 30)
         .padding(.top, 20)
         .padding(.bottom, 20)
+    }
+
+    private var titleText: some View {
+        Text("Insights", comment: "Insights screen title")
+            .font(.system(.title, design: .rounded).weight(.bold))
+            .foregroundStyle(Color.PrimaryText)
+    }
+
+    private var aiButton: some View {
+        Button {
+            showAIAnalysis = true
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "sparkles")
+                Text(String.appLocalized("AI"))
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
+            }
+            .foregroundStyle(Color.PrimaryText)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(Color.Outline, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
     }
 
     private var periodSegmented: some View {
@@ -195,21 +219,39 @@ struct InsightsView: View {
     // MARK: - Summary cards
 
     private var summaryCards: some View {
-        HStack(spacing: 11) {
-            InsightsSummaryBlockView(
-                income: true,
-                amountString: format(insightsVM.periodTotalIncome),
-                showOverlay: false,
-                action: {}
-            )
-            InsightsSummaryBlockView(
-                income: false,
-                amountString: format(insightsVM.periodTotalSpent),
-                showOverlay: false,
-                action: {}
-            )
+        Group {
+            if typeSize.isAccessibilitySize {
+                // Two cards side by side cannot fit large text; stack them.
+                VStack(spacing: 11) {
+                    incomeCard
+                    expenseCard
+                }
+            } else {
+                HStack(spacing: 11) {
+                    incomeCard
+                    expenseCard
+                }
+            }
         }
         .padding(.horizontal, 30)
+    }
+
+    private var incomeCard: some View {
+        InsightsSummaryBlockView(
+            income: true,
+            amountString: format(insightsVM.periodTotalIncome),
+            showOverlay: false,
+            action: {}
+        )
+    }
+
+    private var expenseCard: some View {
+        InsightsSummaryBlockView(
+            income: false,
+            amountString: format(insightsVM.periodTotalSpent),
+            showOverlay: false,
+            action: {}
+        )
     }
 
     // MARK: - Bar chart

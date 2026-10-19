@@ -64,7 +64,7 @@ struct CategoryView: View {
                     } label: {
                         Text(String.appLocalized("Expense"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
@@ -89,7 +89,7 @@ struct CategoryView: View {
                     } label: {
                         Text(String.appLocalized("Income"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
@@ -124,12 +124,12 @@ struct CategoryView: View {
                     HStack(spacing: 3) {
                         Image(systemName: "plus")
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
 
                         Text(String.appLocalized("New"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .lineLimit(1)
                     }
@@ -147,7 +147,7 @@ struct CategoryView: View {
         }
         .sheet(isPresented: $newCategory) {
                 NewCategoryAlert(income: $income, bottomSpacers: false)
-                    .presentationDetents([.height(270)])
+                    .presentationDetents([.medium, .large])
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard, edges: .all)

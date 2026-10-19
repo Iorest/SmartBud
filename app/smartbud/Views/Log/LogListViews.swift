@@ -104,7 +104,7 @@ struct ListView: View {
                                 .layoutPriority(1)
                         }
                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                         .accessibilityElement(children: .ignore)
@@ -263,7 +263,7 @@ struct FutureListView: View {
                         Text(totalString)
                     }
                     .font(.system(.callout, design: .rounded).weight(.semibold))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .accessibilityElement(children: .ignore)

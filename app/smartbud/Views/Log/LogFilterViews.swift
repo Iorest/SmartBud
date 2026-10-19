@@ -174,13 +174,13 @@ struct NoResultsView: View {
 
                 Image(systemName: "tray.full.fill")
                     .font(.system(.largeTitle, design: .rounded))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 38, weight: .regular, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
 
                 Text(String.appLocalized("No entries found."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 21, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
 

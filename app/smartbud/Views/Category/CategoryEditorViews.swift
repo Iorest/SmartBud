@@ -62,13 +62,13 @@ struct NewCategoryAlert: View {
                         HStack(spacing: 5) {
                             Image(systemName: toastImage)
                                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(toastColor)
 
                             Text(toastTitle)
                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
                                 .lineLimit(1)
 //                                .font(.system(size: 16, weight: .semibold, design: .rounded))
                                 .foregroundStyle(toastColor)
@@ -81,13 +81,13 @@ struct NewCategoryAlert: View {
                         if expenseCategories.count == 24 {
                             Text(String.appLocalized("Income Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else if budgetMode {
                             Text(String.appLocalized("Expense Category"))
                                 .font(.system(.body, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else {
@@ -101,7 +101,7 @@ struct NewCategoryAlert: View {
                                 } label: {
                                     Text(String.appLocalized("Expense"))
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
@@ -126,7 +126,7 @@ struct NewCategoryAlert: View {
                                 } label: {
                                     Text(String.appLocalized("Income"))
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        
 //                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
@@ -156,7 +156,7 @@ struct NewCategoryAlert: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
@@ -237,7 +237,7 @@ struct NewCategoryAlert: View {
                         Image(systemName: "plus")
                             .foregroundStyle(Color.LightIcon)
                             .font(.system(.title3, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
                             .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
@@ -442,7 +442,7 @@ struct EditCategoryAlert: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
@@ -456,13 +456,13 @@ struct EditCategoryAlert: View {
                         HStack(spacing: 5) {
                             Image(systemName: toastImage)
                                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(Color.AlertRed)
 
                             Text(toastTitle)
                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
                                 .lineLimit(1)
 //                                .font(.system(size: 16, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color.AlertRed)
@@ -474,7 +474,7 @@ struct EditCategoryAlert: View {
                     } else {
                         Text(LocalizedStringKey(toEdit.income ? "Income" : "Expense"))
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 18, weight: .semibold, design: .rounded))
                     }
 
@@ -485,7 +485,7 @@ struct EditCategoryAlert: View {
                     } label: {
                         Image(systemName: "trash.fill")
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.AlertRed)
                             .padding(7)
@@ -567,7 +567,7 @@ struct EditCategoryAlert: View {
                         Image(systemName: "checkmark")
                             .foregroundStyle(Color.LightIcon)
                             .font(.system(.title3, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
                             .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))

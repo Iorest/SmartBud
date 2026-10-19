@@ -15,7 +15,7 @@ struct ToolbarButton: View {
                 .overlay {
                     Image(systemName: systemName)
                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .foregroundStyle(Color.SubtitleText)
                         .offset(y: 0.8)
                 }

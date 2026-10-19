@@ -118,7 +118,7 @@ struct TransactionView: View {
     var repeatIconWithOverlay: some View {
         Image(systemName: "repeat")
             .font(.system(.subheadline, design: .rounded).weight(.semibold))
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            
             .overlay(alignment: .topTrailing) {
                 repeatOverlayText
             }
@@ -182,7 +182,7 @@ struct TransactionView: View {
     @ViewBuilder
     func deleteButtonLabel(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 20, weight: .semibold, design: .rounded))
+            .font(.system(.title3, design: .rounded).weight(.semibold))
             .foregroundStyle(.white)
             .frame(height: 45)
             .frame(maxWidth: .infinity)
@@ -193,7 +193,7 @@ struct TransactionView: View {
     @ViewBuilder
     func cancelButtonLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 20, weight: .semibold, design: .rounded))
+            .font(.system(.title3, design: .rounded).weight(.semibold))
             .foregroundStyle(Color.PrimaryText.opacity(0.9))
             .frame(height: 45)
             .frame(maxWidth: .infinity)
@@ -206,11 +206,11 @@ struct TransactionView: View {
     var deleteConfirmationHeader: some View {
         Group {
             Text(String.appLocalized("Delete Expense?"))
-                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .font(.system(.title3, design: .rounded).weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
 
             Text(String.appLocalized("This action cannot be undone."))
-                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .font(.system(.callout, design: .rounded).weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
                 .padding(.bottom, 15)
         }
@@ -220,7 +220,7 @@ struct TransactionView: View {
     var deleteButtonIcon: some View {
         Image(systemName: "trash.fill")
             .font(.system(.subheadline, design: .rounded).weight(.semibold))
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            
             .foregroundStyle(Color.AlertRed)
             .padding(7)
             .background(Color.AlertRed.opacity(0.23), in: Circle())
@@ -958,12 +958,17 @@ struct TransactionView: View {
                 datePickerOverlay
             }
         }
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        
         .animation(.easeOut(duration: 0.2), value: showToast)
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
         .appBackground()
         .ignoresSafeArea(.all)
+        // Control-dense surface (keypad + fixed rows). Let text grow to the
+        // first accessibility size, then stop: beyond that the keypad and the
+        // date/category row cannot fit on a phone. Documented exception to
+        // unlimited scaling, same approach as Apple's Calculator.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .onChange(of: showToast) { _, newValue in
             if newValue {
                 Task { @MainActor in
@@ -1040,7 +1045,7 @@ struct TransactionView: View {
                 CustomRecurringView(
                     repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker
                 )
-                .presentationDetents([.height(230)])
+                .presentationDetents([.medium, .large])
         }
         .onChange(of: dynamicTypeSize) { _, _ in
             if income {

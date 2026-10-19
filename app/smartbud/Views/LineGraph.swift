@@ -91,10 +91,10 @@ struct LineGraph: View {
         VStack(spacing: 0) {
             VStack(spacing: 1) {
                 Text(tooltipDate)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.system(.caption2, design: .rounded).weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                 Text(currentPlot?.amountString ?? "")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(.caption, design: .rounded).weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
             }
             .frame(height: 33)

@@ -35,7 +35,7 @@ struct SettingsNumberEntryView: View {
         VStack(spacing: 10) {
             Text(String.appLocalized("Number Entry Method"))
                 .font(.system(.title3, design: .rounded).weight(.semibold))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
@@ -58,7 +58,7 @@ struct SettingsNumberEntryView: View {
                     } label: {
                         Text(options[option])
                             .font(.system(.body, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
                             .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
                             .padding(.horizontal, 8)
@@ -89,23 +89,23 @@ struct SettingsNumberEntryView: View {
                 if numberEntryType == 1 {
                     Text(options[0])
                         .font(.system(.title2, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .foregroundStyle(Color.PrimaryText)
 
                     Text(String.appLocalized("Type the digits and the last two become cents automatically."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.SubtitleText)
                 } else {
                     Text(options[1])
                         .font(.system(.title2, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .foregroundStyle(Color.PrimaryText)
 
                     Text(String.appLocalized("Enter whole numbers; tap the decimal point only when you need cents."))
                         .font(.system(.subheadline, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Color.SubtitleText)
                 }

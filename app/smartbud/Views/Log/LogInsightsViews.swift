@@ -104,7 +104,7 @@ struct LogInsightsView: View {
             }
         }
         .padding([.bottom, .horizontal], 20)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        
         .frame(height: lineGraph ? 240 : 170)
     }
 }

@@ -70,13 +70,13 @@ struct CategoryListView: View {
                 HStack(spacing: 6.5) {
                     Image(systemName: toastImage)
                         .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(toastColor)
 
                     Text(toastTitle)
                         .font(.system(.body, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .lineLimit(1)
 //                        .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundStyle(toastColor)
@@ -103,7 +103,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                
 //                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
@@ -122,7 +122,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
                                 }
@@ -142,7 +142,7 @@ struct CategoryListView: View {
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
@@ -164,7 +164,7 @@ struct CategoryListView: View {
                                     ZStack {
                                         Image(systemName: "arrow.right")
                                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            
                                             .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
 
                                         if allCategories.count == 0 {
@@ -183,8 +183,8 @@ struct CategoryListView: View {
                     .overlay {
                         Text(String.appLocalized("Categories"))
                             .font(.system(.title3, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                            .font(.system(size: 20, weight: .medium, design: .rounded))
+                            
+//                            .font(.system(.title3, design: .rounded).weight(.medium))
                     }
                     .padding(20)
 
@@ -200,7 +200,7 @@ struct CategoryListView: View {
                                     .overlay {
                                         Image(systemName: "chevron.left")
                                             .font(.system(.body, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            
 //                                        .font(.system(size: 18, weight: .semibold))
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
@@ -218,7 +218,7 @@ struct CategoryListView: View {
                                     .overlay {
                                         Image(systemName: "chevron.down")
                                             .font(.system(.body, design: .rounded).weight(.semibold))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
                                     }
@@ -240,7 +240,7 @@ struct CategoryListView: View {
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        
 //                                    .font(.system(size: 16, weight: .semibold))
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
@@ -262,7 +262,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                
 //                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
@@ -281,7 +281,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.system(.callout, design: .rounded).weight(.semibold))
-                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                
 //                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
@@ -296,7 +296,7 @@ struct CategoryListView: View {
                     .overlay {
                         Text(String.appLocalized("Categories"))
                             .font(.system(.title3, design: .rounded).weight(mode == .settings ? .semibold : .medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
 //                            .font(.system(size: 20, weight: mode == .settings ? .semibold : .medium, design: .rounded))
                     }
                     .padding(20)
@@ -310,7 +310,7 @@ struct CategoryListView: View {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
                                         .font(.system(.largeTitle, design: .rounded).weight(.light))
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        
 //                                        .font(.system(size: 37, weight: .light))
                                         .foregroundStyle(Color.SubtitleText)
 
@@ -322,7 +322,7 @@ struct CategoryListView: View {
                                         }
                                     }
                                     .font(.system(.body, design: .rounded).weight(.medium))
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                    
 //                                    .font(.system(size: 17, weight: .medium, design: .rounded))
                                     .italic()
                                     .multilineTextAlignment(.center)
@@ -336,11 +336,11 @@ struct CategoryListView: View {
                                     HStack(spacing: 10) {
                                         Text(category.wrappedEmoji)
                                             .font(.system(.subheadline, design: .rounded))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            
 //                                            .font(.system(size: 15))
                                         Text(category.wrappedName)
                                             .font(.system(.body, design: .rounded))
-                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                            
 //                                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
                                             .lineLimit(1)
                                             .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
@@ -420,11 +420,11 @@ struct CategoryListView: View {
                 VStack(alignment: .leading, spacing: 1.5) {
                     let deleteName = toDelete?.wrappedName ?? ""
                     Text(String(localized: "Delete '\(deleteName)'?"))
-                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .font(.system(.title3, design: .rounded).weight(.medium))
                         .foregroundStyle(Color.PrimaryText)
 
                     Text(String(localized: "This action cannot be undone, and all \(deleteName) transactions would be deleted."))
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(.callout, design: .rounded).weight(.medium))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(.bottom, 15)
 
@@ -440,7 +440,7 @@ struct CategoryListView: View {
 
                     } label: {
                         Text(String.appLocalized("Delete"))
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .font(.system(.title3, design: .rounded).weight(.semibold))
                             .foregroundStyle(.white)
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
@@ -456,7 +456,7 @@ struct CategoryListView: View {
 
                     } label: {
                         Text(String.appLocalized("Cancel"))
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .font(.system(.title3, design: .rounded).weight(.semibold))
                             .foregroundStyle(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
@@ -498,7 +498,7 @@ struct CategoryListView: View {
             toEdit = nil
         }) { category in
                 EditCategoryAlert(toEdit: category, showRootToast: $showToast, rootToastTitle: $toastTitle, rootToastImage: $toastImage, positive: $positive, bottomSpacers: false)
-                    .presentationDetents([.height(270)])
+                    .presentationDetents([.medium, .large])
         }
         .onChange(of: showToast) { _, newValue in
             if newValue {

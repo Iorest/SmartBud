@@ -181,7 +181,7 @@ struct ActualBudgetView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
             }
             .navigationBarTitle("")
             .toolbar(.hidden, for: .navigationBar)

@@ -147,7 +147,7 @@ struct FilteredBudgetView: View {
                                     .layoutPriority(1)
                             }
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel(String(localized: "\(currencySymbol)\(totalString) was spent \(dateConverterAccessibilityLabel(date: entry.day))"))

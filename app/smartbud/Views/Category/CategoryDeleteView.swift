@@ -27,13 +27,13 @@ struct DeleteCategoryAlert: View {
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(String(localized: "Delete '\(toDelete.wrappedName)'?"))
                     .font(.system(.title2, design: .rounded).weight(.medium))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
 
                 Text(String.appLocalized("This action cannot be undone."))
                     .font(.system(.title3, design: .rounded).weight(.medium))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
 //                    .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 15)
@@ -53,7 +53,7 @@ struct DeleteCategoryAlert: View {
                 } label: {
                     Text(String.appLocalized("Delete"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .foregroundStyle(.white)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
@@ -69,7 +69,7 @@ struct DeleteCategoryAlert: View {
                 } label: {
                     Text(String.appLocalized("Cancel"))
                         .font(.system(.title3, design: .rounded).weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 20, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.PrimaryText.opacity(0.9))
                         .frame(height: 45)

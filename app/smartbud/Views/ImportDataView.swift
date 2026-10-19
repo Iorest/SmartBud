@@ -774,7 +774,7 @@ struct ImportDataView: View {
             }
         }
         .padding(20)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard)
         .appBackground()
@@ -819,7 +819,7 @@ struct ImportDataView: View {
         }
         .sheet(isPresented: $showingCategoryView) {
                 NewCategoryAlert(income: $income, bottomSpacers: false, budgetMode: false)
-                    .presentationDetents([.height(270)])
+                    .presentationDetents([.medium, .large])
         }
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in

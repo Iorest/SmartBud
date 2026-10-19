@@ -40,7 +40,7 @@ struct InsightsSummaryBlockView: View {
                         .font(.system(.title3, design: .rounded).weight(.medium))
                         .foregroundStyle(color)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .minimumScaleFactor(0.6)
                 }
             }
             .padding(7)

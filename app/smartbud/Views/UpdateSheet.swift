@@ -135,7 +135,7 @@ struct UpdateAlert: View {
             .offset(y: offset)
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            
         }
         .ignoresSafeArea(.all)
         .background(BackgroundBlurView())

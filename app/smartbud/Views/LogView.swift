@@ -104,7 +104,7 @@ struct LogView: View {
                             Image(systemName: "magnifyingglass")
 //                                .font(.system(size: 23, weight: .regular))
                                 .font(.system(.title2, design: .rounded).weight(.regular))
-                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                                
                                 .foregroundStyle(Color.DarkIcon)
                                 .padding(5)
                                 .contentShape(Rectangle())
@@ -148,7 +148,7 @@ struct LogView: View {
                         } label: {
                             Image(systemName: filter == .all ? "triangle" : "triangle.tophalf.filled")
                                 .font(.system(.title2, design: .rounded).weight(.regular))
-                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                                
                                 .foregroundStyle(Color.DarkIcon)
                                 .rotationEffect(Angle(degrees: 180))
                                 .padding(5)
@@ -240,7 +240,7 @@ struct LogView: View {
         HStack(spacing: 10) {
             Text(text)
                 .font(.system(.body, design: .rounded).weight(.medium))
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
 
             Button {
                 withAnimation(.easeIn(duration: 0.15)) {
@@ -251,7 +251,7 @@ struct LogView: View {
 //                    .resizable()
 //                    .frame(width: 11, height: 11)
                     .font(.system(.caption, design: .rounded).weight(.regular))
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    
                     .foregroundStyle(Color.PrimaryText.opacity(0.7))
             }
             .accessibilityLabel(Text(String.appLocalized("remove filter")))

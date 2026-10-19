@@ -15,13 +15,13 @@ struct SearchView: View {
                     Image(systemName: "magnifyingglass")
 //                        .font(.system(size: 17))
                         .font(.system(.body, design: .rounded).weight(.regular))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
                         .foregroundStyle(Color.DarkIcon.opacity(0.8))
                         .accessibilityHidden(true)
                     TextField(String.appLocalized("Search entry by note"), text: $searchQuery)
                         .focused($searchFocused)
                         .font(.system(.body, design: .rounded).weight(.regular))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 17, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.PrimaryText)
 
@@ -31,7 +31,7 @@ struct SearchView: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(.subheadline, design: .rounded).weight(.regular))
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 //                                .font(.system(size: 15))
                                 .foregroundStyle(Color.SubtitleText)
                                 .background(Color.SecondaryBackground)
@@ -48,7 +48,7 @@ struct SearchView: View {
                     Text(String.appLocalized("Cancel"))
                         .foregroundStyle(Color.PrimaryText)
                         .font(.system(.body, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                 }
             }
@@ -84,12 +84,12 @@ struct FilteredSearchView: View {
                         .padding(.bottom, 15)
                     Text(String.appLocalized("No entries found."))
                         .font(.system(.title3, design: .rounded).weight(.medium))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.PrimaryText)
                     Text(String.appLocalized("Try a different search query!"))
                         .font(.system(.subheadline, design: .rounded).weight(.regular))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        
 //                        .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.SubtitleText)
                 }
@@ -167,14 +167,14 @@ struct TimePickerView: View {
                     HStack {
                         Text(LocalizedStringKey(timeframes[index]))
                             .font(.system(.body, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            
 
                         Spacer()
 
                         if holdingTimeframe == index + 1 {
                             Image(systemName: "checkmark")
                                 .font(.system(.footnote, design: .rounded).weight(.medium))
-                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                                
 //                            .font(.system(size: 14, weight: .medium))
                         }
                     }
@@ -241,19 +241,19 @@ struct FilterPickerView: View {
                         Image(systemName: FilterType.imageDictionary[filter] ?? "")
 //                        .font(.system(size: 16))
                             .font(.system(.callout, design: .rounded).weight(.regular))
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            
                             .frame(width: 20)
                         Text(LocalizedStringKey(filter.rawValue))
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                             .font(.system(.body, design: .rounded).weight(.medium))
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            
                             .lineLimit(1)
                         Spacer()
 
                         if filterType == filter {
                             Image(systemName: "checkmark")
                                 .font(.system(.footnote, design: .rounded).weight(.medium))
-                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                                
 //                            .font(.system(size: 14, weight: .medium))
                         }
                     }

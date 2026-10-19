@@ -75,7 +75,7 @@ struct NewCategoryPickerView: View {
         }
         .scrollIndicators(.hidden)
         .keyboardAwareHeight(showToolbar: false)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        
         .overlay(alignment: .bottom) {
             Button {
                 lightHaptic &+= 1

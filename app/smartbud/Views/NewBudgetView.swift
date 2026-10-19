@@ -552,7 +552,7 @@ struct BrandNewBudgetView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        
         .appBackground()
         .onAppear {
             // Sync the pad VM with the AppStorage flags on first appearance.
@@ -645,7 +645,7 @@ struct BrandNewBudgetView: View {
         }
         .sheet(isPresented: $showingCategoryView) {
                 NewCategoryAlert(income: Binding.constant(false), bottomSpacers: false, budgetMode: true)
-                    .presentationDetents([.height(270)])
+                    .presentationDetents([.medium, .large])
         }
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: numberEntryType) { _, new in
