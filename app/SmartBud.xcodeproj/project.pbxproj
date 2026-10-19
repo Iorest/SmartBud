@@ -180,6 +180,24 @@
 		B0A0F00000000000000000D7 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
 		B0A0F00000000000000000E2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
 		B0A0F00000000000000000E3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
+		B0A0F0000000000000000102 /* SingleBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000101 /* SingleBudgetView.swift */; };
+		B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000103 /* BudgetGraphs.swift */; };
+		B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000105 /* BudgetAlerts.swift */; };
+		B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000107 /* BudgetDetailViews.swift */; };
+		B0A0F000000000000000010A /* TimeBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000109 /* TimeBudgetView.swift */; };
+		B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010B /* FilteredBudgetViews.swift */; };
+		B0A0F000000000000000010E /* TimeMainBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010D /* TimeMainBudgetView.swift */; };
+		B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010F /* BudgetSteppers.swift */; };
+		B0A0F0000000000000000112 /* LogInsightsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000111 /* LogInsightsViews.swift */; };
+		B0A0F0000000000000000114 /* LogSearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000113 /* LogSearchViews.swift */; };
+		B0A0F0000000000000000116 /* LogListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000115 /* LogListViews.swift */; };
+		B0A0F0000000000000000118 /* LogTransactionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000117 /* LogTransactionViews.swift */; };
+		B0A0F000000000000000011A /* LogFilterViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000119 /* LogFilterViews.swift */; };
+		B0A0F000000000000000011C /* LogSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000011B /* LogSteppers.swift */; };
+		B0A0F0000000000000000132 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000131 /* KeychainStore.swift */; };
+		B0A0F0000000000000000134 /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000133 /* LLMClient.swift */; };
+		B0A0F0000000000000000136 /* SettingsLLMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000135 /* SettingsLLMView.swift */; };
+		B0A0F0000000000000000138 /* InsightsAIAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -343,6 +361,24 @@
 		B0A0F00000000000000000D1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModelTests.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000E1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000101 /* SingleBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleBudgetView.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000103 /* BudgetGraphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetGraphs.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000105 /* BudgetAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetAlerts.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000107 /* BudgetDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000109 /* TimeBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeBudgetView.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000010B /* FilteredBudgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredBudgetViews.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000010D /* TimeMainBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeMainBudgetView.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000010F /* BudgetSteppers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSteppers.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000111 /* LogInsightsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInsightsViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000113 /* LogSearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSearchViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000115 /* LogListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogListViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000117 /* LogTransactionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTransactionViews.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000119 /* LogFilterViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFilterViews.swift; sourceTree = "<group>"; };
+		B0A0F000000000000000011B /* LogSteppers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSteppers.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000131 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000133 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LLM/LLMClient.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000135 /* SettingsLLMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLLMView.swift; sourceTree = "<group>"; };
+		B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsAIAnalysisView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -382,6 +418,34 @@
 				B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */,
 			);
 			path = SmartBudTests;
+			sourceTree = "<group>";
+		};
+		B0A0F00000000000000000F0 /* Budget */ = {
+			isa = PBXGroup;
+			children = (
+				B0A0F0000000000000000101 /* SingleBudgetView.swift */,
+				B0A0F0000000000000000103 /* BudgetGraphs.swift */,
+				B0A0F0000000000000000105 /* BudgetAlerts.swift */,
+				B0A0F0000000000000000107 /* BudgetDetailViews.swift */,
+				B0A0F0000000000000000109 /* TimeBudgetView.swift */,
+				B0A0F000000000000000010B /* FilteredBudgetViews.swift */,
+				B0A0F000000000000000010D /* TimeMainBudgetView.swift */,
+				B0A0F000000000000000010F /* BudgetSteppers.swift */,
+			);
+			path = Budget;
+			sourceTree = "<group>";
+		};
+		B0A0F00000000000000000F1 /* Log */ = {
+			isa = PBXGroup;
+			children = (
+				B0A0F0000000000000000111 /* LogInsightsViews.swift */,
+				B0A0F0000000000000000113 /* LogSearchViews.swift */,
+				B0A0F0000000000000000115 /* LogListViews.swift */,
+				B0A0F0000000000000000117 /* LogTransactionViews.swift */,
+				B0A0F0000000000000000119 /* LogFilterViews.swift */,
+				B0A0F000000000000000011B /* LogSteppers.swift */,
+			);
+			path = Log;
 			sourceTree = "<group>";
 		};
 		042918746E7F49F48130B5AB /* ViewModels */ = {
@@ -459,6 +523,7 @@
 				042918746E7F49F48130B5AB /* ViewModels */,
 				AAAA00000000000000000010 /* SubscriptionManager.swift */,
 				AAAA00000000000000000030 /* DataExporter.swift */,
+				B0A0F0000000000000000133 /* LLMClient.swift */,
 			);
 			path = smartbud;
 			sourceTree = "<group>";
@@ -495,6 +560,7 @@
 				533D1C3B2AE7BB6900894764 /* DynamicType.swift */,
 				D63B205E2D8728C300CAFB20 /* ScreenSize.swift */,
 				AAAA00000000000000000020 /* ReviewRequester.swift */,
+				B0A0F0000000000000000131 /* KeychainStore.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -512,6 +578,8 @@
 			isa = PBXGroup;
 			children = (
 				53D6BDC62AF73B1D00F5728E /* Settings */,
+				B0A0F00000000000000000F0 /* Budget */,
+				B0A0F00000000000000000F1 /* Log */,
 				53B907972AE817D50001F496 /* Shapes */,
 				5327D2CD287C6B5E00F76ADF /* CategoryView.swift */,
 				53A4147628B3B559008C30E7 /* WelcomeSheetView.swift */,
@@ -523,6 +591,7 @@
 				5327D2D2287C6B5E00F76ADF /* LogView.swift */,
 				536CC385293106180081E401 /* LineGraph.swift */,
 				5327D2D4287C6B5E00F76ADF /* InsightsView.swift */,
+				B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */,
 				5327D2D3287C6B5E00F76ADF /* BudgetView.swift */,
 				532C58BB2A629C3900DA2C81 /* NewBudgetView.swift */,
 				5327D2D5287C6B5E00F76ADF /* CustomTabBar.swift */,
@@ -639,6 +708,7 @@
 				53D6BDD52AF73CE400F5728E /* SettingsUpcomingView.swift */,
 				53D6BDE02AF73FAB00F5728E /* SettingsSubviewModifier.swift */,
 				D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */,
+				B0A0F0000000000000000135 /* SettingsLLMView.swift */,
 				395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */,
 				AAAA00000000000000000040 /* SettingsExportView.swift */,
 			);
@@ -847,6 +917,24 @@
 				5358E9192AC885E3003E8CA9 /* AlertToast.swift in Sources */,
 				D1550AA12D26000000000002 /* GlassTheme.swift in Sources */,
 				B0A0F00000000000000000E2 /* Theme.swift in Sources */,
+				B0A0F0000000000000000102 /* SingleBudgetView.swift in Sources */,
+				B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */,
+				B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */,
+				B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */,
+				B0A0F000000000000000010A /* TimeBudgetView.swift in Sources */,
+				B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */,
+				B0A0F000000000000000010E /* TimeMainBudgetView.swift in Sources */,
+				B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */,
+				B0A0F0000000000000000112 /* LogInsightsViews.swift in Sources */,
+				B0A0F0000000000000000114 /* LogSearchViews.swift in Sources */,
+				B0A0F0000000000000000116 /* LogListViews.swift in Sources */,
+				B0A0F0000000000000000118 /* LogTransactionViews.swift in Sources */,
+				B0A0F000000000000000011A /* LogFilterViews.swift in Sources */,
+				B0A0F000000000000000011C /* LogSteppers.swift in Sources */,
+				B0A0F0000000000000000132 /* KeychainStore.swift in Sources */,
+				B0A0F0000000000000000134 /* LLMClient.swift in Sources */,
+				B0A0F0000000000000000136 /* SettingsLLMView.swift in Sources */,
+				B0A0F0000000000000000138 /* InsightsAIAnalysisView.swift in Sources */,
 				5327D2C4287C6B2500F76ADF /* TimeFrame.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
