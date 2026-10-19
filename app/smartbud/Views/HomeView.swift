@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import SwiftData
 import SwiftUI
 
 @MainActor
@@ -57,9 +58,14 @@ struct HomeView: View {
 
     @State var showPopup = false
 
-    // Hiding Native TabBar is now done once in `SmartBudApp.init`
-    // (was previously set here, but ran every time this view was
-    // reconstructed).
+    // Floating add button (replaces the custom tab bar's centre button).
+    @State private var addTransaction = false
+    @State private var transactionCountBeforeAdd = 0
+    @State private var lightHaptic = 0
+    @Query private var transactions: [TransactionModel]
+    @AppStorage("confetti", store: .appGroup) private var confetti: Bool = false
+    @AppStorage("firstTransactionViewLaunch", store: .appGroup) private var firstLaunch: Bool = true
+
     init(topEdge: CGFloat, bottomEdge: CGFloat) {
         self.topEdge = topEdge
         self.bottomEdge = bottomEdge
@@ -69,34 +75,61 @@ struct HomeView: View {
         ZStack(alignment: .bottom) {
             AppGlassBackground()
 
+            // Native TabView: one navigation shell that adapts to iPhone,
+            // iPad and Mac (Designed for iPad) without a custom tab bar.
             TabView(selection: $currentTab) {
                 LogView(topEdge: topEdge, bottomEdge: bottomEdge, launchSearch: launchSearch)
-                    .ignoresSafeArea(.all)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: 760)
+                    .frame(maxWidth: .infinity)
                     .background(AppGlassBackground())
                     .tag("Log")
+                    .tabItem {
+                        Label(String.appLocalized("Log"), systemImage: "list.bullet")
+                    }
 
                 InsightsView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: 760)
+                    .frame(maxWidth: .infinity)
                     .background(AppGlassBackground())
                     .tag("Insights")
+                    .tabItem {
+                        Label(String.appLocalized("Insights"), systemImage: "chart.bar.fill")
+                    }
 
                 BudgetView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: 760)
+                    .frame(maxWidth: .infinity)
                     .background(AppGlassBackground())
                     .tag("Budget")
+                    .tabItem {
+                        Label(String.appLocalized("Budget"), systemImage: "chart.pie.fill")
+                    }
 
                 SettingsView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: 760)
+                    .frame(maxWidth: .infinity)
                     .background(AppGlassBackground())
                     .tag("Settings")
+                    .tabItem {
+                        Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
+                    }
             }
             .allowsHitTesting(showPopup ? false : true)
             .environment(toastPresenter)
             .environment(transactionManager)
 
-            CustomTabBar(currentTab: $currentTab, topEdge: topEdge, bottomEdge: bottomEdge, counter: $counter, launchAdd: launchAdd)
-                .offset(y: tabBarManager.hideTab ? (70 + bottomEdge) : 0)
+            Button {
+                lightHaptic &+= 1
+                transactionCountBeforeAdd = transactions.count
+                addTransaction = true
+            } label: {
+                Image(systemName: "plus")
+            }
+            .buttonStyle(MyButtonStyle())
+            .padding(.trailing, 22)
+            .padding(.bottom, bottomEdge + 46)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .accessibilityLabel(String.appLocalized("Add New Transaction"))
 
             if showPopup {
                 Rectangle()
@@ -153,6 +186,25 @@ struct HomeView: View {
         }) { transaction in
             TransactionView(toEdit: transaction)
         }
+        .fullScreenCover(isPresented: $addTransaction, onDismiss: {
+            if confetti && transactionCountBeforeAdd != transactions.count {
+                counter += 1
+            }
+            if firstLaunch {
+                firstLaunch = false
+            }
+        }) {
+            TransactionView(toEdit: nil)
+        }
+        .onChange(of: launchAdd) { _, _ in
+            addTransaction = true
+        }
+        .onOpenURL { url in
+            if url.host == "newExpense" {
+                addTransaction = true
+            }
+        }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }
         .onAppear {

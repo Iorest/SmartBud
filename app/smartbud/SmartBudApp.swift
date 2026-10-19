@@ -24,11 +24,9 @@ struct SmartBudApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
-        // The app uses a fully custom `TabBar` view instead of SwiftUI's
-        // native `TabView`, so hide the system tab bar once at launch
-        // (previously this ran inside `HomeView.init`, which fires every
-        // time the view was reconstructed).
-        UITabBar.appearance().isHidden = true
+        // Tab-bar appearance is now the system default: the app uses the
+        // native TabView so iPhone, iPad and Mac (Designed for iPad) share
+        // one navigation shell.
     }
 
     var body: some Scene {

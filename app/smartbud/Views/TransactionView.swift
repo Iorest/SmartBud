@@ -922,7 +922,10 @@ struct TransactionView: View {
 
             }
             .padding(17)
-            .frame(width: proxy.size.width, height: proxy.size.height)
+            // Cap the entry layout on iPad/Mac so the keypad doesn't stretch
+            // edge to edge; centred by the outer frame.
+            .frame(width: min(proxy.size.width, 560), height: proxy.size.height)
+            .frame(maxWidth: .infinity)
             .background(Color.clear)
             .onTapGesture {
                 self.hideKeyboard()
