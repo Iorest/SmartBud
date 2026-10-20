@@ -38,6 +38,21 @@ final class SpeechService {
 
     func startRecording(completion: @escaping (String) -> Void) {
         guard !audioEngine.isRunning else { return }
+
+        #if os(macOS)
+        // macOS has no AVAudioSession; ask for microphone access directly and
+        // retry once granted.
+        if AVCaptureDevice.authorizationStatus(for: .audio) != .authorized {
+            Task {
+                if await AVCaptureDevice.requestAccess(for: .audio) {
+                    self.startRecording(completion: completion)
+                } else {
+                    self.errorMessage = String.appLocalized("没有语音识别权限，请到系统设置开启。")
+                }
+            }
+            return
+        }
+        #endif
         guard let recognizer, recognizer.isAvailable else {
             errorMessage = String.appLocalized("语音识别不可用，请检查网络或系统设置。")
             return
@@ -46,6 +61,7 @@ final class SpeechService {
         task?.cancel()
         task = nil
 
+        #if !os(macOS)
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(.record, mode: .measurement, options: .duckOthers)
@@ -54,6 +70,7 @@ final class SpeechService {
             errorMessage = String.appLocalized("无法开始录音。")
             return
         }
+        #endif
 
         request = SFSpeechAudioBufferRecognitionRequest()
         guard let request else { return }

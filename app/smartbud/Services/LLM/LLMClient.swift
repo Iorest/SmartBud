@@ -2,9 +2,10 @@
 //  LLMClient.swift
 //  smartbud
 //
-//  Minimal OpenAI-compatible client for ledger analysis. The user supplies
-//  baseURL + model + API key in Settings; the key lives in the Keychain.
-//  Only aggregate figures leave the device — never per-transaction detail.
+//  Minimal client for an OpenAI-compatible or Anthropic-compatible endpoint.
+//  The user supplies provider + baseURL + model + API key in Settings; the
+//  key lives in the Keychain. Only aggregate figures leave the device —
+//  never per-transaction detail.
 //
 
 import Foundation
@@ -12,18 +13,31 @@ import Foundation
 // MARK: - Configuration
 
 struct LLMConfig: Equatable {
+    var provider: LLMProvider = .openAI
     var baseURL: String = ""
     var model: String = ""
     var apiKey: String = ""
 
+    static let providerKey = "llmProvider"
     static let baseURLKey = "llmBaseURL"
     static let modelKey = "llmModel"
     private static let apiKeyAccount = "apiKey"
 
     static func load() -> LLMConfig {
         let defaults = UserDefaults.appGroup
+        let baseURL = defaults.string(forKey: baseURLKey) ?? ""
+        let provider: LLMProvider
+        if let raw = defaults.string(forKey: providerKey), let saved = LLMProvider(rawValue: raw) {
+            provider = saved
+        } else if baseURL.trimmingCharacters(in: .whitespaces).isEmpty {
+            provider = .openAI
+        } else {
+            // Configs written before the provider existed.
+            provider = LLMProvider.inferred(fromBaseURL: baseURL)
+        }
         return LLMConfig(
-            baseURL: defaults.string(forKey: baseURLKey) ?? "",
+            provider: provider,
+            baseURL: baseURL,
             model: defaults.string(forKey: modelKey) ?? "",
             apiKey: KeychainStore.get(forKey: apiKeyAccount) ?? ""
         )
@@ -31,6 +45,7 @@ struct LLMConfig: Equatable {
 
     func save() {
         let defaults = UserDefaults.appGroup
+        defaults.set(provider.rawValue, forKey: Self.providerKey)
         defaults.set(baseURL.trimmingCharacters(in: .whitespacesAndNewlines), forKey: Self.baseURLKey)
         defaults.set(model.trimmingCharacters(in: .whitespacesAndNewlines), forKey: Self.modelKey)
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -42,9 +57,7 @@ struct LLMConfig: Equatable {
     }
 
     var isConfigured: Bool {
-        !baseURL.trimmingCharacters(in: .whitespaces).isEmpty
-            && !model.trimmingCharacters(in: .whitespaces).isEmpty
-            && !apiKey.trimmingCharacters(in: .whitespaces).isEmpty
+        provider.isConfigured(baseURL: baseURL, model: model, apiKey: apiKey)
     }
 }
 
@@ -76,8 +89,14 @@ struct LLMClient {
     enum Failure: LocalizedError {
         case notConfigured
         case invalidURL
+        case unauthorized
+        case notFound
+        case rateLimited
+        case server(Int)
         case http(Int, String)
         case emptyResponse
+        case timeout
+        case network
 
         var errorDescription: String? {
             switch self {
@@ -85,65 +104,134 @@ struct LLMClient {
                 return String.appLocalized("AI 未配置，请先在设置中填写服务地址、模型和 API Key。")
             case .invalidURL:
                 return String.appLocalized("服务地址无效。")
+            case .unauthorized:
+                return String.appLocalized("API Key 无效或没有权限，请检查后重试。")
+            case .notFound:
+                return String.appLocalized("服务地址或模型不存在，请检查服务地址与模型名称。")
+            case .rateLimited:
+                return String.appLocalized("请求过于频繁或额度不足，请稍后再试。")
+            case .server(let status):
+                return String.appLocalized("服务端暂时不可用，请稍后再试。") + " (HTTP \(status))"
             case .http(let status, let body):
                 return "HTTP \(status): \(body.prefix(200))"
             case .emptyResponse:
                 return String.appLocalized("服务未返回内容。")
+            case .timeout:
+                return String.appLocalized("连接超时，请检查网络或服务地址。")
+            case .network:
+                // URLError.localizedDescription follows the system language,
+                // which would mix languages into the in-app UI.
+                return String.appLocalized("无法连接服务器，请检查服务地址或网络。")
             }
         }
     }
 
-    private func endpoint() throws -> URL {
-        var base = config.baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        while base.hasSuffix("/") { base.removeLast() }
-        guard var url = URL(string: base) else { throw Failure.invalidURL }
-        if !base.hasSuffix("/chat/completions") {
-            url.append(path: "chat/completions")
-        }
-        return url
-    }
-
-    /// One non-streaming chat completion. `jsonMode` asks for a JSON object;
-    /// endpoints that ignore `response_format` still work via the prompt.
-    func complete(system: String, user: String, jsonMode: Bool = false) async throws -> String {
+    /// One non-streaming chat completion.
+    func complete(system: String, user: String) async throws -> String {
         guard config.isConfigured else { throw Failure.notConfigured }
 
-        var request = URLRequest(url: try endpoint())
-        request.httpMethod = "POST"
-        request.timeoutInterval = 30
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
+        let request = try makeRequest(system: system, user: user)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch let error as URLError {
+            // A dismissed sheet cancels the task; that is not a network error.
+            if error.code == .cancelled { throw CancellationError() }
+            throw error.code == .timedOut ? Failure.timeout : Failure.network
+        }
 
-        var body: [String: Any] = [
-            "model": config.model,
-            "temperature": 0.3,
-            "messages": [
-                ["role": "system", "content": system],
-                ["role": "user", "content": user]
-            ]
-        ]
-        if jsonMode { body["response_format"] = ["type": "json_object"] }
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw Failure.emptyResponse }
         guard (200..<300).contains(http.statusCode) else {
-            throw Failure.http(http.statusCode, String(data: data, encoding: .utf8) ?? "")
+            throw Self.failure(status: http.statusCode, data: data)
         }
 
-        struct ChatResponse: Decodable {
-            struct Choice: Decodable {
-                struct Message: Decodable { let content: String? }
-                let message: Message
+        let content: String?
+        switch config.provider.dialect {
+        case .openAI:
+            struct ChatResponse: Decodable {
+                struct Choice: Decodable {
+                    struct Message: Decodable { let content: String? }
+                    let message: Message
+                }
+                let choices: [Choice]
             }
-            let choices: [Choice]
+            content = try JSONDecoder().decode(ChatResponse.self, from: data)
+                .choices.first?.message.content
+        case .anthropic:
+            struct MessageResponse: Decodable {
+                struct Block: Decodable {
+                    let type: String
+                    let text: String?
+                }
+                let content: [Block]
+            }
+            content = try JSONDecoder().decode(MessageResponse.self, from: data)
+                .content.first { $0.type == "text" }?.text
         }
-        let decoded = try JSONDecoder().decode(ChatResponse.self, from: data)
-        guard let content = decoded.choices.first?.message.content,
-              !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+
+        guard let text = content?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else {
             throw Failure.emptyResponse
         }
-        return content
+        return text
+    }
+
+    private func makeRequest(system: String, user: String) throws -> URLRequest {
+        guard let url = config.provider.endpoint(baseURL: config.baseURL) else {
+            throw Failure.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 45
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let key = config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let model = config.model.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let body: [String: Any]
+        switch config.provider.dialect {
+        case .openAI:
+            if !key.isEmpty {
+                request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+            }
+            // No temperature: OpenAI's reasoning models reject non-default
+            // values, and it adds nothing to a summarisation task.
+            body = [
+                "model": model,
+                "messages": [
+                    ["role": "system", "content": system],
+                    ["role": "user", "content": user]
+                ]
+            ]
+        case .anthropic:
+            request.setValue(key, forHTTPHeaderField: "x-api-key")
+            request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+            // Anthropic takes the system prompt as a top-level field and
+            // requires max_tokens.
+            body = [
+                "model": model,
+                "max_tokens": 1024,
+                "system": system,
+                "messages": [
+                    ["role": "user", "content": user]
+                ]
+            ]
+        }
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        return request
+    }
+
+    private static func failure(status: Int, data: Data) -> Failure {
+        let body = String(data: data, encoding: .utf8) ?? ""
+        switch status {
+        case 401, 403: return .unauthorized
+        case 404: return .notFound
+        case 429: return .rateLimited
+        case 500...599: return .server(status)
+        default: return .http(status, body)
+        }
     }
 
     /// Analyze aggregated ledger figures and return localized prose.

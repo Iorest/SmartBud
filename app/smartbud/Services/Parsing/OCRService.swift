@@ -8,7 +8,11 @@
 //
 
 import Vision
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 final class OCRService: @unchecked Sendable {
     static let shared = OCRService()
