@@ -11,13 +11,8 @@ import SwiftUI
 extension Color {
     /// Canonical category swatches live in `Theme.Palette`; kept here so the
     /// many existing `Color.colorArray` call sites stay unchanged.
-    static var colourMigrationDictionary: [String: String] { Theme.Palette.legacyIDs }
-
     static var colorArray: [String] { Theme.Palette.swatches }
 
-    static let neuBackground = Color(hex: "f0f0f3")
-    static let dropShadow = Color(hex: "aeaec0").opacity(0.4)
-    static let dropLight = Color(hex: "ffffff")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -72,68 +67,104 @@ extension Color {
         return 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b)
     }
 
+    // MARK: - Semantic colors (system-native)
+
+    // These were asset-catalog colors with fixed hex values. Mapping them to
+    // the platform's semantic colors fixes contrast (secondary text was
+    // ~2.2:1 in light mode) and makes every screen adapt to light/dark,
+    // increased contrast, and macOS window backgrounds automatically.
+
     static var PrimaryBackground: Color {
-        return Color("PrimaryBackground")
+        #if os(macOS)
+        Color(nsColor: .windowBackgroundColor)
+        #else
+        Color(uiColor: .systemGroupedBackground)
+        #endif
     }
 
     static var SecondaryBackground: Color {
-        return Color("SecondaryBackground")
+        #if os(macOS)
+        Color(nsColor: .controlBackgroundColor)
+        #else
+        Color(uiColor: .secondarySystemGroupedBackground)
+        #endif
     }
 
+    static var TertiaryBackground: Color {
+        #if os(macOS)
+        Color(nsColor: .underPageBackgroundColor)
+        #else
+        Color(uiColor: .tertiarySystemGroupedBackground)
+        #endif
+    }
+
+    static var SettingsBackground: Color { SecondaryBackground }
+
+    static var PrimaryText: Color {
+        #if os(macOS)
+        Color(nsColor: .labelColor)
+        #else
+        Color(uiColor: .label)
+        #endif
+    }
+
+    static var SubtitleText: Color {
+        #if os(macOS)
+        Color(nsColor: .secondaryLabelColor)
+        #else
+        Color(uiColor: .secondaryLabel)
+        #endif
+    }
+
+    static var EvenLighterText: Color {
+        #if os(macOS)
+        Color(nsColor: .tertiaryLabelColor)
+        #else
+        Color(uiColor: .tertiaryLabel)
+        #endif
+    }
+
+    static var Outline: Color {
+        #if os(macOS)
+        Color(nsColor: .separatorColor)
+        #else
+        Color(uiColor: .separator)
+        #endif
+    }
+
+    static var AlertRed: Color {
+        #if os(macOS)
+        Color(nsColor: .systemRed)
+        #else
+        Color(uiColor: .systemRed)
+        #endif
+    }
+
+    static var IncomeGreen: Color {
+        #if os(macOS)
+        Color(nsColor: .systemGreen)
+        #else
+        Color(uiColor: .systemGreen)
+        #endif
+    }
+
+    static var Alert: Color {
+        #if os(macOS)
+        Color(nsColor: .systemOrange)
+        #else
+        Color(uiColor: .systemOrange)
+        #endif
+    }
+
+    static var DarkIcon: Color { SubtitleText }
+
+    /// Icon color used on top of saturated category chips.
     static var DarkBackground: Color {
         return Color("DarkBackground")
     }
 
-    static var PrimaryText: Color {
-        return Color("PrimaryText")
-    }
-
-    static var AlertRed: Color {
-        return Color("AlertRed")
-    }
-
-    static var IncomeGreen: Color {
-        return Color("IncomeGreen")
-    }
-
-    static var BudgetBackground: Color {
-        return Color("BudgetBackground")
-    }
-
-    static var SubtitleText: Color {
-        return Color("SubtitleText")
-    }
-
-    static var Outline: Color {
-        return Color("Outline")
-    }
-
     static var LightIcon: Color {
         return Color("LightIcon")
-    }
-
-    static var DarkIcon: Color {
-        return Color("DarkIcon")
-    }
-
-    static var GreyIcon: Color {
-        return Color("GreyIcon")
-    }
-
-    static var Alert: Color {
-        return Color("Alert")
-    }
-
-    static var TertiaryBackground: Color {
-        return Color("TertiaryBackground")
-    }
-
-    static var SettingsBackground: Color {
-        return Color("Settings")
-    }
-
-    static var EvenLighterText: Color {
-        return Color("EvenLighterText")
     }
 }
 

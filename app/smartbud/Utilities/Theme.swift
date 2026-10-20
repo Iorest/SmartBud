@@ -20,27 +20,21 @@ enum Theme {
             "#F6D489", "#88997A", "#F1AF8A", "#2D4B7B", "#5FAF9F", "#D46D7F"
         ]
 
-        /// Legacy numeric colour ids ("1"…"24") still present in old exports.
-        static let legacyIDs: [String: String] = Dictionary(
-            uniqueKeysWithValues: swatches.enumerated().map { (String($0.offset + 1), $0.element) }
-        )
-
         /// Stable 6-bucket palette for the category breakdown chart.
         static let chartSwatches: [String] = [
             "#EB4263", "#D933A6", "#408CF2", "#F28C33", "#4DBF73", "#8C59D9"
         ]
 
-        static func color(hex: String) -> Color { Color(hex: hex) }
         static func chartColors() -> [Color] { chartSwatches.map(Color.init(hex:)) }
     }
 
     /// Fixed brand colours used by chrome (not themeable by the user).
     enum Brand {
-        /// Floating add button.
-        static let accent = Color(hex: "007AFF")
         /// Warning banner.
         static let warning = Color(hex: "FF9500")
         /// Pro / premium crown.
         static let premium = Color(hex: "F2C74F")
+        /// Edit affordance on the budget detail toolbars.
+        static let edit = Color(hex: "FDBC3B")
     }
 }
