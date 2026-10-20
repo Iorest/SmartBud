@@ -81,6 +81,7 @@ struct CategoryListView: View {
                                     Circle()
                                         .fill(Color.IncomeGreen.opacity(0.23))
                                         .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.callout.weight(.semibold))
@@ -99,6 +100,7 @@ struct CategoryListView: View {
                                     Circle()
                                         .fill(Color.SecondaryBackground)
                                         .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.callout.weight(.semibold))
@@ -119,6 +121,7 @@ struct CategoryListView: View {
                             Circle()
                                 .fill(Color.SecondaryBackground)
                                 .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.callout.weight(.semibold))
@@ -140,6 +143,7 @@ struct CategoryListView: View {
                             Circle()
                                 .fill(!allCategories.isEmpty ? Color.IncomeGreen.opacity(0.23) : Color.clear)
                                 .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                 .overlay {
                                     ZStack {
                                         Image(systemName: "arrow.right")
@@ -151,6 +155,7 @@ struct CategoryListView: View {
                                             Circle()
                                                 .stroke(Color.Outline.opacity(0.4), lineWidth: 1.3)
                                                 .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                         }
                                     }
                                 }
@@ -176,6 +181,7 @@ struct CategoryListView: View {
                                 Circle()
                                     .fill(Color.SecondaryBackground)
                                     .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                     .overlay {
                                         Image(systemName: "chevron.left")
                                             .font(.body.weight(.semibold))
@@ -193,6 +199,7 @@ struct CategoryListView: View {
                                 Circle()
                                     .fill(Color.SecondaryBackground)
                                     .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                     .overlay {
                                         Image(systemName: "chevron.down")
                                             .font(.body.weight(.semibold))
@@ -215,6 +222,7 @@ struct CategoryListView: View {
                             Circle()
                                 .fill(Color.SecondaryBackground)
                                 .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.callout.weight(.semibold))
@@ -236,6 +244,7 @@ struct CategoryListView: View {
                                     Circle()
                                         .fill(Color.IncomeGreen.opacity(0.23))
                                         .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.callout.weight(.semibold))
@@ -254,6 +263,7 @@ struct CategoryListView: View {
                                     Circle()
                                         .fill(Color.SecondaryBackground)
                                         .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.callout.weight(.semibold))

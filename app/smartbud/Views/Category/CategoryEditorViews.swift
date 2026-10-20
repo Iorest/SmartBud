@@ -136,7 +136,8 @@ struct NewCategoryAlert: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
-                            .contentShape(Circle())
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                 }
 

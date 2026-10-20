@@ -33,7 +33,8 @@ struct TransactionRepeatButton: View {
                     .contentShape(Circle())
             }
         }
-        .accessibilityRemoveTraits(.isButton)
+        .frame(minWidth: 44, minHeight: 44)
+        .contentShape(Rectangle())
         .accessibilityLabel(accessibilityLabel)
         .popover(isPresented: $showRecurring) {
             RecurringPickerView(

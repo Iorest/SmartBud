@@ -342,7 +342,7 @@ struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
                 .foregroundStyle(Color.DarkIcon.opacity(0.7))
 
             Text("App Locked")
-                .font(.system(size: 28, weight: .semibold))
+                .font(.title.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .padding(.bottom, 30)
 
@@ -354,7 +354,7 @@ struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
 
                     Text("Unlock App")
                 }
-                .font(.system(size: 20, weight: .medium))
+                .font(.title3.weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 15)
@@ -366,7 +366,7 @@ struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
 
             if appLockVM.enrollmentError {
                 Text("Please re-enable Face ID access in the Settings app to unlock application.")
-                    .font(.system(size: 15, weight: .regular))
+                    .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
             }

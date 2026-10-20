@@ -53,7 +53,6 @@ struct NoResultsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .containerRelativeFrame(.vertical) { height, _ in height * 0.7 }
-            .opacity(0.7)
         } else {
             VStack(spacing: 12) {
                 Spacer()

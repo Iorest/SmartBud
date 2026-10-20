@@ -27,7 +27,8 @@ struct SBSaveErrorBanner: View {
             Button(action: dismiss) {
                 Image(systemName: "xmark")
                     .font(.caption.weight(.semibold))
-                    .frame(width: 32, height: 32)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("关闭")))

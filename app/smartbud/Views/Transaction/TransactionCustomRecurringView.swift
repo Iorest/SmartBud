@@ -76,6 +76,8 @@ struct CustomRecurringView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                             .background(
                                 Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
@@ -100,6 +102,8 @@ struct CustomRecurringView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                             .background(
                                 Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
@@ -117,6 +121,8 @@ struct CustomRecurringView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                             .background(
                                 Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
@@ -149,6 +155,8 @@ struct CustomRecurringView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                             .background(
                                 Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )

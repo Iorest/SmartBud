@@ -61,6 +61,7 @@ struct CategoryBreakdownView: View {
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Text(formattedAmount(category.amount))
                 .font(.subheadline.monospacedDigit())
