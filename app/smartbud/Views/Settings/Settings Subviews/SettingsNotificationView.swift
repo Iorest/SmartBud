@@ -27,7 +27,7 @@ struct SettingsNotificationsView: View {
   var center = UNUserNotificationCenter.current()
 
   var body: some View {
-    VStack(spacing: SBSpace.m) {
+    VStack(spacing: SBSpace.medium) {
       VStack(spacing: 0) {
         Toggle(isOn: $showNotifications) {
           Text(String.appLocalized("Enable Notifications"))
@@ -36,7 +36,7 @@ struct SettingsNotificationsView: View {
         .tint(.green)
         .padding(.vertical, 4)
       }
-      .padding(.horizontal, SBSpace.m)
+      .padding(.horizontal, SBSpace.medium)
       .padding(.vertical, SBSpace.xs)
       .background(
         Color.SecondaryBackground,
@@ -63,7 +63,7 @@ struct SettingsNotificationsView: View {
             .padding(.vertical, SBSpace.xs)
           }
         }
-        .padding(.horizontal, SBSpace.m)
+        .padding(.horizontal, SBSpace.medium)
         .padding(.vertical, SBSpace.xs)
         .background(
           Color.SecondaryBackground,
@@ -110,7 +110,7 @@ struct SettingsNotificationsView: View {
         }
       }
     }
-    .padding(.horizontal, SBSpace.m)
+    .padding(.horizontal, SBSpace.medium)
     .navigationTitle(String.appLocalized("Notifications"))
     #if os(iOS)
     .navigationBarTitleDisplayMode(.inline)

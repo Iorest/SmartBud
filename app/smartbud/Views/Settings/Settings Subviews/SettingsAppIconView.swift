@@ -123,7 +123,7 @@ struct SettingsAppIconView: View {
         #endif
       }
     }
-    .padding(.horizontal, SBSpace.m)
+    .padding(.horizontal, SBSpace.medium)
     .padding(.top, SBSpace.xs)
     .navigationTitle(String.appLocalized("App Icon"))
     #if os(iOS)

@@ -62,7 +62,7 @@ struct SettingsLanguageView: View {
         .opacity(isRestarting ? 0.3 : 1)
         .overlay {
             if isRestarting {
-                VStack(spacing: SBSpace.s) {
+                VStack(spacing: SBSpace.small) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.largeTitle)
                         .foregroundStyle(Color.IncomeGreen)
@@ -71,7 +71,7 @@ struct SettingsLanguageView: View {
                         .foregroundStyle(Color.PrimaryText)
                         .multilineTextAlignment(.center)
                 }
-                .padding(SBSpace.l)
+                .padding(SBSpace.large)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                 .transition(.opacity)
             }

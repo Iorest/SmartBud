@@ -133,7 +133,7 @@ struct DeleteAllAlert: View {
         Text(String.appLocalized("This action genuinely cannot be undone."))
           .font(.subheadline)
           .foregroundStyle(Color.SubtitleText)
-          .padding(.bottom, SBSpace.m)
+          .padding(.bottom, SBSpace.medium)
 
         Button(role: .destructive) {
           showEraseConfirmation = true

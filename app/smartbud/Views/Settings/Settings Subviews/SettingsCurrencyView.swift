@@ -30,7 +30,7 @@ struct SettingsCurrencyView: View {
             Button {
                 select(currency)
             } label: {
-                HStack(spacing: SBSpace.s) {
+                HStack(spacing: SBSpace.small) {
                     Text(currency.code)
                         .font(.subheadline.monospaced())
                         .foregroundStyle(Color.SubtitleText)
