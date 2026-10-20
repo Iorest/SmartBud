@@ -350,61 +350,15 @@ struct BrandNewBudgetView: View {
             // Sync the pad VM with the AppStorage flags on first appearance.
             // Subsequent changes are picked up by the `onChange` below.
             padVM.numberEntryType = numberEntryType
-            if let unwrappedEditedBudget = toEditBudget {
-                selectedCategory = unwrappedEditedBudget.category
-                switch unwrappedEditedBudget.type {
-                case 1:
-                    budgetTimeFrame = .day
-                case 2:
-                    budgetTimeFrame = .week
-                    chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedBudget.startDate).weekday!
-                case 3:
-                    budgetTimeFrame = .month
-                    chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedBudget.startDate).day!
-                case 4:
-                    budgetTimeFrame = .year
-                    chosenDayYear = unwrappedEditedBudget.startDate
-                default:
-                    budgetTimeFrame = .week
-                }
-
-                padVM.price = unwrappedEditedBudget.amount
-
-                if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                    padVM.isEditingDecimal = true
-                }
+            if let edited = toEditBudget {
+                selectedCategory = edited.category
+                applyEditorState(type: edited.type, startDate: edited.startDate, amount: edited.amount)
+            } else if let edited = toEditMainBudget {
+                applyEditorState(type: edited.type, startDate: edited.startDate, amount: edited.amount)
             } else {
                 chosenDayWeek = firstWeekday
                 chosenDayMonth = firstDayOfMonth
             }
-
-            if let unwrappedEditedMainBudget = toEditMainBudget {
-                switch unwrappedEditedMainBudget.type {
-                case 1:
-                    budgetTimeFrame = .day
-                case 2:
-                    budgetTimeFrame = .week
-                    chosenDayWeek = Calendar.current.dateComponents([.weekday], from: unwrappedEditedMainBudget.startDate).weekday!
-                case 3:
-                    budgetTimeFrame = .month
-                    chosenDayMonth = Calendar.current.dateComponents([.day], from: unwrappedEditedMainBudget.startDate).day!
-                case 4:
-                    budgetTimeFrame = .year
-                    chosenDayYear = unwrappedEditedMainBudget.startDate
-                default:
-                    budgetTimeFrame = .week
-                }
-
-                padVM.price = unwrappedEditedMainBudget.amount
-
-                if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                    padVM.isEditingDecimal = true
-                }
-            } else if toEditBudget == nil {
-                chosenDayWeek = firstWeekday
-                chosenDayMonth = firstDayOfMonth
-            }
-
         }
         .sheet(isPresented: $showingCategoryView) {
                 NewCategoryAlert(income: Binding.constant(false), bottomSpacers: false, budgetMode: true)
@@ -503,6 +457,32 @@ struct BrandNewBudgetView: View {
 
         padVM.submit()
         dismiss()
+    }
+
+    /// Seeds the picker state from an existing budget. `BudgetModel` and
+    /// `MainBudgetModel` store the same `type` start-date pair, so both edit
+    /// paths share one mapping.
+    private func applyEditorState(type: Int, startDate: Date, amount: Double) {
+        switch type {
+        case 1:
+            budgetTimeFrame = .day
+        case 2:
+            budgetTimeFrame = .week
+            chosenDayWeek = Calendar.current.dateComponents([.weekday], from: startDate).weekday ?? firstWeekday
+        case 3:
+            budgetTimeFrame = .month
+            chosenDayMonth = Calendar.current.dateComponents([.day], from: startDate).day ?? firstDayOfMonth
+        case 4:
+            budgetTimeFrame = .year
+            chosenDayYear = startDate
+        default:
+            budgetTimeFrame = .week
+        }
+
+        padVM.price = amount
+        if amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
+            padVM.isEditingDecimal = true
+        }
     }
 
     func getBudgetTypeInteger(_ budget: BudgetTimeFrame) -> Int {
