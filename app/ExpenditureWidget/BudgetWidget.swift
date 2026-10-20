@@ -84,11 +84,10 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         }
 
         let fetchId = uuid
-        var budgetDesc = FetchDescriptor<BudgetModel>()
-        budgetDesc.fetchLimit = 1
-
-        let allBudgets = (try? context.fetch(budgetDesc)) ?? []
-        guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
+        // `fetchLimit = 1` + `first(where:)` used to return nil as soon as
+        // the user had more than one budget; filter in the store instead.
+        let budgetDesc = FetchDescriptor<BudgetModel>(predicate: #Predicate { $0.id == fetchId })
+        guard let budgetModel = (try? context.fetch(budgetDesc))?.first else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return WidgetBudgetSnapshot(total: 0, percentage: 0, budget: budget)
         }
@@ -100,10 +99,11 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let txnDesc = FetchDescriptor<TransactionModel>()
         let allTransactions = (try? context.fetch(txnDesc)) ?? []
         let filtered = allTransactions.filter {
-            !$0.income
+            guard let categoryID = budgetCategory?.id else { return false }
+            return !$0.income
                 && $0.wrappedDate >= budgetStartDate
                 && $0.wrappedDate <= now
-                && $0.category?.id == budgetCategory?.id
+                && $0.category?.id == categoryID
         }
 
         let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedAmount)))
@@ -165,15 +165,19 @@ struct BudgetWidgetEntryView: View {
         return abs(entry.budget.budgetAmount - entry.totalSpent)
     }
 
+    var percent: Double {
+        return Money.spendFraction(entry.totalSpent, of: entry.budget.budgetAmount)
+    }
+
     var percentString1: String {
-        return "\(Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))%"
+        return "\(Int(round(percent * 100)))%"
     }
 
     var systemSmallWidgetText: String {
         if entry.budget.budgetAmount >= entry.totalSpent {
-            return String(localized: "left \(budgetType)")
+            return String.appFormatted("left %@", budgetType)
         } else {
-            return String(localized: "over \(budgetType)")
+            return String.appFormatted("over %@", budgetType)
         }
     }
 
@@ -217,7 +221,7 @@ struct BudgetWidgetEntryView: View {
                         }
                         .foregroundColor(Color.PrimaryText)
 
-                        Text(String(localized: "SPENT: \(percentString1)"))
+                        Text("SPENT: \(percentString1)")
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
                     }
@@ -243,9 +247,9 @@ struct BudgetWidgetEntryView: View {
                                     .fill(Color.SecondaryBackground)
                                     .frame(width: proxy.size.width, height: proxy.size.width / 2)
 
-                                if entry.totalSpent / entry.budget.budgetAmount < 0.97 {
+                                if percent < 0.97 {
                                     DonutSemicircle(
-                                        percent: 1 - (entry.totalSpent / entry.budget.budgetAmount),
+                                        percent: 1 - percent,
                                         cornerRadius: 4,
                                         width: 15
                                     )

@@ -91,10 +91,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         }
 
         let fetchId = uuid
-        var budgetDesc = FetchDescriptor<BudgetModel>()
-        budgetDesc.fetchLimit = 1
-        let allBudgets = (try? context.fetch(budgetDesc)) ?? []
-        guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
+        // `fetchLimit = 1` + `first(where:)` used to return nil as soon as
+        // the user had more than one budget; filter in the store instead.
+        let budgetDesc = FetchDescriptor<BudgetModel>(predicate: #Predicate { $0.id == fetchId })
+        guard let budgetModel = (try? context.fetch(budgetDesc))?.first else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return LockBudgetSnapshot(total: 0, timeLeft: "", budget: budget)
         }
@@ -104,10 +104,11 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         let now = Date.now
         let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         let filteredTxns = allTxns.filter {
-            !$0.income
+            guard let categoryID = budgetCategory?.id else { return false }
+            return !$0.income
                 && $0.wrappedDate >= budgetStartDate
                 && $0.wrappedDate <= now
-                && $0.category?.id == budgetCategory?.id
+                && $0.category?.id == categoryID
         }
 
         let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.wrappedAmount)))
@@ -130,15 +131,15 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         let calendar = Calendar.current
         if budget.type == 1 {
             let components = calendar.dateComponents([.hour], from: budget.startDate, to: now)
-            return String(localized: "^[\(24 - (components.hour ?? 0)) hours left](inflect: true)")
+            return String(localized: "^[\(max(0, 24 - (components.hour ?? 0))) hours left](inflect: true)")
         }
         if budget.type == 2 {
             let components = calendar.dateComponents([.day], from: budget.startDate, to: now)
-            return String(localized: "^[\(7 - (components.day ?? 0)) days left](inflect: true)")
+            return String(localized: "^[\(max(0, 7 - (components.day ?? 0))) days left](inflect: true)")
         }
         let total = calendar.dateComponents([.day], from: budget.startDate, to: budget.endDate).day ?? 0
         let past = calendar.dateComponents([.day], from: budget.startDate, to: now).day ?? 0
-        return String(localized: "^[\(Int(total - past)) days left](inflect: true)")
+        return String(localized: "^[\(max(0, Int(total - past))) days left](inflect: true)")
     }
 }
 
@@ -170,12 +171,18 @@ struct LockBudgetWidgetEntryView: View {
         return abs(entry.budget.budgetAmount - entry.totalSpent)
     }
 
+    /// The provider hands back a `"failed"` placeholder when the configured
+    /// budget was deleted; both states must fall back to the picker prompt.
+    private var isPlaceholder: Bool {
+        entry.configuration.budget == nil || entry.budget.emoji == "failed"
+    }
+
     var percent: Double {
-        return entry.totalSpent / entry.budget.budgetAmount
+        Money.spendFraction(entry.totalSpent, of: entry.budget.budgetAmount)
     }
 
     var percentString: String {
-        return String(localized: "\(Int(round((entry.totalSpent / entry.budget.budgetAmount) * 100)))% spent")
+        return String.appFormatted("%lld%% spent", Int(round(percent * 100)))
     }
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -188,7 +195,7 @@ struct LockBudgetWidgetEntryView: View {
     var body: some View {
         switch widgetFamily {
         case .accessoryInline:
-            if entry.configuration.budget == nil {
+            if isPlaceholder {
                 Text(String.appLocalized("Select budget in widget options"))
             } else {
                 let amount = amountText(difference, showCents: showCents)
@@ -197,7 +204,7 @@ struct LockBudgetWidgetEntryView: View {
             }
 
         case .accessoryCircular:
-            if entry.configuration.budget == nil {
+            if isPlaceholder {
                 ZStack {
                     AccessoryWidgetBackground()
 
@@ -208,7 +215,7 @@ struct LockBudgetWidgetEntryView: View {
                 }
                 .containerBackground(for: .widget) { AccessoryWidgetBackground() }
             } else {
-                Gauge(value: percent < 1 ? percent : 1) {
+                Gauge(value: min(max(percent, 0), 1)) {
                     Text(entry.budget.emoji)
                 } currentValueLabel: {
                     Text("\(Int(round(percent * 100)))%")
@@ -219,7 +226,7 @@ struct LockBudgetWidgetEntryView: View {
             }
 
         case .accessoryRectangular:
-            if entry.configuration.budget == nil {
+            if isPlaceholder {
                 Text(String.appLocalized("SELECT BUDGET IN WIDGET OPTIONS"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
@@ -243,7 +250,7 @@ struct LockBudgetWidgetEntryView: View {
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
 
-                        Gauge(value: percent, in: 0 ... 1) {
+                        Gauge(value: min(max(percent, 0), 1), in: 0 ... 1) {
                             Text(String.appLocalized("Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()

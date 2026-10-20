@@ -40,8 +40,10 @@ func widgetCategoryColor(_ category: HoldingCategory,
                          among categories: [HoldingCategory],
                          income: Bool) -> Color {
     if income {
+        let palette = Color.colorArray
+        guard !palette.isEmpty else { return Color.accentColor }
         let index = categories.firstIndex(of: category) ?? 0
-        return Color(hex: Color.colorArray[index])
+        return Color(hex: palette[index % palette.count])
     }
     return Color(hex: category.colour)
 }

@@ -29,12 +29,12 @@ struct ExpenditureWidgetEntryView: View {
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "MMM"
-            return String(localized: "in \(formatter.string(from: Date.now))")
+            return String.appFormatted("in %@", formatter.string(from: Date.now))
         case .year:
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(localized: "in \(formatter.string(from: Date.now))")
+            return String.appFormatted("in %@", formatter.string(from: Date.now))
         }
     }
 

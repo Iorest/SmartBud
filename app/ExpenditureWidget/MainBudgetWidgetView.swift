@@ -49,22 +49,22 @@ struct MainBudgetWidgetEntryView: View {
     }
 
     var percentString: String {
-        return String(localized: "\(Int(round((entry.totalSpent / entry.budgetAmount) * 100)))% spent")
+        return String.appFormatted("%lld%% spent", Int(round(percent * 100)))
     }
 
     var percentString1: String {
-        return "\(Int(round((entry.totalSpent / entry.budgetAmount) * 100)))%"
+        return "\(Int(round(percent * 100)))%"
     }
 
     var percent: Double {
-        return entry.totalSpent / entry.budgetAmount
+        return Money.spendFraction(entry.totalSpent, of: entry.budgetAmount)
     }
 
     var systemSmallWidgetText: String {
         if entry.budgetAmount >= entry.totalSpent {
-            return String(localized: "left \(budgetType)")
+            return String.appFormatted("left %@", budgetType)
         } else {
-            return String(localized: "over \(budgetType)")
+            return String.appFormatted("over %@", budgetType)
         }
     }
 
@@ -101,7 +101,7 @@ struct MainBudgetWidgetEntryView: View {
                 }
                 .containerBackground(for: .widget) { AccessoryWidgetBackground() }
             } else {
-                Gauge(value: percent < 1 ? percent : 1) {
+                Gauge(value: min(max(percent, 0), 1)) {
                     Image(systemName: "dollarsign.circle.fill")
                 } currentValueLabel: {
                     Text("\(Int(round(percent * 100)))%")
@@ -137,7 +137,7 @@ struct MainBudgetWidgetEntryView: View {
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
 
-                        Gauge(value: percent, in: 0 ... 1) {
+                        Gauge(value: min(max(percent, 0), 1), in: 0 ... 1) {
                             Text(String.appLocalized("Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()
@@ -175,7 +175,7 @@ struct MainBudgetWidgetEntryView: View {
                                 .lineLimit(1)
                                 .foregroundColor(Color.PrimaryText)
 
-                            Text(String(localized: "SPENT: \(percentString1)"))
+                            Text("SPENT: \(percentString1)")
                                 .font(.system(size: 10, weight: .medium, design: .rounded))
                                 .foregroundColor(Color.SubtitleText)
                         }
@@ -203,7 +203,7 @@ struct MainBudgetWidgetEntryView: View {
 
                                     if entry.totalSpent / entry.budgetAmount < 0.97 {
                                         DonutSemicircle(
-                                            percent: 1 - (entry.totalSpent / entry.budgetAmount),
+                                            percent: 1 - percent,
                                             cornerRadius: 4,
                                             width: 15
                                         )
@@ -282,7 +282,7 @@ func formatDateRange(date1: Date, date2: Date) -> String {
     if components1.month == components2.month {
         dateFormatter.dateFormat = "MMM"
         let dateString = dateFormatter.string(from: date1)
-        return "\(components1.day!) - \(components2.day!) \(dateString)"
+        return "\(components1.day ?? 0) - \(components2.day ?? 0) \(dateString)"
     } else {
         dateFormatter.dateFormat = "d MMM"
         let startDateString = dateFormatter.string(from: date1)
