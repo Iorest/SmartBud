@@ -32,8 +32,10 @@ struct CustomRecurringView: View {
                         .foregroundStyle(Color.SubtitleText)
                         .padding(7)
                         .background(Color.SecondaryBackground, in: Circle())
-                        .contentShape(Circle())
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
+                .accessibilityLabel(String.appLocalized("Cancel"))
 
                 Spacer()
 
@@ -58,8 +60,10 @@ struct CustomRecurringView: View {
                         .foregroundStyle(Color.IncomeGreen)
                         .padding(7)
                         .background(Color.IncomeGreen.opacity(0.23), in: Circle())
-                        .contentShape(Circle())
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
+                .accessibilityLabel(String.appLocalized("Done"))
             }
 
             HStack(spacing: 10) {
