@@ -2,6 +2,14 @@ import SwiftUI
 import SwiftData
 import Observation
 
+/// Result of validating a new or edited category. Replaces a three-member
+/// tuple so call sites read `result.error` / `result.order` instead of
+/// positional destructuring.
+struct CategoryValidation {
+    let error: CategoryError
+    let order: Int
+}
+
 @MainActor
 @Observable
 final class CategoryViewModel {
@@ -18,15 +26,22 @@ final class CategoryViewModel {
 
     /// Starter categories for a fresh install. Without these the picker has
     /// nothing to choose from and a first transaction cannot be categorised.
-    private static let starterCategories: [(name: String, emoji: String, colour: String, income: Bool)] = [
-        ("餐饮", "🍔", "#EC7A58", false),
-        ("交通", "🚆", "#279AF4", false),
-        ("购物", "🛍️", "#C56AF7", false),
-        ("居住", "🏠", "#6E7BF1", false),
-        ("娱乐", "🎮", "#F3BF56", false),
-        ("医疗", "💊", "#ED80A2", false),
-        ("工资", "💼", "#4DBF73", true),
-        ("理财", "📈", "#408CF2", true)
+    private struct StarterCategory {
+        let name: String
+        let emoji: String
+        let colour: String
+        let income: Bool
+    }
+
+    private static let starterCategories: [StarterCategory] = [
+        StarterCategory(name: "餐饮", emoji: "🍔", colour: "#EC7A58", income: false),
+        StarterCategory(name: "交通", emoji: "🚆", colour: "#279AF4", income: false),
+        StarterCategory(name: "购物", emoji: "🛍️", colour: "#C56AF7", income: false),
+        StarterCategory(name: "居住", emoji: "🏠", colour: "#6E7BF1", income: false),
+        StarterCategory(name: "娱乐", emoji: "🎮", colour: "#F3BF56", income: false),
+        StarterCategory(name: "医疗", emoji: "💊", colour: "#ED80A2", income: false),
+        StarterCategory(name: "工资", emoji: "💼", colour: "#4DBF73", income: true),
+        StarterCategory(name: "理财", emoji: "📈", colour: "#408CF2", income: true)
     ]
 
     /// Adds any starter category the user does not already have. Existing
@@ -87,7 +102,7 @@ final class CategoryViewModel {
     func reorder(from source: IndexSet, to destination: Int, income: Bool) {
         var cats = income ? incomeCategories : expenseCategories
         cats.move(fromOffsets: source, toOffset: destination)
-        for (i, cat) in cats.enumerated() { cat.order = i }
+        for (index, category) in cats.enumerated() { category.order = index }
         repo.save()
         load()
     }
@@ -103,27 +118,27 @@ final class CategoryViewModel {
     }
 
     // Validation
-    func validate(name: String, emoji: String, income: Bool) -> (valid: Bool, error: CategoryError, order: Int) {
-        let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if n.isEmpty && emoji.isEmpty { return (false, .incomplete, 0) }
-        if n.isEmpty { return (false, .missingName, 0) }
-        if emoji.isEmpty { return (false, .missingEmoji, 0) }
+    func validate(name: String, emoji: String, income: Bool) -> CategoryValidation {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty && emoji.isEmpty { return CategoryValidation(error: .incomplete, order: 0) }
+        if trimmedName.isEmpty { return CategoryValidation(error: .missingName, order: 0) }
+        if emoji.isEmpty { return CategoryValidation(error: .missingEmoji, order: 0) }
         let cats = income ? incomeCategories : expenseCategories
-        if cats.contains(where: { $0.wrappedEmoji == emoji }) && cats.contains(where: { $0.wrappedName == name }) { return (false, .duplicate, 0) }
-        if cats.contains(where: { $0.wrappedEmoji == emoji }) { return (false, .duplicateEmoji, 0) }
-        if cats.contains(where: { $0.wrappedName == name }) { return (false, .duplicateName, 0) }
-        return (true, .none, (cats.last?.order ?? 0) + 1)
+        if cats.contains(where: { $0.wrappedEmoji == emoji }) && cats.contains(where: { $0.wrappedName == trimmedName }) { return CategoryValidation(error: .duplicate, order: 0) }
+        if cats.contains(where: { $0.wrappedEmoji == emoji }) { return CategoryValidation(error: .duplicateEmoji, order: 0) }
+        if cats.contains(where: { $0.wrappedName == trimmedName }) { return CategoryValidation(error: .duplicateName, order: 0) }
+        return CategoryValidation(error: .none, order: (cats.last?.order ?? 0) + 1)
     }
 
-    func validateEdit(name: String, emoji: String, exclude: CategoryModel) -> (valid: Bool, error: CategoryError, order: Int) {
-        let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if n.isEmpty && emoji.isEmpty { return (false, .incomplete, 0) }
-        if n.isEmpty { return (false, .missingName, 0) }
-        if emoji.isEmpty { return (false, .missingEmoji, 0) }
+    func validateEdit(name: String, emoji: String, exclude: CategoryModel) -> CategoryValidation {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty && emoji.isEmpty { return CategoryValidation(error: .incomplete, order: 0) }
+        if trimmedName.isEmpty { return CategoryValidation(error: .missingName, order: 0) }
+        if emoji.isEmpty { return CategoryValidation(error: .missingEmoji, order: 0) }
         let cats = (exclude.income ? incomeCategories : expenseCategories).filter { $0.id != exclude.id }
-        if cats.contains(where: { $0.wrappedEmoji == emoji }) && cats.contains(where: { $0.wrappedName == name }) { return (false, .duplicate, 0) }
-        if cats.contains(where: { $0.wrappedEmoji == emoji }) { return (false, .duplicateEmoji, 0) }
-        if cats.contains(where: { $0.wrappedName == name }) { return (false, .duplicateName, 0) }
-        return (true, .none, (cats.last?.order ?? 0) + 1)
+        if cats.contains(where: { $0.wrappedEmoji == emoji }) && cats.contains(where: { $0.wrappedName == trimmedName }) { return CategoryValidation(error: .duplicate, order: 0) }
+        if cats.contains(where: { $0.wrappedEmoji == emoji }) { return CategoryValidation(error: .duplicateEmoji, order: 0) }
+        if cats.contains(where: { $0.wrappedName == trimmedName }) { return CategoryValidation(error: .duplicateName, order: 0) }
+        return CategoryValidation(error: .none, order: (cats.last?.order ?? 0) + 1)
     }
 }

@@ -91,7 +91,11 @@ struct SuggestedCategoriesView: View {
                         .onTapGesture {
                             // double check
 
-                            let (_, outcome, order) = categoryVM.validate(name: category.name, emoji: category.emoji, income: income)
+                            let validation = categoryVM.validate(name: category.name,
+                                                         emoji: category.emoji,
+                                                         income: income)
+                            let outcome = validation.error
+                            let order = validation.order
 
                             if outcome != .none {
                                 return

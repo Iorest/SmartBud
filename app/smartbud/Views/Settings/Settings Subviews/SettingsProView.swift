@@ -39,11 +39,22 @@ struct SettingsProView: View {
     // also not in this list — the underlying Vision pipeline is not
     // shipped yet, so advertising it would be a 3.1.1 violation
     // (misleading). Add it back here when the implementation lands.
-    private let features: [(icon: String, color: String, titleKey: String, subtitleKey: String)] = [
-        ("chart.bar.xaxis", "103", "Advanced Insights", "Deeper breakdowns, custom date ranges, exportable charts"),
-        ("paintpalette.fill", "100", "Exclusive Themes", "Additional app icons and accent colors"),
-        ("bell.badge.fill", "102", "Smart Reminders", "Customizable notification schedules and quiet hours"),
-        ("lock.shield.fill", "105", "Priority Support", "Direct access to the development team for help")
+    private struct ProFeature {
+        let icon: String
+        let color: String
+        let titleKey: String
+        let subtitleKey: String
+    }
+
+    private let features: [ProFeature] = [
+        ProFeature(icon: "chart.bar.xaxis", color: "103", titleKey: "Advanced Insights",
+                   subtitleKey: "Deeper breakdowns, custom date ranges, exportable charts"),
+        ProFeature(icon: "paintpalette.fill", color: "100", titleKey: "Exclusive Themes",
+                   subtitleKey: "Additional app icons and accent colors"),
+        ProFeature(icon: "bell.badge.fill", color: "102", titleKey: "Smart Reminders",
+                   subtitleKey: "Customizable notification schedules and quiet hours"),
+        ProFeature(icon: "lock.shield.fill", color: "105", titleKey: "Priority Support",
+                   subtitleKey: "Direct access to the development team for help")
     ]
 
     var body: some View {
