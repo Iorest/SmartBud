@@ -243,7 +243,7 @@ struct InsightsView: View {
                 ForEach(insightsVM.todayTransactions, id: \.id) { transaction in
                     InsightsTransactionRow(
                         transaction: transaction,
-                        currencySymbol: insightsVM.currencySymbol,
+                        currencyCode: currency,
                         showCents: insightsVM.showCents
                     )
                 }
@@ -266,7 +266,7 @@ struct InsightsView: View {
                 ForEach(insightsVM.yesterdayTransactions, id: \.id) { transaction in
                     InsightsTransactionRow(
                         transaction: transaction,
-                        currencySymbol: insightsVM.currencySymbol,
+                        currencyCode: currency,
                         showCents: insightsVM.showCents
                     )
                 }
@@ -345,7 +345,7 @@ private struct InsightsDollarView: View {
 
 private struct InsightsTransactionRow: View {
     let transaction: TransactionModel
-    let currencySymbol: String
+    let currencyCode: String
     let showCents: Bool
 
     var body: some View {
@@ -379,11 +379,8 @@ private struct InsightsTransactionRow: View {
     }
 
     private var amountString: String {
-        let base = abs(transaction.amount).formatted(
-            .currency(code: currencySymbol == "$" ? "USD" : currencySymbol)
-                .precision(.fractionLength(showCents ? 2 : 0))
-        )
-        return transaction.income ? "+\(base)" : "-\(base)"
+        Money.format(transaction.amount, currencyCode: currencyCode,
+                     showsCents: showCents, plus: transaction.income)
     }
 
     private func timeLabel(_ date: Date) -> String {
