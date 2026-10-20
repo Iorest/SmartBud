@@ -345,6 +345,10 @@
 		E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000281 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
+		E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
+		E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
+		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
+		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
 		E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
 		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000254 /* MoneyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */; };
@@ -559,6 +563,8 @@
 		E1A2B3C40000000000000250 /* AmountFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountFormatting.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000280 /* SBToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBToast.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDeleteConfirmation.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002A0 /* TransactionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidation.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidationTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000270 /* TransactionSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSnapshot.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoRestoresRecurrenceTests.swift; sourceTree = "<group>"; };
@@ -602,6 +608,7 @@
 				B0A0F00000000000000000A1 /* BudgetLogic.swift */,
 				B0A0F00000000000000000D1 /* Money.swift */,
 				E1A2B3C40000000000000270 /* TransactionSnapshot.swift */,
+				E1A2B3C400000000000002A0 /* TransactionValidation.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -615,6 +622,7 @@
 				E1A2B3C4000000000000021B /* CSVTableTests.swift */,
 				E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */,
 				E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */,
+				E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */,
 				E1A2B3C40000000000000260 /* BudgetEditPreservesAnchorTests.swift */,
 			);
 			path = SmartBudTests;
@@ -1293,6 +1301,7 @@
 				E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000281 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */,
+				E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000301 /* TransactionCategoryGrid.swift in Sources */,
 				E1A2B3C40000000000000401 /* LogTransactionList.swift in Sources */,
@@ -1355,6 +1364,8 @@
 				E1A2B3C40000000000000254 /* MoneyFormattingTests.swift in Sources */,
 				E1A2B3C40000000000000273 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000275 /* UndoRestoresRecurrenceTests.swift in Sources */,
+				E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */,
+				E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */,
 				E1A2B3C40000000000000276 /* Helper.swift in Sources */,
 				E1A2B3C40000000000000277 /* AppLocale.swift in Sources */,
 				E1A2B3C40000000000000278 /* AppLanguage.swift in Sources */,
@@ -1493,6 +1504,7 @@
 				E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000282 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */,
+				E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000302 /* TransactionCategoryGrid.swift in Sources */,
 				E1A2B3C40000000000000402 /* LogTransactionList.swift in Sources */,

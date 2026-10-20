@@ -1060,29 +1060,15 @@ struct TransactionView: View {
 
         let amount = padVM.price
 
-        if amount == 0 && category == nil {
-            toastImage = "questionmark.app"
-            toastTitle = String.appLocalized("Incomplete Entry")
+        if let validationError = TransactionValidation.error(
+            amount: amount, hasCategory: category != nil
+        ) {
+            toastImage = validationError.systemImage
+            toastTitle = String.appLocalized(validationError.toastTitleKey)
             showToast = true
-            toggleFieldColors()
-
-            errorHaptic &+= 1
-            isSubmitting = false
-
-            return
-        } else if amount == 0 {
-            toastImage = "centsign.circle"
-            toastTitle = String.appLocalized("Missing Amount")
-            showToast = true
-            errorHaptic &+= 1
-            isSubmitting = false
-            return
-        } else if category == nil {
-            toastImage = "tray"
-            toastTitle = String.appLocalized("Missing Category")
-            showToast = true
-
-            toggleFieldColors()
+            if validationError.highlightsFields {
+                toggleFieldColors()
+            }
 
             errorHaptic &+= 1
             isSubmitting = false
