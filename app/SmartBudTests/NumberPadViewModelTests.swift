@@ -149,4 +149,28 @@ struct MoneyTests {
     func roundsNoise() {
         #expect(Money.cents(12.299999999999999) == Decimal(string: "12.3"))
     }
+
+    @Test("Non-finite amounts sum to zero instead of trapping")
+    func nonFiniteAmount() {
+        #expect(Money.cents(.infinity) == .zero)
+        #expect(Money.cents(.nan) == .zero)
+        #expect(Money.sum([.infinity, 1]) == Decimal(1))
+    }
+
+    @Test("Spend fraction divides normally")
+    func spendFractionNormal() {
+        #expect(Money.spendFraction(25, of: 100) == 0.25)
+    }
+
+    @Test("Zero budget reads as fully spent once anything is spent")
+    func spendFractionZeroBudget() {
+        #expect(Money.spendFraction(20, of: 0) == 1)
+        #expect(Money.spendFraction(0, of: 0) == 0)
+    }
+
+    @Test("Non-finite inputs never produce NaN")
+    func spendFractionNonFinite() {
+        #expect(Money.spendFraction(.infinity, of: 100) == 0)
+        #expect(Money.spendFraction(10, of: .infinity) == 1)
+    }
 }
