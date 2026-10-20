@@ -104,7 +104,7 @@ struct SettingsUpcomingView: View {
 
       Text(
         String.appLocalized("Don't worry, even if you do hide them there, you will "
-             + "aways be able to find all upcoming transactions right here.")
+             + "always be able to find all upcoming transactions right here.")
       )
       .font(.caption.weight(.medium))
       .multilineTextAlignment(.leading)

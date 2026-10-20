@@ -287,14 +287,6 @@ extension InsightsViewModel {
         }
     }
 
-    private func formatNumber(showCents: Bool, number: Double) -> String {
-        if showCents {
-            return number.formatted(.number.precision(.fractionLength(2)))
-        } else {
-            return Int(floor(number)).formatted(.number)
-        }
-    }
-
     // MARK: - Shortcuts / App Intents
 
     /// Used by the "Get Insights" Shortcut.

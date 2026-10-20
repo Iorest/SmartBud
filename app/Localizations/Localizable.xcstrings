@@ -3405,13 +3405,13 @@
         }
       }
     },
-    "Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here." : {
+    "Don't worry, even if you do hide them there, you will always be able to find all upcoming transactions right here." : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here."
+            "value" : "Don't worry, even if you do hide them there, you will always be able to find all upcoming transactions right here."
           }
         },
         "zh-Hans" : {
@@ -4683,9 +4683,6 @@
           }
         }
       }
-    },
-    "in \\(formatter.string(from: Date.now))" : {
-
     },
     "in %@" : {
       "localizations" : {
