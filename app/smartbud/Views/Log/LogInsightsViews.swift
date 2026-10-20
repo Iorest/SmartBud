@@ -16,12 +16,8 @@ struct LogInsightsView: View {
 
     @AppStorage("logViewLineGraph", store: .appGroup) var lineGraph: Bool = false
 
-    private var data: InsightsViewModel.LogInsightsData {
-        insightsVM.logInsightsData(timeframe: timeframe, insightsType: insightsType)
-    }
-
     /// Spoken summary for the card: heading, amount and currency.
-    private var accessibilitySummary: String {
+    private func accessibilitySummary(_ data: InsightsViewModel.LogInsightsData) -> String {
         let amount = data.amount.formatted(
             .number.precision(.fractionLength(showCents ? 2 : 0))
         )
@@ -29,18 +25,21 @@ struct LogInsightsView: View {
     }
 
     var body: some View {
+        // One fetch pass per render: the previous computed property re-read
+        // the whole ledger on every access (11 per body evaluation).
+        let data = insightsVM.logInsightsData(timeframe: timeframe, insightsType: insightsType)
         VStack(alignment: .leading, spacing: SBSpace.xxs) {
             if dynamicTypeSize.isAccessibilitySize {
                 // At accessibility sizes "Net total" and the range chip each
                 // need their own line; side by side they wrap mid-word.
                 VStack(alignment: .leading, spacing: SBSpace.xxs) {
-                    headingLabel
-                    rangeButton
+                    headingLabel(data)
+                    rangeButton(data)
                 }
             } else {
                 HStack(spacing: SBSpace.xxs) {
-                    headingLabel
-                    rangeButton
+                    headingLabel(data)
+                    rangeButton(data)
                     Spacer(minLength: 0)
                 }
             }
@@ -54,7 +53,7 @@ struct LogInsightsView: View {
                 currencySymbol: currencySymbol
             )
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(accessibilitySummary)
+            .accessibilityLabel(accessibilitySummary(data))
 
             if data.totalSpent != 0 && data.totalIncome != 0 && insightsType == 1 {
                 HStack(spacing: SBSpace.extraSmall) {
@@ -108,14 +107,14 @@ struct LogInsightsView: View {
 
     private static let periodOptions = ["today", "this week", "this month", "this year", "all time"]
 
-    private var headingLabel: some View {
+    private func headingLabel(_ data: InsightsViewModel.LogInsightsData) -> some View {
         Text(data.headingText)
             .font(.subheadline)
             .foregroundStyle(Color.SubtitleText)
             .lineLimit(1)
     }
 
-    private var rangeButton: some View {
+    private func rangeButton(_ data: InsightsViewModel.LogInsightsData) -> some View {
         Menu {
             ForEach(Array(Self.periodOptions.enumerated()), id: \.offset) { index, option in
                 Button {
