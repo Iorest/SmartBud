@@ -144,13 +144,7 @@ extension BudgetModel {
     @Transient var fullName: String { "\(wrappedEmoji) \(wrappedName)" }
 
     @Transient var endDate: Date {
-        switch type {
-        case 1: return Calendar.current.date(byAdding: .day, value: 1, to: startDate) ?? startDate
-        case 2: return Calendar.current.date(byAdding: .day, value: 7, to: startDate) ?? startDate
-        case 3: return Calendar.current.date(byAdding: .month, value: 1, to: startDate) ?? startDate
-        case 4: return Calendar.current.date(byAdding: .year, value: 1, to: startDate) ?? startDate
-        default: return startDate
-        }
+        BudgetPeriod.endDate(from: startDate, type: type)
     }
 }
 
@@ -176,13 +170,7 @@ extension MainBudgetModel {
     @Transient var wrappedDate: Date { startDate }
 
     @Transient var endDate: Date {
-        switch type {
-        case 1: return Calendar.current.date(byAdding: .day, value: 1, to: startDate) ?? startDate
-        case 2: return Calendar.current.date(byAdding: .day, value: 7, to: startDate) ?? startDate
-        case 3: return Calendar.current.date(byAdding: .month, value: 1, to: startDate) ?? startDate
-        case 4: return Calendar.current.date(byAdding: .year, value: 1, to: startDate) ?? startDate
-        default: return startDate
-        }
+        BudgetPeriod.endDate(from: startDate, type: type)
     }
 }
 

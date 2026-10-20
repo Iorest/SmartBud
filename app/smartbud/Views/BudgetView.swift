@@ -175,18 +175,7 @@ struct MainBudgetView: View {
     }
 
     var budgetType: String {
-        switch budget.type {
-        case 1:
-            return String.appLocalized("today")
-        case 2:
-            return String.appLocalized("this week")
-        case 3:
-            return String.appLocalized("this month")
-        case 4:
-            return String.appLocalized("this year")
-        default:
-            return String.appLocalized("this week")
-        }
+        String.appLocalized(BudgetPeriod.labelKey(for: budget.type))
     }
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"

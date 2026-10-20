@@ -36,6 +36,34 @@ enum BudgetRollover {
     }
 }
 
+/// Period metadata for the integer `type` stored on both budget models
+/// (1=day, 2=week, 3=month, 4=year). The label switch and the end-date switch
+/// used to be copy-pasted into the two budget cards, the Shortcuts intent and
+/// both models.
+enum BudgetPeriod {
+    /// Localisation key for the "current period" label on a budget card.
+    static func labelKey(for type: Int) -> String {
+        switch type {
+        case 1: return "today"
+        case 2: return "this week"
+        case 3: return "this month"
+        case 4: return "this year"
+        default: return "this week"
+        }
+    }
+
+    /// End of the period that starts at `startDate`.
+    static func endDate(from startDate: Date, type: Int, calendar: Calendar = .current) -> Date {
+        switch type {
+        case 1: return calendar.date(byAdding: .day, value: 1, to: startDate) ?? startDate
+        case 2: return calendar.date(byAdding: .day, value: 7, to: startDate) ?? startDate
+        case 3: return calendar.date(byAdding: .month, value: 1, to: startDate) ?? startDate
+        case 4: return calendar.date(byAdding: .year, value: 1, to: startDate) ?? startDate
+        default: return startDate
+        }
+    }
+}
+
 /// Start date for a budget being created or edited. Editing only the amount
 /// must keep the existing anchor; a new period type has to be re-anchored
 /// from the freshly picked day, otherwise the period would still start on

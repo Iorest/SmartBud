@@ -89,18 +89,7 @@ struct ShortcutBudgetView: View {
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     var budgetType: String {
-        switch type {
-        case 1:
-            return String.appLocalized("today")
-        case 2:
-            return String.appLocalized("this week")
-        case 3:
-            return String.appLocalized("this month")
-        case 4:
-            return String.appLocalized("this year")
-        default:
-            return "this week"
-        }
+        String.appLocalized(BudgetPeriod.labelKey(for: type))
     }
 
     var amountString: String {
