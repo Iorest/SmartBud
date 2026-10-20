@@ -10,7 +10,6 @@ struct RecurringPickerView: View {
     @Binding var showPicker: Bool
 
     let stringArray = ["none", "daily", "weekly", "monthly"]
-    let stringArray2 = ["", "days", "weeks", "months"]
 
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15

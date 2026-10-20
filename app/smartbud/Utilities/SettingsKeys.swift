@@ -23,7 +23,6 @@ enum SettingsKey {
     // MARK: - Title and section headers
 
     static let title = "settings.title"
-    static let sectionPro = "settings.section.pro"
     static let sectionGeneral = "settings.section.general"
     static let sectionAppearance = "settings.section.appearance"
     static let sectionData = "settings.section.data"
@@ -46,8 +45,6 @@ enum SettingsKey {
     static let proManageSubscription = "settings.pro.manage"
     static let proErrorTitle = "settings.pro.error.title"
     static let proErrorPurchase = "settings.pro.error.purchase"
-    static let proErrorPending = "settings.pro.error.pending"
-    static let proErrorRestore = "settings.pro.error.restore"
     static let proErrorDismiss = "settings.pro.error.dismiss"
     static let proLimitedFreeTitle = "settings.pro.limitedFreeTitle"
     static let proLimitedFreeSubtitle = "settings.pro.limitedFreeSubtitle"
@@ -65,7 +62,6 @@ enum SettingsKey {
     // MARK: - Erase all data
 
     static let eraseTitle = "settings.erase.title"
-    static let eraseProgress = "settings.erase.progress"
     static let eraseSuccess = "settings.erase.success"
     static let erasePartial = "settings.erase.partial"
     static let eraseFailure = "settings.erase.failure"
@@ -76,7 +72,6 @@ enum SettingsKey {
     static let exportSubtitle = "settings.export.subtitle"
     static let exportAction = "settings.export.action"
     static let exportProgress = "settings.export.progress"
-    static let exportSuccess = "settings.export.success"
     static let exportFailure = "settings.export.failure"
     static let exportEmpty = "settings.export.empty"
 
@@ -91,7 +86,6 @@ enum SettingsKey {
     static let rowCurrency = "settings.row.currency"
     static let rowNumberEntry = "settings.row.numberEntry"
     static let rowAuthentication = "settings.row.authentication"
-    static let rowIncomeTracking = "settings.row.incomeTracking"
     static let rowTimeFrames = "settings.row.timeFrames"
 
     // MARK: - Row titles (Appearance)
@@ -108,7 +102,6 @@ enum SettingsKey {
 
     static let rowCategories = "settings.row.categories"
     static let rowTemplates = "settings.row.templates"
-    static let rowICloudSync = "settings.row.iCloudSync"
     static let rowImportData = "settings.row.importData"
     static let rowExportData = "settings.row.exportData"
     static let rowEraseData = "settings.row.eraseData"
@@ -116,7 +109,6 @@ enum SettingsKey {
     // MARK: - Row titles (Others)
 
     static let rowHaptics = "settings.row.haptics"
-    static let rowFeatureLab = "settings.row.featureLab"
     static let rowReportBug = "settings.row.reportBug"
     static let rowFeatureRequest = "settings.row.featureRequest"
     static let rowRateAppStore = "settings.row.rateAppStore"
@@ -131,7 +123,6 @@ enum SettingsKey {
     static let notificationMornings = "settings.notification.mornings"
     static let notificationEvenings = "settings.notification.evenings"
     static let notificationCustom = "settings.notification.custom"
-    static let toggleOn = "settings.toggle.on"
     static let toggleOff = "settings.toggle.off"
     static let numberEntryType1 = "settings.numberEntry.type1"
     static let numberEntryType2 = "settings.numberEntry.type2"
@@ -159,12 +150,7 @@ enum L10n {
 
     // MARK: - CSV export
 
-    static let exportCsvHeader = "export.csv.header"
-    static let exportTypeIncome = "export.type.income"
-    static let exportTypeExpense = "export.type.expense"
-    static let exportFailed = "export.failed"
 
     // MARK: - Generic alerts / buttons
 
-    static let alertOk = "alert.ok"
 }

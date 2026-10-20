@@ -81,15 +81,6 @@ private struct SeededRNG {
     }
 }
 
-extension HorizontalAlignment {
-    struct MoneySubtitle: AlignmentID {
-        static func defaultValue(in d: ViewDimensions) -> CGFloat {
-            d[.top]
-        }
-    }
-
-    static let moneySubtitle = HorizontalAlignment(MoneySubtitle.self)
-}
 
 extension View {
     /// `fullScreenCover` is iOS-only; macOS presents the same content as a

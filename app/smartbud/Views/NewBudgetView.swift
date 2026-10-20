@@ -49,18 +49,6 @@ struct BrandNewBudgetView: View {
     @State var chosenDayMonth = 1
     @State var chosenDayYear = Date.now
 
-    var timeFrameString: String {
-        switch budgetTimeFrame {
-        case .day:
-            return String.appLocalized("day")
-        case .week:
-            return String.appLocalized("weekNewBudget")
-        case .month:
-            return String.appLocalized("monthNewBudget")
-        case .year:
-            return String.appLocalized("yearNewBudget")
-        }
-    }
 
     var oneYearAgo: Date {
         return Calendar.current.date(byAdding: .year, value: -1, to: Date.now)!

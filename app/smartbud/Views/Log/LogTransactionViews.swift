@@ -43,14 +43,7 @@ struct SingleTransactionView: View {
     @State private var mediumHaptic = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    var imageSize: Double {
-        let scale = min(1.5, 1 + (abs(offset + 40) / 100))
-        return scale * 10 as Double
-    }
 
-    var imageScale: Double {
-        return min(1, 1 + (abs(Double(offset) + 40) / 100))
-    }
 
     var transactionAmountString: String {
         Money.format(transaction.amount, currencyCode: currency, showsCents: showCents)

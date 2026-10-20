@@ -76,13 +76,6 @@ struct SettingsView: View {
 
   @AppStorage("firstWeekday", store: .appGroup)
   var firstWeekday: Int = 1
-  var firstWeekdayString: String {
-    if firstWeekday == 1 {
-      return String.appLocalized(SettingsKey.weekdaySunday)
-    } else {
-      return String.appLocalized(SettingsKey.weekdayMonday)
-    }
-  }
 
   @AppStorage("showNotifications", store: .appGroup)
   var showNotifications: Bool = false

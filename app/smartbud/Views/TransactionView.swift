@@ -15,13 +15,6 @@ struct TransactionView: View {
     @Environment(\.dismiss) var dismiss
 
     @Environment(\.colorScheme) var colorScheme
-    var boldText: Bool {
-        #if os(macOS)
-        false
-        #else
-        UIAccessibility.isBoldTextEnabled
-        #endif
-    }
 
     @AppStorage("topEdge", store: .appGroup) var topEdge:
     Double = 20
@@ -50,13 +43,6 @@ struct TransactionView: View {
     @State private var repeatCoefficient = 1
     @State var income = false
 
-    var transactionTypeString: String {
-        if income {
-            return String.appLocalized("Income")
-        } else {
-            return String.appLocalized("Expense")
-        }
-    }
 
     @State var showCategoryPicker = false
     @State var showCategorySheet = false

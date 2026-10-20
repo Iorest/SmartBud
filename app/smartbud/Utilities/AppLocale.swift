@@ -47,11 +47,6 @@
 
 import Foundation
 
-/// Languages with a compiled `.lproj` directory in the app bundle. The
-/// `appSupportedLanguageCodes` list used to gate `appChildBundle`; the
-/// child-bundle mechanism is gone, but this constant stays as the source
-/// of truth for "what languages the String Catalog compiles for".
-private let appSupportedLanguageCodes: [String] = ["en", "zh-Hans", "zh-Hant"]
 
 /// Languages the in-app language picker can set `appLanguage` to. The
 /// empty string `""` means "follow system locale".
