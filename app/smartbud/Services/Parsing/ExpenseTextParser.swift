@@ -34,7 +34,7 @@ enum ExpenseTextParser {
         "教育": ["书", "课程", "培训", "学费", "考试", "教材"],
         "医疗": ["药", "医院", "挂号", "检查", "体检", "看病", "诊所"],
         "工资": ["工资", "薪水"],
-        "奖金": ["奖金", "奖励", "季度奖", "年终奖"],
+        "奖金": ["奖金", "奖励", "季度奖", "年终奖"]
     ]
 
     /// Bucket → tokens matched against `CategoryModel.name` (any language).
@@ -48,7 +48,7 @@ enum ExpenseTextParser {
         "教育": ["教育", "education", "book", "course"],
         "医疗": ["医疗", "健康", "health", "medical", "pharmacy"],
         "工资": ["工资", "薪水", "salary", "paycheck", "income"],
-        "奖金": ["奖金", "bonus"],
+        "奖金": ["奖金", "bonus"]
     ]
 
     // MARK: - Parse
@@ -77,7 +77,7 @@ enum ExpenseTextParser {
             "消费[:：]?\\s*(\\d+\\.?\\d*)",
             "支付[:：]?\\s*(\\d+\\.?\\d*)",
             "花费[:：]?\\s*(\\d+\\.?\\d*)",
-            "扣款[:：]?\\s*(\\d+\\.?\\d*)",
+            "扣款[:：]?\\s*(\\d+\\.?\\d*)"
         ]
         for pattern in patterns {
             if let regex = try? NSRegularExpression(pattern: pattern),
@@ -134,7 +134,7 @@ enum ExpenseTextParser {
             "星巴克", "瑞幸", "美团", "饿了么", "滴滴", "京东", "淘宝",
             "天猫", "麦当劳", "肯德基", "盒马", "永辉", "沃尔玛",
             "山姆", "拼多多", "小米", "华为", "苹果", "比亚迪",
-            "Starbucks", "McDonald's", "Uber", "Amazon",
+            "Starbucks", "McDonald's", "Uber", "Amazon"
         ]
         if let merchant = known.first(where: { text.localizedCaseInsensitiveContains($0) }) {
             return merchant

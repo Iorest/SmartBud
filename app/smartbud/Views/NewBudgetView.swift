@@ -23,7 +23,6 @@ struct BrandNewBudgetView: View {
 
     @Environment(\.dismiss) var dismiss
 
-
     @State var progress = 1
 
     @State var showToast: Bool = false
@@ -48,7 +47,6 @@ struct BrandNewBudgetView: View {
     @State var chosenDayWeek = 1
     @State var chosenDayMonth = 1
     @State var chosenDayYear = Date.now
-
 
     var oneYearAgo: Date {
         return Calendar.current.date(byAdding: .year, value: -1, to: Date.now)!
@@ -332,7 +330,7 @@ struct BrandNewBudgetView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        
+
         .appBackground()
         .onAppear {
             // Sync the pad VM with the AppStorage flags on first appearance.
@@ -512,4 +510,3 @@ struct BrandNewBudgetView: View {
     }
 
 }
-

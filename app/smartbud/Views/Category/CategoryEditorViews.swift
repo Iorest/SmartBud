@@ -61,12 +61,12 @@ struct NewCategoryAlert: View {
                         if expenseCategories.count == 24 {
                             Text(String.appLocalized("Income Category"))
                                 .font(.body.weight(.semibold))
-                                
+
                                 .padding(.top, 4)
                         } else if budgetMode {
                             Text(String.appLocalized("Expense Category"))
                                 .font(.body.weight(.semibold))
-                                
+
                                 .padding(.top, 4)
                         } else {
                             HStack(spacing: 0) {
@@ -79,7 +79,7 @@ struct NewCategoryAlert: View {
                                 } label: {
                                     Text(String.appLocalized("Expense"))
                                         .font(.callout.weight(.semibold))
-                                        
+
                                         .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
                                         .padding(.horizontal, 7)
@@ -103,7 +103,7 @@ struct NewCategoryAlert: View {
                                 } label: {
                                     Text(String.appLocalized("Income"))
                                         .font(.callout.weight(.semibold))
-                                        
+
                                         .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
                                         .padding(.horizontal, 7)
@@ -132,7 +132,7 @@ struct NewCategoryAlert: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.callout.weight(.semibold))
-                            
+
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
@@ -213,7 +213,7 @@ struct NewCategoryAlert: View {
                         Image(systemName: "plus")
                             .foregroundStyle(Color.LightIcon)
                             .font(.title3.weight(.semibold))
-                            
+
                             .frame(width: 50, height: 50)
                             .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                     }
@@ -410,7 +410,7 @@ struct EditCategoryAlert: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.callout.weight(.semibold))
-                            
+
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
@@ -425,7 +425,7 @@ struct EditCategoryAlert: View {
                     } else {
                         Text(LocalizedStringKey(toEdit.income ? "Income" : "Expense"))
                             .font(.body.weight(.semibold))
-                            
+
                     }
 
                     Spacer()
@@ -435,7 +435,7 @@ struct EditCategoryAlert: View {
                     } label: {
                         Image(systemName: "trash.fill")
                             .font(.callout.weight(.semibold))
-                            
+
                             .foregroundStyle(Color.AlertRed)
                             .padding(7)
                             .background(Color.AlertRed.opacity(0.23), in: Circle())
@@ -516,7 +516,7 @@ struct EditCategoryAlert: View {
                         Image(systemName: "checkmark")
                             .foregroundStyle(Color.LightIcon)
                             .font(.title3.weight(.semibold))
-                            
+
                             .frame(width: 50, height: 50)
                             .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                     }
@@ -615,4 +615,3 @@ struct EditCategoryAlert: View {
         }
     }
 }
-

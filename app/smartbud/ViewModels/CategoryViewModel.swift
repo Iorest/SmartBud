@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-final class CategoryViewModel{
+final class CategoryViewModel {
     static let shared = CategoryViewModel()
     private let repo = DataRepository.shared
 

@@ -81,10 +81,10 @@ final class CategoryModel {
     var order: Int = 0
     var dateCreated: Date = Date.now
     /// CloudKit requires all to-many relationships to be optional.
-    var transactions: [TransactionModel]? = nil
+    var transactions: [TransactionModel]?
     var budget: BudgetModel?
     /// CloudKit requires all to-many relationships to be optional.
-    var templates: [TemplateTransactionModel]? = nil
+    var templates: [TemplateTransactionModel]?
 
     init(
         name: String = "",

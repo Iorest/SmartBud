@@ -6,7 +6,7 @@ struct DeleteBudgetAlert: View {
     @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: BudgetModel
-    var onDeleted: (() -> Void)? = nil
+    var onDeleted: (() -> Void)?
     @Environment(\.colorScheme) var systemColorScheme
 
     @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
@@ -93,7 +93,7 @@ struct DeleteMainBudgetAlert: View {
     @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: MainBudgetModel
-    var onDeleted: (() -> Void)? = nil
+    var onDeleted: (() -> Void)?
     @Environment(\.colorScheme) var systemColorScheme
 
     @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
@@ -173,4 +173,3 @@ struct DeleteMainBudgetAlert: View {
         .background(BackgroundBlurView())
     }
 }
-

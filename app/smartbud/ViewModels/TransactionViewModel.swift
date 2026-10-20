@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-final class TransactionViewModel{
+final class TransactionViewModel {
     static let shared = TransactionViewModel()
     private let repo = DataRepository.shared
 

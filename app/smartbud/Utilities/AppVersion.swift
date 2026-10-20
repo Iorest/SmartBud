@@ -46,4 +46,3 @@ extension Bundle {
         object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
     }
 }
-

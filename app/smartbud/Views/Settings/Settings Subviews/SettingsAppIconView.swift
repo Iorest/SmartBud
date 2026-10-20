@@ -73,8 +73,7 @@ struct SettingsAppIconView: View {
           } label: {
             HStack(spacing: 13) {
               Image(options[index].exampleFileName)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
+                .resizable().scaledToFill()
                 .frame(width: 70, height: 70)
                 .clipShape(RoundedRectangle(cornerRadius: SBRadius.card))
                 .shadow(color: .black.opacity(0.15), radius: 5, x: 5, y: 5)

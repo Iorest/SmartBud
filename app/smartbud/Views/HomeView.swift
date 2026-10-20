@@ -41,7 +41,6 @@ struct HomeView: View {
     @State private var showConfetti = false
     var isInFallbackMode: Bool = false
 
-
     @State var showPopup = false
 
     // Floating add button (replaces the custom tab bar's centre button).

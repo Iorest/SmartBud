@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-final class HomeViewModel{
+final class HomeViewModel {
     static let shared = HomeViewModel()
     private let repo = DataRepository.shared
 

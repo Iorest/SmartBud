@@ -16,7 +16,7 @@ import AppKit
 
 @MainActor
 @Observable
-class AppLockViewModel{
+class AppLockViewModel {
     private static let appLockKey = "appLockEnabled"
 
     // Publishing the applock state from user defaults

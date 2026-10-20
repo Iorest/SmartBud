@@ -114,7 +114,7 @@ final class SubscriptionManager {
         "com.iorest.smartbud.pro.monthly",
         "com.iorest.smartbud.pro.halfyearly",
         "com.iorest.smartbud.pro.yearly",
-        "com.iorest.smartbud.pro.lifetime",
+        "com.iorest.smartbud.pro.lifetime"
     ]
 
     /// The three auto-renewable subscription SKUs. Subset of
@@ -123,7 +123,7 @@ final class SubscriptionManager {
     static let subscriptionProductIDs: Set<String> = [
         "com.iorest.smartbud.pro.monthly",
         "com.iorest.smartbud.pro.halfyearly",
-        "com.iorest.smartbud.pro.yearly",
+        "com.iorest.smartbud.pro.yearly"
     ]
 
     /// The non-consumable lifetime unlock SKU. Single string (not a

@@ -138,7 +138,7 @@ struct FilteredBudgetView: View {
                                     .layoutPriority(1)
                             }
                             .font(.callout.weight(.semibold))
-                            
+
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel(String.appFormatted("%@%@ was spent %@", currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
@@ -216,4 +216,3 @@ struct FilteredBudgetView: View {
         _totalSpent = totalSpent
     }
 }
-

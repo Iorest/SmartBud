@@ -43,7 +43,7 @@ struct SettingsProView: View {
         ("chart.bar.xaxis", "103", "Advanced Insights", "Deeper breakdowns, custom date ranges, exportable charts"),
         ("paintpalette.fill", "100", "Exclusive Themes", "Additional app icons and accent colors"),
         ("bell.badge.fill", "102", "Smart Reminders", "Customizable notification schedules and quiet hours"),
-        ("lock.shield.fill", "105", "Priority Support", "Direct access to the development team for help"),
+        ("lock.shield.fill", "105", "Priority Support", "Direct access to the development team for help")
     ]
 
     var body: some View {

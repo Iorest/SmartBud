@@ -42,7 +42,6 @@ struct ActualBudgetView: View {
 
     @State var newBudget = false
 
-
     @State private var toDelete: BudgetModel?
     @State private var toEdit: BudgetModel?
 
@@ -52,8 +51,6 @@ struct ActualBudgetView: View {
     ]
 
     @AppStorage("budgetViewStyle", store: .appGroup) var budgetRows: Bool = false
-
-
 
     var body: some View {
         NavigationStack {
@@ -134,7 +131,7 @@ struct ActualBudgetView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                
+
             }
             .navigationTitle("")
             .hiddenNavigationBar()
@@ -203,7 +200,6 @@ struct MainBudgetView: View {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-
     var difference: Double {
         return abs(budgetAmount - totalSpent)
     }
@@ -215,8 +211,6 @@ struct MainBudgetView: View {
     var percentString1: String {
         return "\(Int(round((totalSpent / budgetAmount) * 100)))%"
     }
-
-
 
     var body: some View {
         VStack(alignment: .leading, spacing: SBSpace.s) {
@@ -294,4 +288,3 @@ struct MainBudgetView: View {
         soloBudget = solo
     }
 }
-

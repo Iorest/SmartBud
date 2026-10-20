@@ -18,7 +18,7 @@ struct CategoryStepperView: View {
             if income {
                 Image(systemName: "plus")
                     .font(.body.weight(.semibold))
-                    
+
                     .foregroundStyle(Color.IncomeGreen)
                     .padding(7)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -36,7 +36,7 @@ struct CategoryStepperView: View {
             } else {
                 Image(systemName: "minus")
                     .font(.body.weight(.semibold))
-                    
+
                     .foregroundStyle(Color.AlertRed)
                     .padding(7)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,10 +60,10 @@ struct CategoryStepperView: View {
                             HStack(spacing: 5) {
                                 Text(item.wrappedEmoji)
                                     .font(.footnote.weight(.medium))
-                                    
+
                                 Text(item.wrappedName)
                                     .font(.body.weight(.medium))
-                                    
+
                             }
                             .id(item.id)
                             .padding(.horizontal, 11)
@@ -130,7 +130,7 @@ struct IncomeFilterToggleView: View {
         HStack(spacing: 0) {
             Text(String.appLocalized("Expense"))
                 .font(.body.weight(.semibold))
-                
+
                 .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
                 .padding(.horizontal, 8)
@@ -152,7 +152,7 @@ struct IncomeFilterToggleView: View {
 
             Text(String.appLocalized("filter-picker-income"))
                 .font(.body.weight(.semibold))
-                
+
                 .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
                 .padding(.horizontal, 8)
@@ -213,7 +213,7 @@ struct DateStepperView: View {
 
             Text(dateString)
                 .font(.headline)
-                
+
                 .accessibilityLabel(String.appFormatted("showing transactions on %@", dateString))
 
             Spacer()

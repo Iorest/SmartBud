@@ -43,7 +43,6 @@ struct TransactionView: View {
     @State private var repeatCoefficient = 1
     @State var income = false
 
-
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
 
@@ -86,7 +85,6 @@ struct TransactionView: View {
 
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
-
 
     let numberArray = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
@@ -133,7 +131,7 @@ struct TransactionView: View {
     var deleteButtonIcon: some View {
         Image(systemName: "trash.fill")
             .font(.subheadline.weight(.semibold))
-            
+
             .foregroundStyle(Color.AlertRed)
             .padding(7)
             .background(Color.AlertRed.opacity(0.23), in: Circle())
@@ -609,7 +607,7 @@ struct TransactionView: View {
                 datePickerOverlay
             }
         }
-        
+
         .animation(.easeOut(duration: 0.2), value: showToast)
         .appBackground()
         #if os(macOS)
@@ -741,7 +739,6 @@ struct TransactionView: View {
         .sensoryFeedback(.error, trigger: errorHaptic)
         .sensoryFeedback(.success, trigger: successHaptic)
     }
-
 
     func toggleFieldColors() {
         if categoryButtonTextColor == Color.AlertRed
@@ -885,4 +882,3 @@ struct TransactionView: View {
         toEdit = nil
     }
 }
-

@@ -12,7 +12,7 @@ struct SummaryData: Equatable {
 
 @MainActor
 @Observable
-final class InsightsViewModel{
+final class InsightsViewModel {
     static let shared = InsightsViewModel()
     private let repo = DataRepository.shared
 

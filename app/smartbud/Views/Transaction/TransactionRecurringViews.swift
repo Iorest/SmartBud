@@ -14,7 +14,6 @@ struct RecurringPickerView: View {
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
 
-
     @State var holdingType = 0
     @State var holdingCoefficient = 0
 
@@ -33,14 +32,14 @@ struct RecurringPickerView: View {
                 HStack {
                     Text(LocalizedStringKey(string))
                         .font(.body.weight(.medium))
-                        
+
                         .lineLimit(1)
                     Spacer()
 
                     if repeatType == index && repeatCoefficient == 1 {
                         Image(systemName: "checkmark")
                             .font(.footnote.weight(.medium))
-                            
+
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -91,13 +90,13 @@ struct RecurringPickerView: View {
                 if repeatCoefficient > 1 {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.medium))
-                        
+
                 }
             }
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
             .font(.body.weight(.medium))
-            
+
             .padding(5)
             .background {
                 if repeatCoefficient > 1 {
@@ -146,4 +145,3 @@ struct RecurringPickerView: View {
                 darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 }
-

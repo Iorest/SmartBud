@@ -23,7 +23,7 @@ struct CategoryView: View {
     /// Transaction mode only: called with the tapped category, then the sheet
     /// dismisses. Without this, tapping a row opened the editor and there was
     /// no way to actually pick a category for the transaction.
-    var onSelect: ((CategoryModel) -> Void)? = nil
+    var onSelect: ((CategoryModel) -> Void)?
     @Environment(\.dismiss) var dismiss
 //    @Environment(\.colorScheme) var colorScheme
     @State var income = false
@@ -68,7 +68,7 @@ struct CategoryView: View {
                     } label: {
                         Text(String.appLocalized("Expense"))
                             .font(.body.weight(.semibold))
-                            
+
                             .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
                             .padding(.horizontal, 8)
@@ -92,7 +92,7 @@ struct CategoryView: View {
                     } label: {
                         Text(String.appLocalized("Income"))
                             .font(.body.weight(.semibold))
-                            
+
                             .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
                             .padding(.horizontal, 8)
@@ -126,11 +126,10 @@ struct CategoryView: View {
                     HStack(spacing: 3) {
                         Image(systemName: "plus")
                             .font(.subheadline.weight(.semibold))
-                            
 
                         Text(String.appLocalized("New"))
                             .font(.body.weight(.semibold))
-                            
+
                             .lineLimit(1)
                     }
                     .foregroundStyle(Color.PrimaryText)
@@ -157,4 +156,3 @@ struct CategoryView: View {
         }
     }
 }
-

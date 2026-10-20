@@ -67,17 +67,17 @@ struct SuggestedCategoriesView: View {
                         HStack(spacing: 8) {
                             Text(category.emoji)
                                 .font(.subheadline)
-                                
+
                             Text(LocalizedStringKey(category.name))
                                 .font(.body)
-                                
+
                                 .lineLimit(1)
 
                             Spacer()
 
                             Image(systemName: "plus")
                                 .font(.subheadline.weight(.semibold))
-                                
+
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(4)
                                 .background(Color.SecondaryBackground, in: Circle())
@@ -92,7 +92,6 @@ struct SuggestedCategoriesView: View {
                             // double check
 
                             let (_, outcome, order) = categoryVM.validate(name: category.name, emoji: category.emoji, income: income)
-
 
                             if outcome != .none {
                                 return

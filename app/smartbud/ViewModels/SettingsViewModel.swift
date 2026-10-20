@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-final class SettingsViewModel{
+final class SettingsViewModel {
     static let shared = SettingsViewModel()
     private let repo = DataRepository.shared
 

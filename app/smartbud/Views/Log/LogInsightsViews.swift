@@ -11,7 +11,6 @@ struct LogInsightsView: View {
     let showCents: Bool
     let currencySymbol: String
 
-
     @AppStorage("logInsightsTimeFrame", store: .appGroup) var timeframe = 2
     @AppStorage("logInsightsType", store: .appGroup) var insightsType = 1
 

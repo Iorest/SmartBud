@@ -31,12 +31,12 @@ struct DeleteCategoryAlert: View {
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(String.appFormatted("Delete '%@'?", toDelete.wrappedName))
                     .font(.title2.weight(.medium))
-                    
+
                     .foregroundStyle(Color.PrimaryText)
 
                 Text(String.appLocalized("This action cannot be undone."))
                     .font(.title3.weight(.medium))
-                    
+
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 15)
                     .accessibilityHidden(true)
@@ -55,7 +55,7 @@ struct DeleteCategoryAlert: View {
                 } label: {
                     Text(String.appLocalized("Delete"))
                         .font(.title3.weight(.semibold))
-                        
+
                         .foregroundStyle(.white)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
@@ -71,7 +71,7 @@ struct DeleteCategoryAlert: View {
                 } label: {
                     Text(String.appLocalized("Cancel"))
                         .font(.title3.weight(.semibold))
-                        
+
                         .foregroundStyle(Color.PrimaryText.opacity(0.9))
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
@@ -110,4 +110,3 @@ struct DeleteCategoryAlert: View {
         .background(BackgroundBlurView())
     }
 }
-

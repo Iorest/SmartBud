@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-final class BudgetViewModel{
+final class BudgetViewModel {
     static let shared = BudgetViewModel()
     private let repo = DataRepository.shared
 

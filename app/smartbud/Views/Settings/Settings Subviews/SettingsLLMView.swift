@@ -255,7 +255,7 @@ struct SettingsLLMView: View {
             .foregroundStyle(Color.SubtitleText)
     }
 
-    private func test() async {
+    func test() async {
         let config = currentConfig
         guard config.isConfigured else {
             status = .failure(String.appLocalized("请先填写服务地址、模型和 API Key。"))

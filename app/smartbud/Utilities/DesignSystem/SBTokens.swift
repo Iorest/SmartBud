@@ -29,5 +29,3 @@ enum SBRadius {
     /// Cards inside lists.
     static let card: CGFloat = 16
 }
-
-

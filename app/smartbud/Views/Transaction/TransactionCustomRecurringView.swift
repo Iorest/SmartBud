@@ -28,7 +28,7 @@ struct CustomRecurringView: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.subheadline.weight(.semibold))
-                        
+
                         .foregroundStyle(Color.SubtitleText)
                         .padding(7)
                         .background(Color.SecondaryBackground, in: Circle())
@@ -41,7 +41,6 @@ struct CustomRecurringView: View {
 
                 Text(String.appLocalized("Custom Interval"))
                     .font(.body.weight(.semibold))
-                    
 
                 Spacer()
 
@@ -56,7 +55,7 @@ struct CustomRecurringView: View {
                 } label: {
                     Image(systemName: "checkmark")
                         .font(.subheadline.weight(.semibold))
-                        
+
                         .foregroundStyle(Color.IncomeGreen)
                         .padding(7)
                         .background(Color.IncomeGreen.opacity(0.23), in: Circle())
@@ -181,4 +180,3 @@ struct CustomRecurringView: View {
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 }
-

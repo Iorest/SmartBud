@@ -88,4 +88,3 @@ struct DetailedBudgetDifferenceDollarView: View {
         .lineLimit(1)
     }
 }
-

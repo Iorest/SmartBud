@@ -25,7 +25,7 @@ struct NumberPad: View {
     /// Selected category. Owned by the parent (it's a separate piece of
     /// transaction-entry state); the pad only reads it to drive the
     /// submit-button's bounce effect.
-    var category: CategoryModel? = nil
+    var category: CategoryModel?
     /// Submit action. Called when the user taps the checkmark. The pad also
     /// calls `vm.submit()` first, which clears the state. Declared last so
     /// the trailing-closure syntax reads naturally at the call site.

@@ -108,7 +108,6 @@ struct SingleBudgetView: View {
         return Double(numberOfDays - numberOfDaysPast) / Double(numberOfDays)
     }
 
-
     // swipe to delete
     @State private var offset: CGFloat = 0
     @State private var deleted: Bool = false
@@ -354,4 +353,3 @@ struct SingleBudgetView: View {
         _toEdit = toEdit ?? Binding.constant(nil)
     }
 }
-

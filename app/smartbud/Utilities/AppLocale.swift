@@ -47,7 +47,6 @@
 
 import Foundation
 
-
 /// Languages the in-app language picker can set `appLanguage` to. The
 /// empty string `""` means "follow system locale".
 private let appLanguageCodeCandidates: [String] = ["", "en", "zh-Hans", "zh-Hant"]

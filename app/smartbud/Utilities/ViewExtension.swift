@@ -81,7 +81,6 @@ private struct SeededRNG {
     }
 }
 
-
 extension View {
     /// `fullScreenCover` is iOS-only; macOS presents the same content as a
     /// sheet so dialogs stay inside the window.

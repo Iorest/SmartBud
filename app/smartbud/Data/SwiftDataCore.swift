@@ -62,7 +62,7 @@ final class DataRepository {
         CategoryModel.self,
         BudgetModel.self,
         MainBudgetModel.self,
-        TemplateTransactionModel.self,
+        TemplateTransactionModel.self
     ])
 
     init() {

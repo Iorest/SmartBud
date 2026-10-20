@@ -13,7 +13,6 @@ extension Color {
     /// many existing `Color.colorArray` call sites stay unchanged.
     static var colorArray: [String] { Theme.Palette.swatches }
 
-
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt64()

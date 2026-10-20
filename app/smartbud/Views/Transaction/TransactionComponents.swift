@@ -53,7 +53,7 @@ struct NoteView: View {
         HStack(spacing: 7) {
             Image(systemName: "text.alignleft")
                 .font(.subheadline.weight(.semibold))
-                
+
                 .foregroundStyle(Color.SubtitleText)
 
             ZStack(alignment: .leading) {
@@ -76,7 +76,7 @@ struct NoteView: View {
                 }
             }
             .font(.body.weight(.semibold))
-            
+
             .frame(maxWidth: noteWidth, alignment: .center)
         }
         .onTapGesture {

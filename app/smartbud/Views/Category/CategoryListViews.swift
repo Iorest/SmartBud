@@ -61,7 +61,6 @@ struct CategoryListView: View {
         }
     }
 
-
     var body: some View {
         VStack(spacing: 5) {
             if showToast {
@@ -85,7 +84,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.callout.weight(.semibold))
-                                                
+
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
                                 }
@@ -104,7 +103,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.callout.weight(.semibold))
-                                                
+
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
                                 }
@@ -125,7 +124,7 @@ struct CategoryListView: View {
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.callout.weight(.semibold))
-                                        
+
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
@@ -148,7 +147,7 @@ struct CategoryListView: View {
                                     ZStack {
                                         Image(systemName: "arrow.right")
                                             .font(.callout.weight(.semibold))
-                                            
+
                                             .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
 
                                         if allCategories.count == 0 {
@@ -168,7 +167,7 @@ struct CategoryListView: View {
                     .overlay {
                         Text(String.appLocalized("Categories"))
                             .font(.title3.weight(.medium))
-                            
+
                     }
                     .padding(20)
 
@@ -185,7 +184,7 @@ struct CategoryListView: View {
                                     .overlay {
                                         Image(systemName: "chevron.left")
                                             .font(.body.weight(.semibold))
-                                            
+
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
                                     }
@@ -203,7 +202,7 @@ struct CategoryListView: View {
                                     .overlay {
                                         Image(systemName: "chevron.down")
                                             .font(.body.weight(.semibold))
-                                            
+
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
                                     }
@@ -226,7 +225,7 @@ struct CategoryListView: View {
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
                                         .font(.callout.weight(.semibold))
-                                        
+
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
@@ -248,7 +247,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "checkmark")
                                                 .font(.callout.weight(.semibold))
-                                                
+
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
                                 }
@@ -267,7 +266,7 @@ struct CategoryListView: View {
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
                                                 .font(.callout.weight(.semibold))
-                                                
+
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
                                 }
@@ -281,7 +280,7 @@ struct CategoryListView: View {
                     .overlay {
                         Text(String.appLocalized("Categories"))
                             .font(.title3.weight(mode == .settings ? .semibold : .medium))
-                            
+
                     }
                     .padding(20)
                 }
@@ -294,7 +293,7 @@ struct CategoryListView: View {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
                                         .font(.largeTitle.weight(.light))
-                                        
+
                                         .foregroundStyle(Color.SubtitleText)
 
                                     Group {
@@ -305,7 +304,7 @@ struct CategoryListView: View {
                                         }
                                     }
                                     .font(.body.weight(.medium))
-                                    
+
                                     .multilineTextAlignment(.center)
                                     .foregroundStyle(Color.SubtitleText)
 
@@ -323,10 +322,10 @@ struct CategoryListView: View {
                                     HStack(spacing: 10) {
                                         Text(category.wrappedEmoji)
                                             .font(.subheadline)
-                                            
+
                                         Text(category.wrappedName)
                                             .font(.body)
-                                            
+
                                             .lineLimit(1)
                                             .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
 
@@ -514,4 +513,3 @@ struct CategoryListView: View {
         self.onSelect = onSelect
     }
 }
-

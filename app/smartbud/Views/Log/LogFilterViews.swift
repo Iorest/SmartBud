@@ -41,12 +41,12 @@ struct NoResultsView: View {
 
                 Image(systemName: "tray.full.fill")
                     .font(.largeTitle)
-                    
+
                     .foregroundStyle(Color.SubtitleText)
 
                 Text(String.appLocalized("No entries found."))
                     .font(.title3.weight(.medium))
-                    
+
                     .foregroundStyle(Color.SubtitleText)
 
                 Spacer()
@@ -56,7 +56,6 @@ struct NoResultsView: View {
         } else {
             VStack(spacing: 12) {
                 Spacer()
-
 
                 Image(systemName: "tray.full.fill")
                     .font(.system(size: 38, weight: .regular))
@@ -74,4 +73,3 @@ struct NoResultsView: View {
         }
     }
 }
-

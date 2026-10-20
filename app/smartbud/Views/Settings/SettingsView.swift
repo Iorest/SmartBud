@@ -122,7 +122,6 @@ struct SettingsView: View {
   @AppStorage("currency", store: .appGroup) var currency:
     String = Locale.current.currency?.identifier ?? "USD"
 
-
   @AppStorage("showExpenseOrIncomeSign", store: .appGroup)
   var showExpenseOrIncomeSign: Bool = true
 
@@ -154,8 +153,6 @@ struct SettingsView: View {
   // popups
 
   @State var showImportGuide = false
-
-
 
   @State var settingsVM = SettingsViewModel.shared
 

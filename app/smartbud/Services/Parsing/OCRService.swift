@@ -104,7 +104,7 @@ final class OCRService: @unchecked Sendable {
             "实付[:：]\\s*(\\d+\\.?\\d*)",
             "支付[:：]\\s*(\\d+\\.?\\d*)",
             "总计[:：]\\s*(\\d+\\.?\\d*)",
-            "价格[:：]\\s*(\\d+\\.?\\d*)",
+            "价格[:：]\\s*(\\d+\\.?\\d*)"
         ]
         var amounts: [Decimal] = []
         for pattern in patterns {
@@ -128,7 +128,7 @@ final class OCRService: @unchecked Sendable {
             "天猫", "京东", "淘宝", "拼多多",
             "滴滴", "高德", "地铁", "公交",
             "麦当劳", "肯德基", "汉堡王",
-            "房租", "水电", "物业", "医院", "药店", "诊所",
+            "房租", "水电", "物业", "医院", "药店", "诊所"
         ]
         return keywords.first { text.contains($0) }
     }

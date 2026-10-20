@@ -281,7 +281,6 @@ struct ImportDataView: View {
                                 .foregroundStyle(Color.PrimaryText)
                                 .font(.title2.weight(.semibold))
 
-
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
@@ -301,7 +300,6 @@ struct ImportDataView: View {
                             Text(instructions[progress - 1].title)
                                 .foregroundStyle(Color.PrimaryText)
                                 .font(.title2.weight(.semibold))
-
 
                             if progress == 7 {
                                 Button {
@@ -335,7 +333,6 @@ struct ImportDataView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle.fill")
                             .font(.subheadline.weight(.medium))
-
 
                         Text("Additional Pointers")
                             .font(.body.weight(.semibold))
@@ -392,7 +389,6 @@ struct ImportDataView: View {
                                                         Image(systemName: labels[index].image)
                                                             .font(.caption.weight(.semibold))
 
-
                                                         Text(labels[index].label)
                                                             .font(.subheadline.weight(.semibold))
 
@@ -439,7 +435,6 @@ struct ImportDataView: View {
                                             HStack(spacing: 4.5) {
                                                 Image(systemName: labels[progress - 2].image)
                                                     .font(.caption.weight(.semibold))
-
 
                                                 Text(labels[progress - 2].label)
                                                     .font(.subheadline.weight(.semibold))
@@ -590,7 +585,6 @@ struct ImportDataView: View {
                                 Text("Import")
                                     .font(.title3.weight(.semibold))
 
-
                                 Image(systemName: "square.and.arrow.up.fill")
                                     .font(.subheadline.weight(.semibold))
 
@@ -714,7 +708,7 @@ struct ImportDataView: View {
             }
         }
         .padding(20)
-        
+
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.keyboard)
         .appBackground()

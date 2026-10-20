@@ -150,7 +150,6 @@ enum L10n {
 
     // MARK: - CSV export
 
-
     // MARK: - Generic alerts / buttons
 
 }

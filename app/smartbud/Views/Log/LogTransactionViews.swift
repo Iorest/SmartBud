@@ -43,8 +43,6 @@ struct SingleTransactionView: View {
     @State private var mediumHaptic = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-
-
     var transactionAmountString: String {
         Money.format(transaction.amount, currencyCode: currency, showsCents: showCents)
     }
@@ -84,7 +82,7 @@ struct SingleTransactionView: View {
         ZStack(alignment: .trailing) {
             Image(systemName: "xmark")
                 .font(.caption.weight(.bold))
-                
+
                 .foregroundStyle(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
                 .padding(5)
                 .background(deleteConfirm ? Color.AlertRed.opacity(0.23) : Color.SecondaryBackground, in: Circle())
@@ -308,7 +306,7 @@ struct EmojiLogView: View {
             Text(emoji)
                 .font(.system(huge ? .title : .title3))
                 // future ? .caption :
-                
+
                 .padding(8)
         }
         .opacity(future ? 0.6 : 1)
@@ -346,13 +344,13 @@ struct DeleteTransactionAlert: View {
             VStack(alignment: .leading, spacing: 1.5) {
                 Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String.appFormatted("Delete '%@'?", unwrappedToDelete.wrappedNote))
                     .font(.title2.weight(.medium))
-                    
+
                     .foregroundStyle(Color.PrimaryText)
                     .accessibilityLabel(String.appFormatted("Delete %@ transaction confirmation. You can undo right after deleting.", unwrappedToDelete.wrappedNote))
 
                 Text(String.appLocalized(stopRecurring ? "The transaction will no longer be automatically logged." : "You can undo right after deleting."))
                     .font(.title3.weight(.medium))
-                    
+
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)
                     .accessibilityHidden(true)
@@ -398,4 +396,3 @@ struct DeleteTransactionAlert: View {
         }
     }
 }
-
