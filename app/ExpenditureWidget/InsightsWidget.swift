@@ -24,288 +24,181 @@ struct InsightsWidget: Widget {
     }
 }
 
+/// Everything the widget renders. Replaces a seven-member tuple so the
+/// provider's signature stays readable (and SwiftLint-legal).
+struct InsightsSnapshot {
+    let amount: Double
+    let maximum: Double
+    let average: Double
+    let numberOfDays: Int
+    let dates: [Date]
+    let dateDictionary: [Date: Double]
+    let categories: [HoldingCategory]
+
+    static let empty = InsightsSnapshot(amount: 0, maximum: 0, average: 0, numberOfDays: 0,
+                                        dates: [], dateDictionary: [:], categories: [])
+}
+
+/// Start date and bucket shape for one of the three periods.
+private struct PeriodSpec {
+    let startDate: Date
+    let step: Calendar.Component
+    let value: Int
+    let count: Int
+    /// Unit used for the "average per ..." divisor.
+    let elapsedUnit: Calendar.Component
+}
+
+/// One bucket series: daily for week/month, monthly for year.
+private struct BucketSeries {
+    let total: Double
+    let maximum: Double
+    let activeDays: Int
+    let dates: [Date]
+    let byDate: [Date: Double]
+}
+
 struct InsightsProvider: AppIntentTimelineProvider {
     typealias Intent = InsightsWidgetConfigurationIntent
 
     public typealias Entry = InsightsWidgetEntry
 
     func placeholder(in _: Context) -> InsightsWidgetEntry {
-        let results = loadData(type: .week, income: true)
-
-        return InsightsWidgetEntry(date: Date(), amount: results.amount, duration: .week, maximum: results.maximum, dates: results.dates, dictionary: results.dateDictionary, numberOfDays: results.numberOfDays, average: results.average, categories: results.categories, income: true)
+        makeEntry(from: loadData(type: .week, income: true), duration: .week, income: true)
     }
 
     func snapshot(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> InsightsWidgetEntry {
-        let loaded = loadData(type: configuration.duration, income: configuration.income == .income)
-
-        let entry = InsightsWidgetEntry(date: Date(), amount: loaded.amount, duration: configuration.duration, maximum: loaded.maximum, dates: loaded.dates, dictionary: loaded.dateDictionary, numberOfDays: loaded.numberOfDays, average: loaded.average, categories: loaded.categories, income: configuration.income == .income)
-        return entry
+        let income = configuration.income == .income
+        return makeEntry(from: loadData(type: configuration.duration, income: income),
+                         duration: configuration.duration, income: income)
     }
 
     func timeline(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
-        let loaded = loadData(type: configuration.duration, income: configuration.income == .income)
-
-        let entry = InsightsWidgetEntry(date: Date(), amount: loaded.amount, duration: configuration.duration, maximum: loaded.maximum, dates: loaded.dates, dictionary: loaded.dateDictionary, numberOfDays: loaded.numberOfDays, average: loaded.average, categories: loaded.categories, income: configuration.income == .income)
-
-        let timeline = Timeline(entries: [entry], policy: .atEnd)
-
-        return timeline
+        let income = configuration.income == .income
+        let entry = makeEntry(from: loadData(type: configuration.duration, income: income),
+                              duration: configuration.duration, income: income)
+        return Timeline(entries: [entry], policy: .atEnd)
     }
 
-    func loadData(type: InsightsTimePeriod, income: Bool) -> (amount: Double, maximum: Double, average: Double, numberOfDays: Int, dates: [Date], dateDictionary: [Date: Double], categories: [HoldingCategory]) {
-//        let dataController = DataController()
+    private func makeEntry(from data: InsightsSnapshot,
+                           duration: InsightsTimePeriod,
+                           income: Bool) -> InsightsWidgetEntry {
+        InsightsWidgetEntry(
+            date: Date(),
+            amount: data.amount,
+            duration: duration,
+            maximum: data.maximum,
+            dates: data.dates,
+            dictionary: data.dateDictionary,
+            numberOfDays: data.numberOfDays,
+            average: data.average,
+            categories: data.categories,
+            income: income
+        )
+    }
+
+    func loadData(type: InsightsTimePeriod, income: Bool) -> InsightsSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
-        var cal = Calendar(identifier: .gregorian)
-        cal.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-        cal.minimumDaysInFirstWeek = 4
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
+        calendar.minimumDaysInFirstWeek = 4
 
-        let startDate: Date
+        guard let period = periodSpec(type: type, now: now, calendar: calendar) else {
+            return .empty
+        }
+
+        let allTransactions = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+        let transactions = allTransactions.filter {
+            $0.income == income && $0.wrappedDate >= period.startDate && $0.wrappedDate <= now
+        }
+        let allCategories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
+        let categories = allCategories.filter { $0.income == income }
+
+        let series = bucketSeries(for: transactions, period: period, calendar: calendar)
+        let elapsed = Calendar.current.dateComponents([period.elapsedUnit],
+                                                      from: period.startDate, to: now)
+        let divisor = (elapsed.value(for: period.elapsedUnit) ?? 0) + 1
+
+        return InsightsSnapshot(
+            amount: series.total,
+            maximum: series.maximum,
+            average: series.total / Double(divisor),
+            numberOfDays: series.activeDays,
+            dates: series.dates,
+            dateDictionary: series.byDate,
+            categories: categoryBreakdown(transactions: transactions,
+                                          categories: categories,
+                                          total: series.total)
+        )
+    }
+
+    private func periodSpec(type: InsightsTimePeriod, now: Date,
+                            calendar: Calendar) -> PeriodSpec? {
         switch type {
         case .week:
-            let comps = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
-            guard let date = cal.date(from: comps) else {
-                return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
-            }
-            startDate = date
+            let comps = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
+            guard let start = calendar.date(from: comps) else { return nil }
+            return PeriodSpec(startDate: start, step: .day, value: 1,
+                              count: 7, elapsedUnit: .day)
         case .month:
-            let sday = UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
-            startDate = getStartOfMonth(startDay: sday)
+            let startDay = UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
+            let start = getStartOfMonth(startDay: startDay)
+            guard let range = calendar.range(of: .day, in: .month, for: start) else { return nil }
+            return PeriodSpec(startDate: start, step: .day, value: 1,
+                              count: range.count, elapsedUnit: .day)
         case .year:
-            let comps = cal.dateComponents([.year], from: now)
-            guard let date = cal.date(from: comps) else {
-                return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
-            }
-            startDate = date
+            let comps = calendar.dateComponents([.year], from: now)
+            guard let start = calendar.date(from: comps) else { return nil }
+            return PeriodSpec(startDate: start, step: .month, value: 1,
+                              count: 12, elapsedUnit: .month)
         case .unknown:
-            return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
+            return nil
+        }
+    }
+
+    private func bucketSeries(for transactions: [TransactionModel],
+                              period: PeriodSpec,
+                              calendar: Calendar) -> BucketSeries {
+        var dates: [Date] = []
+        var byDate: [Date: Double] = [:]
+        var total = 0.0
+        var maximum = 0.0
+        var activeDays = 0
+        var cursor = period.startDate
+
+        for _ in 0..<period.count {
+            let next = calendar.date(byAdding: period.step, value: period.value, to: cursor) ?? cursor
+            let bucket = transactions
+                .filter { $0.wrappedDate >= cursor && $0.wrappedDate < next }
+                .reduce(0.0) { $0 + $1.wrappedAmount }
+
+            total += bucket
+            byDate[cursor] = bucket
+            maximum = max(maximum, bucket)
+            if bucket != 0 { activeDays += 1 }
+            dates.append(cursor)
+            cursor = next
         }
 
-        let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
-        let transactions = allTxns.filter {
-            $0.income == income && ($0.wrappedDate) >= startDate && ($0.wrappedDate) <= now
+        return BucketSeries(total: total, maximum: maximum, activeDays: activeDays,
+                            dates: dates, byDate: byDate)
+    }
+
+    private func categoryBreakdown(transactions: [TransactionModel],
+                                   categories: [CategoryModel],
+                                   total: Double) -> [HoldingCategory] {
+        guard total > 0 else { return [] }
+        return categories.compactMap { category in
+            let amount = transactions
+                .filter { $0.category == category }
+                .reduce(0.0) { $0 + $1.wrappedAmount }
+            guard amount != 0 else { return nil }
+            return HoldingCategory(colour: category.wrappedColour,
+                                   name: category.wrappedName,
+                                   percent: amount / total)
         }
-        let allCats = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
-        let categories = allCats.filter { $0.income == income }
-        var iterativeDate = startDate
-
-        switch type {
-        case .week:
-            var dates = [Date]()
-            var nextDate = iterativeDate
-
-            // calendar initialization
-            var calendar = Calendar(identifier: .gregorian)
-
-            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-            calendar.minimumDaysInFirstWeek = 4
-
-            var dictionary = [Date: Double]()
-            var totalForWeek = 0.0
-            var maximum = 0.0
-            var numberOfDays = 0
-
-            for _ in 1 ... 7 {
-                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate) ?? iterativeDate
-
-                let holding = transactions.filter {
-                    $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                totalForWeek += total
-
-                dictionary[iterativeDate] = total
-
-                if total > maximum {
-                    maximum = total
-                }
-
-                if total != 0 {
-                    numberOfDays += 1
-                }
-
-                dates.append(iterativeDate)
-                iterativeDate = nextDate
-            }
-
-            let numberOfDaysPast = Calendar.current.dateComponents([.day], from: startDate, to: Date.now)
-
-            var holdingCat = [HoldingCategory]()
-
-            for category in categories {
-                let holding = transactions.filter {
-                    $0.category == category
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                if total == 0 {
-                    continue
-                }
-
-                let newCategory = HoldingCategory(colour: category.wrappedColour, name: category.wrappedName, percent: total / totalForWeek)
-
-                holdingCat.append(newCategory)
-            }
-
-            holdingCat.sort(by: { lhs, rhs in
-                lhs.percent > rhs.percent
-            })
-
-            return (totalForWeek, maximum, totalForWeek / Double((numberOfDaysPast.day ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
-        case .unknown:
-            return (0, 0, 0, 0, [Date](), [Date: Double](), [HoldingCategory]())
-        case .month:
-            var dates = [Date]()
-            var nextDate = iterativeDate
-
-            let calendar = Calendar(identifier: .gregorian)
-            let range = calendar.range(of: .day, in: .month, for: iterativeDate)!
-
-            var dictionary = [Date: Double]()
-            var totalForMonth = 0.0
-            var maximum = 0.0
-            var numberOfDays = 0
-
-            for _ in 1 ... range.count {
-                nextDate = calendar.date(byAdding: .day, value: 1, to: iterativeDate) ?? iterativeDate
-
-                let holding = transactions.filter {
-                    $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                totalForMonth += total
-
-                dictionary[iterativeDate] = total
-
-                if total > maximum {
-                    maximum = total
-                }
-
-                if total != 0 {
-                    numberOfDays += 1
-                }
-
-                dates.append(iterativeDate)
-                iterativeDate = nextDate
-            }
-
-            let numDays = Calendar.current.dateComponents([.day], from: startDate, to: Date.now)
-
-            var holdingCat = [HoldingCategory]()
-
-            for category in categories {
-                let holding = transactions.filter {
-                    $0.category == category
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                if total == 0 {
-                    continue
-                }
-
-                let newCategory = HoldingCategory(colour: category.wrappedColour, name: category.wrappedName, percent: total / totalForMonth)
-
-                holdingCat.append(newCategory)
-            }
-
-            holdingCat.sort(by: { lhs, rhs in
-                lhs.percent > rhs.percent
-            })
-
-            return (totalForMonth, maximum, totalForMonth / Double((numDays.day ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
-        case .year:
-            // trackin dates
-            var dates = [Date]()
-            var nextDate = iterativeDate
-
-            let calendar = Calendar(identifier: .gregorian)
-
-            var dictionary = [Date: Double]()
-            var totalForYear = 0.0
-            var maximum = 0.0
-            var numberOfDays = 0
-
-            for _ in 1 ... 12 {
-                nextDate = calendar.date(byAdding: .month, value: 1, to: iterativeDate) ?? iterativeDate
-
-                let holding = transactions.filter {
-                    $0.wrappedDate >= iterativeDate && $0.wrappedDate < nextDate
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                totalForYear += total
-
-                dictionary[iterativeDate] = total
-
-                if total > maximum {
-                    maximum = total
-                }
-
-                if total != 0 {
-                    numberOfDays += 1
-                }
-
-                dates.append(iterativeDate)
-                iterativeDate = nextDate
-            }
-
-            let numDays = Calendar.current.dateComponents([.month], from: startDate, to: Date.now)
-
-            var holdingCat = [HoldingCategory]()
-
-            for category in categories {
-                let holding = transactions.filter {
-                    $0.category == category
-                }
-
-                var total = 0.0
-
-                holding.forEach { transaction in
-                    total += transaction.wrappedAmount
-                }
-
-                if total == 0 {
-                    continue
-                }
-
-                let newCategory = HoldingCategory(colour: category.wrappedColour, name: category.wrappedName, percent: total / totalForYear)
-
-                holdingCat.append(newCategory)
-            }
-
-            holdingCat.sort(by: { lhs, rhs in
-                lhs.percent > rhs.percent
-            })
-
-            return (totalForYear, maximum, totalForYear / Double((numDays.month ?? 0) + 1), numberOfDays, dates, dictionary, holdingCat)
-        }
+        .sorted { $0.percent > $1.percent }
     }
 }
 

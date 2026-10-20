@@ -36,16 +36,26 @@ struct Provider: AppIntentTimelineProvider {
     public typealias Entry = RecentWidgetEntry
 
     func placeholder(in _: Context) -> RecentWidgetEntry {
-        RecentWidgetEntry(date: Date(), amount: loadAmount(type: .week, insightsType: .net), transactions: loadTransactions(type: .week, count: 9), duration: .week, type: .net)
+        makeEntry(duration: .week, type: .net)
+    }
+
+    private func makeEntry(duration: TimePeriod, type: InsightsType) -> RecentWidgetEntry {
+        RecentWidgetEntry(
+            date: Date(),
+            amount: loadAmount(type: duration, insightsType: type),
+            transactions: loadTransactions(type: duration, count: 9),
+            duration: duration,
+            type: type
+        )
     }
 
     func snapshot(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> RecentWidgetEntry {
-        let entry = RecentWidgetEntry(date: Date(), amount: loadAmount(type: configuration.duration, insightsType: configuration.insightsType), transactions: loadTransactions(type: configuration.duration, count: 9), duration: configuration.duration, type: configuration.insightsType)
+        let entry = makeEntry(duration: configuration.duration, type: configuration.insightsType)
         return entry
     }
 
     func timeline(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
-        let entry = RecentWidgetEntry(date: Date(), amount: loadAmount(type: configuration.duration, insightsType: configuration.insightsType), transactions: loadTransactions(type: configuration.duration, count: 9), duration: configuration.duration, type: configuration.insightsType)
+        let entry = makeEntry(duration: configuration.duration, type: configuration.insightsType)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 

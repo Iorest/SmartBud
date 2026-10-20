@@ -27,38 +27,59 @@ struct MainBudgetWidget: Widget {
     }
 }
 
+struct MainBudgetSnapshot {
+    let found: Bool
+    let totalSpent: Double
+    let budgetAmount: Double
+    let percentage: Double
+    let type: Int
+    let startDate: Date
+}
+
 struct MainBudgetWidgetProvider: TimelineProvider {
     typealias Entry = MainBudgetWidgetEntry
 
     func placeholder(in _: Context) -> MainBudgetWidgetEntry {
         let loaded = loadData()
 
-        return MainBudgetWidgetEntry(date: Date(), totalSpent: loaded.totalSpent, percentageOfDays: loaded.percentage, type: loaded.type, budgetAmount: loaded.budgetAmount, startDate: loaded.startDate, found: loaded.found)
+        return makeEntry(from: loaded)
     }
 
     func getSnapshot(in _: Context, completion: @escaping (MainBudgetWidgetEntry) -> Void) {
         let loaded = loadData()
 
-        let entry = MainBudgetWidgetEntry(date: Date(), totalSpent: loaded.totalSpent, percentageOfDays: loaded.percentage, type: loaded.type, budgetAmount: loaded.budgetAmount, startDate: loaded.startDate, found: loaded.found)
+        let entry = makeEntry(from: loaded)
         completion(entry)
     }
 
     func getTimeline(in _: Context, completion: @escaping (Timeline<MainBudgetWidgetEntry>) -> Void) {
         let loaded = loadData()
 
-        let entry = MainBudgetWidgetEntry(date: Date(), totalSpent: loaded.totalSpent, percentageOfDays: loaded.percentage, type: loaded.type, budgetAmount: loaded.budgetAmount, startDate: loaded.startDate, found: loaded.found)
+        let entry = makeEntry(from: loaded)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
         completion(timeline)
     }
 
-    func loadData() -> (found: Bool, totalSpent: Double, budgetAmount: Double, percentage: Double, type: Int, startDate: Date) {
+    private func makeEntry(from data: MainBudgetSnapshot) -> MainBudgetWidgetEntry {
+        MainBudgetWidgetEntry(
+            date: Date(),
+            totalSpent: data.totalSpent,
+            percentageOfDays: data.percentage,
+            type: data.type,
+            budgetAmount: data.budgetAmount,
+            startDate: data.startDate,
+            found: data.found
+        )
+    }
+
+    func loadData() -> MainBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         let budgetDescriptor = FetchDescriptor<MainBudgetModel>()
         guard let budget = try? context.fetch(budgetDescriptor).first else {
-            return (false, 0, 0, 0, 0, Date.now)
+            return MainBudgetSnapshot(found: false, totalSpent: 0, budgetAmount: 0, percentage: 0, type: 0, startDate: Date.now)
         }
 
         let budgetStartDate = budget.startDate
@@ -81,7 +102,9 @@ struct MainBudgetWidgetProvider: TimelineProvider {
         } else {
             let components1 = calendar.dateComponents([.day], from: budget.startDate, to: budget.endDate)
             guard let numberOfDays = components1.day, numberOfDays > 0 else {
-                return (true, holdingTotal, budget.amount, 0, budget.type, budget.startDate)
+                return MainBudgetSnapshot(found: true, totalSpent: holdingTotal,
+                                          budgetAmount: budget.amount, percentage: 0,
+                                          type: budget.type, startDate: budget.startDate)
             }
 
             let components2 = calendar.dateComponents([.day], from: budget.startDate, to: now)
@@ -90,7 +113,9 @@ struct MainBudgetWidgetProvider: TimelineProvider {
             percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
         }
 
-        return (true, holdingTotal, budget.amount, percentageOfDays, budget.type, budget.startDate)
+        return MainBudgetSnapshot(found: true, totalSpent: holdingTotal,
+                                  budgetAmount: budget.amount, percentage: percentageOfDays,
+                                  type: budget.type, startDate: budget.startDate)
     }
 }
 
@@ -238,7 +263,10 @@ struct MainBudgetWidgetEntryView: View {
                         }
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
 
-                        Text("\(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(entry.totalSpent > entry.budgetAmount ? String.appLocalized("over") : String.appLocalized("left")) \(budgetType)")
+                        let statusText = entry.totalSpent > entry.budgetAmount
+                            ? String.appLocalized("over")
+                            : String.appLocalized("left")
+                        Text("\(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(statusText) \(budgetType)")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
 
