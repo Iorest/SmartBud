@@ -476,127 +476,18 @@ struct TransactionView: View {
         }
     }
 
-    @ViewBuilder
-    var categoryButtonArea: some View {
-        if (categoryVM.expenseCategories.count == 0 && !income) || (categoryVM.incomeCategories.count == 0 && income) {
-            emptyCategoryButton
-        } else {
-            Group {
-                if showCategoryPicker {
-                    HStack(spacing: 10) {
-                        Text(String.appLocalized("Close"))
-                            .font(.body.weight(.semibold))
-                            .lineLimit(1)
-                    }
-                    .padding(.vertical, 8.5)
-                    .padding(.horizontal, 10)
-                    .frame(width: widthOfCategoryButton)
-                    .foregroundStyle(Color.AlertRed)
-                    .background(Color.AlertRed.opacity(0.23),
-                        in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                    )
-                } else {
-                    if let unwrappedCategory = category {
-                        categoryChip(unwrappedCategory)
-                    } else {
-                        noCategoryButton
-                            .offset(x: shake ? -5 : 0)
-                    }
-                }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                withAnimation(.easeInOut) {
-                    showCategoryPicker.toggle()
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func categoryChip(_ category: CategoryModel) -> some View {
-        let color = chipColor(category.wrappedColour)
-        HStack(spacing: 5) {
-            Text(category.wrappedEmoji)
-                .font(.footnote.weight(.semibold))
-
-            Text(category.wrappedName)
-                .font(.body.weight(.semibold))
-                .lineLimit(1)
-        }
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .foregroundStyle(color)
-        .background(
-            color.opacity(0.35),
-            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
+    private var categoryButtonArea: some View {
+        TransactionCategoryRow(
+            category: category,
+            hasCategories: income
+                ? !categoryVM.incomeCategories.isEmpty
+                : !categoryVM.expenseCategories.isEmpty,
+            isPickerOpen: $showCategoryPicker,
+            textColor: categoryButtonTextColor,
+            backgroundColor: categoryButtonBackgroundColor,
+            outlineColor: categoryButtonOutlineColor,
+            shake: shake
         )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            showCategoryPicker = true
-        }
-    }
-
-    @ViewBuilder
-    var emptyCategoryButton: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "plus")
-                .font(.subheadline.weight(.semibold))
-
-            Text(String.appLocalized("Category"))
-                .font(.body.weight(.semibold))
-                .lineLimit(1)
-        }
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .foregroundStyle(categoryButtonTextColor)
-        .background(
-            categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-        )
-        .contentShape(Rectangle())
-        .overlay(
-            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
-        )
-        .drawingGroup()
-        .offset(x: shake ? -5 : 0)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            // Always use the grid picker, even before any category exists;
-            // its empty state offers starter categories.
-            withAnimation(.easeInOut) {
-                showCategoryPicker = true
-            }
-        }
-    }
-
-    @ViewBuilder
-    var noCategoryButton: some View {
-        HStack(spacing: 5.5) {
-                Image(systemName: "circle.grid.2x2")
-                    .font(.subheadline.weight(.semibold))
-                    .symbolEffect(
-                        .bounce.up.byLayer, options: .repeating.speed(0.5),
-                        value: showCategoryPicker)
-
-            Text(String.appLocalized("Category"))
-                .font(.body.weight(.semibold))
-                .lineLimit(1)
-        }
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .frame(width: widthOfCategoryButton)
-        .foregroundStyle(categoryButtonTextColor)
-        .background(
-            categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
-        )
-        .drawingGroup()
     }
 
     @ViewBuilder
@@ -719,12 +610,6 @@ struct TransactionView: View {
         default:
             return 23
         }
-    }
-
-    var widthOfCategoryButton: CGFloat {
-        let fontSize = UIFont.getBodyFontSize(dynamicTypeSize: dynamicTypeSize)
-
-        return "Category".widthOfRoundedString(size: fontSize, weight: .semibold) + 50
     }
 
     /// Two chips and the header no longer fit on a 375pt phone from xxLarge
