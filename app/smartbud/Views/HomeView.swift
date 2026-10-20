@@ -15,7 +15,6 @@ import SwiftUI
 class OverallTransactionManager {
     var toEdit: TransactionModel?
     var toDelete: TransactionModel?
-    var showToast: Bool = false
     var showPopup: Bool = false
     var future: Bool = false
 }
@@ -310,7 +309,6 @@ struct HomeView: View {
             Button {
                 transactionVM.undoPendingDelete()
                 transactionManager.toDelete = nil
-                withAnimation { transactionManager.showToast = false }
             } label: {
                 Text(String.appLocalized("Undo"))
                     .font(.subheadline.weight(.semibold))

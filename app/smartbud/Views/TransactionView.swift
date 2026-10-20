@@ -14,8 +14,6 @@ struct TransactionView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @Environment(\.colorScheme) var colorScheme
-
     @AppStorage("topEdge", store: .appGroup) var topEdge:
     Double = 20
 
@@ -86,7 +84,6 @@ struct TransactionView: View {
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
 
-    let numberArray = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
     func formattedAmount(_ amount: Double) -> String {
         "\(currencySymbol)\(Int(round(amount)))"
@@ -480,18 +477,6 @@ struct TransactionView: View {
 
     @Environment(\.colorScheme) var systemColorScheme
 
-    var darkMode: Bool {
-        (colourScheme == 0 && systemColorScheme == .dark) || colourScheme == 2
-    }
-
-    var backgroundColor: Color {
-        if darkMode {
-            return Color("AlwaysDarkBackground")
-        } else {
-            return Color("AlwaysLightBackground")
-        }
-    }
-
     @State var showPicker = false
     @State var animateIcon = false
 
@@ -518,27 +503,6 @@ struct TransactionView: View {
     }
 
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
-
-    var fontSize: CGFloat {
-        switch dynamicTypeSize {
-        case .xSmall:
-            return 14
-        case .small:
-            return 15
-        case .medium:
-            return 16
-        case .large:
-            return 17
-        case .xLarge:
-            return 19
-        case .xxLarge:
-            return 21
-        case .xxxLarge:
-            return 23
-        default:
-            return 23
-        }
-    }
 
     /// Two chips and the header no longer fit on a 375pt phone from xxLarge
     /// up, so switch to the stacked layout there (not just at AX sizes).

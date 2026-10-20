@@ -101,8 +101,6 @@ struct DeleteCategoryAlert: View {
                         }
                     }
             )
-//                        dismiss()
-//                }))
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
         }

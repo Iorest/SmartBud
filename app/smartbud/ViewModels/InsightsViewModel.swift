@@ -337,12 +337,9 @@ final class InsightsViewModel {
     var periodTotalIncome: Double = 0
     var periodTotalSpent: Double = 0
     var periodAverage: Double = 0
-    var periodDateRangeIncomeText: String = ""
-    var periodAverageIncome: Double = 0
     var barChartData: [BarChartPoint] = []
     var categoryBreakdown: [PowerCategory] = []
     var todayTotal: Double = 0
-    var todayCount: Int = 0
     var todayTransactions: [TransactionModel] = []
     var yesterdayTotal: Double = 0
     var yesterdayTransactions: [TransactionModel] = []
@@ -414,10 +411,8 @@ final class InsightsViewModel {
             divisor = configuredCalendar.range(of: .day, in: .month, for: periodStart)?.count ?? 30
         }
         periodAverage = Money.double(abs(net) / Decimal(max(1, divisor)))
-        periodAverageIncome = Money.double(inc / Decimal(max(1, divisor)))
 
         periodDateRangeText = getDateRangeText(for: selectedPeriod)
-        periodDateRangeIncomeText = selectedPeriod == 3 ? String.appLocalized("AVG/MONTH", comment: "Insights avg per month") : String.appLocalized("AVG/DAY", comment: "Insights avg per day")
 
         barChartData = getBarChartData(for: selectedPeriod)
         categoryBreakdown = getCategoryBreakdown(for: selectedPeriod)
@@ -431,7 +426,6 @@ final class InsightsViewModel {
             .filter { ($0.date ?? .distantPast) >= today && ($0.date ?? .distantPast) < tomorrow }
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         todayTransactions = todayTxns
-        todayCount = todayTxns.count
         todayTotal = Money.double(Money.sum(todayTxns.map { $0.income ? $0.amount : -$0.amount }))
 
         let yesterdayTxns = inPeriod

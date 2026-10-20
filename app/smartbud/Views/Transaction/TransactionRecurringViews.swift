@@ -14,9 +14,6 @@ struct RecurringPickerView: View {
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
 
-    @State var holdingType = 0
-    @State var holdingCoefficient = 0
-
     @AppStorage("colourScheme", store: .appGroup)
     var colourScheme: Int = 0
 
@@ -114,8 +111,6 @@ struct RecurringPickerView: View {
                     repeatCoefficient = 2
                     repeatType = 2
 
-                    holdingType = repeatType
-                    holdingCoefficient = repeatCoefficient
                 }
 
                 withAnimation {

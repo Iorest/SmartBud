@@ -211,7 +211,6 @@ struct SingleTransactionView: View {
                                 try? await Task.sleep(for: .milliseconds(400))
                                 withAnimation {
                                     transactionVM.stageDelete(transaction)
-                                    transactionManager.showToast = true
                                     transactionManager.toDelete = transaction
 //                                    transactionManager.future = future
 //                                    transactionManager.toDelete = transaction
@@ -365,7 +364,6 @@ struct DeleteTransactionAlert: View {
                     } else {
                         withAnimation(.easeInOut(duration: 0.5)) {
                             transactionVM.stageDelete(unwrappedToDelete)
-                            transactionManager.showToast = true
                         }
                     }
                 } label: {

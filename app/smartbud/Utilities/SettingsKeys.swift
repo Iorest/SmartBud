@@ -118,8 +118,6 @@ enum SettingsKey {
     static let themeLight = "settings.theme.light"
     static let themeDark = "settings.theme.dark"
     static let themeSystem = "settings.theme.system"
-    static let weekdaySunday = "settings.weekday.sunday"
-    static let weekdayMonday = "settings.weekday.monday"
     static let notificationMornings = "settings.notification.mornings"
     static let notificationEvenings = "settings.notification.evenings"
     static let notificationCustom = "settings.notification.custom"

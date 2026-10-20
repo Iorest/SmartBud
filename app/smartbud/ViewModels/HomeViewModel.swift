@@ -13,7 +13,6 @@ final class HomeViewModel {
     var totalIncome: Double = 0
     var netValue: Double = 0
     var netPositive: Bool = true
-    var recentTransactions: [TransactionModel] = []
 
     func refresh() {
         let txns = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
@@ -25,7 +24,6 @@ final class HomeViewModel {
         totalIncome = Money.double(income)
         netValue = Money.double(abs(net))
         netPositive = net >= 0
-        recentTransactions = Array(txns.prefix(10))
     }
 
     func setPeriod(_ type: Int) { periodType = type; refresh() }

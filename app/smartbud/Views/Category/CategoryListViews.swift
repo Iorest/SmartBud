@@ -37,13 +37,6 @@ struct CategoryListView: View {
     // delete mode
     @State private var deleteMode = false
     @State private var toDelete: CategoryModel?
-    var alertMessage: String {
-        String.localizedStringWithFormat(
-            String.appLocalized("Delete '%@'?"),
-            toDelete?.wrappedName ?? ""
-        )
-    }
-
     // edit mode
     @State private var toEdit: CategoryModel?
 

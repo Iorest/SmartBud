@@ -84,15 +84,9 @@ struct ActualBudgetView: View {
                             VStack {
                                 if let first = mainBudget.first {
                                     NavigationLink(value: first) {
-                                        if budgets.count == 0 {
-                                            MainBudgetView(budget: first, solo: true)
-                                                .padding(.horizontal, 25)
-                                                .padding(.bottom, 15)
-                                        } else {
-                                            MainBudgetView(budget: first, solo: false)
-                                                .padding(.horizontal, 25)
-                                                .padding(.bottom, 15)
-                                        }
+                                        MainBudgetView(budget: first)
+                                            .padding(.horizontal, 25)
+                                            .padding(.bottom, 15)
                                     }
                                 }
 
@@ -174,7 +168,6 @@ struct MainBudgetView: View {
         budgetAmount - budgetVM.leftoverOverall(budget)
     }
 
-    var soloBudget: Bool
 
     var budgetAmount: Double {
         return budget.amount
@@ -283,8 +276,7 @@ struct MainBudgetView: View {
         }
     }
 
-    init(budget: MainBudgetModel, solo: Bool) {
+    init(budget: MainBudgetModel) {
         self.budget = budget
-        soloBudget = solo
     }
 }
