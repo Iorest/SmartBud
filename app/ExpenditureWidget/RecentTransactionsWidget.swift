@@ -126,8 +126,9 @@ struct Provider: AppIntentTimelineProvider {
         let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
         let limited = Array(filtered.prefix(count))
 
-        return limited.map { t in
-            HoldingTransaction(colour: t.wrappedColour, note: t.wrappedNote, amount: t.wrappedAmount, income: t.income)
+        return limited.map { txn in
+            HoldingTransaction(colour: txn.wrappedColour, note: txn.wrappedNote,
+                               amount: txn.wrappedAmount, income: txn.income)
         }
     }
 }

@@ -74,20 +74,20 @@ final class TransactionViewModel {
     func processRecurring(_ txn: TransactionModel) {
         let today = Calendar.current.startOfDay(for: Date.now)
         if txn.nextTransactionDate < today {
-            var d = txn.nextTransactionDate
+            var cursor = txn.nextTransactionDate
             // `nextOccurrence` returns nil for an unusable recurrence
             // (unknown type or coefficient <= 0), terminating the loop
             // instead of spinning forever.
-            while d <= today,
+            while cursor <= today,
                   let next = Recurrence.nextOccurrence(
-                      after: Calendar.current.startOfDay(for: d),
+                      after: Calendar.current.startOfDay(for: cursor),
                       type: txn.recurringType,
                       coefficient: txn.recurringCoefficient) {
                 let new = TransactionModel(note: txn.note ?? "", category: txn.category,
-                                           income: txn.income, amount: txn.amount, date: d)
+                                           income: txn.income, amount: txn.amount, date: cursor)
                 repo.insert(new)
                 new.onceRecurring = true
-                d = next
+                cursor = next
             }
             txn.recurringType = 0
         } else if Calendar.current.isDateInToday(txn.nextTransactionDate) {
