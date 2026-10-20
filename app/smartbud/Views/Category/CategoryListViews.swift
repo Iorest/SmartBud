@@ -18,11 +18,9 @@ struct CategoryListView: View {
     @Environment(\.colorScheme) var systemColorScheme
     @Environment(CategoryViewModel.self) var categoryVM
 
-    @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
 
     @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true
 
-    @State private var offset: CGFloat = 0
 
     var categories: [CategoryModel] {
         income ? categoryVM.incomeCategories : categoryVM.expenseCategories
@@ -386,93 +384,19 @@ struct CategoryListView: View {
         .fullScreenPresentation(isPresented: $deleteMode, onDismiss: {
             toDelete = nil
         }) {
-            ZStack(alignment: .bottom) {
-                Color.clear
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        deleteMode = false
-                    }
-                    .accessibilityAddTraits(.isButton)
-
-                VStack(alignment: .leading, spacing: 1.5) {
-                    let deleteName = toDelete?.wrappedName ?? ""
-                    Text(String.appFormatted("Delete '%@'?", deleteName))
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(Color.PrimaryText)
-
-                    Text(String(
-                        format: String.appLocalized("This action cannot be undone. %@ transactions are kept and become uncategorized."),
-                        deleteName
-                    ))
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(Color.SubtitleText)
-                        .padding(.bottom, 15)
-
-                    Button {
-                        withAnimation {
-                            if let gonnaDelete = toDelete {
-                                categoryVM.delete(gonnaDelete)
-                            }
-                        }
-
-                        toDelete = nil
-                        deleteMode = false
-
-                    } label: {
-                        Text(String.appLocalized("Delete"))
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(height: 45)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                    }
-                    .padding(.bottom, 8)
-
-                    Button {
-                        withAnimation(.easeOut(duration: 0.7)) {
-                            deleteMode = false
-                            offset = 0
-                        }
-
-                    } label: {
-                        Text(String.appLocalized("Cancel"))
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(Color.PrimaryText.opacity(0.9))
-                            .frame(height: 45)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                    }
-                }
-                .padding(13)
-                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
-                .offset(y: offset)
-                .gesture(
-                    DragGesture()
-                        .onChanged { gesture in
-                            if gesture.translation.height < 0 {
-                                offset = gesture.translation.height / 3
-                            } else {
-                                offset = gesture.translation.height
-                            }
-                        }
-                        .onEnded { value in
-                            if value.translation.height > 20 {
-                                deleteMode = false
-                                offset = 0
-                            } else {
-                                withAnimation {
-                                    offset = 0
-                                }
-                            }
-                        }
+            SBDeleteSheet(
+                title: String.appFormatted("Delete '%@'?", toDelete?.wrappedName ?? ""),
+                message: String(
+                    format: String.appLocalized(
+                        "This action cannot be undone. %@ transactions are kept and become uncategorized."),
+                    toDelete?.wrappedName ?? ""
                 )
-                .padding(.horizontal, 17)
-                .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
+            ) {
+                if let gonnaDelete = toDelete {
+                    withAnimation { categoryVM.delete(gonnaDelete) }
+                }
+                deleteMode = false
             }
-            .ignoresSafeArea(.all)
-            .background(BackgroundBlurView())
         }
         .sheet(item: $toEdit, onDismiss: {
             toEdit = nil

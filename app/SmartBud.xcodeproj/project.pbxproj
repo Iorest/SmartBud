@@ -328,6 +328,8 @@
 		E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000281 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
+		E1A2B3C40000000000000441 /* SBDeleteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000440 /* SBDeleteSheet.swift */; };
+		E1A2B3C40000000000000442 /* SBDeleteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000440 /* SBDeleteSheet.swift */; };
 		E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
 		E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
 		E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
@@ -554,6 +556,7 @@
 		E1A2B3C4000000000000021B /* CSVTableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVTableTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000250 /* AmountFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountFormatting.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000280 /* SBToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBToast.swift; sourceTree = "<group>"; };
+		E1A2B3C40000000000000440 /* SBDeleteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBDeleteSheet.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDeleteConfirmation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002B0 /* TransactionDateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDateRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionCategoryRow.swift; sourceTree = "<group>"; };
@@ -706,6 +709,7 @@
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
 				E1A2B3C40000000000000280 /* SBToast.swift */,
+				E1A2B3C40000000000000440 /* SBDeleteSheet.swift */,
 				E1A2B3C40000000000000218 /* CSVTable.swift */,
 				E1A2B3C40000000000000300 /* TransactionCategoryGrid.swift */,
 				E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */,
@@ -1292,6 +1296,7 @@
 				E1A2B3C40000000000000219 /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000281 /* SBToast.swift in Sources */,
+				E1A2B3C40000000000000441 /* SBDeleteSheet.swift in Sources */,
 				E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */,
 				E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */,
@@ -1495,6 +1500,7 @@
 				E1A2B3C4000000000000021A /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000282 /* SBToast.swift in Sources */,
+				E1A2B3C40000000000000442 /* SBDeleteSheet.swift in Sources */,
 				E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */,
 				E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */,
