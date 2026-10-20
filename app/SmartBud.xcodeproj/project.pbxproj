@@ -333,6 +333,14 @@
 		E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
 		E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */; };
 		E1A2B3C400000000000002E1 /* BudgetTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002E0 /* BudgetTimeView.swift */; };
+		E1A2B3C400000000000002F1 /* ImportDataView+Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */; };
+		E1A2B3C40000000000000431 /* ImportSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000430 /* ImportSupport.swift */; };
+		E1A2B3C40000000000000432 /* ImportSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000430 /* ImportSupport.swift */; };
+		E1A2B3C40000000000000421 /* ImportDataView+Importing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000420 /* ImportDataView+Importing.swift */; };
+		E1A2B3C40000000000000422 /* ImportDataView+Importing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000420 /* ImportDataView+Importing.swift */; };
+		E1A2B3C400000000000002F2 /* ImportDataView+Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */; };
+		E1A2B3C40000000000000411 /* ImportDataView+Chrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */; };
+		E1A2B3C40000000000000412 /* ImportDataView+Chrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */; };
 		E1A2B3C400000000000002E2 /* BudgetTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002E0 /* BudgetTimeView.swift */; };
 		E1A2B3C400000000000002D2 /* TransactionRepeatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */; };
 		E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
@@ -551,6 +559,10 @@
 		E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionCategoryRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionRepeatButton.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002E0 /* BudgetTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetTimeView.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportDataView+Steps.swift"; sourceTree = "<group>"; };
+		E1A2B3C40000000000000430 /* ImportSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSupport.swift; sourceTree = "<group>"; };
+		E1A2B3C40000000000000420 /* ImportDataView+Importing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportDataView+Importing.swift"; sourceTree = "<group>"; };
+		E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportDataView+Chrome.swift"; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A0 /* TransactionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidationTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
@@ -809,6 +821,10 @@
 				53A4147628B3B559008C30E7 /* WelcomeSheetView.swift */,
 				5327D2CE287C6B5E00F76ADF /* TransactionView.swift */,
 				5362CF312A92750800244744 /* ImportDataView.swift */,
+				E1A2B3C40000000000000430 /* ImportSupport.swift */,
+				E1A2B3C40000000000000420 /* ImportDataView+Importing.swift */,
+				E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */,
+				E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */,
 				5327D2D0287C6B5E00F76ADF /* HomeView.swift */,
 				5327D2D2287C6B5E00F76ADF /* LogView.swift */,
 				536CC385293106180081E401 /* LineGraph.swift */,
@@ -1281,6 +1297,10 @@
 				E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */,
 				E1A2B3C400000000000002E1 /* BudgetTimeView.swift in Sources */,
+				E1A2B3C400000000000002F1 /* ImportDataView+Steps.swift in Sources */,
+				E1A2B3C40000000000000431 /* ImportSupport.swift in Sources */,
+				E1A2B3C40000000000000421 /* ImportDataView+Importing.swift in Sources */,
+				E1A2B3C40000000000000411 /* ImportDataView+Chrome.swift in Sources */,
 				E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000301 /* TransactionCategoryGrid.swift in Sources */,
@@ -1480,6 +1500,10 @@
 				E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D2 /* TransactionRepeatButton.swift in Sources */,
 				E1A2B3C400000000000002E2 /* BudgetTimeView.swift in Sources */,
+				E1A2B3C400000000000002F2 /* ImportDataView+Steps.swift in Sources */,
+				E1A2B3C40000000000000432 /* ImportSupport.swift in Sources */,
+				E1A2B3C40000000000000422 /* ImportDataView+Importing.swift in Sources */,
+				E1A2B3C40000000000000412 /* ImportDataView+Chrome.swift in Sources */,
 				E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000302 /* TransactionCategoryGrid.swift in Sources */,
