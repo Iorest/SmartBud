@@ -1,8 +1,38 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
+#if os(macOS)
+struct EmojiTextField: View {
+    @Binding var text: String
+    var placeholder: String = ""
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .font(.system(size: 50))
+            .multilineTextAlignment(.center)
+            .textFieldStyle(.plain)
+    }
+}
+
+struct NormalTextField: View {
+    @Binding var text: String
+    var placeholder: String = ""
+    var action: () -> Void
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .font(.title2.weight(.medium))
+            .textFieldStyle(.plain)
+            .onSubmit(action)
+    }
+}
+#else
 struct EmojiTextField: UIViewRepresentable {
     @Binding var text: String
     var placeholder: String = ""
@@ -90,4 +120,4 @@ struct NormalTextField: UIViewRepresentable {
         }
     }
 }
-
+#endif

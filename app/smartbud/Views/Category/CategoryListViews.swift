@@ -1,7 +1,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct CategoryListView: View {
     @Binding var income: Bool
@@ -17,7 +21,6 @@ struct CategoryListView: View {
     @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
 
     @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true
-    @State var suggestionsToast = false
 
     @State private var offset: CGFloat = 0
 
@@ -62,27 +65,24 @@ struct CategoryListView: View {
         }
     }
 
-    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     var body: some View {
         VStack(spacing: 5) {
             if showToast {
                 HStack(spacing: 6.5) {
                     Image(systemName: toastImage)
-                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .font(.subheadline.weight(.semibold))
                         
-//                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(toastColor)
 
                     Text(toastTitle)
-                        .font(.system(.body, design: .rounded).weight(.semibold))
+                        .font(.body.weight(.semibold))
                         
                         .lineLimit(1)
-//                        .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundStyle(toastColor)
                 }
                 .padding(8)
-                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                 .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                 .frame(maxWidth: 250)
                 .frame(height: 35)
@@ -102,9 +102,8 @@ struct CategoryListView: View {
                                         .frame(width: 33, height: 33)
                                         .overlay {
                                             Image(systemName: "checkmark")
-                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .font(.callout.weight(.semibold))
                                                 
-//                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
                                 }
@@ -121,7 +120,7 @@ struct CategoryListView: View {
                                         .frame(width: 33, height: 33)
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
-                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .font(.callout.weight(.semibold))
                                                 
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
@@ -141,7 +140,7 @@ struct CategoryListView: View {
                                 .frame(width: 33, height: 33)
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
-                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .font(.callout.weight(.semibold))
                                         
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
@@ -163,7 +162,7 @@ struct CategoryListView: View {
                                 .overlay {
                                     ZStack {
                                         Image(systemName: "arrow.right")
-                                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                                            .font(.callout.weight(.semibold))
                                             
                                             .foregroundStyle(!allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8))
 
@@ -182,9 +181,8 @@ struct CategoryListView: View {
                     .frame(maxWidth: .infinity)
                     .overlay {
                         Text(String.appLocalized("Categories"))
-                            .font(.system(.title3, design: .rounded).weight(.medium))
+                            .font(.title3.weight(.medium))
                             
-//                            .font(.system(.title3, design: .rounded).weight(.medium))
                     }
                     .padding(20)
 
@@ -199,9 +197,8 @@ struct CategoryListView: View {
                                     .frame(width: 33, height: 33)
                                     .overlay {
                                         Image(systemName: "chevron.left")
-                                            .font(.system(.body, design: .rounded).weight(.semibold))
+                                            .font(.body.weight(.semibold))
                                             
-//                                        .font(.system(size: 18, weight: .semibold))
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
                                     }
@@ -217,7 +214,7 @@ struct CategoryListView: View {
                                     .frame(width: 33, height: 33)
                                     .overlay {
                                         Image(systemName: "chevron.down")
-                                            .font(.system(.body, design: .rounded).weight(.semibold))
+                                            .font(.body.weight(.semibold))
                                             
                                             .foregroundStyle(Color.SubtitleText)
                                             .offset(y: 0.8)
@@ -239,9 +236,8 @@ struct CategoryListView: View {
                                 .frame(width: 33, height: 33)
                                 .overlay {
                                     Image(systemName: showSuggestions ? "eye.slash" : "eye")
-                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .font(.callout.weight(.semibold))
                                         
-//                                    .font(.system(size: 16, weight: .semibold))
                                         .foregroundStyle(Color.SubtitleText)
                                         .offset(y: 0.8)
                                 }
@@ -261,9 +257,8 @@ struct CategoryListView: View {
                                         .frame(width: 33, height: 33)
                                         .overlay {
                                             Image(systemName: "checkmark")
-                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .font(.callout.weight(.semibold))
                                                 
-//                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.IncomeGreen)
                                         }
                                 }
@@ -280,9 +275,8 @@ struct CategoryListView: View {
                                         .frame(width: 33, height: 33)
                                         .overlay {
                                             Image(systemName: "arrow.up.arrow.down")
-                                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                                .font(.callout.weight(.semibold))
                                                 
-//                                            .font(.system(size: 16, weight: .semibold))
                                                 .foregroundStyle(Color.SubtitleText)
                                         }
                                 }
@@ -295,9 +289,8 @@ struct CategoryListView: View {
                     .frame(maxWidth: .infinity)
                     .overlay {
                         Text(String.appLocalized("Categories"))
-                            .font(.system(.title3, design: .rounded).weight(mode == .settings ? .semibold : .medium))
+                            .font(.title3.weight(mode == .settings ? .semibold : .medium))
                             
-//                            .font(.system(size: 20, weight: mode == .settings ? .semibold : .medium, design: .rounded))
                     }
                     .padding(20)
                 }
@@ -309,9 +302,8 @@ struct CategoryListView: View {
                             if categories.isEmpty {
                                 VStack(spacing: 10) {
                                     Image(systemName: "tray")
-                                        .font(.system(.largeTitle, design: .rounded).weight(.light))
+                                        .font(.largeTitle.weight(.light))
                                         
-//                                        .font(.system(size: 37, weight: .light))
                                         .foregroundStyle(Color.SubtitleText)
 
                                     Group {
@@ -321,12 +313,16 @@ struct CategoryListView: View {
                                             Text(LocalizedStringKey("no_expense_categories"))
                                         }
                                     }
-                                    .font(.system(.body, design: .rounded).weight(.medium))
+                                    .font(.body.weight(.medium))
                                     
-//                                    .font(.system(size: 17, weight: .medium, design: .rounded))
-                                    .italic()
                                     .multilineTextAlignment(.center)
                                     .foregroundStyle(Color.SubtitleText)
+
+                                    Button(String.appLocalized("添加常用分类")) {
+                                        categoryVM.seedStarterCategories()
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .padding(.top, SBSpace.xxs)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.vertical, 37)
@@ -335,20 +331,18 @@ struct CategoryListView: View {
                                 ForEach(categories) { category in
                                     HStack(spacing: 10) {
                                         Text(category.wrappedEmoji)
-                                            .font(.system(.subheadline, design: .rounded))
+                                            .font(.subheadline)
                                             
-//                                            .font(.system(size: 15))
                                         Text(category.wrappedName)
-                                            .font(.system(.body, design: .rounded))
+                                            .font(.body)
                                             
-//                                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
                                             .lineLimit(1)
                                             .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
 
                                         Spacer()
 
                                         if !income {
-                                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                                            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                                 .fill(Color(hex: category.wrappedColour))
                                                 .frame(width: 20, height: 20)
                                         }
@@ -385,7 +379,6 @@ struct CategoryListView: View {
                                 .onMove(perform: moveItem)
                             }
 
-//                                .onDelete(perform: deleteItem)
                         }
 
                         if showSuggestions {
@@ -394,7 +387,9 @@ struct CategoryListView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollIndicators(.hidden)
+                    #if os(iOS)
                     .environment(\.editMode, .constant(self.isEditing ? EditMode.active : EditMode.inactive))
+                    #endif
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -405,7 +400,7 @@ struct CategoryListView: View {
                 deleteMode = true
             }
         }
-        .fullScreenCover(isPresented: $deleteMode, onDismiss: {
+        .fullScreenPresentation(isPresented: $deleteMode, onDismiss: {
             toDelete = nil
         }) {
             ZStack(alignment: .bottom) {
@@ -419,12 +414,15 @@ struct CategoryListView: View {
 
                 VStack(alignment: .leading, spacing: 1.5) {
                     let deleteName = toDelete?.wrappedName ?? ""
-                    Text(String(localized: "Delete '\(deleteName)'?"))
-                        .font(.system(.title3, design: .rounded).weight(.medium))
+                    Text(String.appFormatted("Delete '%@'?", deleteName))
+                        .font(.title3.weight(.medium))
                         .foregroundStyle(Color.PrimaryText)
 
-                    Text(String(localized: "This action cannot be undone, and all \(deleteName) transactions would be deleted."))
-                        .font(.system(.callout, design: .rounded).weight(.medium))
+                    Text(String(
+                        format: String.appLocalized("This action cannot be undone. %@ transactions are kept and become uncategorized."),
+                        deleteName
+                    ))
+                        .font(.callout.weight(.medium))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(.bottom, 15)
 
@@ -440,11 +438,11 @@ struct CategoryListView: View {
 
                     } label: {
                         Text(String.appLocalized("Delete"))
-                            .font(.system(.title3, design: .rounded).weight(.semibold))
+                            .font(.title3.weight(.semibold))
                             .foregroundStyle(.white)
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
-                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                            .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                     }
                     .padding(.bottom, 8)
 
@@ -456,17 +454,16 @@ struct CategoryListView: View {
 
                     } label: {
                         Text(String.appLocalized("Cancel"))
-                            .font(.system(.title3, design: .rounded).weight(.semibold))
+                            .font(.title3.weight(.semibold))
                             .foregroundStyle(Color.PrimaryText.opacity(0.9))
                             .frame(height: 45)
                             .frame(maxWidth: .infinity)
-                            //                        .background(Color("13").opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
-                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                     }
                 }
                 .padding(13)
-                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
                 .offset(y: offset)
                 .gesture(
                     DragGesture()

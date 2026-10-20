@@ -1,7 +1,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct DeleteCategoryAlert: View {
     @Environment(CategoryViewModel.self) var categoryVM
@@ -25,16 +29,14 @@ struct DeleteCategoryAlert: View {
                 .accessibilityAddTraits(.isButton)
 
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(String(localized: "Delete '\(toDelete.wrappedName)'?"))
-                    .font(.system(.title2, design: .rounded).weight(.medium))
+                Text(String.appFormatted("Delete '%@'?", toDelete.wrappedName))
+                    .font(.title2.weight(.medium))
                     
-//                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
 
                 Text(String.appLocalized("This action cannot be undone."))
-                    .font(.system(.title3, design: .rounded).weight(.medium))
+                    .font(.title3.weight(.medium))
                     
-//                    .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 15)
                     .accessibilityHidden(true)
@@ -52,12 +54,12 @@ struct DeleteCategoryAlert: View {
 
                 } label: {
                     Text(String.appLocalized("Delete"))
-                        .font(.system(.title3, design: .rounded).weight(.semibold))
+                        .font(.title3.weight(.semibold))
                         
                         .foregroundStyle(.white)
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
-                        .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                        .background(Color.AlertRed, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                 }
                 .padding(.bottom, 8)
 
@@ -68,19 +70,17 @@ struct DeleteCategoryAlert: View {
 
                 } label: {
                     Text(String.appLocalized("Cancel"))
-                        .font(.system(.title3, design: .rounded).weight(.semibold))
+                        .font(.title3.weight(.semibold))
                         
-//                        .font(.system(size: 20, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.PrimaryText.opacity(0.9))
                         .frame(height: 45)
                         .frame(maxWidth: .infinity)
-                        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                 }
             }
             .padding(13)
-//            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()
@@ -101,11 +101,7 @@ struct DeleteCategoryAlert: View {
                         }
                     }
             )
-//            .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
-//                .onEnded({ value in
-//                    if value.translation.height > 0 {
 //                        dismiss()
-//                    }
 //                }))
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)

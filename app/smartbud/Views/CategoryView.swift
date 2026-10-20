@@ -8,7 +8,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 enum CategoryViewMode {
     case welcome, settings, transaction
@@ -63,9 +67,8 @@ struct CategoryView: View {
                         }
                     } label: {
                         Text(String.appLocalized("Expense"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
                             .padding(.horizontal, 8)
@@ -88,9 +91,8 @@ struct CategoryView: View {
                         }
                     } label: {
                         Text(String.appLocalized("Income"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                             .padding(6)
                             .padding(.horizontal, 8)
@@ -123,14 +125,12 @@ struct CategoryView: View {
                 } label: {
                     HStack(spacing: 3) {
                         Image(systemName: "plus")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .font(.subheadline.weight(.semibold))
                             
-//                        .font(.system(size: 14.5, weight: .semibold, design: .rounded))
 
                         Text(String.appLocalized("New"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             
-//                        .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .lineLimit(1)
                     }
                     .foregroundStyle(Color.PrimaryText)

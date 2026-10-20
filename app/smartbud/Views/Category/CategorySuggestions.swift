@@ -1,7 +1,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct SuggestedCategoriesView: View {
     let income: Bool
@@ -62,21 +66,18 @@ struct SuggestedCategoriesView: View {
                     ForEach(suggestions, id: \.self) { category in
                         HStack(spacing: 8) {
                             Text(category.emoji)
-//                            .font(.system(size: 15))
-                                .font(.system(.subheadline, design: .rounded))
+                                .font(.subheadline)
                                 
                             Text(LocalizedStringKey(category.name))
-                                .font(.system(.body, design: .rounded))
+                                .font(.body)
                                 
-//                            .font(.system(size: 18.5, weight: .regular, design: .rounded))
                                 .lineLimit(1)
 
                             Spacer()
 
                             Image(systemName: "plus")
-                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                                .font(.subheadline.weight(.semibold))
                                 
-//                            .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(4)
                                 .background(Color.SecondaryBackground, in: Circle())
@@ -146,6 +147,7 @@ struct SuggestedCategoriesView: View {
     }
 }
 
+#if !os(macOS)
 class UIEmojiTextField: UITextField {
     override var textInputMode: UITextInputMode? {
         .activeInputModes.first(where: { $0.primaryLanguage == "emoji" })
@@ -155,4 +157,4 @@ class UIEmojiTextField: UITextField {
         return CGRect.zero
     }
 }
-
+#endif

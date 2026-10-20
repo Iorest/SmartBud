@@ -1,7 +1,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct ColourPickerView: View {
     var selectedColours: [String]
@@ -14,7 +18,6 @@ struct ColourPickerView: View {
     @State var customMode: Bool = false
     @State var customSelectedColor = Color.white
 
-    @State var testing = false
     let columns = [
         GridItem(.fixed(40), spacing: 6),
         GridItem(.fixed(40), spacing: 6),
@@ -41,10 +44,10 @@ struct ColourPickerView: View {
                         showNativePicker = true
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: GlassRadius.chip)
+                            RoundedRectangle(cornerRadius: SBRadius.chip)
                                 .fill(AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]), center: .center))
 
-                            RoundedRectangle(cornerRadius: GlassRadius.pill)
+                            RoundedRectangle(cornerRadius: SBRadius.pill)
                                 .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
                                 .padding(4)
 
@@ -76,7 +79,7 @@ struct ColourPickerView: View {
                             }
                         }
                     } label: {
-                        RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                        RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                             .fill(Color(hex: suggestedColor))
                             .frame(height: 40)
                             .opacity(selectedColours.contains(suggestedColor) ? 0.2 : 1)
@@ -94,8 +97,8 @@ struct ColourPickerView: View {
         }
         .padding(6)
         .frame(width: 282)
-        .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
-        .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .background(RoundedRectangle(cornerRadius: SBRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+        .overlay(RoundedRectangle(cornerRadius: SBRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 
     init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>, expenseCategories: [CategoryModel], toEdit: CategoryModel? = nil) {

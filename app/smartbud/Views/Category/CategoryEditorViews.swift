@@ -1,7 +1,11 @@
 import CoreHaptics
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct NewCategoryAlert: View {
     @Binding var income: Bool
@@ -43,10 +47,6 @@ struct NewCategoryAlert: View {
         positive ? Color.IncomeGreen : Color.AlertRed
     }
 
-    var addButtonDisabled: Bool {
-        return newName.trimmingCharacters(in: .whitespacesAndNewlines) == "" || newEmoji == ""
-    }
-
     @State var showNativePicker: Bool = false
     @State var customSelectedColor = Color.white
 
@@ -61,34 +61,30 @@ struct NewCategoryAlert: View {
                     if showToast {
                         HStack(spacing: 5) {
                             Image(systemName: toastImage)
-                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                                .font(.subheadline.weight(.semibold))
                                 
-//                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(toastColor)
 
                             Text(toastTitle)
-                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                .font(.callout.weight(.semibold))
                                 
                                 .lineLimit(1)
-//                                .font(.system(size: 16, weight: .semibold, design: .rounded))
                                 .foregroundStyle(toastColor)
                         }
                         .padding(6)
-                        .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                        .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
                         if expenseCategories.count == 24 {
                             Text(String.appLocalized("Income Category"))
-                                .font(.system(.body, design: .rounded).weight(.semibold))
+                                .font(.body.weight(.semibold))
                                 
-//                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else if budgetMode {
                             Text(String.appLocalized("Expense Category"))
-                                .font(.system(.body, design: .rounded).weight(.semibold))
+                                .font(.body.weight(.semibold))
                                 
-//                                .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .padding(.top, 4)
                         } else {
                             HStack(spacing: 0) {
@@ -100,9 +96,8 @@ struct NewCategoryAlert: View {
                                     }
                                 } label: {
                                     Text(String.appLocalized("Expense"))
-                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .font(.callout.weight(.semibold))
                                         
-//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
                                         .padding(.horizontal, 7)
@@ -125,9 +120,8 @@ struct NewCategoryAlert: View {
                                     }
                                 } label: {
                                     Text(String.appLocalized("Income"))
-                                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                                        .font(.callout.weight(.semibold))
                                         
-//                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                                         .padding(5)
                                         .padding(.horizontal, 7)
@@ -155,9 +149,8 @@ struct NewCategoryAlert: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
                             
-//                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
@@ -181,9 +174,9 @@ struct NewCategoryAlert: View {
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)
                         .background {
-                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .emoji && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     if newEmoji == "" {
@@ -202,14 +195,14 @@ struct NewCategoryAlert: View {
                         Button {
                             showingColourPicker = true
                         } label: {
-                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                 .fill(Color(hex: selectedColour))
                                 .padding(8)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                                 .frame(width: 50, height: 50)
                                 .overlay {
                                     if showingColourPicker {
-                                        RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                                        RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                             .stroke(Color.SubtitleText, lineWidth: 2.2)
                                     }
                                 }
@@ -226,9 +219,9 @@ struct NewCategoryAlert: View {
 
                         .frame(height: 50)
                         .background {
-                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .name && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
                     //
                     Button {
@@ -236,11 +229,10 @@ struct NewCategoryAlert: View {
                     } label: {
                         Image(systemName: "plus")
                             .foregroundStyle(Color.LightIcon)
-                            .font(.system(.title3, design: .rounded).weight(.semibold))
+                            .font(.title3.weight(.semibold))
                             
-//                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                     }
                 }
             }
@@ -332,7 +324,7 @@ struct NewCategoryAlert: View {
             showToast = true
 
         } else {
-            toastTitle = String(localized: "Added \(newName)")
+            toastTitle = String.appFormatted("Added %@", newName)
 
             successHaptic &+= 1
 
@@ -441,9 +433,8 @@ struct EditCategoryAlert: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
                             
-//                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
@@ -455,27 +446,24 @@ struct EditCategoryAlert: View {
                     if showToast {
                         HStack(spacing: 5) {
                             Image(systemName: toastImage)
-                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                                .font(.subheadline.weight(.semibold))
                                 
-//                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(Color.AlertRed)
 
                             Text(toastTitle)
-                                .font(.system(.callout, design: .rounded).weight(.semibold))
+                                .font(.callout.weight(.semibold))
                                 
                                 .lineLimit(1)
-//                                .font(.system(size: 16, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color.AlertRed)
                         }
                         .padding(6)
-                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                         .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                         .frame(maxWidth: 200)
                     } else {
                         Text(LocalizedStringKey(toEdit.income ? "Income" : "Expense"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             
-//                            .font(.system(size: 18, weight: .semibold, design: .rounded))
                     }
 
                     Spacer()
@@ -484,9 +472,8 @@ struct EditCategoryAlert: View {
                         toDelete = toEdit
                     } label: {
                         Image(systemName: "trash.fill")
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
                             
-//                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.AlertRed)
                             .padding(7)
                             .background(Color.AlertRed.opacity(0.23), in: Circle())
@@ -511,9 +498,9 @@ struct EditCategoryAlert: View {
                         .padding(8)
                         .frame(width: 80, height: 80, alignment: .center)
                         .background {
-                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .emoji && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     if newEmoji == "" {
@@ -532,14 +519,14 @@ struct EditCategoryAlert: View {
                         Button {
                             showingColourPicker = true
                         } label: {
-                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                 .fill(Color(hex: selectedColour))
                                 .padding(8)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                                 .frame(width: 50, height: 50)
                                 .overlay {
                                     if showingColourPicker {
-                                        RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                                        RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                             .stroke(Color.SubtitleText, lineWidth: 2.2)
                                     }
                                 }
@@ -556,9 +543,9 @@ struct EditCategoryAlert: View {
                         .frame(height: 50)
                         .foregroundStyle(Color.PrimaryText)
                         .background {
-                            RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                 .strokeBorder((focusedField == .name && !showingColourPicker) ? Color.SubtitleText : Color.clear, lineWidth: 2.2)
-                                .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.SecondaryBackground))
+                                .background(RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous).fill(Color.SecondaryBackground))
                         }
 
                     Button {
@@ -566,11 +553,10 @@ struct EditCategoryAlert: View {
                     } label: {
                         Image(systemName: "checkmark")
                             .foregroundStyle(Color.LightIcon)
-                            .font(.system(.title3, design: .rounded).weight(.semibold))
+                            .font(.title3.weight(.semibold))
                             
-//                            .font(.system(size: 20, weight: .semibold))
                             .frame(width: 50, height: 50)
-                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+                            .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                     }
                 }
             }
@@ -588,7 +574,7 @@ struct EditCategoryAlert: View {
                 }
             }
         }
-        .fullScreenCover(item: $toDelete, onDismiss: {
+        .fullScreenPresentation(item: $toDelete, onDismiss: {
             toDelete = nil
         }) { category in
             DeleteCategoryAlert(toDelete: category, deleted: $deleteMode)
@@ -662,7 +648,7 @@ struct EditCategoryAlert: View {
                 categoryVM.update(toEdit, name: newName.trimmingCharacters(in: .whitespaces).capitalized, emoji: newEmoji, colour: selectedColour)
             }
 
-            rootToastTitle = String(localized: "Edited \(newName)")
+            rootToastTitle = String.appFormatted("Edited %@", newName)
             rootToastImage = "checkmark.circle.fill"
             positive = true
             showRootToast = true
