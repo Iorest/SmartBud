@@ -344,23 +344,8 @@ struct TransactionView: View {
     var toastOrIncomeExpensePicker: some View {
         VStack {
             if showToast {
-                HStack(spacing: 6.5) {
-                    Image(systemName: toastImage)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.AlertRed)
-
-                    Text(toastTitle)
-                        .font(.body.weight(.semibold))
-                        .lineLimit(1)
-                        .foregroundStyle(Color.AlertRed)
-                }
-                .padding(8)
-                .background(
-                    Color.AlertRed.opacity(0.23),
-                    in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
-                )
-                .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-                .frame(maxWidth: dynamicTypeSize > .xLarge ? 250 : 200)
+                SBToast(title: toastTitle, systemImage: toastImage)
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
             } else {
                 ZStack(alignment: .leading) {
                     Capsule()
@@ -1001,14 +986,7 @@ struct TransactionView: View {
         // date/category row cannot fit on a phone. Documented exception to
         // unlimited scaling, same approach as Apple's Calculator.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .onChange(of: showToast) { _, newValue in
-            if newValue {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .seconds(2))
-                    showToast = false
-                }
-            }
-        }
+        .sbToastDismissal($showToast)
         .onChange(of: income) { _, newValue in
             lightHaptic &+= 1
             // Only drop a category that belongs to the other side; clearing

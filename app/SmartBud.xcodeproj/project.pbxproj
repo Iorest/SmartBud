@@ -343,6 +343,8 @@
 		E1A2B3C4000000000000021D /* CSVTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000218 /* CSVTable.swift */; };
 		E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
+		E1A2B3C40000000000000281 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
+		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000254 /* MoneyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */; };
 		E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000270 /* TransactionSnapshot.swift */; };
 		E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000270 /* TransactionSnapshot.swift */; };
@@ -553,6 +555,7 @@
 		E1A2B3C40000000000000218 /* CSVTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/Import/CSVTable.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000021B /* CSVTableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVTableTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000250 /* AmountFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountFormatting.swift; sourceTree = "<group>"; };
+		E1A2B3C40000000000000280 /* SBToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBToast.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000270 /* TransactionSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSnapshot.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoRestoresRecurrenceTests.swift; sourceTree = "<group>"; };
@@ -693,6 +696,7 @@
 				E1A2B3C40000000000000209 /* SBAmountText.swift */,
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
+				E1A2B3C40000000000000280 /* SBToast.swift */,
 				E1A2B3C40000000000000218 /* CSVTable.swift */,
 				E1A2B3C40000000000000300 /* TransactionCategoryGrid.swift */,
 				E1A2B3C40000000000000400 /* LogTransactionList.swift */,
@@ -1283,6 +1287,7 @@
 				E1A2B3C40000000000000216 /* SBSaveErrorBanner.swift in Sources */,
 				E1A2B3C40000000000000219 /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */,
+				E1A2B3C40000000000000281 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000301 /* TransactionCategoryGrid.swift in Sources */,
 				E1A2B3C40000000000000401 /* LogTransactionList.swift in Sources */,
@@ -1481,6 +1486,7 @@
 				E1A2B3C40000000000000217 /* SBSaveErrorBanner.swift in Sources */,
 				E1A2B3C4000000000000021A /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */,
+				E1A2B3C40000000000000282 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000302 /* TransactionCategoryGrid.swift in Sources */,
 				E1A2B3C40000000000000402 /* LogTransactionList.swift in Sources */,

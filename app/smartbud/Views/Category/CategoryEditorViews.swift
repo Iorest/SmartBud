@@ -43,10 +43,6 @@ struct NewCategoryAlert: View {
     @State var toastImage = ""
     @State var positive = false
 
-    var toastColor: Color {
-        positive ? Color.IncomeGreen : Color.AlertRed
-    }
-
     @State var showNativePicker: Bool = false
     @State var customSelectedColor = Color.white
 
@@ -59,22 +55,8 @@ struct NewCategoryAlert: View {
             VStack {
                 VStack {
                     if showToast {
-                        HStack(spacing: 5) {
-                            Image(systemName: toastImage)
-                                .font(.subheadline.weight(.semibold))
-                                
-                                .foregroundStyle(toastColor)
-
-                            Text(toastTitle)
-                                .font(.callout.weight(.semibold))
-                                
-                                .lineLimit(1)
-                                .foregroundStyle(toastColor)
-                        }
-                        .padding(6)
-                        .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                        .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-                        .frame(maxWidth: 200)
+                        SBToast(title: toastTitle, systemImage: toastImage, positive: positive)
+                            .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     } else {
                         if expenseCategories.count == 24 {
                             Text(String.appLocalized("Income Category"))
@@ -247,14 +229,7 @@ struct NewCategoryAlert: View {
                 dismiss()
             }
         }
-        .onChange(of: showToast) { _, newValue in
-            if newValue {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .seconds(2))
-                    showToast = false
-                }
-            }
-        }
+        .sbToastDismissal($showToast)
         .onChange(of: customSelectedColor) { _, _ in
             selectedColour = customSelectedColor.toHex() ?? "#FFFFFF"
         }
@@ -444,22 +419,8 @@ struct EditCategoryAlert: View {
                     Spacer()
 
                     if showToast {
-                        HStack(spacing: 5) {
-                            Image(systemName: toastImage)
-                                .font(.subheadline.weight(.semibold))
-                                
-                                .foregroundStyle(Color.AlertRed)
-
-                            Text(toastTitle)
-                                .font(.callout.weight(.semibold))
-                                
-                                .lineLimit(1)
-                                .foregroundStyle(Color.AlertRed)
-                        }
-                        .padding(6)
-                        .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                        .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-                        .frame(maxWidth: 200)
+                        SBToast(title: toastTitle, systemImage: toastImage)
+                            .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     } else {
                         Text(LocalizedStringKey(toEdit.income ? "Income" : "Expense"))
                             .font(.body.weight(.semibold))
@@ -566,14 +527,7 @@ struct EditCategoryAlert: View {
         .frame(maxHeight: .infinity, alignment: .top)
         .background(.clear)
         .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: showToast) { _, newValue in
-            if newValue {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .seconds(2))
-                    showToast = false
-                }
-            }
-        }
+        .sbToastDismissal($showToast)
         .fullScreenPresentation(item: $toDelete, onDismiss: {
             toDelete = nil
         }) { category in

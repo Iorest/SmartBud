@@ -53,10 +53,6 @@ struct CategoryListView: View {
     @Binding var toastImage: String
     @Binding var positive: Bool
 
-    var toastColor: Color {
-        positive ? Color.IncomeGreen : Color.AlertRed
-    }
-
     var sectionHeader: LocalizedStringKey {
         if income {
             return "INCOME CATEGORIES"
@@ -69,24 +65,9 @@ struct CategoryListView: View {
     var body: some View {
         VStack(spacing: 5) {
             if showToast {
-                HStack(spacing: 6.5) {
-                    Image(systemName: toastImage)
-                        .font(.subheadline.weight(.semibold))
-                        
-                        .foregroundStyle(toastColor)
-
-                    Text(toastTitle)
-                        .font(.body.weight(.semibold))
-                        
-                        .lineLimit(1)
-                        .foregroundStyle(toastColor)
-                }
-                .padding(8)
-                .background(toastColor.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-                .frame(maxWidth: 250)
-                .frame(height: 35)
-                .padding(20)
+                SBToast(title: toastTitle, systemImage: toastImage, positive: positive)
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .padding(20)
             } else {
                 if mode == .welcome {
                     HStack(spacing: 8) {
@@ -497,14 +478,7 @@ struct CategoryListView: View {
                 EditCategoryAlert(toEdit: category, showRootToast: $showToast, rootToastTitle: $toastTitle, rootToastImage: $toastImage, positive: $positive, bottomSpacers: false)
                     .presentationDetents([.medium, .large])
         }
-        .onChange(of: showToast) { _, newValue in
-            if newValue {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .seconds(2))
-                    showToast = false
-                }
-            }
-        }
+        .sbToastDismissal($showToast)
         .onChange(of: showSuggestions) { _, newValue in
             if !newValue {
                 toastTitle = String.appLocalized("Suggestions Hidden")
