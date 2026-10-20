@@ -157,9 +157,7 @@
 		B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000103 /* BudgetGraphs.swift */; };
 		B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000105 /* BudgetAlerts.swift */; };
 		B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000107 /* BudgetDetailViews.swift */; };
-		B0A0F000000000000000010A /* TimeBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000109 /* TimeBudgetView.swift */; };
 		B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010B /* FilteredBudgetViews.swift */; };
-		B0A0F000000000000000010E /* TimeMainBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010D /* TimeMainBudgetView.swift */; };
 		B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010F /* BudgetSteppers.swift */; };
 		B0A0F0000000000000000112 /* LogInsightsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000111 /* LogInsightsViews.swift */; };
 		B0A0F0000000000000000116 /* LogListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000115 /* LogListViews.swift */; };
@@ -206,9 +204,7 @@
 		D0C0FFEE0000000000000113 /* BudgetGraphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000103 /* BudgetGraphs.swift */; };
 		D0C0FFEE0000000000000114 /* BudgetAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000105 /* BudgetAlerts.swift */; };
 		D0C0FFEE0000000000000115 /* BudgetDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000107 /* BudgetDetailViews.swift */; };
-		D0C0FFEE0000000000000116 /* TimeBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000109 /* TimeBudgetView.swift */; };
 		D0C0FFEE0000000000000117 /* FilteredBudgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010B /* FilteredBudgetViews.swift */; };
-		D0C0FFEE0000000000000118 /* TimeMainBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010D /* TimeMainBudgetView.swift */; };
 		D0C0FFEE0000000000000119 /* BudgetSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010F /* BudgetSteppers.swift */; };
 		D0C0FFEE000000000000011A /* LogInsightsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000111 /* LogInsightsViews.swift */; };
 		D0C0FFEE000000000000011C /* LogListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000115 /* LogListViews.swift */; };
@@ -336,6 +332,8 @@
 		E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
 		E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
 		E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */; };
+		E1A2B3C400000000000002E1 /* BudgetTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002E0 /* BudgetTimeView.swift */; };
+		E1A2B3C400000000000002E2 /* BudgetTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002E0 /* BudgetTimeView.swift */; };
 		E1A2B3C400000000000002D2 /* TransactionRepeatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */; };
 		E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
 		E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
@@ -507,9 +505,7 @@
 		B0A0F0000000000000000103 /* BudgetGraphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetGraphs.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000105 /* BudgetAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetAlerts.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000107 /* BudgetDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViews.swift; sourceTree = "<group>"; };
-		B0A0F0000000000000000109 /* TimeBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeBudgetView.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000010B /* FilteredBudgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredBudgetViews.swift; sourceTree = "<group>"; };
-		B0A0F000000000000000010D /* TimeMainBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeMainBudgetView.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000010F /* BudgetSteppers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSteppers.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000111 /* LogInsightsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInsightsViews.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000115 /* LogListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogListViews.swift; sourceTree = "<group>"; };
@@ -554,6 +550,7 @@
 		E1A2B3C400000000000002B0 /* TransactionDateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDateRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionCategoryRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionRepeatButton.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002E0 /* BudgetTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetTimeView.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A0 /* TransactionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidationTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
@@ -626,9 +623,8 @@
 				B0A0F0000000000000000103 /* BudgetGraphs.swift */,
 				B0A0F0000000000000000105 /* BudgetAlerts.swift */,
 				B0A0F0000000000000000107 /* BudgetDetailViews.swift */,
-				B0A0F0000000000000000109 /* TimeBudgetView.swift */,
+				E1A2B3C400000000000002E0 /* BudgetTimeView.swift */,
 				B0A0F000000000000000010B /* FilteredBudgetViews.swift */,
-				B0A0F000000000000000010D /* TimeMainBudgetView.swift */,
 				B0A0F000000000000000010F /* BudgetSteppers.swift */,
 			);
 			path = Budget;
@@ -1176,9 +1172,7 @@
 				B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */,
 				B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */,
 				B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */,
-				B0A0F000000000000000010A /* TimeBudgetView.swift in Sources */,
 				B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */,
-				B0A0F000000000000000010E /* TimeMainBudgetView.swift in Sources */,
 				B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */,
 				B0A0F0000000000000000112 /* LogInsightsViews.swift in Sources */,
 				B0A0F0000000000000000116 /* LogListViews.swift in Sources */,
@@ -1286,6 +1280,7 @@
 				E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */,
+				E1A2B3C400000000000002E1 /* BudgetTimeView.swift in Sources */,
 				E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000301 /* TransactionCategoryGrid.swift in Sources */,
@@ -1380,9 +1375,7 @@
 				D0C0FFEE0000000000000113 /* BudgetGraphs.swift in Sources */,
 				D0C0FFEE0000000000000114 /* BudgetAlerts.swift in Sources */,
 				D0C0FFEE0000000000000115 /* BudgetDetailViews.swift in Sources */,
-				D0C0FFEE0000000000000116 /* TimeBudgetView.swift in Sources */,
 				D0C0FFEE0000000000000117 /* FilteredBudgetViews.swift in Sources */,
-				D0C0FFEE0000000000000118 /* TimeMainBudgetView.swift in Sources */,
 				D0C0FFEE0000000000000119 /* BudgetSteppers.swift in Sources */,
 				D0C0FFEE000000000000011A /* LogInsightsViews.swift in Sources */,
 				D0C0FFEE000000000000011C /* LogListViews.swift in Sources */,
@@ -1486,6 +1479,7 @@
 				E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D2 /* TransactionRepeatButton.swift in Sources */,
+				E1A2B3C400000000000002E2 /* BudgetTimeView.swift in Sources */,
 				E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000302 /* TransactionCategoryGrid.swift in Sources */,

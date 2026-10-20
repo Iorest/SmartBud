@@ -2,15 +2,30 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-struct TimeBudgetView: View {
-    let budget: BudgetModel
+/// Budget detail (category or overall). Both used to be separate 290-line
+/// views that differed only in the model type, the header title and the tint.
+struct BudgetTimeView: View {
+    let amount: Double
+    let type: Int
+    /// Period start stored on the budget (not the day being browsed).
+    let budgetStart: Date
+    let endDate: Date
+    /// nil for the overall budget.
+    let category: CategoryModel?
+    let title: String
+    let emoji: String?
+
+    private var tintColor: Color {
+        guard let category else { return Color.accentColor }
+        return Color(hex: category.wrappedColour)
+    }
 
     var budgetAmount: Double {
-        return budget.amount
+        return amount
     }
 
     var budgetType: Int {
-        return Int(budget.type)
+        return type
     }
 
     @State var startDate = Date.now
@@ -47,7 +62,7 @@ struct TimeBudgetView: View {
         let calendar = Calendar.current
 
         if budgetType == 1 {
-            let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
+            let components = calendar.dateComponents([.hour], from: budgetStart, to: Date.now)
             return String.appFormatted("%lld hours left", 24 - (components.hour ?? 0))
         } else {
             return String.appFormatted("%lld days left", daysLeftNumber)
@@ -55,7 +70,7 @@ struct TimeBudgetView: View {
     }
 
     var subtitleText: String {
-        if budget.startDate == startDate {
+        if budgetStart == startDate {
             return timeLeft
         } else {
             return dateString
@@ -73,7 +88,7 @@ struct TimeBudgetView: View {
 
     var differenceSubtitle: String {
         if budgetAmount >= totalSpent {
-            if startDate == budget.startDate {
+            if startDate == budgetStart {
                 if budgetType == 1 {
                     return String.appLocalized("left today")
                 } else if budgetType == 2 {
@@ -92,15 +107,15 @@ struct TimeBudgetView: View {
                     dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
                     return String.appFormatted("left on %@", dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
-                    let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.day], from: startDate, to: budgetStart)
                     let weekString = String.appFormatted("%lld weeks ago", (components.day ?? 0) / 7)
                     return String.appFormatted("left %@", weekString)
                 } else if budgetType == 3 {
-                    let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.month], from: startDate, to: budgetStart)
                     let monthString = String.appFormatted("%lld months ago", components.month ?? 0)
                     return String.appFormatted("left %@", monthString)
                 } else if budgetType == 4 {
-                    let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.year], from: startDate, to: budgetStart)
                     let yearString = String.appFormatted("%lld years ago", components.year ?? 0)
                     return String.appFormatted("left %@", yearString)
                 } else {
@@ -108,7 +123,7 @@ struct TimeBudgetView: View {
                 }
             }
         } else {
-            if startDate == budget.startDate {
+            if startDate == budgetStart {
                 if budgetType == 1 {
                     return String.appLocalized("over today")
                 } else if budgetType == 2 {
@@ -127,15 +142,15 @@ struct TimeBudgetView: View {
                     dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
                     return String.appFormatted("over on %@", dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
-                    let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.day], from: startDate, to: budgetStart)
                     let weekString = String.appFormatted("%lld weeks ago", (components.day ?? 0) / 7)
                     return String.appFormatted("over %@", weekString)
                 } else if budgetType == 3 {
-                    let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.month], from: startDate, to: budgetStart)
                     let monthString = String.appFormatted("%lld months ago", components.month ?? 0)
                     return String.appFormatted("over %@", monthString)
                 } else if budgetType == 4 {
-                    let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
+                    let components = Calendar.current.dateComponents([.year], from: startDate, to: budgetStart)
                     let yearString = String.appFormatted("%lld years ago", components.year ?? 0)
                     return String.appFormatted("over %@", yearString)
                 } else {
@@ -153,19 +168,19 @@ struct TimeBudgetView: View {
         if budgetType == 1 {
             return 0
         } else if budgetType == 2 {
-            let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
+            let components = calendar.dateComponents([.day], from: budgetStart, to: Date.now)
             return 7 - (components.day ?? 0)
         } else if budgetType == 3 {
-            let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
+            let components1 = calendar.dateComponents([.day], from: budgetStart, to: endDate)
             let numberOfDays = components1.day!
-            let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
+            let components2 = calendar.dateComponents([.day], from: budgetStart, to: Date.now)
             let numberOfDaysPast = components2.day!
 
             return Int(numberOfDays - numberOfDaysPast)
         } else if budgetType == 4 {
-            let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
+            let components1 = calendar.dateComponents([.day], from: budgetStart, to: endDate)
             let numberOfDays = components1.day!
-            let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
+            let components2 = calendar.dateComponents([.day], from: budgetStart, to: Date.now)
             let numberOfDaysPast = components2.day!
             return Int(numberOfDays - numberOfDaysPast)
         } else {
@@ -183,7 +198,7 @@ struct TimeBudgetView: View {
 
     var showExtraDetails: Bool {
         if budgetType >= 2 {
-            return budget.startDate == startDate && totalSpent < budgetAmount && daysLeftNumber != 1
+            return budgetStart == startDate && totalSpent < budgetAmount && daysLeftNumber != 1
         } else {
             return false
         }
@@ -194,9 +209,11 @@ struct TimeBudgetView: View {
             // budget name and emoji and time left
             VStack(spacing: 10) {
                 HStack(spacing: 7.5) {
-                    Text(budget.wrappedEmoji)
-                        .font(.subheadline)
-                    Text(budget.wrappedName)
+                    if let emoji {
+                        Text(emoji)
+                            .font(.subheadline)
+                    }
+                    Text(title)
                         .font(.title3.weight(.medium))
                         .lineLimit(1)
                 }
@@ -252,9 +269,7 @@ struct TimeBudgetView: View {
 
             VStack(spacing: SBSpace.xs) {
                 ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
-                    .tint(totalSpent >= budgetAmount
-                          ? Color.AlertRed
-                          : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
+                    .tint(totalSpent >= budgetAmount ? Color.AlertRed : tintColor)
                     .accessibilityLabel(String.appLocalized("Spent"))
                     .accessibilityValue("\(Int(round((totalSpent / max(budgetAmount, 1)) * 100)))%")
 
@@ -276,25 +291,23 @@ struct TimeBudgetView: View {
                     .padding(.horizontal, 25)
             }
 
-            if let category = budget.category {
-                ScrollView(showsIndicators: false) {
-                    if budgetType == 1 {
-                        FilteredCategoryDayBudgetView(category: category, day: startDate, totalSpent: $totalSpent)
-                            .padding(.horizontal, 15)
-                    } else {
-                        FilteredBudgetView(category: category, startDate: startDate, totalSpent: $totalSpent, type: budgetType - 1)
-                            .padding(.horizontal, 15)
-                    }
+            ScrollView(showsIndicators: false) {
+                if budgetType == 1 {
+                    FilteredCategoryDayBudgetView(category: category, day: startDate, totalSpent: $totalSpent)
+                        .padding(.horizontal, 15)
+                } else {
+                    FilteredBudgetView(category: category, startDate: startDate, totalSpent: $totalSpent, type: budgetType - 1)
+                        .padding(.horizontal, 15)
                 }
-                .frame(maxHeight: .infinity)
-
-                BudgetStepperView(category: category, date: $startDate, startDate: budget.wrappedDate, budgetType: budgetType)
-                    .padding(.horizontal, 25)
             }
+            .frame(maxHeight: .infinity)
+
+            BudgetStepperView(category: category, date: $startDate, startDate: budgetStart, budgetType: budgetType)
+                .padding(.horizontal, 25)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
-            startDate = budget.wrappedDate
+            startDate = budgetStart
         }
     }
 }

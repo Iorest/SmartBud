@@ -49,7 +49,15 @@ struct DetailedBudgetView: View {
             }
             .padding(.horizontal, 20)
 
-            TimeBudgetView(budget: budget)
+            BudgetTimeView(
+                amount: budget.amount,
+                type: budget.type,
+                budgetStart: budget.wrappedDate,
+                endDate: budget.endDate,
+                category: budget.category,
+                title: budget.wrappedName,
+                emoji: budget.wrappedEmoji
+            )
         }
         .padding(.vertical, 15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -115,7 +123,15 @@ struct DetailedMainBudgetView: View {
             }
             .padding(.horizontal, 20)
 
-            TimeMainBudgetView(budget: budget)
+            BudgetTimeView(
+                amount: budget.amount,
+                type: budget.type,
+                budgetStart: budget.wrappedDate,
+                endDate: budget.endDate,
+                category: nil,
+                title: String.appLocalized("Overall Budget"),
+                emoji: nil
+            )
         }
         .padding(.vertical, 15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
