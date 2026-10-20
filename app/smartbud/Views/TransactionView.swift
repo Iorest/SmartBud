@@ -48,7 +48,6 @@ struct TransactionView: View {
     }
     @State private var repeatType = 0
     @State private var repeatCoefficient = 1
-    @State private var showRecurring = false
     @State var income = false
 
     var transactionTypeString: String {
@@ -103,12 +102,7 @@ struct TransactionView: View {
     var bottomEdge: Double = 15
 
 
-    let repeatOverlays = ["D", "W", "M"]
     let numberArray = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-
-    var repeatChar: String {
-        repeatOverlays[max(0, repeatType - 1)]
-    }
 
     func formattedAmount(_ amount: Double) -> String {
         "\(currencySymbol)\(Int(round(amount)))"
@@ -116,28 +110,6 @@ struct TransactionView: View {
 
     func chipColor(_ hex: String) -> Color {
         Color(hex: hex)
-    }
-
-    @ViewBuilder
-    var repeatIconWithOverlay: some View {
-        Image(systemName: "repeat")
-            .font(.subheadline.weight(.semibold))
-            
-            .overlay(alignment: .topTrailing) {
-                repeatOverlayText
-            }
-            .foregroundStyle(Color.IncomeGreen)
-            .padding(7)
-            .background(Color.IncomeGreen.opacity(0.23), in: Circle())
-            .contentShape(Circle())
-    }
-
-    var repeatOverlayText: some View {
-        Text(repeatChar)
-            .font(.system(size: 6, weight: .black))
-            .foregroundStyle(Color.IncomeGreen)
-            .frame(width: 10, alignment: .leading)
-            .offset(x: 5.7, y: 1.5)
     }
 
     @ViewBuilder
@@ -216,27 +188,11 @@ struct TransactionView: View {
                 .accessibilityLabel(String.appLocalized("delete transaction"))
             }
 
-            Button {
-                showRecurring = true
-            } label: {
-                if repeatType > 0 {
-                    repeatIconWithOverlay
-                } else {
-                    Image(systemName: "repeat")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color.SubtitleText)
-                        .padding(7)
-                        .background(Color.SecondaryBackground, in: Circle())
-                        .contentShape(Circle())
-                }
-            }
-            .accessibilityRemoveTraits(.isButton)
-            .accessibilityLabel(repeatButtonAccessibility)
-            .popover(isPresented: $showRecurring) {
-                RecurringPickerView(
-                    repeatType: $repeatType, repeatCoefficient: $repeatCoefficient,
-                    showMenu: $showRecurring, showPicker: $showPicker)
-            }
+            TransactionRepeatButton(
+                repeatType: $repeatType,
+                repeatCoefficient: $repeatCoefficient,
+                showPicker: $showPicker
+            )
         }
         .frame(maxWidth: .infinity)
     }
@@ -533,18 +489,6 @@ struct TransactionView: View {
         dateFormatter.locale = Locale.appLocale
         dateFormatter.dateFormat = "d MMM yyyy"
         return dateFormatter.string(from: date)
-    }
-
-    var repeatButtonAccessibility: String {
-        if repeatType == 1 {
-            return String.appLocalized("transaction recurs daily, button to edit recurring duration")
-        } else if repeatType == 2 {
-            return String.appLocalized("transaction recurs weekly, button to edit recurring duration")
-        } else if repeatType == 3 {
-            return String.appLocalized("transaction recurs monthly, button to edit recurring duration")
-        } else {
-            return String.appLocalized("button to make transaction recurring")
-        }
     }
 
     @AppStorage("colourScheme", store: .appGroup)
