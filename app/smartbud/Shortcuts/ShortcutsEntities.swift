@@ -53,7 +53,12 @@ struct IncomeCategoryQuery: EntityStringQuery {
         await MainActor.run {
             identifiers.compactMap { identifier in
                 if let match = CategoryViewModel.shared.findCategory(id: identifier) {
-                    return IncomeCategoryEntity(id: match.id, name: match.wrappedName, emoji: match.wrappedEmoji, income: match.income)
+                    return IncomeCategoryEntity(
+                        id: match.id,
+                        name: match.wrappedName,
+                        emoji: match.wrappedEmoji,
+                        income: match.income
+                    )
                 }
                 return nil
             }
@@ -115,7 +120,12 @@ struct ExpenseCategoryQuery: EntityStringQuery {
         await MainActor.run {
             identifiers.compactMap { identifier in
                 if let match = CategoryViewModel.shared.findCategory(id: identifier) {
-                    return ExpenseCategoryEntity(id: match.id, name: match.wrappedName, emoji: match.wrappedEmoji, income: match.income)
+                    return ExpenseCategoryEntity(
+                        id: match.id,
+                        name: match.wrappedName,
+                        emoji: match.wrappedEmoji,
+                        income: match.income
+                    )
                 }
                 return nil
             }

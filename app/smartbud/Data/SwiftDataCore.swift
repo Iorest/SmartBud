@@ -66,6 +66,44 @@ final class DataRepository {
     ])
 
     init() {
+        let built = Self.makeContainer()
+        // Staged deletes rely on `rollback()` to restore a row. Autosave would
+        // commit the pending delete behind our back (usually before the user
+        // taps "Undo"), so persistence must be explicit via `save()`.
+        built.container.mainContext.autosaveEnabled = false
+        container = built.container
+        fallbackReason = built.reason
+    }
+
+    /// Local-only store: works on simulators and devices without the App
+    /// Group entitlement (preview builds, store-less test runs).
+    private static func localContainer() -> ModelContainer? {
+        try? ModelContainer(
+            for: Self.schema,
+            configurations: ModelConfiguration(Self.storeName)
+        )
+    }
+
+    /// Last resort: data won't persist or sync, but the app launches instead
+    /// of crashing on a corrupted store. The user sees the fallback banner.
+    private static func memoryContainer() -> ModelContainer? {
+        try? ModelContainer(
+            for: Self.schema,
+            configurations: ModelConfiguration(
+                Self.storeName,
+                isStoredInMemoryOnly: true
+            )
+        )
+    }
+
+    private struct BootResult {
+        let container: ModelContainer
+        let reason: FallbackReason?
+    }
+
+    /// Tries App Group + CloudKit, then a local store, then in-memory, so the
+    /// app still launches when the preferred store is unavailable.
+    private static func makeContainer() -> BootResult {
         var container: ModelContainer!
         var reason: FallbackReason?
 
@@ -114,30 +152,12 @@ final class DataRepository {
             reason = .appGroupUnavailable
         }
 
-        // 2. Local-only on-device store. Works on simulators and
-        //    devices without the App Group entitlement (e.g. preview
-        //    builds, store-less test runs).
-        if container == nil,
-           let local = try? ModelContainer(
-               for: Self.schema,
-               configurations: ModelConfiguration(Self.storeName)
-           ) {
+        // 2. Local-only on-device store, then 3. an in-memory store.
+        if container == nil, let local = Self.localContainer() {
             container = local
             if reason == nil { reason = .appGroupUnavailable }
         }
-
-        // 3. Last resort: in-memory store. Data won't persist or sync,
-        //    but the app launches instead of crashing on a corrupted
-        //    on-disk store. The user sees the fallback banner and can
-        //    reinstall or open another device to recover.
-        if container == nil,
-           let memoryOnly = try? ModelContainer(
-               for: Self.schema,
-               configurations: ModelConfiguration(
-                   Self.storeName,
-                   isStoredInMemoryOnly: true
-               )
-           ) {
+        if container == nil, let memoryOnly = Self.memoryContainer() {
             container = memoryOnly
             reason = .storageCorrupted
         }
@@ -149,12 +169,7 @@ final class DataRepository {
         guard let container else {
             fatalError("DataRepository: every ModelContainer init attempt failed")
         }
-        // Staged deletes rely on `rollback()` to restore a row. Autosave would
-        // commit the pending delete behind our back (usually before the user
-        // taps "Undo"), so persistence must be explicit via `save()`.
-        container.mainContext.autosaveEnabled = false
-        self.container = container
-        self.fallbackReason = reason
+        return BootResult(container: container, reason: reason)
     }
 
     // MARK: - Convenience accessors

@@ -2,6 +2,28 @@ import SwiftUI
 import SwiftData
 import Observation
 
+/// Values written when creating or editing a transaction.
+struct TransactionEdit {
+    let note: String
+    let category: CategoryModel?
+    let income: Bool
+    let amount: Double
+    let date: Date
+    let repeatType: Int
+    let repeatCoefficient: Int
+}
+
+/// Values written when saving a quick-add template.
+struct TemplateDefinition {
+    let order: Int
+    let note: String
+    let category: CategoryModel?
+    let income: Bool
+    let amount: Double
+    let repeatType: Int
+    let repeatCoefficient: Int
+}
+
 @MainActor
 @Observable
 final class TransactionViewModel {
@@ -11,13 +33,13 @@ final class TransactionViewModel {
     // MARK: Transaction Creation
 
     @discardableResult
-    func create(note: String, category: CategoryModel?, income: Bool, amount: Double,
-                date: Date = .now, repeatType: Int = 0, repeatCoefficient: Int = 0) -> TransactionModel {
-        let txn = TransactionModel(note: note, category: category, income: income,
-                                   amount: amount, date: date,
-                                   repeatType: repeatType, repeatCoefficient: repeatCoefficient)
+    func create(_ edit: TransactionEdit) -> TransactionModel {
+        let txn = TransactionModel(note: edit.note, category: edit.category,
+                                   income: edit.income, amount: edit.amount, date: edit.date,
+                                   repeatType: edit.repeatType,
+                                   repeatCoefficient: edit.repeatCoefficient)
         repo.insert(txn)
-        if repeatType > 0 { processRecurring(txn) }
+        if edit.repeatType > 0 { processRecurring(txn) }
         repo.save()
         // Fire-in-app review prompt at the 3rd, 10th, and 25th
         // transaction. Apple's StoreKit caps the prompt itself at
@@ -30,29 +52,27 @@ final class TransactionViewModel {
 
     /// Edits an existing transaction in place. Computes `day` / `month` derived fields
     /// from `date` and re-processes recurring transactions if `repeatType > 0`.
-    func update(_ txn: TransactionModel, note: String, category: CategoryModel?,
-                income: Bool, amount: Double, date: Date,
-                repeatType: Int, repeatCoefficient: Int) {
-        txn.note = note
-        txn.category = category
-        txn.amount = amount
-        txn.date = date
-        txn.income = income
+    func update(_ txn: TransactionModel, with edit: TransactionEdit) {
+        txn.note = edit.note
+        txn.category = edit.category
+        txn.amount = edit.amount
+        txn.date = edit.date
+        txn.income = edit.income
 
         let calendar = Calendar(identifier: .gregorian)
-        txn.day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: date) ?? Date.now
-        let dateComponents = calendar.dateComponents([.month, .year], from: date)
+        txn.day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: edit.date) ?? Date.now
+        let dateComponents = calendar.dateComponents([.month, .year], from: edit.date)
         txn.month = calendar.date(from: dateComponents) ?? Date.now
 
-        if repeatType > 0 {
+        if edit.repeatType > 0 {
             txn.onceRecurring = true
-            txn.recurringType = repeatType
-            txn.recurringCoefficient = repeatCoefficient
+            txn.recurringType = edit.repeatType
+            txn.recurringCoefficient = edit.repeatCoefficient
             processRecurring(txn)
         } else {
             txn.onceRecurring = false
-            txn.recurringType = repeatType
-            txn.recurringCoefficient = repeatCoefficient
+            txn.recurringType = edit.repeatType
+            txn.recurringCoefficient = edit.repeatCoefficient
         }
         repo.save()
     }
@@ -108,29 +128,36 @@ final class TransactionViewModel {
 
     func applyTemplate(_ order: Int) {
         guard let tmpl = getTemplate(order), let cat = tmpl.category else { return }
-        create(note: tmpl.wrappedNote, category: cat, income: tmpl.income,
-               amount: tmpl.wrappedAmount, repeatType: tmpl.recurringType,
-               repeatCoefficient: tmpl.recurringCoefficient)
+        create(TransactionEdit(
+            note: tmpl.wrappedNote,
+            category: cat,
+            income: tmpl.income,
+            amount: tmpl.wrappedAmount,
+            date: .now,
+            repeatType: tmpl.recurringType,
+            repeatCoefficient: tmpl.recurringCoefficient
+        ))
     }
 
     /// All templates ordered by `order` (used by the quick-add widget editor).
     /// Inserts a new template at `order`, or updates the existing template at that `order`.
     @discardableResult
-    func createOrUpdateTemplate(order: Int, note: String, category: CategoryModel?, income: Bool,
-                                amount: Double, repeatType: Int, repeatCoefficient: Int) -> TemplateTransactionModel {
+    func createOrUpdateTemplate(_ template: TemplateDefinition) -> TemplateTransactionModel {
+        let order = template.order
         if let existing = getTemplate(order) {
-            existing.note = note
-            existing.category = category
-            existing.income = income
-            existing.amount = amount
-            existing.recurringType = repeatType
-            existing.recurringCoefficient = repeatCoefficient
+            existing.note = template.note
+            existing.category = template.category
+            existing.income = template.income
+            existing.amount = template.amount
+            existing.recurringType = template.repeatType
+            existing.recurringCoefficient = template.repeatCoefficient
             repo.save()
             return existing
         } else {
-            let tmpl = TemplateTransactionModel(note: note, category: category, income: income,
-                                                amount: amount, order: order,
-                                                repeatType: repeatType, repeatCoefficient: repeatCoefficient)
+            let tmpl = TemplateTransactionModel(note: template.note, category: template.category,
+                                                income: template.income, amount: template.amount,
+                                                order: order, repeatType: template.repeatType,
+                                                repeatCoefficient: template.repeatCoefficient)
             repo.insert(tmpl)
             repo.save()
             return tmpl

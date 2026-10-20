@@ -12,8 +12,9 @@ import SwiftUI
 struct GetInsightsIntent: AppIntent {
     static let title: LocalizedStringResource = "Get Insights"
 
-    static let description =
-        IntentDescription(LocalizedStringResource("Extracts your total expenditure or income for a particular time period"))
+    static let description = IntentDescription(
+        LocalizedStringResource("Extracts your total expenditure or income for a particular time period")
+    )
 
     @Parameter(
         title: LocalizedStringResource("Type"),
@@ -32,14 +33,18 @@ struct GetInsightsIntent: AppIntent {
     @Parameter(
         title: LocalizedStringResource("Category Filters"),
         description: LocalizedStringResource("Additional Category Filters"),
-        requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?"))
+        requestValueDialog: IntentDialog(
+            LocalizedStringResource("Which additional category filters do you want to impose?")
+        )
     )
     var incomeCategories: [IncomeCategoryEntity]?
 
     @Parameter(
         title: LocalizedStringResource("Category Filters"),
         description: LocalizedStringResource("Additional Category Filters"),
-        requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?"))
+        requestValueDialog: IntentDialog(
+            LocalizedStringResource("Which additional category filters do you want to impose?")
+        )
     )
     var expenseCategories: [ExpenseCategoryEntity]?
 
@@ -77,7 +82,12 @@ struct GetInsightsIntent: AppIntent {
             typeInt = 3
         }
 
-        let result = InsightsViewModel.shared.getShortcutInsights(type: typeInt, timeframe: timeframe.rawValue, optionalIncome: optionalIncome, categories: categories)
+        let result = InsightsViewModel.shared.getShortcutInsights(
+            type: typeInt,
+            timeframe: timeframe.rawValue,
+            optionalIncome: optionalIncome,
+            categories: categories
+        )
 
         return .result(value: result, dialog: IntentDialog(LocalizedStringResource("Here you go!"))) {
             ShortcutInsightsView(amount: result, type: type, timeframe: timeframe)

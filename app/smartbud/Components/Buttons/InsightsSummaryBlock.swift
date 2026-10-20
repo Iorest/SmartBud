@@ -20,7 +20,7 @@ struct InsightsSummaryBlockView: View {
     }
 
     var body: some View {
-        HStack(spacing: SBSpace.xs) {
+        HStack(spacing: SBSpace.extraSmall) {
             Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(color)

@@ -80,10 +80,13 @@ struct LLMProviderTests {
 
     @Test("Remote providers require an API key")
     func remoteRequiresKey() {
-        #expect(LLMProvider.openAI.isConfigured(baseURL: "https://api.openai.com/v1", model: "gpt-4o-mini", apiKey: "") == false)
-        #expect(LLMProvider.openAI.isConfigured(baseURL: "https://api.openai.com/v1", model: "gpt-4o-mini", apiKey: "sk-test"))
+        #expect(LLMProvider.openAI
+            .isConfigured(baseURL: "https://api.openai.com/v1", model: "gpt-4o-mini", apiKey: "") == false)
+        #expect(LLMProvider.openAI
+            .isConfigured(baseURL: "https://api.openai.com/v1", model: "gpt-4o-mini", apiKey: "sk-test"))
         #expect(LLMProvider.openAI.isConfigured(baseURL: "", model: "gpt-4o-mini", apiKey: "sk-test") == false)
-        #expect(LLMProvider.openAI.isConfigured(baseURL: "https://api.openai.com/v1", model: " ", apiKey: "sk-test") == false)
+        #expect(LLMProvider.openAI
+            .isConfigured(baseURL: "https://api.openai.com/v1", model: " ", apiKey: "sk-test") == false)
     }
 
     @Test("Custom endpoints keep an optional key field")

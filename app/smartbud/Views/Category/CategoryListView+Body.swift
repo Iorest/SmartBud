@@ -1,0 +1,386 @@
+//
+//  CategoryListView+Body.swift
+//  smartbud
+//
+import CoreHaptics
+import Foundation
+import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#else
+import AppKit
+#endif
+
+extension CategoryListView {
+
+    var body: some View {
+        VStack(spacing: 5) {
+            if showToast {
+                SBToast(title: toastTitle, systemImage: toastImage, positive: positive)
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .padding(20)
+            } else {
+                if mode == .welcome {
+                    HStack(spacing: 8) {
+                        if categories.count > 1 {
+                            if isEditing {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.callout.weight(.semibold))
+
+                                                .foregroundStyle(Color.IncomeGreen)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Done"))
+                            } else {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.callout.weight(.semibold))
+
+                                                .foregroundStyle(Color.SubtitleText)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
+                            }
+                        }
+
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.callout.weight(.semibold))
+
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String
+                            .appLocalized("Show suggestions"))
+
+                        Spacer()
+
+                        Button {
+                            if allCategories.count > 0 {
+                                dismiss()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(!allCategories.isEmpty ? Color.IncomeGreen.opacity(0.23) : Color.clear)
+                                .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                .overlay {
+                                    ZStack {
+                                        Image(systemName: "arrow.right")
+                                            .font(.callout.weight(.semibold))
+
+                                            .foregroundStyle(
+                                                !allCategories.isEmpty ? Color.IncomeGreen : Color.Outline.opacity(0.8)
+                                            )
+
+                                        if allCategories.count == 0 {
+                                            Circle()
+                                                .stroke(Color.Outline.opacity(0.4), lineWidth: 1.3)
+                                                .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                        }
+                                    }
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String.appLocalized("Continue"))
+                    }
+                    .frame(height: 35)
+                    .frame(maxWidth: .infinity)
+                    .overlay {
+                        Text(String.appLocalized("Categories"))
+                            .font(.title3.weight(.medium))
+
+                    }
+                    .padding(20)
+
+                } else {
+                    HStack(spacing: 8) {
+                        if mode == .settings {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Circle()
+                                    .fill(Color.SecondaryBackground)
+                                    .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                    .overlay {
+                                        Image(systemName: "chevron.left")
+                                            .font(.body.weight(.semibold))
+
+                                            .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String.appLocalized("Back"))
+                        } else {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Circle()
+                                    .fill(Color.SecondaryBackground)
+                                    .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                    .overlay {
+                                        Image(systemName: "chevron.down")
+                                            .font(.body.weight(.semibold))
+
+                                            .foregroundStyle(Color.SubtitleText)
+                                            .offset(y: 0.8)
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(String.appLocalized("Close"))
+                        }
+
+                        Spacer()
+
+                        Button {
+                            withAnimation {
+                                showSuggestions.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(Color.SecondaryBackground)
+                                .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                .overlay {
+                                    Image(systemName: showSuggestions ? "eye.slash" : "eye")
+                                        .font(.callout.weight(.semibold))
+
+                                        .foregroundStyle(Color.SubtitleText)
+                                        .offset(y: 0.8)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(showSuggestions ? String.appLocalized("Hide suggestions") : String
+                            .appLocalized("Show suggestions"))
+
+                        if categories.count > 1 {
+                            if isEditing {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.IncomeGreen.opacity(0.23))
+                                        .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                        .overlay {
+                                            Image(systemName: "checkmark")
+                                                .font(.callout.weight(.semibold))
+
+                                                .foregroundStyle(Color.IncomeGreen)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Done"))
+                            } else {
+                                Button {
+                                    withAnimation {
+                                        isEditing.toggle()
+                                    }
+                                } label: {
+                                    Circle()
+                                        .fill(Color.SecondaryBackground)
+                                        .frame(width: 33, height: 33)
+                                        .contentShape(Rectangle().inset(by: -5.5))
+                                        .overlay {
+                                            Image(systemName: "arrow.up.arrow.down")
+                                                .font(.callout.weight(.semibold))
+
+                                                .foregroundStyle(Color.SubtitleText)
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String.appLocalized("Reorder categories"))
+                            }
+                        }
+                    }
+                    .frame(height: 35)
+                    .frame(maxWidth: .infinity)
+                    .overlay {
+                        Text(String.appLocalized("Categories"))
+                            .font(.title3.weight(mode == .settings ? .semibold : .medium))
+
+                    }
+                    .padding(20)
+                }
+            }
+
+            VStack {
+                    List {
+                        Section(header: Text(sectionHeader).foregroundStyle(Color.SubtitleText)) {
+                            if categories.isEmpty {
+                                VStack(spacing: 10) {
+                                    Image(systemName: "tray")
+                                        .font(.largeTitle.weight(.light))
+
+                                        .foregroundStyle(Color.SubtitleText)
+
+                                    Group {
+                                        if income {
+                                            Text(LocalizedStringKey("no_income_categories"))
+                                        } else {
+                                            Text(LocalizedStringKey("no_expense_categories"))
+                                        }
+                                    }
+                                    .font(.body.weight(.medium))
+
+                                    .multilineTextAlignment(.center)
+                                    .foregroundStyle(Color.SubtitleText)
+
+                                    Button(String.appLocalized("添加常用分类")) {
+                                        categoryVM.seedStarterCategories()
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .padding(.top, SBSpace.xxs)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 37)
+                                .listRowBackground(Color.SettingsBackground)
+                            } else {
+                                ForEach(categories) { category in
+                                    HStack(spacing: 10) {
+                                        Text(category.wrappedEmoji)
+                                            .font(.subheadline)
+
+                                        Text(category.wrappedName)
+                                            .font(.body)
+
+                                            .lineLimit(1)
+                                            .foregroundStyle(toDelete == category ? Color.AlertRed : Color.PrimaryText)
+
+                                        Spacer()
+
+                                        if !income {
+                                            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
+                                                .fill(Color(hex: category.wrappedColour))
+                                                .frame(width: 20, height: 20)
+                                        }
+                                    }
+                                    .padding(.vertical, 5)
+                                    .listRowBackground(Color.SettingsBackground)
+                                    .listRowSeparatorTint(Color.Outline)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        if let onSelect {
+                                            onSelect(category)
+                                        } else {
+                                            toEdit = category
+                                        }
+                                    }
+                                    .accessibilityAddTraits(.isButton)
+                                    .swipeActions(edge: .trailing) {
+                                        Button {
+                                            toDelete = category
+                                        } label: {
+                                            Image(systemName: "trash.fill")
+                                        }
+                                        .tint(Color.AlertRed)
+                                    }
+                                    .swipeActions(edge: .leading) {
+                                        Button {
+                                            toEdit = category
+                                        } label: {
+                                            Image(systemName: "pencil")
+                                        }
+                                        .tint(Color("Yellow"))
+                                    }
+                                }
+                                .onMove(perform: moveItem)
+                            }
+
+                        }
+
+                        if showSuggestions {
+                            SuggestedCategoriesView(income: income)
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.hidden)
+                    #if os(iOS)
+                    .environment(\.editMode, .constant(self.isEditing ? EditMode.active : EditMode.inactive))
+                    #endif
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(.clear)
+        .animation(.easeOut(duration: 0.2), value: showToast)
+        .onChange(of: toDelete) { _, _ in
+            if toDelete != nil {
+                deleteMode = true
+            }
+        }
+        .fullScreenPresentation(isPresented: $deleteMode) {
+            SBDeleteSheet(
+                title: String.appFormatted("Delete '%@'?", toDelete?.wrappedName ?? ""),
+                message: String(
+                    format: String.appLocalized(
+                        "This action cannot be undone. %@ transactions are kept and become uncategorized."),
+                    toDelete?.wrappedName ?? ""
+                )
+            ) {
+                if let gonnaDelete = toDelete {
+                    withAnimation { categoryVM.delete(gonnaDelete) }
+                }
+                deleteMode = false
+                toDelete = nil
+            }
+        }
+        .sheet(item: $toEdit) { category in
+                EditCategoryAlert(
+                    toEdit: category,
+                    showRootToast: $showToast,
+                    rootToastTitle: $toastTitle,
+                    rootToastImage: $toastImage,
+                    positive: $positive,
+                    bottomSpacers: false
+                )
+                    .presentationDetents([.medium, .large])
+        }
+        .sbToastDismissal($showToast)
+        .onChange(of: showSuggestions) { _, newValue in
+            if !newValue {
+                toastTitle = String.appLocalized("Suggestions Hidden")
+                toastImage = "eye.slash"
+                showToast = true
+                positive = true
+            }
+        }
+    }
+}

@@ -39,7 +39,7 @@ struct SettingsEraseView: View {
       Button {
         showAlert = true
       } label: {
-        HStack(spacing: SBSpace.xs) {
+        HStack(spacing: SBSpace.extraSmall) {
           Image(systemName: "trash.fill")
           Text(String.appLocalized("Permanently Delete Everything"))
           Spacer(minLength: 0)
@@ -58,7 +58,8 @@ struct SettingsEraseView: View {
       .accessibilityHint(Text(String.appLocalized("This action genuinely cannot be undone.")))
 
       Text(
-        String.appLocalized("This action would delete all existing transactions, categories, and budgets, and cannot be undone.")
+        String.appLocalized("This action would delete all existing transactions, "
+             + "categories, and budgets, and cannot be undone.")
       )
       .font(.caption.weight(.medium))
       .multilineTextAlignment(.leading)
@@ -68,7 +69,8 @@ struct SettingsEraseView: View {
 
       // 5.1.1(v) hint: data also lives in the user's iCloud.
       Text(
-        String.appLocalized("Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers.")
+        String.appLocalized("Erasing also removes your data from iCloud. If you're not signed "
+             + "in, the next online sync will clear it on Apple's servers.")
       )
       .font(.caption.weight(.regular))
       .multilineTextAlignment(.leading)
@@ -138,7 +140,7 @@ struct DeleteAllAlert: View {
         Button(role: .destructive) {
           showEraseConfirmation = true
         } label: {
-          HStack(spacing: SBSpace.xs) {
+          HStack(spacing: SBSpace.extraSmall) {
             if isWiping {
               ProgressView().tint(.white)
             } else {

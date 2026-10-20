@@ -20,6 +20,14 @@ struct LogInsightsView: View {
         insightsVM.logInsightsData(timeframe: timeframe, insightsType: insightsType)
     }
 
+    /// Spoken summary for the card: heading, amount and currency.
+    private var accessibilitySummary: String {
+        let amount = data.amount.formatted(
+            .number.precision(.fractionLength(showCents ? 2 : 0))
+        )
+        return "\(data.headingText) \(amount) \(currencySymbol)"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: SBSpace.xxs) {
             if dynamicTypeSize.isAccessibilitySize {
@@ -46,10 +54,10 @@ struct LogInsightsView: View {
                 currencySymbol: currencySymbol
             )
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(data.headingText) \(data.amount, format: .number.precision(.fractionLength(showCents ? 2 : 0))) \(currencySymbol)")
+            .accessibilityLabel(accessibilitySummary)
 
             if data.totalSpent != 0 && data.totalIncome != 0 && insightsType == 1 {
-                HStack(spacing: SBSpace.xs) {
+                HStack(spacing: SBSpace.extraSmall) {
                     Text(data.formattedIncome)
                         .font(.subheadline.monospacedDigit())
                         .foregroundStyle(Color.IncomeGreen)

@@ -45,7 +45,12 @@ struct ColourPickerView: View {
                     } label: {
                         ZStack {
                             RoundedRectangle(cornerRadius: SBRadius.chip)
-                                .fill(AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]), center: .center))
+                                .fill(
+            AngularGradient(
+                gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .pink]),
+                center: .center
+            )
+        )
 
                             RoundedRectangle(cornerRadius: SBRadius.pill)
                                 .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
@@ -102,10 +107,12 @@ struct ColourPickerView: View {
                 .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
                 .shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6)
         )
-        .overlay(RoundedRectangle(cornerRadius: SBRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .overlay(RoundedRectangle(cornerRadius: SBRadius.chip)
+            .stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 
-    init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>, expenseCategories: [CategoryModel], toEdit: CategoryModel? = nil) {
+    init(selectedColor: Binding<String>, showMenu: Binding<Bool>, showNativePicker: Binding<Bool>,
+         expenseCategories: [CategoryModel], toEdit: CategoryModel? = nil) {
         _selectedColour = selectedColor
         _showMenu = showMenu
         _showNativePicker = showNativePicker

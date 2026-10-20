@@ -17,17 +17,17 @@ struct TransactionView: View {
     @AppStorage("topEdge", store: .appGroup) var topEdge:
     Double = 20
 
-    @State private var note = ""
+    @State var note = ""
     @State var category: CategoryModel?
-    @State private var date = Date.now
-    @State private var showSmartEntry = false
+    @State var date = Date.now
+    @State var showSmartEntry = false
     /// Non-empty draft → Cancel asks before discarding (HIG error tolerance).
-    @State private var showDiscardConfirmation = false
+    @State var showDiscardConfirmation = false
 
     /// True when closing would throw away work. New entries count once any
     /// field is filled; edits count only once a field actually changed, so
     /// opening and closing an existing transaction never nags.
-    private var hasDraft: Bool {
+    var hasDraft: Bool {
         if let toEdit {
             return padVM.price != toEdit.wrappedAmount
                 || note != toEdit.wrappedNote
@@ -37,8 +37,8 @@ struct TransactionView: View {
         }
         return padVM.price > 0 || !note.isEmpty || category != nil
     }
-    @State private var repeatType = 0
-    @State private var repeatCoefficient = 1
+    @State var repeatType = 0
+    @State var repeatCoefficient = 1
     @State var income = false
 
     @State var showCategoryPicker = false
@@ -58,10 +58,10 @@ struct TransactionView: View {
     @State var toastImage = ""
 
     // sensory feedback triggers
-    @State private var errorHaptic = 0
-    @State private var isSubmitting = false
-    @State private var successHaptic = 0
-    @State private var lightHaptic = 0
+    @State var errorHaptic = 0
+    @State var isSubmitting = false
+    @State var successHaptic = 0
+    @State var lightHaptic = 0
 
     // shaking category error
     @State var categoryButtonTextColor = Color.SubtitleText
@@ -128,7 +128,7 @@ struct TransactionView: View {
         usesLargeTextLayout ? 140 : 100
     }
 
-    @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
+    @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
     @AppStorage("numberEntryType", store: .appGroup)
     var numberEntryType: Int = 1
 
@@ -190,7 +190,7 @@ struct TransactionView: View {
 
     /// Fills the form from a smart-entry parse result. Nothing is saved here —
     /// the user still submits the form themselves.
-    private func applyParsed(_ parsed: ParsedExpense) {
+    func applyParsed(_ parsed: ParsedExpense) {
         income = parsed.isIncome
         padVM.price = Money.double(parsed.amount)
         if note.isEmpty, let merchant = parsed.merchant {
@@ -235,8 +235,7 @@ struct TransactionView: View {
                 finalNote = trimmedNote
             }
 
-            transactionVM.update(
-                editedTransaction,
+            transactionVM.update(editedTransaction, with: TransactionEdit(
                 note: finalNote,
                 category: category,
                 income: income,
@@ -244,14 +243,14 @@ struct TransactionView: View {
                 date: date,
                 repeatType: repeatType,
                 repeatCoefficient: repeatCoefficient
-            )
+            ))
 
             dismiss()
 
             return
         }
 
-        transactionVM.create(
+        transactionVM.create(TransactionEdit(
             note: note.trimmingCharacters(in: .whitespacesAndNewlines) == ""
                 ? (category?.wrappedName ?? "") : note.trimmingCharacters(in: .whitespaces),
             category: category,
@@ -260,7 +259,7 @@ struct TransactionView: View {
             date: date,
             repeatType: repeatType,
             repeatCoefficient: repeatCoefficient
-        )
+        ))
 
         // Reset pad state (price / decimal / haptic trigger) for the next
         // entry. The pad's submit button also clears the VM via `vm.submit()`,
@@ -297,558 +296,4 @@ struct TransactionView: View {
 
         toEdit = nil
     }
-}
-
-extension TransactionView {
-
-    var body: some View {
-        GeometryReader { proxy in
-            VStack(spacing: 8) {
-                // income/expense picker
-                headerArea
-
-                swipeAndNumberPadArea
-
-                suggestionsOrDateCategoryRow
-
-                // date and category picker
-                categoryPickerOrNumberPad
-
-            }
-            .padding(17)
-            // Cap the entry layout on iPad/Mac so the keypad doesn't stretch
-            // edge to edge; centred by the outer frame.
-            .frame(width: min(proxy.size.width, 560), height: proxy.size.height)
-            .frame(maxWidth: .infinity)
-            .background(Color.clear)
-            .onTapGesture {
-                self.hideKeyboard()
-            }
-            .overlay {
-                datePickerOverlay
-            }
-        }
-
-        .animation(.easeOut(duration: 0.2), value: showToast)
-        .appBackground()
-        #if os(macOS)
-        // A sheet has no intrinsic size; the entry screen is a fixed
-        // calculator-like surface, so give it one.
-        .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
-        #else
-        .ignoresSafeArea(.keyboard, edges: .all)
-        .frame(maxHeight: .infinity)
-        .ignoresSafeArea(.all)
-        #endif
-        .overlay {
-            if deleteMode {
-                TransactionDeleteConfirmation(
-                    income: toDelete?.income ?? income,
-                    bottomEdge: bottomEdge,
-                    onDelete: {
-                        deleteMode = false
-                        withAnimation {
-                            if let itemToDelete = toDelete {
-                                transactionVM.delete(itemToDelete)
-                            }
-                        }
-                        dismiss()
-                    },
-                    onCancel: {
-                        withAnimation(.easeOut(duration: 0.7)) {
-                            deleteMode = false
-                            toDelete = nil
-                        }
-                    }
-                )
-                    .transition(.opacity)
-            }
-        }
-        .animation(.easeOut(duration: 0.2), value: deleteMode)
-        // Control-dense surface (keypad + fixed rows). Let text grow to the
-        // first accessibility size, then stop: beyond that the keypad and the
-        // date/category row cannot fit on a phone. Documented exception to
-        // unlimited scaling, same approach as Apple's Calculator.
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .sbToastDismissal($showToast)
-        .onChange(of: income) { _, newValue in
-            lightHaptic &+= 1
-            // Only drop a category that belongs to the other side; clearing
-            // unconditionally wiped the category when editing an income
-            // transaction (onAppear sets `income` after `category`).
-            if let category, category.income != newValue {
-                self.category = nil
-            }
-        }
-        .onChange(of: numberEntryType) { _, new in
-            padVM.numberEntryType = new
-        }
-        .onChange(of: isDragging) { _, _ in
-            if !isDragging {
-                if income {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        swipingOffset = capsuleWidth
-                    }
-                } else {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        swipingOffset = 0
-                    }
-                }
-            }
-        }
-        .onAppear {
-            categoryVM.load()
-            // The init can't read `capsuleWidth`, so re-align the income
-            // capsule once the environment (and its type size) is known.
-            if income {
-                swipingOffset = capsuleWidth
-            }
-            // Sync the pad's numberEntryType with the AppStorage flag at the
-            // moment the view first appears. Subsequent changes are picked up
-            // by the `.onChange(of: numberEntryType)` modifier above.
-            padVM.numberEntryType = numberEntryType
-            DispatchQueue.main.async {
-                if let transaction = toEdit {
-                    repeatType = Int(transaction.recurringType)
-                    repeatCoefficient = Int(transaction.recurringCoefficient)
-                    padVM.price = transaction.wrappedAmount
-
-                    if transaction.wrappedAmount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
-                        padVM.isEditingDecimal = true
-                    }
-
-                    if transaction.wrappedDate > Date.now {
-                        animateIcon = true
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $showCategorySheet) {
-            CategoryView(mode: .transaction, income: income) { selected in
-                category = selected
-                // Picking a category also clears a pending "missing
-                // category" highlight left over from a failed submit.
-                categoryButtonTextColor = Color.SubtitleText
-                categoryButtonBackgroundColor = Color.clear
-                categoryButtonOutlineColor = Color.Outline
-            }
-        }
-        .sheet(isPresented: $showSmartEntry) {
-            SmartEntrySheet(
-                expenseCategories: categoryVM.expenseCategories,
-                incomeCategories: categoryVM.incomeCategories
-            ) { parsed in
-                applyParsed(parsed)
-            }
-        }
-        .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
-            Button(String.appLocalized("Keep Editing"), role: .cancel) {}
-            Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
-        }
-        .sheet(isPresented: $showPicker) {
-                CustomRecurringView(
-                    repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker
-                )
-                .presentationDetents([.medium, .large])
-        }
-        .onChange(of: dynamicTypeSize) { _, _ in
-            if income {
-                swipingOffset = capsuleWidth
-            }
-        }
-        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
-        .sensoryFeedback(.error, trigger: errorHaptic)
-        .sensoryFeedback(.success, trigger: successHaptic)
-    }
-}
-
-extension TransactionView {
-
-    func formattedAmount(_ amount: Double) -> String {
-        "\(currencySymbol)\(Int(round(amount)))"
-    }
-
-    func chipColor(_ hex: String) -> Color {
-        Color(hex: hex)
-    }
-
-    @ViewBuilder
-    func suggestedTransactionLabel(_ transaction: TransactionModel) -> some View {
-        HStack(spacing: 3) {
-            Text(transaction.wrappedNote)
-                .foregroundStyle(Color.PrimaryText)
-                .lineLimit(1)
-                .padding(.vertical, 3.5)
-                .padding(.horizontal, 7)
-
-            suggestedAmountChip(transaction)
-        }
-        .font(.body.weight(.semibold))
-        .padding(5)
-        .background(
-            Color.SecondaryBackground,
-            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous))
-    }
-
-    @ViewBuilder
-    func suggestedAmountChip(_ transaction: TransactionModel) -> some View {
-        let color = chipColor(transaction.wrappedColour)
-        Text(formattedAmount(transaction.wrappedAmount))
-            .lineLimit(1)
-            .foregroundStyle(color)
-            .padding(.vertical, 3.5)
-            .padding(.horizontal, 5)
-            .background(
-                color.opacity(0.23),
-                in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous))
-    }
-
-    @ViewBuilder
-    var deleteButtonIcon: some View {
-        Image(systemName: "trash.fill")
-            .font(.subheadline.weight(.semibold))
-
-            .foregroundStyle(Color.AlertRed)
-            .padding(7)
-            .background(Color.AlertRed.opacity(0.23), in: Circle())
-            .contentShape(Circle())
-    }
-
-    @ViewBuilder
-    var topBarButtons: some View {
-        HStack {
-            // HIG: modals with user input get an explicit Cancel, not "×".
-            // Accidental dismissal of a draft asks before discarding.
-            Button {
-                if hasDraft {
-                    showDiscardConfirmation = true
-                } else {
-                    dismiss()
-                }
-            } label: {
-                Text(String.appLocalized("Cancel"))
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.PrimaryText)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 4)
-                    .contentShape(Rectangle())
-            }
-            .accessibilityLabel(Text(String.appLocalized("Cancel")))
-
-            Spacer()
-
-            if toEdit != nil {
-                Button {
-                    toDelete = toEdit
-                    deleteMode = true
-
-                } label: {
-                    deleteButtonIcon
-                }
-                .accessibilityLabel(String.appLocalized("delete transaction"))
-            }
-
-            TransactionRepeatButton(
-                repeatType: $repeatType,
-                repeatCoefficient: $repeatCoefficient,
-                showPicker: $showPicker
-            )
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    var incomeExpenseSwipeGesture: some Gesture {
-        DragGesture()
-            .updating($isDragging) { _, state, _ in
-                state = true
-            }
-            .onChanged { gesture in
-                let swipe: CGFloat = gesture.translation.width
-
-                if income {
-                    if swipe < 0 {
-                        swipingOffset = max(-capsuleWidth, -pow(abs(swipe), 0.8)) + capsuleWidth
-                    }
-                } else {
-                    if swipe > 0 {
-                        swipingOffset = min(capsuleWidth, pow(swipe, 0.8))
-                    }
-                }
-            }
-            .onEnded { _ in
-                handleSwipeEnded()
-            }
-    }
-
-    func handleSwipeEnded() {
-        if income {
-            if swipingOffset < (capsuleWidth / 2) {
-                withAnimation {
-                    swipingOffset = 0
-                    income = false
-                }
-            } else {
-                withAnimation {
-                    swipingOffset = capsuleWidth
-                }
-            }
-        } else {
-            if swipingOffset > (capsuleWidth / 2) {
-                withAnimation {
-                    swipingOffset = capsuleWidth
-                    income = true
-                }
-            } else {
-                withAnimation {
-                    swipingOffset = 0
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    var toastOrIncomeExpensePicker: some View {
-        VStack {
-            if showToast {
-                SBToast(title: toastTitle, systemImage: toastImage)
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-            } else {
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.SecondaryBackground)
-                        .frame(width: capsuleWidth)
-                        .offset(x: swipingOffset)
-
-                    HStack(spacing: 0) {
-                        expenseToggleButton
-
-                        incomeToggleButton
-                    }
-                }
-                .padding(3)
-                .fixedSize(horizontal: true, vertical: true)
-                .overlay(Capsule().stroke(Color.Outline.opacity(0.4), lineWidth: 1.3))
-            }
-        }
-    }
-
-    private var smartEntryButton: some View {
-        Button {
-            showSmartEntry = true
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "sparkles")
-                Text(String.appLocalized("智能"))
-                    .font(.caption.weight(.semibold))
-            }
-            .foregroundStyle(Color.SubtitleText)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 7)
-            .overlay(
-                RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                    .stroke(Color.Outline, lineWidth: 1.5)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text(String.appLocalized("智能记账")))
-    }
-
-    @ViewBuilder
-    var swipeAndNumberPadArea: some View {
-        VStack(spacing: 0) {
-            VStack(spacing: 8) {
-                NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
-                // The note pill is sized to its text and capped at
-                // screenWidth/1.5, so it still fits next to the smart entry
-                // button at accessibility sizes — no need to stack them.
-                HStack(spacing: 8) {
-                    NoteView(note: $note, focused: $textFieldFocused)
-                    smartEntryButton
-                }
-            }
-            // Bottom spacer absorbs every remaining point in the parent VStack
-            // so the date row + number pad get pinned to the screen edge.
-            // Without this the VStack's intrinsic-size pass gives the pad an
-            // extra ~70pt of breathing room below it.
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .contentShape(Rectangle())
-        .simultaneousGesture(incomeExpenseSwipeGesture)
-    }
-
-    @ViewBuilder
-    var suggestionsOrDateCategoryRow: some View {
-        if showingNotePicker {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(suggestedTransactions, id: \.self) { transaction in
-                        Button {
-                            note = transaction.wrappedNote
-                            withAnimation {
-                                if padVM.price == 0 {
-                                    padVM.price = transaction.wrappedAmount
-                                }
-                                if category == nil {
-                                    category = transaction.category
-                                }
-                            }
-                            self.hideKeyboard()
-                        } label: {
-                            suggestedTransactionLabel(transaction)
-                        }
-                    }
-                }
-            }
-            .padding(.bottom, 5)
-        } else {
-            if usesLargeTextLayout {
-                // Large text: two chips side by side would truncate the date.
-                VStack(alignment: .leading, spacing: 8) {
-                    dateButton
-                    categoryButtonArea
-                }
-                .padding(.bottom, 5)
-            } else {
-                HStack(spacing: 8) {
-                    dateButton
-
-                    categoryButtonArea
-                }
-                .padding(.bottom, 5)
-            }
-        }
-    }
-
-    @ViewBuilder
-    var categoryPickerOrNumberPad: some View {
-        if showCategoryPicker {
-            TransactionCategoryGrid(
-                category: $category,
-                showPicker: $showCategoryPicker,
-                showingCategoryView: $showCategorySheet,
-                income: income
-            )
-            .environment(categoryVM)
-            .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
-        } else {
-            NumberPad(
-                vm: padVM,
-                showingNotePicker: showingNotePicker,
-                category: category
-            ) {
-                submit()
-            }
-            .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
-        }
-    }
-
-    @ViewBuilder
-    var datePickerOverlay: some View {
-        ZStack(alignment: .bottom) {
-            GeometryReader { _ in
-                EmptyView()
-            }
-            .background(Color.black)
-            .opacity(showingDatePicker ? 0.3 : 0)
-            .onTapGesture {
-                showingDatePicker = false
-            }
-
-            DatePicker(String.appLocalized("Date"), selection: $date)
-                .datePickerStyle(.graphical)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 8)
-                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card))
-                .padding(17)
-                .onChange(of: dateString) { _, _ in
-                    handleDateChanged()
-                }
-                .padding(.bottom, 10)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .opacity(showingDatePicker ? 1 : 0)
-        .allowsHitTesting(showingDatePicker)
-        .animation(.easeOut(duration: 0.25), value: showingDatePicker)
-    }
-
-    func handleDateChanged() {
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(300))
-            showingDatePicker = false
-        }
-
-        if date > Date.now {
-            animateIcon = true
-        } else {
-            animateIcon = false
-        }
-    }
-
-    var dateButton: some View {
-        TransactionDateRow(date: date, animateIcon: animateIcon) {
-            hideKeyboard()
-            showingDatePicker = true
-        }
-    }
-
-    private var categoryButtonArea: some View {
-        TransactionCategoryRow(
-            category: category,
-            hasCategories: income
-                ? !categoryVM.incomeCategories.isEmpty
-                : !categoryVM.expenseCategories.isEmpty,
-            isPickerOpen: $showCategoryPicker,
-            textColor: categoryButtonTextColor,
-            backgroundColor: categoryButtonBackgroundColor,
-            outlineColor: categoryButtonOutlineColor,
-            shake: shake
-        )
-    }
-
-    @ViewBuilder
-    var expenseToggleButton: some View {
-        Text(String.appLocalized("Expense"))
-            .font(.body.weight(.semibold))
-            .lineLimit(1)
-            .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-            .padding(6)
-            .frame(width: capsuleWidth)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                DispatchQueue.main.async {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        income = false
-                        swipingOffset = 0
-                    }
-                }
-            }
-    }
-
-    @ViewBuilder
-    var incomeToggleButton: some View {
-        Text(String.appLocalized("transaction-view-income-picker"))
-            .font(.body.weight(.semibold))
-            .lineLimit(1)
-            .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-            .padding(6)
-            .frame(width: capsuleWidth)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                DispatchQueue.main.async {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        income = true
-                        swipingOffset = capsuleWidth
-                    }
-                }
-            }
-    }
-
-    var dateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
-        dateFormatter.dateFormat = "d MMM yyyy"
-        return dateFormatter.string(from: date)
-    }
-
 }

@@ -13,7 +13,8 @@ struct BudgetWidget: Widget {
     let kind: String = "BudgetWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: BudgetWidgetProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self,
+            provider: BudgetWidgetProvider()) { entry in
             BudgetWidgetEntryView(entry: entry)
                 .environment(\.locale, Locale.appLocale)
         }
@@ -21,6 +22,12 @@ struct BudgetWidget: Widget {
         .description("Monitor how you are sticking to your budgets.")
         .supportedFamilies([.systemSmall])
     }
+}
+
+struct WidgetBudgetSnapshot {
+    let total: Double
+    let percentage: Double
+    let budget: HoldingBudget
 }
 
 struct BudgetWidgetProvider: AppIntentTimelineProvider {
@@ -31,31 +38,49 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
     func placeholder(in _: Context) -> BudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
 
-        return BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: BudgetWidgetConfigurationIntent())
+        return BudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            percentageOfDays: loaded.percentage,
+            budget: loaded.budget,
+            configuration: BudgetWidgetConfigurationIntent()
+        )
     }
 
     func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> BudgetWidgetEntry {
         let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
-        return BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: configuration)
+        return BudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            percentageOfDays: loaded.percentage,
+            budget: loaded.budget,
+            configuration: configuration
+        )
     }
 
     func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
         let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
-        let entry = BudgetWidgetEntry(date: Date(), totalSpent: loaded.total, percentageOfDays: loaded.percentage, budget: loaded.budget, configuration: configuration)
+        let entry = BudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            percentageOfDays: loaded.percentage,
+            budget: loaded.budget,
+            configuration: configuration
+        )
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
         return timeline
     }
 
-    func loadData(budgetId: String) -> (total: Double, percentage: Double, budget: HoldingBudget) {
+    func loadData(budgetId: String) -> WidgetBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
-            return (0, 0, budget)
+            return WidgetBudgetSnapshot(total: 0, percentage: 0, budget: budget)
         }
 
         let fetchId = uuid
@@ -65,7 +90,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let allBudgets = (try? context.fetch(budgetDesc)) ?? []
         guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
-            return (0, 0, budget)
+            return WidgetBudgetSnapshot(total: 0, percentage: 0, budget: budget)
         }
 
         let budgetStartDate = budgetModel.startDate
@@ -75,7 +100,10 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let txnDesc = FetchDescriptor<TransactionModel>()
         let allTransactions = (try? context.fetch(txnDesc)) ?? []
         let filtered = allTransactions.filter {
-            !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
+            !$0.income
+                && $0.wrappedDate >= budgetStartDate
+                && $0.wrappedDate <= now
+                && $0.category?.id == budgetCategory?.id
         }
 
         let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedAmount)))
@@ -97,7 +125,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         } else {
             let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
             guard let numberOfDays = components1.day, numberOfDays > 0 else {
-                return (holdingTotal, 0, returnBudget)
+                return WidgetBudgetSnapshot(total: holdingTotal, percentage: 0, budget: returnBudget)
             }
 
             let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
@@ -106,7 +134,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)
         }
 
-        return (holdingTotal, percentageOfDays, returnBudget)
+        return WidgetBudgetSnapshot(total: holdingTotal, percentage: percentageOfDays, budget: returnBudget)
     }
 }
 
@@ -207,7 +235,12 @@ struct BudgetWidgetEntryView: View {
 
                     Spacer()
 
-                    RingView(percent: entry.percentageOfDays, width: 2.4, topStroke: Color.DarkBackground, bottomStroke: Color.SecondaryBackground)
+                    RingView(
+                        percent: entry.percentageOfDays,
+                        width: 2.4,
+                        topStroke: Color.DarkBackground,
+                        bottomStroke: Color.SecondaryBackground
+                    )
                         .frame(width: 13, height: 13)
                         .padding(3)
                 }
@@ -222,7 +255,11 @@ struct BudgetWidgetEntryView: View {
                                     .frame(width: proxy.size.width, height: proxy.size.width / 2)
 
                                 if entry.totalSpent / entry.budget.budgetAmount < 0.97 {
-                                    DonutSemicircle(percent: 1 - (entry.totalSpent / entry.budget.budgetAmount), cornerRadius: 4, width: 15)
+                                    DonutSemicircle(
+                                        percent: 1 - (entry.totalSpent / entry.budget.budgetAmount),
+                                        cornerRadius: 4,
+                                        width: 15
+                                    )
                                         .fill(Color(hex: entry.budget.colour))
                                         .frame(width: proxy.size.width, height: proxy.size.width / 2)
                                 }
@@ -230,7 +267,10 @@ struct BudgetWidgetEntryView: View {
                             .frame(width: proxy.size.width)
 
                             VStack(spacing: -4) {
-                                WidgetBudgetDollarView(amount: difference, red: entry.totalSpent >= entry.budget.budgetAmount)
+                                WidgetBudgetDollarView(
+                                    amount: difference,
+                                    red: entry.totalSpent >= entry.budget.budgetAmount
+                                )
                                     .frame(width: proxy.size.width - 50)
 
                                 if showTimeFrame(size: proxy.size.width - 50) {
@@ -278,7 +318,7 @@ struct BudgetWidgetEntryView: View {
             .containerBackground(for: .widget) {
                 WidgetGlassBackground()
             }
-            .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
+            .widgetURL(budgetDeepLink(entry.budget.name))
         }
     }
 }

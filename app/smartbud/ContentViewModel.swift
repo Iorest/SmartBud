@@ -42,7 +42,10 @@ final class ContentViewModel {
     @ObservationIgnored @AppStorage("firstLaunch", store: .appGroup) var firstLaunch: Bool = true
     @ObservationIgnored @AppStorage("dataMigration1", store: .appGroup) var dataMigration1: Bool = true
     @ObservationIgnored @AppStorage("dataMigration2", store: .appGroup) var dataMigration2: Bool = true
-    @ObservationIgnored @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    @ObservationIgnored @AppStorage("currency", store: .appGroup) var currency: String = Locale
+        .current
+        .currency?
+        .identifier ?? "USD"
 
     // MARK: - Transient presentation state
 

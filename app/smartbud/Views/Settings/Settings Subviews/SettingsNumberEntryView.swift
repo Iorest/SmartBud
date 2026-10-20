@@ -30,7 +30,8 @@ struct SettingsNumberEntryView: View {
                 .labelsHidden()
                 #endif
             } footer: {
-                Text(String.appLocalized("Decimal entry adds a decimal key to the keypad; whole numbers only hides it."))
+                Text(String.appLocalized("Decimal entry adds a decimal key to the "
+                     + "keypad; whole numbers only hides it."))
             }
         }
         #if os(macOS)

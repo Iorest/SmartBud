@@ -35,15 +35,18 @@ struct DetailedBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110"), label: String.appLocalized("Add transaction")) {
+                DetailedBudgetViewTopBarButton(imageName: "plus", color: Color("110"), label: String
+                    .appLocalized("Add transaction")) {
                     newTransaction = true
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String.appLocalized("Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String
+                    .appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String.appLocalized("Delete budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String
+                    .appLocalized("Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -64,17 +67,13 @@ struct DetailedBudgetView: View {
         .hiddenNavigationBackButton()
         .hiddenNavigationBar()
         .appBackground()
-        .sheet(item: $toEdit, onDismiss: {
-            toEdit = nil
-        }) { budget in
+        .sheet(item: $toEdit) { budget in
             BrandNewBudgetView(overallBudgetCreated: false, toEditBudget: budget)
         }
         .fullScreenPresentation(isPresented: $newTransaction) {
             TransactionView(category: budget.category)
         }
-        .fullScreenPresentation(item: $toDelete, onDismiss: {
-            toDelete = nil
-        }) { budget in
+        .fullScreenPresentation(item: $toDelete) { budget in
             DeleteBudgetAlert(toDelete: budget) {
                 dismiss()
             }
@@ -113,11 +112,13 @@ struct DetailedMainBudgetView: View {
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String.appLocalized("Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String
+                    .appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String.appLocalized("Delete budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "trash.fill", color: Color.AlertRed, label: String
+                    .appLocalized("Delete budget")) {
                     toDelete = budget
                 }
             }
@@ -138,14 +139,10 @@ struct DetailedMainBudgetView: View {
         .hiddenNavigationBackButton()
         .hiddenNavigationBar()
         .appBackground()
-        .fullScreenPresentation(item: $toEdit, onDismiss: {
-            toEdit = nil
-        }) { budget in
+        .fullScreenPresentation(item: $toEdit) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenPresentation(item: $toDelete, onDismiss: {
-            toDelete = nil
-        }) { budget in
+        .fullScreenPresentation(item: $toDelete) { budget in
             DeleteMainBudgetAlert(toDelete: budget) {
                 dismiss()
             }

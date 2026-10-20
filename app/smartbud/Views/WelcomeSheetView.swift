@@ -27,7 +27,8 @@ struct WelcomeSheetView: View {
     let timer = Timer.publish(every: 0.16, on: .main, in: .common).autoconnect()
 
     let welcomeFeatures = [
-        WelcomeSheetFeatureRow(icon: "list.bullet.rectangle.fill", header: "welcome_header_1", subtitle: "welcome_subtitle_1"),
+        WelcomeSheetFeatureRow(icon: "list.bullet.rectangle.fill", header: "welcome_header_1",
+            subtitle: "welcome_subtitle_1"),
         WelcomeSheetFeatureRow(icon: "chart.bar.xaxis", header: "welcome_header_2", subtitle: "welcome_subtitle_2"),
         WelcomeSheetFeatureRow(icon: "archivebox.fill", header: "welcome_header_3", subtitle: "welcome_subtitle_3")
     ]
@@ -35,7 +36,7 @@ struct WelcomeSheetView: View {
     var body: some View {
         Group {
             if firstPage {
-                VStack(spacing: SBSpace.xl) {
+                VStack(spacing: SBSpace.extraLarge) {
                     VStack(spacing: SBSpace.xxs) {
                         Text(String.appLocalized("app_name"))
                             .font(.largeTitle.bold())

@@ -37,7 +37,7 @@ struct SettingsNotificationsView: View {
         .padding(.vertical, 4)
       }
       .padding(.horizontal, SBSpace.medium)
-      .padding(.vertical, SBSpace.xs)
+      .padding(.vertical, SBSpace.extraSmall)
       .background(
         Color.SecondaryBackground,
         in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
@@ -60,11 +60,11 @@ struct SettingsNotificationsView: View {
               selection: $customTime,
               displayedComponents: .hourAndMinute
             )
-            .padding(.vertical, SBSpace.xs)
+            .padding(.vertical, SBSpace.extraSmall)
           }
         }
         .padding(.horizontal, SBSpace.medium)
-        .padding(.vertical, SBSpace.xs)
+        .padding(.vertical, SBSpace.extraSmall)
         .background(
           Color.SecondaryBackground,
           in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)

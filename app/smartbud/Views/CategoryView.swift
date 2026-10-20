@@ -55,7 +55,11 @@ struct CategoryView: View {
                                  onSelect?(category)
                                  dismiss()
                              },
-                             showToast: $showToast, toastTitle: $toastTitle, toastImage: $toastImage, positive: $positive)
+                                 showToast: $showToast,
+    toastTitle: $toastTitle,
+    toastImage: $toastImage,
+    positive: $positive
+)
 
             HStack {
                 HStack(spacing: 0) {

@@ -130,7 +130,7 @@ extension String {
         bundle: Bundle? = nil,
         comment: StaticString? = nil
     ) -> String {
-        let keyString = key.withUTF8Buffer { String(decoding: $0, as: UTF8.self) }
+        let keyString = key.withUTF8Buffer { String(bytes: $0, encoding: .utf8) ?? "" }
         let code = resolvedAppLanguageCode()
         let target = bundle ?? .main
         let languages = appLookupLanguages(forAppLanguageCode: code)

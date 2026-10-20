@@ -95,7 +95,12 @@ struct ActualBudgetView: View {
                                     VStack(spacing: 10) {
                                         ForEach(budgets, id: \.self) { budget in
                                             NavigationLink(value: budget) {
-                                                SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
+                                                SingleBudgetView(
+                                                    budget: budget,
+                                                    toDelete: $toDelete,
+                                                    toEdit: $toEdit,
+                                                    budgetRows: budgetRows
+                                                )
                                             }
                                         }
                                     }
@@ -104,7 +109,12 @@ struct ActualBudgetView: View {
                                     LazyVGrid(columns: layout, spacing: 15) {
                                         ForEach(budgets, id: \.self) { budget in
                                             NavigationLink(value: budget) {
-                                                SingleBudgetView(budget: budget, toDelete: $toDelete, toEdit: $toEdit, budgetRows: budgetRows)
+                                                SingleBudgetView(
+                                                    budget: budget,
+                                                    toDelete: $toDelete,
+                                                    toEdit: $toEdit,
+                                                    budgetRows: budgetRows
+                                                )
                                             }
                                         }
                                     }
@@ -136,9 +146,7 @@ struct ActualBudgetView: View {
             .navigationDestination(for: BudgetModel.self) { budget in
                 DetailedBudgetView(budget: budget)
             }
-            .sheet(item: $toEdit, onDismiss: {
-                toEdit = nil
-            }) { budget in
+            .sheet(item: $toEdit) { budget in
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty, toEditBudget: budget)
             }
             .onAppear {
@@ -148,9 +156,7 @@ struct ActualBudgetView: View {
             .sheet(isPresented: $newBudget) {
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty)
             }
-            .fullScreenPresentation(item: $toDelete, onDismiss: {
-                toDelete = nil
-            }) { budget in
+            .fullScreenPresentation(item: $toDelete) { budget in
                 DeleteBudgetAlert(toDelete: budget)
             }
         }
@@ -196,12 +202,12 @@ struct MainBudgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: SBSpace.small) {
-            HStack(alignment: .firstTextBaseline, spacing: SBSpace.xs) {
+            HStack(alignment: .firstTextBaseline, spacing: SBSpace.extraSmall) {
                 Label(String.appLocalized("Total Budget"), systemImage: "chart.pie.fill")
                     .font(.headline)
                     .foregroundStyle(Color.PrimaryText)
 
-                Spacer(minLength: SBSpace.xs)
+                Spacer(minLength: SBSpace.extraSmall)
 
                 Text(percentString1)
                     .font(.subheadline.monospacedDigit())
@@ -227,7 +233,7 @@ struct MainBudgetView: View {
 
             HStack {
                 Text(totalSpent, format: .currency(code: currency))
-                Spacer(minLength: SBSpace.xs)
+                Spacer(minLength: SBSpace.extraSmall)
                 Text(budgetAmount, format: .currency(code: currency))
             }
             .font(.caption.monospacedDigit())
@@ -253,14 +259,10 @@ struct MainBudgetView: View {
                 Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
             }
         }
-        .sheet(item: $toEdit, onDismiss: {
-            toEdit = nil
-        }) { budget in
+        .sheet(item: $toEdit) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenPresentation(item: $toDelete, onDismiss: {
-            toDelete = nil
-        }) { budget in
+        .fullScreenPresentation(item: $toDelete) { budget in
             DeleteMainBudgetAlert(toDelete: budget)
         }
     }

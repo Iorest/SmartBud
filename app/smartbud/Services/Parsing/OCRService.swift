@@ -41,6 +41,22 @@ final class OCRService: @unchecked Sendable {
         return result
     }
 
+    /// Collects text and amounts from the recognised observations.
+    private static func result(from observations: [VNRecognizedTextObservation]) -> OCRResult {
+        var allText = ""
+        var amounts: [Decimal] = []
+        for observation in observations {
+            guard let text = observation.topCandidates(1).first?.string else { continue }
+            allText += text + "\n"
+            amounts.append(contentsOf: extractAmounts(from: text))
+        }
+        return OCRResult(
+            amounts: Array(Set(amounts)),
+            merchant: extractMerchant(from: allText),
+            allText: allText
+        )
+    }
+
     func recognizeText(from image: UIImage) async throws -> OCRResult {
         guard let cgImage = image.cgImage else {
             throw NSError(domain: "OCRService", code: -1,
@@ -57,26 +73,18 @@ final class OCRService: @unchecked Sendable {
                 }
                 guard let observations = request.results as? [VNRecognizedTextObservation] else {
                     resumed = true
-                    continuation.resume(throwing: NSError(domain: "OCRService", code: -2,
-                                                          userInfo: [NSLocalizedDescriptionKey: "Unable to recognize text"]))
+                    continuation.resume(
+                        throwing: NSError(
+                            domain: "OCRService",
+                            code: -2,
+                            userInfo: [NSLocalizedDescriptionKey: "Unable to recognize text"]
+                        )
+                    )
                     return
                 }
 
-                var allText = ""
-                var amounts: [Decimal] = []
-                for observation in observations {
-                    guard let text = observation.topCandidates(1).first?.string else { continue }
-                    allText += text + "\n"
-                    amounts.append(contentsOf: Self.extractAmounts(from: text))
-                }
-                let merchant = Self.extractMerchant(from: allText)
-                let result = OCRResult(
-                    amounts: Array(Set(amounts)),
-                    merchant: merchant,
-                    allText: allText
-                )
                 resumed = true
-                continuation.resume(returning: result)
+                continuation.resume(returning: Self.result(from: observations))
             }
 
             request.recognitionLevel = .accurate

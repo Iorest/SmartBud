@@ -37,7 +37,7 @@ struct SettingsLanguageView: View {
                                 .font(.body)
                                 .foregroundStyle(Color.PrimaryText)
 
-                            Spacer(minLength: SBSpace.xs)
+                            Spacer(minLength: SBSpace.extraSmall)
 
                             if appLanguage == code {
                                 Image(systemName: "checkmark")

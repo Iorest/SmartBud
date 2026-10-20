@@ -72,7 +72,10 @@ extension ImportDataView {
                             .foregroundStyle(Color.AlertRed)
                     }
                     .padding(8)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
+                    .background(
+                        Color.AlertRed.opacity(0.23),
+                        in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
+                    )
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .frame(width: 250)
                 }
@@ -158,7 +161,10 @@ extension ImportDataView {
                         .frame(height: 50)
                         .frame(maxWidth: .infinity)
                         .foregroundStyle(Color.LightIcon)
-                        .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                        .background(
+                            Color.DarkBackground,
+                            in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
+                        )
                     }
                     .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
 
@@ -267,7 +273,10 @@ extension ImportDataView {
                         .frame(height: 50)
                         .frame(maxWidth: .infinity)
                         .foregroundStyle(Color.LightIcon)
-                        .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                        .background(
+                            Color.DarkBackground,
+                            in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
+                        )
                 }
                 .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
             }

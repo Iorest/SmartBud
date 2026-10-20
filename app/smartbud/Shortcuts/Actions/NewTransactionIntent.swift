@@ -56,77 +56,53 @@ struct NewTransactionIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
-        if expenseCategory == nil && incomeCategory == nil {
-            if income == .expense {
-                throw $expenseCategory.needsValueError()
-            } else {
-                throw $incomeCategory.needsValueError()
-            }
-        } else {
-            if amount == 0 {
-                throw $amount.needsValueError()
-            }
+        guard expenseCategory != nil || incomeCategory != nil else {
+            throw income == .expense
+                ? $expenseCategory.needsValueError()
+                : $incomeCategory.needsValueError()
+        }
+        guard amount != 0 else { throw $amount.needsValueError() }
 
-            let repeatType: Int
+        let repeatType = self.repeatType
+        if income == .expense {
+            return try log(id: expenseCategory?.id, isExpense: true, repeatType: repeatType)
+        }
+        return try log(id: incomeCategory?.id, isExpense: false, repeatType: repeatType)
+    }
 
-            if !recurringTransaction {
-                repeatType = 0
-            } else {
-                switch recurringType {
-                case .daily:
-                    repeatType = 1
-                case .weekly:
-                    repeatType = 2
-                case .monthly:
-                    repeatType = 3
-                }
-            }
+    /// Maps the picker value onto the stored recurrence type.
+    @MainActor
+    private var repeatType: Int {
+        guard recurringTransaction else { return 0 }
+        switch recurringType {
+        case .daily: return 1
+        case .weekly: return 2
+        case .monthly: return 3
+        }
+    }
 
-            if income == .expense {
-                if let unwrappedExpenseCategory = expenseCategory {
-                    guard let category = CategoryViewModel.shared.findCategory(id: unwrappedExpenseCategory.id) else {
-                        throw $expenseCategory.needsValueError()
-                    }
+    /// Resolves the category and logs the transaction, returning the snippet.
+    @MainActor
+    private func log(id: UUID?, isExpense: Bool,
+                     repeatType: Int) throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
+        guard let id, let category = CategoryViewModel.shared.findCategory(id: id) else {
+            throw isExpense ? $expenseCategory.needsValueError() : $incomeCategory.needsValueError()
+        }
 
-                    let transaction = TransactionViewModel.shared.create(
-                        note: note ?? "",
-                        category: category,
-                        income: false,
-                        amount: amount,
-                        date: Date.now,
-                        repeatType: repeatType,
-                        repeatCoefficient: 1
-                    )
-
-                    return .result(dialog: IntentDialog(LocalizedStringResource("Expense successfully logged."))) {
-                        ShortcutTransactionView(transaction: transaction)
-                    }
-                } else {
-                    throw $expenseCategory.needsValueError()
-                }
-            } else {
-                if let unwrappedIncomeCategory = incomeCategory {
-                    guard let category = CategoryViewModel.shared.findCategory(id: unwrappedIncomeCategory.id) else {
-                        throw $incomeCategory.needsValueError()
-                    }
-
-                    let transaction = TransactionViewModel.shared.create(
-                        note: note ?? "",
-                        category: category,
-                        income: true,
-                        amount: amount,
-                        date: Date.now,
-                        repeatType: repeatType,
-                        repeatCoefficient: 1
-                    )
-
-                    return .result(dialog: IntentDialog(LocalizedStringResource("Income successfully logged."))) {
-                        ShortcutTransactionView(transaction: transaction)
-                    }
-                } else {
-                    throw $incomeCategory.needsValueError()
-                }
-            }
+        let transaction = TransactionViewModel.shared.create(TransactionEdit(
+            note: note ?? "",
+            category: category,
+            income: !isExpense,
+            amount: amount,
+            date: Date.now,
+            repeatType: repeatType,
+            repeatCoefficient: 1
+        ))
+        let message: LocalizedStringResource = isExpense
+            ? "Expense successfully logged."
+            : "Income successfully logged."
+        return .result(dialog: IntentDialog(message)) {
+            ShortcutTransactionView(transaction: transaction)
         }
     }
 

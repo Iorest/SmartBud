@@ -103,7 +103,8 @@ struct SettingsUpcomingView: View {
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
 
       Text(
-        String.appLocalized("Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here.")
+        String.appLocalized("Don't worry, even if you do hide them there, you will "
+             + "aways be able to find all upcoming transactions right here.")
       )
       .font(.caption.weight(.medium))
       .multilineTextAlignment(.leading)

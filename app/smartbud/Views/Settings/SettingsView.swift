@@ -316,7 +316,13 @@ struct SettingsView: View {
     }
 
     @ViewBuilder
-    private func settingsLink(_ route: SettingsRoute, _ icon: String, _ colour: Int, _ title: String, _ value: String?) -> some View {
+    private func settingsLink(
+        _ route: SettingsRoute,
+        _ icon: String,
+        _ colour: Int,
+        _ title: String,
+        _ value: String?
+    ) -> some View {
       NavigationLink(value: route) {
         HStack(spacing: 0) {
           SettingsRowView(icon: icon, colour: colour, title: title, value: value)
@@ -367,7 +373,7 @@ struct SettingsRowView: View {
                 .foregroundStyle(Color.PrimaryText)
                 .lineLimit(2)
 
-            Spacer(minLength: SBSpace.xs)
+            Spacer(minLength: SBSpace.extraSmall)
 
             if let value, !value.isEmpty {
                 Text(value)

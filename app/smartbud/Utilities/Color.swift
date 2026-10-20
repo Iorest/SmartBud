@@ -174,7 +174,12 @@ public extension View {
     /// `UIColorPickerViewController` (iOS 14). The native
     /// `ColorPicker` is sufficient and avoids the UIKit dance.
     /// `title` is shown above the picker when non-empty.
-    func colorPickerSheet(isPresented: Binding<Bool>, selection: Binding<Color>, supportsAlpha: Bool = true, title: String? = nil) -> some View {
+    func colorPickerSheet(
+        isPresented: Binding<Bool>,
+        selection: Binding<Color>,
+        supportsAlpha: Bool = true,
+        title: String? = nil
+    ) -> some View {
         sheet(isPresented: isPresented) {
             VStack(spacing: 12) {
                 if let title, !title.isEmpty {

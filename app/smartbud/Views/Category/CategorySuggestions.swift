@@ -104,7 +104,13 @@ struct SuggestedCategoriesView: View {
                             lightHaptic &+= 1
 
                             if !income {
-                                _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: selectedColour, income: false, order: order)
+                                _ = categoryVM.create(
+                                    name: NSLocalizedString(category.name, comment: "category name"),
+                                    emoji: category.emoji,
+                                    colour: selectedColour,
+                                    income: false,
+                                    order: order
+                                )
 
                                 availableColours = Color.colorArray
                                 categories.forEach { category in
@@ -119,7 +125,13 @@ struct SuggestedCategoriesView: View {
                                     selectedColour = availableColours[0]
                                 }
                             } else {
-                                _ = categoryVM.create(name: NSLocalizedString(category.name, comment: "category name"), emoji: category.emoji, colour: "#76FBB0", income: true, order: order)
+                                _ = categoryVM.create(
+                                    name: NSLocalizedString(category.name, comment: "category name"),
+                                    emoji: category.emoji,
+                                    colour: "#76FBB0",
+                                    income: true,
+                                    order: order
+                                )
                             }
                         }
                         .accessibilityAddTraits(.isButton)

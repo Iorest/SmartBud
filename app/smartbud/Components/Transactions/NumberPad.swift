@@ -20,14 +20,14 @@
 import SwiftUI
 
 struct NumberPad: View {
-    @Bindable var vm: NumberPadViewModel
+    @Bindable var viewModel: NumberPadViewModel
     var showingNotePicker: Bool = false
     /// Selected category. Owned by the parent (it's a separate piece of
     /// transaction-entry state); the pad only reads it to drive the
     /// submit-button's bounce effect.
     var category: CategoryModel?
     /// Submit action. Called when the user taps the checkmark. The pad also
-    /// calls `vm.submit()` first, which clears the state. Declared last so
+    /// calls `viewModel.submit()` first, which clears the state. Declared last so
     /// the trailing-closure syntax reads naturally at the call site.
     var submit: () -> Void = {}
 
@@ -65,13 +65,13 @@ struct NumberPad: View {
         .padding(.bottom, 15)
         .keyboardAwareHeight(showToolbar: showingNotePicker)
         .modifier(DigitHapticModifier(
-            haptic: .impact(weight: .light, intensity: vm.digitHapticIntensity),
-            trigger: vm.price,
-            enabled: vm.hapticsEnabled
+            haptic: .impact(weight: .light, intensity: viewModel.digitHapticIntensity),
+            trigger: viewModel.price,
+            enabled: viewModel.hapticsEnabled
         ))
         .modifier(SuccessHapticModifier(
-            trigger: vm.submitTrigger,
-            enabled: vm.hapticsEnabled
+            trigger: viewModel.submitTrigger,
+            enabled: viewModel.hapticsEnabled
         ))
     }
 
@@ -88,7 +88,7 @@ struct NumberPad: View {
     @ViewBuilder
     private var bottomRow: some View {
         HStack(spacing: 8) {
-            if vm.numberEntryType == 1 {
+            if viewModel.numberEntryType == 1 {
                 backspaceButton
             } else {
                 decimalButton
@@ -103,9 +103,9 @@ struct NumberPad: View {
 
     @ViewBuilder
     private func digitButton(_ digit: Int) -> some View {
-        let disabled = vm.isInputDisabled
+        let disabled = viewModel.isInputDisabled
         Button {
-            vm.tap(digit)
+            viewModel.tap(digit)
         } label: {
             // `VStack` with equal Spacers above and below is the only way
             // to put the glyph truly in the middle of the cell. Text has a
@@ -137,7 +137,7 @@ struct NumberPad: View {
     @ViewBuilder
     private var backspaceButton: some View {
         Button {
-            vm.deleteLast()
+            viewModel.deleteLast()
         } label: {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
@@ -160,7 +160,7 @@ struct NumberPad: View {
     @ViewBuilder
     private var decimalButton: some View {
         Button {
-            vm.enterDecimal()
+            viewModel.enterDecimal()
         } label: {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
@@ -183,9 +183,9 @@ struct NumberPad: View {
 
     @ViewBuilder
     private var checkmarkButton: some View {
-        let canSubmit = vm.price != 0
+        let canSubmit = viewModel.price != 0
         Button {
-            // IMPORTANT: do NOT call `vm.submit()` here before the parent
+            // IMPORTANT: do NOT call `viewModel.submit()` here before the parent
             // closure. The parent reads `padVM.price` to decide whether to
             // create the transaction; if the VM clears it first, the
             // parent sees `amount == 0` and shows a "Missing Amount" toast
@@ -217,7 +217,7 @@ struct NumberPad: View {
 /// `NumberPadViewModel` so it stays in lockstep with `NumberPad` without
 /// passing bindings around.
 struct NumberPadTextView: View {
-    @Bindable var vm: NumberPadViewModel
+    @Bindable var viewModel: NumberPadViewModel
     /// Currency symbol displayed to the left of the amount. Owned by the
     /// caller because it's purely a presentation concern.
     var currencySymbol: String
@@ -253,7 +253,7 @@ struct NumberPadTextView: View {
                     .font(.largeTitle)
                     .foregroundStyle(Color.SubtitleText)
 
-                Text(vm.amountString)
+                Text(viewModel.amountString)
                     .font(.system(size: fontSize, weight: .regular))
                     .foregroundStyle(Color.PrimaryText)
                     .contentTransition(.numericText())
@@ -261,7 +261,7 @@ struct NumberPadTextView: View {
             .minimumScaleFactor(0.5)
             .lineLimit(1)
 
-            if vm.showsTrailingDelete {
+            if viewModel.showsTrailingDelete {
                 trailingDelete
             }
         }
@@ -271,7 +271,7 @@ struct NumberPadTextView: View {
     @ViewBuilder
     private var trailingDelete: some View {
         Button {
-            vm.deleteLast()
+            viewModel.deleteLast()
         } label: {
             Image(systemName: "delete.left.fill")
                 .font(.system(size: 16, weight: .semibold))
@@ -281,7 +281,7 @@ struct NumberPadTextView: View {
                 .systemChip(in: Circle())
                 .contentShape(Circle())
         }
-        .disabled(vm.price == 0 && !vm.isEditingDecimal)
+        .disabled(viewModel.price == 0 && !viewModel.isEditingDecimal)
         .accessibilityLabel(Text(String.appLocalized("Delete")))
     }
 }

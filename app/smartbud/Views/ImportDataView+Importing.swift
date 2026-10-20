@@ -9,15 +9,24 @@
 import SwiftUI
 import SwiftData
 
+/// Row validation failure, carrying the localized message shown in the wizard.
+private struct ImportFailure: Error {
+    let message: String
+}
+
+/// One validated row, ready to be written.
+private struct ImportDraft {
+    let note: String
+    let category: CategoryModel
+    let amount: Double
+    let date: Date
+}
+
 extension ImportDataView {
 
     func validateDoubles(strings: [String]) -> Bool {
         for string in strings {
-            if let _ = Double(string) {
-                // Valid double
-            } else {
-                return false // Invalid double found
-            }
+            guard Double(string) != nil else { return false }
         }
         return true // All strings are valid doubles
     }
@@ -77,24 +86,12 @@ extension ImportDataView {
     /// Validates every row first, then writes the whole batch with one save.
     /// A bad row aborts the import with zero rows written.
     func importData() {
-        guard selectedColumns.count > 3 else {
-            processingState = .error
-            errorMessage = String.appLocalized("请先完成列匹配。")
-            return
-        }
+        guard importSelectionIsValid() else { return }
 
-        let categoryColumnIndex = selectedColumns[0]
-        let noteColumnIndex = selectedColumns[1]
-        let dateColumnIndex = selectedColumns[2]
-        let amountColumnIndex = selectedColumns[3]
-        let maxIndex = max(categoryColumnIndex, noteColumnIndex, dateColumnIndex, amountColumnIndex)
-
-        guard !dateFormatString.isEmpty else {
-            processingState = .error
-            errorMessage = String.appLocalized("请先选择日期格式。")
-            return
-        }
-
+        let indexes = ImportColumns(
+            category: selectedColumns[0], note: selectedColumns[1],
+            date: selectedColumns[2], amount: selectedColumns[3]
+        )
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
         dateFormatter.dateFormat = dateFormatString
@@ -106,46 +103,15 @@ extension ImportDataView {
             uniquingKeysWith: { first, _ in first }
         )
 
-        struct Draft {
-            let note: String
-            let category: CategoryModel
-            let amount: Double
-            let date: Date
-        }
-
-        var drafts: [Draft] = []
-        drafts.reserveCapacity(rows.count)
-
-        for (offset, row) in rows.enumerated() {
-            let line = offset + 1
-
-            guard row.count > maxIndex else {
-                processingState = .error
-                errorMessage = String(format: String.appLocalized("第 %d 行缺少列，请检查 CSV。"), line)
-                return
-            }
-            guard let transactionDate = dateFormatter.date(from: row[dateColumnIndex]) else {
-                processingState = .error
-                errorMessage = String(format: String.appLocalized("第 %d 行的日期无法解析。"), line)
-                return
-            }
-            guard let rowCategory = categoryDictionary[row[categoryColumnIndex]] else {
-                processingState = .error
-                errorMessage = String(format: String.appLocalized("第 %d 行的分类未匹配。"), line)
-                return
-            }
-            guard let transactionAmount = Double(row[amountColumnIndex]) else {
-                processingState = .error
-                errorMessage = String(format: String.appLocalized("第 %d 行的金额无法解析。"), line)
-                return
-            }
-
-            drafts.append(Draft(
-                note: row[noteColumnIndex],
-                category: rowCategory,
-                amount: abs(transactionAmount),
-                date: transactionDate
-            ))
+        let drafts: [ImportDraft]
+        switch makeDrafts(indexes: indexes, formatter: dateFormatter,
+                          categories: categoryDictionary) {
+        case .success(let built):
+            drafts = built
+        case .failure(let failure):
+            processingState = .error
+            errorMessage = failure.message
+            return
         }
 
         for draft in drafts {
@@ -171,6 +137,67 @@ extension ImportDataView {
             confettiNumber += 1
         }
     }
+    /// Rejects an incomplete wizard before any parsing happens.
+    private func importSelectionIsValid() -> Bool {
+        if selectedColumns.count <= 3 {
+            processingState = .error
+            errorMessage = String.appLocalized("请先完成列匹配。")
+            return false
+        }
+        if dateFormatString.isEmpty {
+            processingState = .error
+            errorMessage = String.appLocalized("请先选择日期格式。")
+            return false
+        }
+        return true
+    }
+
+    /// Column indexes picked in the wizard.
+    private struct ImportColumns {
+        let category: Int
+        let note: Int
+        let date: Int
+        let amount: Int
+    }
+
+    /// Validates every row before anything is written, so a bad row leaves the
+    /// store untouched.
+    private func makeDrafts(indexes: ImportColumns,
+                            formatter: DateFormatter,
+                            categories: [String: CategoryModel])
+    -> Result<[ImportDraft], ImportFailure> {
+        var drafts: [ImportDraft] = []
+        drafts.reserveCapacity(rows.count)
+
+        for (offset, row) in rows.enumerated() {
+            let line = offset + 1
+
+            guard row.count > maxIndex(of: indexes) else {
+                return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行缺少列，请检查 CSV。"), line)))
+            }
+            guard let transactionDate = formatter.date(from: row[indexes.date]) else {
+                return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的日期无法解析。"), line)))
+            }
+            guard let rowCategory = categories[row[indexes.category]] else {
+                return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的分类未匹配。"), line)))
+            }
+            guard let transactionAmount = Double(row[indexes.amount]) else {
+                return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的金额无法解析。"), line)))
+            }
+
+            drafts.append(ImportDraft(
+                note: row[indexes.note],
+                category: rowCategory,
+                amount: abs(transactionAmount),
+                date: transactionDate
+            ))
+        }
+        return .success(drafts)
+    }
+
+    private func maxIndex(of indexes: ImportColumns) -> Int {
+        max(indexes.category, indexes.note, indexes.date, indexes.amount)
+    }
 
     func deduceDateFormat(from dateString: String) -> String? {
         let dateFormats = ["yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy",
@@ -182,7 +209,7 @@ extension ImportDataView {
 
         for dateFormat in dateFormats {
             dateFormatter.dateFormat = dateFormat
-            if let _ = dateFormatter.date(from: dateString) {
+            if dateFormatter.date(from: dateString) != nil {
                 return dateFormat
             }
         }
@@ -193,7 +220,9 @@ extension ImportDataView {
     func makeAttributedString() -> AttributedString {
         var string = AttributedString("this article")
         string.foregroundColor = Color.PrimaryText
-        string.link = URL(string: "https://pro.arcgis.com/en/pro-app/latest/help/mapping/time/convert-string-or-numeric-time-values-into-data-format.htm")
+        let reference = "https://pro.arcgis.com/en/pro-app/latest/help/mapping/time/"
+            + "convert-string-or-numeric-time-values-into-data-format.htm"
+        string.link = URL(string: reference)
         string.underlineColor = UIColor(Color.PrimaryText)
         string.underlineStyle = .single
 

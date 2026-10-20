@@ -149,7 +149,9 @@ struct FilteredBudgetView: View {
 
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(String.appFormatted("%@%@ was spent %@", currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
+                            .accessibilityLabel(String
+                                .appFormatted("%@%@ was spent %@", currencySymbol, totalString,
+                                    dateConverterAccessibilityLabel(date: entry.day)))
 
                             Line()
                                 .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -221,7 +223,10 @@ struct FilteredBudgetView: View {
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                !$0.income && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate && $0.category?.id == categoryId
+                !$0
+                    .income && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate && $0
+                    .category?
+                    .id == categoryId
             })
         } else {
             _transactions = Query(filter: #Predicate<TransactionModel> {

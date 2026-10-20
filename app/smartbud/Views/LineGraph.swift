@@ -24,7 +24,8 @@ struct LineGraph: View {
     private var currentPlot: LineGraphDataPoint? {
         guard let selectedDate else { return nil }
         // Pick the data point whose date is closest to the selected x.
-        return data.min(by: { abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate)) })
+        return data
+            .min(by: { abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate)) })
     }
 
     private var color: Color {

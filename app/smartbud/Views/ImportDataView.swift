@@ -112,25 +112,32 @@ struct ImportDataView: View {
     let instructions: [InstructionHeadings] = [
         InstructionHeadings(
             title: String.appLocalized("Import transactions"),
-            subtitle: String.appLocalized("Begin by adding a CSV file with 4 columns: amount, note, date, and category.")),
+            subtitle: String
+                .appLocalized("Begin by adding a CSV file with 4 columns: amount, note, date, and category.")),
         InstructionHeadings(
             title: String.appLocalized("Assign category column"),
-            subtitle: String.appLocalized("Select a column from your import that corresponds to the categories of your transactions.")),
+            subtitle: String.appLocalized("Select a column from your import that corresponds "
+                 + "to the categories of your transactions.")),
         InstructionHeadings(
             title: String.appLocalized("Assign note column"),
-            subtitle: String.appLocalized("Select a column from your import that corresponds to the notes/subtitles of your transactions.")),
+            subtitle: String.appLocalized("Select a column from your import that corresponds "
+                 + "to the notes/subtitles of your transactions.")),
         InstructionHeadings(
             title: String.appLocalized("Assign date column"),
-            subtitle: String.appLocalized("Select a column from your import that corresponds to the dates of your transactions.")),
+            subtitle: String
+                .appLocalized("Select a column from your import that corresponds to the dates of your transactions.")),
         InstructionHeadings(
             title: String.appLocalized("Assign amount column"),
-            subtitle: String.appLocalized("Select a column from your import that corresponds to the values of your transactions.")),
+            subtitle: String
+                .appLocalized("Select a column from your import that corresponds to the values of your transactions.")),
         InstructionHeadings(
             title: String.appLocalized("Indicate date format"),
-            subtitle: String.appLocalized("Referencing this article, state the format of the dates in the assigned column.")),
+            subtitle: String
+                .appLocalized("Referencing this article, state the format of the dates in the assigned column.")),
         InstructionHeadings(
             title: String.appLocalized("Link categories"),
-            subtitle: String.appLocalized("Match values found in the 'Category' column to the corresponding categories in SmartBud.")),
+            subtitle: String.appLocalized("Match values found in the 'Category' column "
+                 + "to the corresponding categories in SmartBud.")),
         InstructionHeadings(
             title: String.appLocalized("Processing import"),
             subtitle: String.appLocalized("Please wait while we process your new transactions."))
@@ -145,7 +152,8 @@ struct ImportDataView: View {
 
     let pointers = [
         String.appLocalized("Ensure that the values in the 'Amount' column do not contain any currency symbols."),
-        String.appLocalized("All dates should be of a consistent, recognizable format. If no timestamps are provided, the time of transaction will default to 12:00 am."),
+        String.appLocalized("All dates should be of a consistent, recognizable format. If no timestamps "
+             + "are provided, the time of transaction will default to 12:00 am."),
         String.appLocalized("Fields containing commas are fine as long as they are wrapped in double quotes.")
     ]
 

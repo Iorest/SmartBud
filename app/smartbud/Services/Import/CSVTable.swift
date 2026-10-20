@@ -14,32 +14,30 @@ struct CSVTable: Equatable {
     /// Parses quoted fields (`"a,b"`), escaped quotes (`""`), CRLF, bare CR
     /// and a trailing newline.
     init(text: String) throws {
-        var rows: [[String]] = []
-        var row: [String] = []
-        var field = ""
-        var inQuotes = false
-        var line = 1
         // Swift treats "\r\n" as one grapheme cluster, so normalise line
         // endings before iterating; quoted newlines become plain "\n".
         let normalized = text
             .replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
-        var iterator = normalized.makeIterator()
+        var parser = CSVParser()
+        rows = try parser.parse(normalized)
+    }
+
+    var columnCounts: Set<Int> { Set(rows.map(\.count)) }
+}
+
+/// Character-level RFC 4180 state machine. Split out of `CSVTable.init` so the
+/// quote handling and the row bookkeeping can be read on their own.
+private struct CSVParser {
+    private var rows: [[String]] = []
+    private var row: [String] = []
+    private var field = ""
+    private var inQuotes = false
+    private var line = 1
+
+    mutating func parse(_ text: String) throws -> [[String]] {
+        var iterator = text.makeIterator()
         var pending: Character?
-
-        func finishField() {
-            row.append(field)
-            field = ""
-        }
-
-        func finishRow() {
-            finishField()
-            // Ignore the empty row produced by a trailing newline.
-            if !(row.count == 1 && row[0].isEmpty) {
-                rows.append(row)
-            }
-            row = []
-        }
 
         while true {
             let character: Character
@@ -51,41 +49,7 @@ struct CSVTable: Equatable {
             } else {
                 break
             }
-
-            if inQuotes {
-                if character == "\"" {
-                    if let next = iterator.next() {
-                        if next == "\"" {
-                            field.append("\"")
-                        } else {
-                            inQuotes = false
-                            pending = next
-                        }
-                    } else {
-                        inQuotes = false
-                    }
-                } else {
-                    if character == "\n" { line += 1 }
-                    field.append(character)
-                }
-                continue
-            }
-
-            switch character {
-            case "\"":
-                if field.isEmpty {
-                    inQuotes = true
-                } else {
-                    field.append(character)
-                }
-            case ",":
-                finishField()
-            case "\n":
-                finishRow()
-                line += 1
-            default:
-                field.append(character)
-            }
+            pending = try consume(character, lookingAt: &iterator)
         }
 
         if inQuotes {
@@ -95,10 +59,62 @@ struct CSVTable: Equatable {
             finishRow()
         }
         guard !rows.isEmpty else { throw CSVError.empty }
-        self.rows = rows
+        return rows
     }
 
-    var columnCounts: Set<Int> { Set(rows.map(\.count)) }
+    /// Consumes one character. Returns a character that was read ahead and must
+    /// be handled next (closing quote or escaped quote).
+    private mutating func consume(_ character: Character,
+                                  lookingAt iterator: inout String.Iterator) throws -> Character? {
+        if inQuotes {
+            if character == "\"" {
+                guard let next = iterator.next() else {
+                    inQuotes = false
+                    return nil
+                }
+                if next == "\"" {
+                    field.append("\"")
+                    return nil
+                }
+                inQuotes = false
+                return next
+            }
+            if character == "\n" { line += 1 }
+            field.append(character)
+            return nil
+        }
+
+        switch character {
+        case "\"":
+            if field.isEmpty {
+                inQuotes = true
+            } else {
+                field.append(character)
+            }
+        case ",":
+            finishField()
+        case "\n":
+            finishRow()
+            line += 1
+        default:
+            field.append(character)
+        }
+        return nil
+    }
+
+    private mutating func finishField() {
+        row.append(field)
+        field = ""
+    }
+
+    private mutating func finishRow() {
+        finishField()
+        // Ignore the empty row produced by a trailing newline.
+        if !(row.count == 1 && row[0].isEmpty) {
+            rows.append(row)
+        }
+        row = []
+    }
 }
 
 enum CSVError: LocalizedError, Equatable {

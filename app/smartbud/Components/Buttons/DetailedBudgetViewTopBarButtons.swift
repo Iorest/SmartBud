@@ -15,9 +15,9 @@ struct DetailedBudgetViewTopBarButton: View {
     var action: () -> Void
 
     var body: some View {
-        Button(action: {
+        Button {
             self.action()
-        }) {
+        } label: {
             Image(systemName: imageName)
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(color)

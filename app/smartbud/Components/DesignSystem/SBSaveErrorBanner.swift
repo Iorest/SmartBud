@@ -22,7 +22,7 @@ struct SBSaveErrorBanner: View {
                 .foregroundStyle(Color.PrimaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Spacer(minLength: SBSpace.xs)
+            Spacer(minLength: SBSpace.extraSmall)
 
             Button(action: dismiss) {
                 Image(systemName: "xmark")

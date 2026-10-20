@@ -29,8 +29,8 @@ struct BrandNewBudgetView: View {
     @State var toastMessage: String = String.appLocalized("Missing Category")
 
     // sensory feedback triggers
-    @State private var errorHaptic = 0
-    @State private var lightHaptic = 0
+    @State var errorHaptic = 0
+    @State var lightHaptic = 0
 
     // stage one (ignore if editing), overall budget or category budget
     @State var categoryBudget: Bool = false
@@ -56,7 +56,7 @@ struct BrandNewBudgetView: View {
 
     @AppStorage("numberEntryType", store: .appGroup) var numberEntryType: Int = 1
 
-    @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
+    @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
@@ -105,23 +105,25 @@ struct BrandNewBudgetView: View {
         [
             InstructionHeadings(
                 title: String.appLocalized("Indicate budget type"),
-                subtitle: String.appLocalized("Pick the scope, period and start day. You can change all of this later.")),
+                subtitle: String
+                    .appLocalized("Pick the scope, period and start day. You can change all of this later.")),
             InstructionHeadings(
                 title: String.appLocalized("Set budget amount"),
-                subtitle: String.appLocalized("Try your best to stay under this limit! Also, feel free to change this in the future."))
+                subtitle: String.appLocalized("Try your best to stay under this limit! "
+                     + "Also, feel free to change this in the future."))
         ]
     }
 
     // MARK: - Page 1: details
 
-    private var weekdaySymbols: [String] {
+    var weekdaySymbols: [String] {
         var calendar = Calendar.current
         calendar.locale = Locale.appLocale
         return calendar.weekdaySymbols
     }
 
     @ViewBuilder
-    private var budgetDetails: some View {
+    var budgetDetails: some View {
         Form {
             Section {
                 Picker(String.appLocalized("Budget type"), selection: $categoryBudget) {
@@ -168,7 +170,7 @@ struct BrandNewBudgetView: View {
     }
 
     @ViewBuilder
-    private var startDaySection: some View {
+    var startDaySection: some View {
         switch budgetTimeFrame {
         case .day:
             EmptyView()
@@ -203,7 +205,7 @@ struct BrandNewBudgetView: View {
         }
     }
 
-    private func continueToAmount() {
+    func continueToAmount() {
         if categoryBudget && selectedCategory == nil {
             showToast = true
             toastMessage = String.appLocalized("Missing Category")
@@ -219,9 +221,9 @@ struct BrandNewBudgetView: View {
 
     // MARK: - Page 2: amount
 
-    private var amountPage: some View {
+    var amountPage: some View {
         VStack(spacing: 10) {
-            NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
+            NumberPadTextView(viewModel: padVM, currencySymbol: currencySymbol)
 
             if budgetTimeFrame != .day && padVM.price > 0 {
                 Text(amountPerDayString)
@@ -234,96 +236,17 @@ struct BrandNewBudgetView: View {
 
             Spacer()
 
-            NumberPad(vm: padVM) {
+            NumberPad(viewModel: padVM) {
                 submit()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    func submit() {
-        let amount = padVM.price
-        if amount == 0 {
-            errorHaptic &+= 1
-            showToast = true
-            toastMessage = String.appLocalized("Missing Amount")
-            return
-        }
-
-        lightHaptic &+= 1
-
-        let budgetType = getBudgetTypeInteger(budgetTimeFrame)
-        let timeFrameInt: Int = {
-            switch budgetTimeFrame {
-            case .day: return 0
-            case .week: return 1
-            case .month: return 2
-            case .year: return 3
-            }
-        }()
-        let computedStart = budgetVM.computeStartDate(
-            timeFrameRaw: timeFrameInt,
-            chosenDayWeek: chosenDayWeek,
-            chosenDayMonth: chosenDayMonth,
-            chosenDayYear: chosenDayYear
-        )
-        let originalStart = toEditBudget?.startDate ?? toEditMainBudget?.startDate
-        let originalType = toEditBudget?.type ?? toEditMainBudget?.type ?? budgetType
-        let startDate = BudgetAnchor.startDate(
-            original: originalStart,
-            oldType: originalType,
-            newType: budgetType,
-            computed: computedStart
-        )
-
-        if let unwrappedEditedBudget = toEditBudget {
-            let category = selectedCategory ?? unwrappedEditedBudget.category
-            if let category {
-                budgetVM.update(
-                    unwrappedEditedBudget,
-                    amount: amount,
-                    startDate: startDate,
-                    type: budgetType,
-                    category: category
-                )
-            }
-
-            padVM.submit()
-            dismiss()
-
-            return
-        }
-
-        if let unwrappedEditedMainBudget = toEditMainBudget {
-            budgetVM.updateMain(
-                unwrappedEditedMainBudget,
-                amount: amount,
-                startDate: startDate,
-                type: budgetType
-            )
-
-            padVM.submit()
-            dismiss()
-
-            return
-        }
-
-        if categoryBudget {
-            if let unwrappedCategory = selectedCategory {
-                _ = budgetVM.create(amount: amount, startDate: startDate, type: budgetType, category: unwrappedCategory)
-            }
-        } else {
-            _ = budgetVM.createMain(amount: amount, startDate: startDate, type: budgetType)
-        }
-
-        padVM.submit()
-        dismiss()
-    }
-
     /// Seeds the picker state from an existing budget. `BudgetModel` and
     /// `MainBudgetModel` store the same `type` start-date pair, so both edit
     /// paths share one mapping.
-    private func applyEditorState(type: Int, startDate: Date, amount: Double) {
+    func applyEditorState(type: Int, startDate: Date, amount: Double) {
         switch type {
         case 1:
             budgetTimeFrame = .day
@@ -381,135 +304,14 @@ struct BrandNewBudgetView: View {
         self.toEditBudget = toEditBudget
         self.toEditMainBudget = toEditMainBudget
 
-        _categories = Query(filter: #Predicate<CategoryModel> { $0.budget == nil && $0.income == false }, sort: [SortDescriptor(\.order)])
+        _categories = Query(
+            filter: #Predicate<CategoryModel> { $0.budget == nil && $0.income == false },
+            sort: [SortDescriptor(\.order)]
+        )
     }
 
 }
 
 extension BrandNewBudgetView {
 
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                    Button {
-                        if showBackButton {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
-                                if progress > 1 {
-                                    progress = 1
-                                }
-                            }
-                        } else {
-                            dismiss()
-                        }
-                    } label: {
-                        Image(systemName: showBackButton ? "chevron.left" : "xmark")
-                            .font(.callout.weight(.semibold))
-
-                            .foregroundStyle(Color.SubtitleText)
-                            .padding(8)
-                            .background(Color.SecondaryBackground, in: Circle())
-                    }
-                    .contentTransition(.symbolEffect(.replace.downUp.wholeSymbol))
-
-                Spacer()
-
-                ProgressView(value: progress == 1 ? 0.5 : 1)
-                    .frame(width: 72)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .overlay {
-                if showToast {
-                    HStack(spacing: 6.5) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.AlertRed)
-
-                        Text(toastMessage)
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(Color.AlertRed)
-                    }
-                    .padding(8)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
-                    .frame(width: 250)
-                }
-            }
-            .padding(.bottom, 50)
-            .animation(.easeInOut, value: showBackButton)
-
-            VStack(alignment: .leading, spacing: 5) {
-                HStack {
-                    Text(instructions[progress == 1 ? 0 : 1].title)
-                        .foregroundStyle(Color.PrimaryText)
-                        .font(.title2.weight(.semibold))
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-
-                Text(instructions[progress == 1 ? 0 : 1].subtitle)
-                    .foregroundStyle(Color.SubtitleText)
-                    .font(.body.weight(.medium))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(height: labelHeight, alignment: .top)
-
-            if progress == 1 {
-                budgetDetails
-            } else {
-                amountPage
-            }
-
-            if progress == 1 {
-                Button {
-                    continueToAmount()
-                } label: {
-                    Text(String.appLocalized("Continue"))
-                        .font(.body.weight(.semibold))
-                        .padding(.vertical, 13)
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(Color.LightIcon)
-                        .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
-                }
-                .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
-            }
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-
-        .appBackground()
-        .onAppear {
-            // Sync the pad VM with the AppStorage flags on first appearance.
-            // Subsequent changes are picked up by the `onChange` below.
-            padVM.numberEntryType = numberEntryType
-            if let edited = toEditBudget {
-                selectedCategory = edited.category
-                applyEditorState(type: edited.type, startDate: edited.startDate, amount: edited.amount)
-            } else if let edited = toEditMainBudget {
-                applyEditorState(type: edited.type, startDate: edited.startDate, amount: edited.amount)
-            } else {
-                chosenDayWeek = firstWeekday
-                chosenDayMonth = firstDayOfMonth
-            }
-        }
-        .sheet(isPresented: $showingCategoryView) {
-                NewCategoryAlert(income: Binding.constant(false), bottomSpacers: false, budgetMode: true)
-                    .presentationDetents([.medium, .large])
-        }
-        .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: numberEntryType) { _, new in
-            padVM.numberEntryType = new
-        }
-        .onChange(of: showToast) { _, newValue in
-            if newValue {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .seconds(2))
-                    showToast = false
-                }
-            }
-        }
-        .sensoryFeedback(.error, trigger: errorHaptic)
-        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
-    }
 }

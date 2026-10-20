@@ -20,6 +20,11 @@ struct SingleBudgetView: View {
         return budget.amount
     }
 
+    /// "left" / "over" before the period label.
+    private var remainingStatus: String {
+        budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")
+    }
+
     var budgetType: String {
         String.appLocalized(BudgetPeriod.labelKey(for: budget.type))
     }
@@ -116,6 +121,16 @@ struct SingleBudgetView: View {
     @State private var lightHaptic = 0
     @State private var heavyHaptic = 0
 
+    init(budget: BudgetModel, toDelete: Binding<BudgetModel?>?, toEdit: Binding<BudgetModel?>?, budgetRows: Bool) {
+        self.budget = budget
+        self.budgetRows = budgetRows
+        _toDelete = toDelete ?? Binding.constant(nil)
+        _toEdit = toEdit ?? Binding.constant(nil)
+    }
+}
+
+extension SingleBudgetView {
+
     var body: some View {
         Group {
             if budgetRows {
@@ -165,7 +180,7 @@ struct SingleBudgetView: View {
                         VStack(alignment: .trailing, spacing: -4) {
                             BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 1)
 
-                            Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
+                            Text("\(remainingStatus) \(budgetType)")
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
@@ -280,7 +295,7 @@ struct SingleBudgetView: View {
 
                             BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2)
 
-                            Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
+                            Text("\(remainingStatus) \(budgetType)")
                                 .font(.footnote.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                                 .minimumScaleFactor(0.7)
@@ -298,9 +313,11 @@ struct SingleBudgetView: View {
                                   : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
                             .frame(maxWidth: .infinity)
                         .overlay(alignment: .topLeading) {
-                            if budget.type != 1 && totalSpent < budgetAmount && targetPercent > 0 && targetPercent < 0.95 {
+                            if budget
+                                .type != 1 && totalSpent < budgetAmount && targetPercent > 0 && targetPercent < 0.95 {
                                 RoundedTriangle(cornerRadius: 1.3)
-                                    .fill((targetPercent * budgetAmount) <= (budgetAmount - totalSpent) ? Color.DarkBackground : Color.AlertRed)
+                                    .fill((targetPercent * budgetAmount) <= (budgetAmount - totalSpent) ? Color
+                                        .DarkBackground : Color.AlertRed)
                                     .frame(width: 14, height: 6.5)
                                     .offset(x: (targetPercent * proxy.size.width) - 7, y: -3.5)
                             }
@@ -329,12 +346,5 @@ struct SingleBudgetView: View {
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
         .sensoryFeedback(.impact(weight: .heavy), trigger: heavyHaptic)
-    }
-
-    init(budget: BudgetModel, toDelete: Binding<BudgetModel?>?, toEdit: Binding<BudgetModel?>?, budgetRows: Bool) {
-        self.budget = budget
-        self.budgetRows = budgetRows
-        _toDelete = toDelete ?? Binding.constant(nil)
-        _toEdit = toEdit ?? Binding.constant(nil)
     }
 }

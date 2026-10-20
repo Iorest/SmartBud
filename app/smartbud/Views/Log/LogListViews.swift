@@ -59,7 +59,7 @@ struct FutureListView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, SBSpace.xs)
+                    .padding(.horizontal, SBSpace.extraSmall)
                     .padding(.top, SBSpace.small)
                     .padding(.bottom, SBSpace.xxs)
 

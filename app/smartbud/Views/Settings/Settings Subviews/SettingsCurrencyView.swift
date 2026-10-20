@@ -41,7 +41,7 @@ struct SettingsCurrencyView: View {
                         .foregroundStyle(Color.PrimaryText)
                         .lineLimit(1)
 
-                    Spacer(minLength: SBSpace.xs)
+                    Spacer(minLength: SBSpace.extraSmall)
 
                     if currency.code == currencyCode {
                         Image(systemName: "checkmark")

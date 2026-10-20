@@ -1,0 +1,169 @@
+//
+//  TransactionView+Subviews.swift
+//  smartbud
+//
+import Foundation
+import SwiftUI
+
+extension TransactionView {
+
+    var body: some View {
+        GeometryReader { proxy in
+            VStack(spacing: 8) {
+                // income/expense picker
+                headerArea
+
+                swipeAndNumberPadArea
+
+                suggestionsOrDateCategoryRow
+
+                // date and category picker
+                categoryPickerOrNumberPad
+
+            }
+            .padding(17)
+            // Cap the entry layout on iPad/Mac so the keypad doesn't stretch
+            // edge to edge; centred by the outer frame.
+            .frame(width: min(proxy.size.width, 560), height: proxy.size.height)
+            .frame(maxWidth: .infinity)
+            .background(Color.clear)
+            .onTapGesture {
+                self.hideKeyboard()
+            }
+            .overlay {
+                datePickerOverlay
+            }
+        }
+
+        .animation(.easeOut(duration: 0.2), value: showToast)
+        .appBackground()
+        #if os(macOS)
+        // A sheet has no intrinsic size; the entry screen is a fixed
+        // calculator-like surface, so give it one.
+        .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
+        #else
+        .ignoresSafeArea(.keyboard, edges: .all)
+        .frame(maxHeight: .infinity)
+        .ignoresSafeArea(.all)
+        #endif
+        .overlay {
+            if deleteMode {
+                TransactionDeleteConfirmation(
+                    income: toDelete?.income ?? income,
+                    bottomEdge: bottomEdge,
+                    onDelete: {
+                        deleteMode = false
+                        withAnimation {
+                            if let itemToDelete = toDelete {
+                                transactionVM.delete(itemToDelete)
+                            }
+                        }
+                        dismiss()
+                    },
+                    onCancel: {
+                        withAnimation(.easeOut(duration: 0.7)) {
+                            deleteMode = false
+                            toDelete = nil
+                        }
+                    }
+                )
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: deleteMode)
+        // Control-dense surface (keypad + fixed rows). Let text grow to the
+        // first accessibility size, then stop: beyond that the keypad and the
+        // date/category row cannot fit on a phone. Documented exception to
+        // unlimited scaling, same approach as Apple's Calculator.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .sbToastDismissal($showToast)
+        .onChange(of: income) { _, newValue in
+            lightHaptic &+= 1
+            // Only drop a category that belongs to the other side; clearing
+            // unconditionally wiped the category when editing an income
+            // transaction (onAppear sets `income` after `category`).
+            if let category, category.income != newValue {
+                self.category = nil
+            }
+        }
+        .onChange(of: numberEntryType) { _, new in
+            padVM.numberEntryType = new
+        }
+        .onChange(of: isDragging) { _, _ in
+            if !isDragging {
+                if income {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        swipingOffset = capsuleWidth
+                    }
+                } else {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        swipingOffset = 0
+                    }
+                }
+            }
+        }
+        .onAppear {
+            categoryVM.load()
+            // The init can't read `capsuleWidth`, so re-align the income
+            // capsule once the environment (and its type size) is known.
+            if income {
+                swipingOffset = capsuleWidth
+            }
+            // Sync the pad's numberEntryType with the AppStorage flag at the
+            // moment the view first appears. Subsequent changes are picked up
+            // by the `.onChange(of: numberEntryType)` modifier above.
+            padVM.numberEntryType = numberEntryType
+            DispatchQueue.main.async {
+                if let transaction = toEdit {
+                    repeatType = Int(transaction.recurringType)
+                    repeatCoefficient = Int(transaction.recurringCoefficient)
+                    padVM.price = transaction.wrappedAmount
+
+                    if transaction.wrappedAmount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
+                        padVM.isEditingDecimal = true
+                    }
+
+                    if transaction.wrappedDate > Date.now {
+                        animateIcon = true
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showCategorySheet) {
+            CategoryView(mode: .transaction, income: income) { selected in
+                category = selected
+                // Picking a category also clears a pending "missing
+                // category" highlight left over from a failed submit.
+                categoryButtonTextColor = Color.SubtitleText
+                categoryButtonBackgroundColor = Color.clear
+                categoryButtonOutlineColor = Color.Outline
+            }
+        }
+        .sheet(isPresented: $showSmartEntry) {
+            SmartEntrySheet(
+                expenseCategories: categoryVM.expenseCategories,
+                incomeCategories: categoryVM.incomeCategories
+            ) { parsed in
+                applyParsed(parsed)
+            }
+        }
+        .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
+            Button(String.appLocalized("Keep Editing"), role: .cancel) {}
+            Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
+        }
+        .sheet(isPresented: $showPicker) {
+                CustomRecurringView(
+                    repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker
+                )
+                .presentationDetents([.medium, .large])
+        }
+        .onChange(of: dynamicTypeSize) { _, _ in
+            if income {
+                swipingOffset = capsuleWidth
+            }
+        }
+        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
+        .sensoryFeedback(.error, trigger: errorHaptic)
+        .sensoryFeedback(.success, trigger: successHaptic)
+    }
+}

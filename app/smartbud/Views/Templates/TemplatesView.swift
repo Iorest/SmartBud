@@ -25,7 +25,8 @@ struct TemplatesView: View {
                 ContentUnavailableView {
                     Label(String.appLocalized("No templates yet"), systemImage: "square.on.square")
                 } description: {
-                    Text(String.appLocalized("Save a transaction you record often. Tap a template to log it instantly."))
+                    Text(String.appLocalized("Save a transaction you record often. "
+                         + "Tap a template to log it instantly."))
                 } actions: {
                     Button(String.appLocalized("New Template")) { showEditor = true }
                         .buttonStyle(.borderedProminent)
@@ -88,22 +89,8 @@ struct TemplatesView: View {
         }
     }
 
-    private var nextOrder: Int {
-        (templates.map(\.order).max() ?? -1) + 1
-    }
-
-    private func templateRow(_ template: TemplateTransactionModel) -> some View {
-        Button {
-            transactionVM.applyTemplate(template.order)
-            withAnimation { loggedTemplateID = template.id }
-            Task { @MainActor in
-                try? await Task.sleep(for: .seconds(1.5))
-                withAnimation {
-                    if loggedTemplateID == template.id { loggedTemplateID = nil }
-                }
-            }
-        } label: {
-            HStack(spacing: SBSpace.small) {
+    private func templateRowLabel(_ template: TemplateTransactionModel) -> some View {
+        HStack(spacing: SBSpace.small) {
                 EmojiLogView(
                     emoji: template.wrappedEmoji,
                     colour: template.wrappedColour,
@@ -127,7 +114,7 @@ struct TemplatesView: View {
                     }
                 }
 
-                Spacer(minLength: SBSpace.xs)
+                Spacer(minLength: SBSpace.extraSmall)
 
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(amountText(template))
@@ -144,6 +131,24 @@ struct TemplatesView: View {
             }
             .padding(.vertical, 4)
             .contentShape(Rectangle())
+    }
+
+    private var nextOrder: Int {
+        (templates.map(\.order).max() ?? -1) + 1
+    }
+
+    private func templateRow(_ template: TemplateTransactionModel) -> some View {
+        Button {
+            transactionVM.applyTemplate(template.order)
+            withAnimation { loggedTemplateID = template.id }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.5))
+                withAnimation {
+                    if loggedTemplateID == template.id { loggedTemplateID = nil }
+                }
+            }
+        } label: {
+            templateRowLabel(template)
         }
         .buttonStyle(.plain)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -292,7 +297,7 @@ struct TemplateEditorView: View {
 
     private func save() {
         guard let category, let amount else { return }
-        transactionVM.createOrUpdateTemplate(
+        transactionVM.createOrUpdateTemplate(TemplateDefinition(
             order: nextOrder,
             note: note,
             category: category,
@@ -300,7 +305,7 @@ struct TemplateEditorView: View {
             amount: amount,
             repeatType: repeatType,
             repeatCoefficient: repeatType == 0 ? 0 : 1
-        )
+        ))
         dismiss()
     }
 }

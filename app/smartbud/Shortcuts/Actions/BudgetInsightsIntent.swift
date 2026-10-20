@@ -15,10 +15,17 @@ struct BudgetIntent: AppIntent {
     static let description =
         IntentDescription(LocalizedStringResource("Extract leftover amount for a particular budget"))
 
-    @Parameter(title: LocalizedStringResource("Budget Type"), requestValueDialog: IntentDialog(LocalizedStringResource("What budget type would you like to extract insights from?")))
+    @Parameter(title: LocalizedStringResource("Budget Type"),
+        requestValueDialog: IntentDialog(
+            LocalizedStringResource("What budget type would you like to extract insights from?")
+        )
+    )
     var type: ShortcutsBudgetsType
 
-    @Parameter(title: LocalizedStringResource("Category Budget"), requestValueDialog: IntentDialog(LocalizedStringResource("Select a categorical budget.")))
+    @Parameter(
+        title: LocalizedStringResource("Category Budget"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Select a categorical budget."))
+    )
     var budget: BudgetEntity?
 
     @MainActor

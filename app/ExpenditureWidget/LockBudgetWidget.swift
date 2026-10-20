@@ -19,7 +19,8 @@ struct LockBudgetWidget: Widget {
     ]
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self, provider: LockBudgetWidgetProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: BudgetWidgetConfigurationIntent.self,
+            provider: LockBudgetWidgetProvider()) { entry in
             LockBudgetWidgetEntryView(entry: entry)
                 .environment(\.locale, Locale.appLocale)
         }
@@ -27,6 +28,12 @@ struct LockBudgetWidget: Widget {
         .description("Monitor how you are sticking to your budgets.")
         .supportedFamilies(supportedFamilies)
     }
+}
+
+struct LockBudgetSnapshot {
+    let total: Double
+    let timeLeft: String
+    let budget: HoldingBudget
 }
 
 struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
@@ -37,32 +44,50 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     func placeholder(in _: Context) -> LockBudgetWidgetEntry {
         let loaded = loadData(budgetId: "")
 
-        return LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: BudgetWidgetConfigurationIntent())
+        return LockBudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            timeLeft: loaded.timeLeft,
+            budget: loaded.budget,
+            configuration: BudgetWidgetConfigurationIntent()
+        )
     }
 
     func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> LockBudgetWidgetEntry {
         let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
-        let entry = LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: configuration)
+        let entry = LockBudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            timeLeft: loaded.timeLeft,
+            budget: loaded.budget,
+            configuration: configuration
+        )
         return entry
     }
 
     func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
         let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
 
-        let entry = LockBudgetWidgetEntry(date: Date(), totalSpent: loaded.total, timeLeft: loaded.timeLeft, budget: loaded.budget, configuration: configuration)
+        let entry = LockBudgetWidgetEntry(
+            date: Date(),
+            totalSpent: loaded.total,
+            timeLeft: loaded.timeLeft,
+            budget: loaded.budget,
+            configuration: configuration
+        )
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
         return timeline
     }
 
-    func loadData(budgetId: String) -> (total: Double, timeLeft: String, budget: HoldingBudget) {
+    func loadData(budgetId: String) -> LockBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
-            return (0, "", budget)
+            return LockBudgetSnapshot(total: 0, timeLeft: "", budget: budget)
         }
 
         let fetchId = uuid
@@ -71,7 +96,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         let allBudgets = (try? context.fetch(budgetDesc)) ?? []
         guard let budgetModel = allBudgets.first(where: { $0.id == fetchId }) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
-            return (0, "", budget)
+            return LockBudgetSnapshot(total: 0, timeLeft: "", budget: budget)
         }
 
         let budgetStartDate = budgetModel.startDate
@@ -79,7 +104,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         let now = Date.now
         let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         let filteredTxns = allTxns.filter {
-            !$0.income && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now && $0.category?.id == budgetCategory?.id
+            !$0.income
+                && $0.wrappedDate >= budgetStartDate
+                && $0.wrappedDate <= now
+                && $0.category?.id == budgetCategory?.id
         }
 
         let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.wrappedAmount)))
@@ -92,27 +120,25 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
             budgetAmount: budgetModel.amount
         )
 
-        let timeLeft: String
+        let timeLeft = Self.timeLeftLabel(for: budgetModel, now: now)
+
+        return LockBudgetSnapshot(total: holdingTotal, timeLeft: timeLeft, budget: returnBudget)
+    }
+
+    /// "5 days left" copy for the accessory widgets.
+    private static func timeLeftLabel(for budget: BudgetModel, now: Date) -> String {
         let calendar = Calendar.current
-
-        if budgetModel.type == 1 {
-            let components = calendar.dateComponents([.hour], from: budgetModel.startDate, to: now)
-            timeLeft = String(localized: "^[\(24 - (components.hour ?? 0)) hours left](inflect: true)")
-        } else if budgetModel.type == 2 {
-            let components = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
-            timeLeft = String(localized: "^[\(7 - (components.day ?? 0)) days left](inflect: true)")
-        } else {
-            let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
-            let numberOfDays = components1.day ?? 0
-
-            let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
-            let numberOfDaysPast = components2.day ?? 0
-
-            let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-            timeLeft = String(localized: "^[\(daysLeftNumber) days left](inflect: true)")
+        if budget.type == 1 {
+            let components = calendar.dateComponents([.hour], from: budget.startDate, to: now)
+            return String(localized: "^[\(24 - (components.hour ?? 0)) hours left](inflect: true)")
         }
-
-        return (holdingTotal, timeLeft, returnBudget)
+        if budget.type == 2 {
+            let components = calendar.dateComponents([.day], from: budget.startDate, to: now)
+            return String(localized: "^[\(7 - (components.day ?? 0)) days left](inflect: true)")
+        }
+        let total = calendar.dateComponents([.day], from: budget.startDate, to: budget.endDate).day ?? 0
+        let past = calendar.dateComponents([.day], from: budget.startDate, to: now).day ?? 0
+        return String(localized: "^[\(Int(total - past)) days left](inflect: true)")
     }
 }
 
@@ -176,8 +202,9 @@ struct LockBudgetWidgetEntryView: View {
             if entry.configuration.budget == nil {
                 Text(String.appLocalized("Select budget in widget options"))
             } else {
-                Text("\(entry.budget.emoji) \(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle)")
-                    .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
+                let amount = amountText(difference, showCents: showCents)
+                Text("\(entry.budget.emoji) \(currencySymbol)\(amount) \(subtitle)")
+                    .widgetURL(budgetDeepLink(entry.budget.name))
             }
 
         case .accessoryCircular:
@@ -198,7 +225,7 @@ struct LockBudgetWidgetEntryView: View {
                     Text("\(Int(round(percent * 100)))%")
                 }
                 .gaugeStyle(AccessoryCircularGaugeStyle())
-                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
+                .widgetURL(budgetDeepLink(entry.budget.name))
                 .containerBackground(for: .widget) { Color.clear }
             }
 
@@ -222,7 +249,8 @@ struct LockBudgetWidgetEntryView: View {
                         }
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
 
-                        Text("\(currencySymbol)\(difference, specifier: (showCents && difference < 100) ? "%.2f" : "%.0f") \(subtitle) \(budgetType)")
+                        let amount = amountText(difference, showCents: showCents)
+                        Text("\(currencySymbol)\(amount) \(subtitle) \(budgetType)")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundColor(Color.SubtitleText)
 
@@ -231,10 +259,10 @@ struct LockBudgetWidgetEntryView: View {
                         } currentValueLabel: {
                             EmptyView()
                         } minimumValueLabel: {
-                            Text("\(entry.totalSpent, specifier: (showCents && entry.totalSpent < 100) ? "%.2f" : "%.0f")")
+                            Text(amountText(entry.totalSpent, showCents: showCents))
                                 .font(.system(size: 10, weight: .regular, design: .rounded))
                         } maximumValueLabel: {
-                            Text("\(entry.budget.budgetAmount, specifier: (showCents && entry.budget.budgetAmount < 100) ? "%.2f" : "%.0f")")
+                            Text(amountText(entry.budget.budgetAmount, showCents: showCents))
                                 .font(.system(size: 10, weight: .regular, design: .rounded))
                         }
                         .frame(height: 5)
@@ -243,7 +271,7 @@ struct LockBudgetWidgetEntryView: View {
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .widgetURL(URL(string: "smartbud://budget?budget=\(entry.budget.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"))
+                .widgetURL(budgetDeepLink(entry.budget.name))
                 .containerBackground(for: .widget) { Color.clear }
             }
 
@@ -253,6 +281,10 @@ struct LockBudgetWidgetEntryView: View {
     }
 
     func showPercent(size: CGFloat) -> Bool {
-        return size > entry.budget.name.widthOfRoundedString(size: 15, weight: .semibold) + 15 + percentString.widthOfRoundedString(size: 15, weight: .semibold)
+        return size > entry
+            .budget
+            .name
+            .widthOfRoundedString(size: 15, weight: .semibold) + 15 + percentString
+            .widthOfRoundedString(size: 15, weight: .semibold)
     }
 }

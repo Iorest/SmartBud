@@ -70,7 +70,9 @@ struct KeyboardAwareModifier: ViewModifier {
                 // executor.
                 await withTaskGroup(of: Void.self) { group in
                     group.addTask {
-                        for await note in NotificationCenter.default.notifications(named: UIResponder.keyboardWillShowNotification) {
+                        for await note in NotificationCenter
+                            .default
+                            .notifications(named: UIResponder.keyboardWillShowNotification) {
                             let height = note.keyboardHeight
                             if height > 200 {
                                 await MainActor.run {
@@ -81,7 +83,9 @@ struct KeyboardAwareModifier: ViewModifier {
                         }
                     }
                     group.addTask {
-                        for await _ in NotificationCenter.default.notifications(named: UIResponder.keyboardWillHideNotification) {
+                        for await _ in NotificationCenter
+                            .default
+                            .notifications(named: UIResponder.keyboardWillHideNotification) {
                             await MainActor.run { isKeyboardVisible = false }
                         }
                     }

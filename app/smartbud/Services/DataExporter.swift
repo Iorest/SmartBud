@@ -154,68 +154,93 @@ enum DataExporter {
 
     // MARK: - Payload assembly
 
+    private static func categoriesDTOs(_ repo: DataRepository) -> [CategoryDTO] {
+    repo.fetch(CategoryModel.self)
+        .sorted { $0.order < $1.order }
+        .map { cat in
+            CategoryDTO(
+                id: cat.id, name: cat.name, emoji: cat.emoji, colour: cat.colour,
+                income: cat.income, order: cat.order, dateCreated: cat.dateCreated
+            )
+        }
+
+    }
+
+    private static func transactionsDTOs(_ repo: DataRepository) -> [TransactionDTO] {
+    repo.fetch(TransactionModel.self)
+        .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+        .map { txn in
+            TransactionDTO(
+                id: txn.id,
+                amount: txn.amount,
+                date: txn.date,
+                day: txn.day,
+                month: txn.month,
+                note: txn.note,
+                income: txn.income,
+                recurringType: txn.recurringType,
+                recurringCoefficient: txn.recurringCoefficient,
+                onceRecurring: txn.onceRecurring,
+                categoryId: txn.category?.id,
+                categoryName: txn.category?.name
+            )
+        }
+
+    }
+
+    private static func budgetsDTOs(_ repo: DataRepository) -> [BudgetDTO] {
+    repo.fetch(BudgetModel.self)
+        .sorted { $0.startDate < $1.startDate }
+        .map { budget in
+            BudgetDTO(
+                id: budget.id, amount: budget.amount, startDate: budget.startDate,
+                dateCreated: budget.dateCreated, type: budget.type, green: budget.green,
+                categoryId: budget.category?.id, categoryName: budget.category?.name
+            )
+        }
+
+    }
+
+    private static func mainBudgetsDTOs(_ repo: DataRepository) -> [MainBudgetDTO] {
+    repo.fetch(MainBudgetModel.self)
+        .sorted { $0.startDate < $1.startDate }
+        .map { mainBudget in
+            MainBudgetDTO(
+                amount: mainBudget.amount, startDate: mainBudget.startDate,
+                dateCreated: mainBudget.dateCreated, type: mainBudget.type, green: mainBudget.green
+            )
+        }
+
+    }
+
+    private static func templatesDTOs(_ repo: DataRepository) -> [TemplateTransactionDTO] {
+    repo.fetch(TemplateTransactionModel.self)
+        .sorted { $0.order < $1.order }
+        .map { template in
+            TemplateTransactionDTO(
+                id: template.id, amount: template.amount, note: template.note,
+                income: template.income, order: template.order,
+                recurringType: template.recurringType,
+                recurringCoefficient: template.recurringCoefficient,
+                categoryId: template.category?.id, categoryName: template.category?.name
+            )
+        }
+
+    }
+
     private static func makePayload(repo: DataRepository) throws -> ExportPayload {
         let appVersion = Bundle.main.appVersion
         let exportDate = Date.now
 
-        let categories = repo.fetch(CategoryModel.self)
-            .sorted { $0.order < $1.order }
-            .map { cat in
-                CategoryDTO(
-                    id: cat.id, name: cat.name, emoji: cat.emoji, colour: cat.colour,
-                    income: cat.income, order: cat.order, dateCreated: cat.dateCreated
-                )
-            }
+        let categories = categoriesDTOs(repo)
 
-        let transactions = repo.fetch(TransactionModel.self)
-            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
-            .map { txn in
-                TransactionDTO(
-                    id: txn.id,
-                    amount: txn.amount,
-                    date: txn.date,
-                    day: txn.day,
-                    month: txn.month,
-                    note: txn.note,
-                    income: txn.income,
-                    recurringType: txn.recurringType,
-                    recurringCoefficient: txn.recurringCoefficient,
-                    onceRecurring: txn.onceRecurring,
-                    categoryId: txn.category?.id,
-                    categoryName: txn.category?.name
-                )
-            }
+        let transactions = transactionsDTOs(repo)
 
-        let budgets = repo.fetch(BudgetModel.self)
-            .sorted { $0.startDate < $1.startDate }
-            .map { budget in
-                BudgetDTO(
-                    id: budget.id, amount: budget.amount, startDate: budget.startDate,
-                    dateCreated: budget.dateCreated, type: budget.type, green: budget.green,
-                    categoryId: budget.category?.id, categoryName: budget.category?.name
-                )
-            }
+        let budgets = budgetsDTOs(repo)
 
-        let mainBudgets = repo.fetch(MainBudgetModel.self)
-            .sorted { $0.startDate < $1.startDate }
-            .map { mb in
-                MainBudgetDTO(
-                    amount: mb.amount, startDate: mb.startDate,
-                    dateCreated: mb.dateCreated, type: mb.type, green: mb.green
-                )
-            }
+        let mainBudgets = mainBudgetsDTOs(repo)
 
-        let templates = repo.fetch(TemplateTransactionModel.self)
-            .sorted { $0.order < $1.order }
-            .map { template in
-                TemplateTransactionDTO(
-                    id: template.id, amount: template.amount, note: template.note,
-                    income: template.income, order: template.order,
-                    recurringType: template.recurringType,
-                    recurringCoefficient: template.recurringCoefficient,
-                    categoryId: template.category?.id, categoryName: template.category?.name
-                )
-            }
+        let templates = templatesDTOs(repo)
 
         return ExportPayload(
             exportDate: exportDate,

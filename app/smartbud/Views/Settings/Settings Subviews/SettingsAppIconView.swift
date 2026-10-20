@@ -124,7 +124,7 @@ struct SettingsAppIconView: View {
       }
     }
     .padding(.horizontal, SBSpace.medium)
-    .padding(.top, SBSpace.xs)
+    .padding(.top, SBSpace.extraSmall)
     .navigationTitle(String.appLocalized("App Icon"))
     #if os(iOS)
     .navigationBarTitleDisplayMode(.inline)

@@ -36,6 +36,30 @@ final class SpeechService {
         }
     }
 
+    private func installRecognitionTask(recognizer: SFSpeechRecognizer,
+                                        request: SFSpeechAudioBufferRecognitionRequest,
+                                        completion: @escaping (String) -> Void) {
+        task = recognizer.recognitionTask(with: request) { [weak self] result, error in
+            if let error {
+                self?.errorMessage = error.localizedDescription
+                self?.stopRecording()
+                return
+            }
+            if let result, result.isFinal {
+                completion(result.bestTranscription.formattedString)
+                self?.stopRecording()
+            }
+        }
+    }
+
+    private func installAudioTap() {
+        let input = audioEngine.inputNode
+        input.installTap(onBus: 0, bufferSize: 1024,
+                         format: input.outputFormat(forBus: 0)) { [weak self] buffer, _ in
+            self?.request?.append(buffer)
+        }
+    }
+
     func startRecording(completion: @escaping (String) -> Void) {
         guard !audioEngine.isRunning else { return }
 
@@ -76,22 +100,9 @@ final class SpeechService {
         guard let request else { return }
         request.shouldReportPartialResults = true
 
-        task = recognizer.recognitionTask(with: request) { [weak self] result, error in
-            if let error {
-                self?.errorMessage = error.localizedDescription
-                self?.stopRecording()
-                return
-            }
-            if let result, result.isFinal {
-                completion(result.bestTranscription.formattedString)
-                self?.stopRecording()
-            }
-        }
-
-        let input = audioEngine.inputNode
-        input.installTap(onBus: 0, bufferSize: 1024, format: input.outputFormat(forBus: 0)) { [weak self] buffer, _ in
-            self?.request?.append(buffer)
-        }
+        installRecognitionTask(recognizer: recognizer, request: request,
+                               completion: completion)
+        installAudioTap()
 
         audioEngine.prepare()
         do {

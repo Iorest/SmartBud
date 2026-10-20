@@ -82,7 +82,10 @@ struct CustomRecurringView: View {
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(
+                                    cornerRadius: SBRadius.pill,
+                                    style: .continuous
+                                )
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 30 ? 0.25 : 1)
@@ -108,7 +111,10 @@ struct CustomRecurringView: View {
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(
+                                    cornerRadius: SBRadius.pill,
+                                    style: .continuous
+                                )
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 2 ? 0.25 : 1)
@@ -127,7 +133,10 @@ struct CustomRecurringView: View {
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(
+                                    cornerRadius: SBRadius.pill,
+                                    style: .continuous
+                                )
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 1 ? 0.25 : 1)
@@ -161,7 +170,10 @@ struct CustomRecurringView: View {
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(
+                                    cornerRadius: SBRadius.pill,
+                                    style: .continuous
+                                )
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 3 ? 0.25 : 1)

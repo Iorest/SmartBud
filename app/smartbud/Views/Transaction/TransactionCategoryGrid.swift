@@ -37,8 +37,8 @@ struct TransactionCategoryGrid: View {
     }
 
     private let columns = [
-        GridItem(.flexible(), spacing: SBSpace.xs),
-        GridItem(.flexible(), spacing: SBSpace.xs)
+        GridItem(.flexible(), spacing: SBSpace.extraSmall),
+        GridItem(.flexible(), spacing: SBSpace.extraSmall)
     ]
 
     var body: some View {
@@ -47,7 +47,7 @@ struct TransactionCategoryGrid: View {
                 emptyState
             } else {
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: SBSpace.xs) {
+                    LazyVGrid(columns: columns, spacing: SBSpace.extraSmall) {
                         ForEach(categories) { item in
                             tile(item)
                         }
@@ -94,7 +94,7 @@ struct TransactionCategoryGrid: View {
                 withAnimation { showPicker = false }
             }
         } label: {
-            HStack(spacing: SBSpace.xs) {
+            HStack(spacing: SBSpace.extraSmall) {
                 Text(item.wrappedEmoji)
                     .font(.title3)
                 Text(item.wrappedName)

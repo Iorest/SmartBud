@@ -149,24 +149,10 @@ struct LLMClient {
         let content: String?
         switch config.provider.dialect {
         case .openAI:
-            struct ChatResponse: Decodable {
-                struct Choice: Decodable {
-                    struct Message: Decodable { let content: String? }
-                    let message: Message
-                }
-                let choices: [Choice]
-            }
-            content = try JSONDecoder().decode(ChatResponse.self, from: data)
+            content = try JSONDecoder().decode(OpenAIChatResponse.self, from: data)
                 .choices.first?.message.content
         case .anthropic:
-            struct MessageResponse: Decodable {
-                struct Block: Decodable {
-                    let type: String
-                    let text: String?
-                }
-                let content: [Block]
-            }
-            content = try JSONDecoder().decode(MessageResponse.self, from: data)
+            content = try JSONDecoder().decode(AnthropicMessageResponse.self, from: data)
                 .content.first { $0.type == "text" }?.text
         }
 
@@ -252,4 +238,26 @@ struct LLMClient {
     func testConnection() async throws -> String {
         try await complete(system: "Reply with OK.", user: "ping")
     }
+}
+
+// MARK: - Provider response shapes
+
+private struct OpenAIChatMessage: Decodable {
+    let content: String?
+}
+
+private struct OpenAIChatChoice: Decodable {
+    let message: OpenAIChatMessage
+}
+
+private struct OpenAIChatResponse: Decodable {
+    let choices: [OpenAIChatChoice]
+}
+
+private struct AnthropicMessageResponse: Decodable {
+    struct Block: Decodable {
+        let type: String
+        let text: String?
+    }
+    let content: [Block]
 }

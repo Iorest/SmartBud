@@ -24,7 +24,10 @@ extension ImportDataView {
             }
             .padding(12)
             .foregroundStyle(Color.IncomeGreen)
-            .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            .background(
+                Color.IncomeGreen.opacity(0.23),
+                in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
+            )
             .padding(.bottom, 20)
 
             ScrollView(showsIndicators: false) {
@@ -84,7 +87,10 @@ extension ImportDataView {
                                             .padding(.horizontal, 10)
                                             .frame(width: columnWidth, height: 30, alignment: .leading)
                                             .foregroundStyle(Color(labels[index].label))
-                                            .background(Color(labels[index].label).opacity(0.23), in: RoundedCorner(radius: 10, corners: [.topLeft, .topRight]))
+                                            .background(
+                                                Color(labels[index].label).opacity(0.23),
+                                                in: RoundedCorner(radius: 10, corners: [.topLeft, .topRight])
+                                            )
                                         }
                                     } else {
                                         Rectangle()
@@ -131,7 +137,10 @@ extension ImportDataView {
                                     .padding(.horizontal, 10)
                                     .frame(width: columnWidth + 2, height: 30, alignment: .leading)
                                     .foregroundStyle(Color.LightIcon)
-                                    .background(Color.DarkBackground, in: RoundedCorner(radius: 10, corners: [.topLeft, .topRight]))
+                                    .background(
+                                        Color.DarkBackground,
+                                        in: RoundedCorner(radius: 10, corners: [.topLeft, .topRight])
+                                    )
 
                                     Rectangle()
                                         .stroke(Color.DarkBackground, lineWidth: 2)
@@ -193,7 +202,10 @@ extension ImportDataView {
                 .background {
                     RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
                         .stroke(Color.SubtitleText, lineWidth: 2)
-                        .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous))
+                        .background(
+                            Color.SecondaryBackground,
+                            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
+                        )
                 }
                 .onChange(of: dateFormatString) { _, newValue in
                     let dateFormatter = DateFormatter()
@@ -212,7 +224,9 @@ extension ImportDataView {
     @ViewBuilder
     var stepSummary: some View {
             VStack(alignment: .leading, spacing: SBSpace.small) {
-                Text(String.appFormatted("%lld/^[%lld category](inflect: true) linked", numberOfLinkedCategories, uniqueCategories.count))
+                Text(String
+                    .appFormatted("%lld/^[%lld category](inflect: true) linked", numberOfLinkedCategories,
+                        uniqueCategories.count))
                     .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.horizontal, SBSpace.medium)
@@ -222,13 +236,13 @@ extension ImportDataView {
                         let isIncome = uniqueCategories[categoryIndex].income
                         let pool = isIncome ? incomeCategories : expenseCategories
 
-                        VStack(alignment: .leading, spacing: SBSpace.xs) {
+                        VStack(alignment: .leading, spacing: SBSpace.extraSmall) {
                             HStack(spacing: SBSpace.small) {
                                 Text(uniqueCategories[categoryIndex].excelValue)
                                     .font(.headline)
                                     .lineLimit(1)
 
-                                Spacer(minLength: SBSpace.xs)
+                                Spacer(minLength: SBSpace.extraSmall)
 
                                 Picker("", selection: $uniqueCategories[categoryIndex].income) {
                                     Text(String.appLocalized("Expense")).tag(false)
@@ -245,7 +259,8 @@ extension ImportDataView {
                                 }
                             }
 
-                            Picker(String.appLocalized("Category"), selection: $uniqueCategories[categoryIndex].category) {
+                            Picker(String.appLocalized("Category"), selection: $uniqueCategories[categoryIndex]
+                                .category) {
                                 Text(String.appLocalized("Select")).tag(CategoryModel?.none)
                                 ForEach(pool) { category in
                                     Text("\(category.wrappedEmoji) \(category.wrappedName)")

@@ -42,16 +42,6 @@ struct LogView: View {
         Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-    var body: some View {
-        #if os(iOS)
-        NavigationStack {
-            content
-        }
-        #else
-        content
-        #endif
-    }
-
     // MARK: - Content
 
     private var content: some View {
@@ -178,32 +168,6 @@ struct LogView: View {
         }
     }
 
-    @ViewBuilder
-    private var stepperBar: some View {
-        Group {
-            switch filter {
-            case .category:
-                CategoryStepperView(categoryFilter: $categoryFilter)
-            case .day:
-                DateStepperView(date: $dateFilter)
-            case .week:
-                WeekStepperView(showingDate: $weekFilter)
-            case .month:
-                MonthStepperView(showingDate: $monthFilter)
-            case .type:
-                IncomeFilterToggleView(income: $income)
-            default:
-                EmptyView()
-            }
-        }
-        .padding(.horizontal, SBSpace.medium)
-        .padding(.vertical, SBSpace.xs)
-        .background(.bar)
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
-    }
-
     private var filterMenu: some View {
         Menu {
             Picker(String.appLocalized("Filter"), selection: $filter) {
@@ -310,5 +274,47 @@ struct LogView: View {
 
         let amount = String(format: "%.2f", transaction.amount)
         return amount.contains(query)
+    }
+}
+
+extension LogView {
+
+    var body: some View {
+        #if os(iOS)
+        NavigationStack {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+}
+
+extension LogView {
+
+    @ViewBuilder
+    private var stepperBar: some View {
+        Group {
+            switch filter {
+            case .category:
+                CategoryStepperView(categoryFilter: $categoryFilter)
+            case .day:
+                DateStepperView(date: $dateFilter)
+            case .week:
+                WeekStepperView(showingDate: $weekFilter)
+            case .month:
+                MonthStepperView(showingDate: $monthFilter)
+            case .type:
+                IncomeFilterToggleView(income: $income)
+            default:
+                EmptyView()
+            }
+        }
+        .padding(.horizontal, SBSpace.medium)
+        .padding(.vertical, SBSpace.extraSmall)
+        .background(.bar)
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
     }
 }

@@ -22,7 +22,13 @@ struct RoundedTriangle: Shape {
         let firstCentre = CGPoint(x: weirdLength, y: cornerRadius)
 
         path.move(to: firstControlPointFrom)
-        path.addArc(center: firstCentre, radius: cornerRadius, startAngle: Angle(degrees: 270), endAngle: Angle(degrees: 270) - Angle(radians: CGFloat.pi - cornerAngle), clockwise: true)
+        path.addArc(
+            center: firstCentre,
+            radius: cornerRadius,
+            startAngle: Angle(degrees: 270),
+            endAngle: Angle(degrees: 270) - Angle(radians: CGFloat.pi - cornerAngle),
+            clockwise: true
+        )
 //        path.addQuadCurve(to: firstControlPointTo, control: firstControlPoint)
 
         let weirdHypot = cornerRadius / tan((CGFloat.pi / 2) - cornerAngle)
@@ -42,12 +48,21 @@ struct RoundedTriangle: Shape {
                     startAngle: arcStart, endAngle: arcEnd, clockwise: true)
 //        path.addQuadCurve(to: secondControlPointTo, control: secondControlPoint)
 
-        let thirdControlPointFrom = CGPoint(x: rect.width - weirdLength + (cornerRadius * cos(CGFloat.pi / 2 - cornerAngle)), y: cornerRadius + (cornerRadius * sin(CGFloat.pi / 2 - cornerAngle)))
+        let thirdControlPointFrom = CGPoint(
+            x: rect.width - weirdLength + (cornerRadius * cos(CGFloat.pi / 2 - cornerAngle)),
+            y: cornerRadius + (cornerRadius * sin(CGFloat.pi / 2 - cornerAngle))
+        )
 
         let thirdCentre = CGPoint(x: rect.width - weirdLength, y: cornerRadius)
 
         path.addLine(to: thirdControlPointFrom)
-        path.addArc(center: thirdCentre, radius: cornerRadius, startAngle: Angle(degrees: 90) - Angle(radians: cornerAngle), endAngle: Angle(degrees: 270), clockwise: true)
+        path.addArc(
+            center: thirdCentre,
+            radius: cornerRadius,
+            startAngle: Angle(degrees: 90) - Angle(radians: cornerAngle),
+            endAngle: Angle(degrees: 270),
+            clockwise: true
+        )
 //        path.addQuadCurve(to: thirdControlPointTo, control: thirdControlPoint)
         path.closeSubpath()
 

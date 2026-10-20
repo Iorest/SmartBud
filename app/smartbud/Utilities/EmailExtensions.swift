@@ -72,7 +72,7 @@ enum DeviceInfo {
         var model = [CChar](repeating: 0, count: size)
         sysctlbyname("hw.model", &model, &size, nil, 0)
         let bytes = model.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
-        return String(decoding: bytes, as: UTF8.self)
+        return String(bytes: bytes, encoding: .utf8) ?? "Mac"
         #else
         UIDevice.current.modelName
         #endif

@@ -204,6 +204,10 @@ struct BudgetTimeView: View {
         }
     }
 
+}
+
+extension BudgetTimeView {
+
     var body: some View {
         VStack(spacing: 20) {
             // budget name and emoji and time left
@@ -267,7 +271,7 @@ struct BudgetTimeView: View {
 
             // bar graph
 
-            VStack(spacing: SBSpace.xs) {
+            VStack(spacing: SBSpace.extraSmall) {
                 ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
                     .tint(totalSpent >= budgetAmount ? Color.AlertRed : tintColor)
                     .accessibilityLabel(String.appLocalized("Spent"))
@@ -296,7 +300,12 @@ struct BudgetTimeView: View {
                     FilteredCategoryDayBudgetView(category: category, day: startDate, totalSpent: $totalSpent)
                         .padding(.horizontal, 15)
                 } else {
-                    FilteredBudgetView(category: category, startDate: startDate, totalSpent: $totalSpent, type: budgetType - 1)
+                    FilteredBudgetView(
+                        category: category,
+                        startDate: startDate,
+                        totalSpent: $totalSpent,
+                        type: budgetType - 1
+                    )
                         .padding(.horizontal, 15)
                 }
             }

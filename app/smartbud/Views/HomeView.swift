@@ -114,6 +114,94 @@ struct HomeView: View {
     }
     #endif
 
+    /// Explicit undo affordance for a staged delete. Replaces the previous
+    /// AlertToast, whose tap handler was swallowed on iOS 26 so "undo" only
+    /// dismissed the toast and the deletion stuck.
+    @ViewBuilder
+    private var undoBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "trash.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.AlertRed)
+
+            Text(String.appLocalized("Log Deleted"))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Color.PrimaryText)
+                .lineLimit(1)
+
+            Spacer(minLength: 12)
+
+            Button {
+                transactionVM.undoPendingDelete()
+                transactionManager.toDelete = nil
+            } label: {
+                Text(String.appLocalized("Undo"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.PrimaryText)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.SecondaryBackground, in: Capsule())
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(String.appLocalized("Undo")))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().stroke(Color.Outline.opacity(0.5), lineWidth: 0.5))
+        .padding(.horizontal, 20)
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+    }
+}
+
+struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
+
+    var body: some View {
+        VStack(spacing: 15) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 65))
+                .foregroundStyle(Color.DarkIcon.opacity(0.7))
+
+            Text("App Locked")
+                .font(.title.weight(.semibold))
+                .foregroundStyle(Color.PrimaryText)
+                .padding(.bottom, 30)
+
+            Button {
+                appLockVM.appLockValidation()
+            } label: {
+                HStack {
+                    Image(systemName: "faceid")
+
+                    Text("Unlock App")
+                }
+                .font(.title3.weight(.medium))
+                .foregroundStyle(Color.PrimaryText)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 15)
+                .overlay {
+                    RoundedRectangle(cornerRadius: SBRadius.card)
+                        .stroke(Color.Outline)
+                }
+            }
+
+            if appLockVM.enrollmentError {
+                Text("Please re-enable Face ID access in the Settings app to unlock application.")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.SubtitleText)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.horizontal, 30)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.PrimaryBackground.opacity(0.3))
+        .background(.ultraThinMaterial)
+    }
+}
+
+extension HomeView {
+
     var body: some View {
         ZStack(alignment: .bottom) {
             AppBackground()
@@ -215,9 +303,7 @@ struct HomeView: View {
                 showPopup = newValue
             }
         }
-        .fullScreenPresentation(item: $transactionManager.toEdit, onDismiss: {
-            transactionManager.toEdit = nil
-        }) { transaction in
+        .fullScreenPresentation(item: $transactionManager.toEdit) { transaction in
             TransactionView(toEdit: transaction)
         }
         .fullScreenPresentation(isPresented: $addTransaction, onDismiss: {
@@ -227,9 +313,9 @@ struct HomeView: View {
             if firstLaunch {
                 firstLaunch = false
             }
-        }) {
+        }, content: {
             TransactionView(toEdit: nil)
-        }
+        })
         .onChange(of: launchAdd) { _, _ in
             addTransaction = true
         }
@@ -288,89 +374,5 @@ struct HomeView: View {
                 currentTab = "Budget"
             }
         }
-    }
-    /// Explicit undo affordance for a staged delete. Replaces the previous
-    /// AlertToast, whose tap handler was swallowed on iOS 26 so "undo" only
-    /// dismissed the toast and the deletion stuck.
-    @ViewBuilder
-    private var undoBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "trash.fill")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.AlertRed)
-
-            Text(String.appLocalized("Log Deleted"))
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(Color.PrimaryText)
-                .lineLimit(1)
-
-            Spacer(minLength: 12)
-
-            Button {
-                transactionVM.undoPendingDelete()
-                transactionManager.toDelete = nil
-            } label: {
-                Text(String.appLocalized("Undo"))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.PrimaryText)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.SecondaryBackground, in: Capsule())
-                    .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text(String.appLocalized("Undo")))
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(.regularMaterial, in: Capsule())
-        .overlay(Capsule().stroke(Color.Outline.opacity(0.5), lineWidth: 0.5))
-        .padding(.horizontal, 20)
-        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
-    }
-}
-
-struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
-
-    var body: some View {
-        VStack(spacing: 15) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 65))
-                .foregroundStyle(Color.DarkIcon.opacity(0.7))
-
-            Text("App Locked")
-                .font(.title.weight(.semibold))
-                .foregroundStyle(Color.PrimaryText)
-                .padding(.bottom, 30)
-
-            Button {
-                appLockVM.appLockValidation()
-            } label: {
-                HStack {
-                    Image(systemName: "faceid")
-
-                    Text("Unlock App")
-                }
-                .font(.title3.weight(.medium))
-                .foregroundStyle(Color.PrimaryText)
-                .padding(.horizontal, 40)
-                .padding(.vertical, 15)
-                .overlay {
-                    RoundedRectangle(cornerRadius: SBRadius.card)
-                        .stroke(Color.Outline)
-                }
-            }
-
-            if appLockVM.enrollmentError {
-                Text("Please re-enable Face ID access in the Settings app to unlock application.")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.SubtitleText)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .padding(.horizontal, 30)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.PrimaryBackground.opacity(0.3))
-        .background(.ultraThinMaterial)
     }
 }

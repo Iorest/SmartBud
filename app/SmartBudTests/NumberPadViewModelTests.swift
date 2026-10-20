@@ -23,111 +23,111 @@ struct NumberPadViewModelTests {
 
     @Test("Digits enter as cents: 1,2,3 → 1.23")
     func preDottedEntry() {
-        let vm = pad(.preDotted)
-        vm.tap(1); vm.tap(2); vm.tap(3)
-        #expect(vm.amount == Decimal(string: "1.23"))
-        #expect(vm.amountString == "1.23")
+        let viewModel = pad(.preDotted)
+        viewModel.tap(1); viewModel.tap(2); viewModel.tap(3)
+        #expect(viewModel.amount == Decimal(string: "1.23"))
+        #expect(viewModel.amountString == "1.23")
     }
 
     @Test("Backspace removes exactly one digit (old Int(price*10) truncated)")
     func preDottedBackspace() {
-        let vm = pad(.preDotted)
-        vm.tap(1); vm.tap(2); vm.tap(3); vm.tap(4)   // 12.34
-        vm.deleteLast()                                // 1.23
-        #expect(vm.amount == Decimal(string: "1.23"))
-        vm.deleteLast()                                // 0.12
-        #expect(vm.amount == Decimal(string: "0.12"))
-        vm.deleteLast()                                // 0.01
-        #expect(vm.amount == Decimal(string: "0.01"))
-        vm.deleteLast()                                // 0
-        #expect(vm.amount == Decimal.zero)
+        let viewModel = pad(.preDotted)
+        viewModel.tap(1); viewModel.tap(2); viewModel.tap(3); viewModel.tap(4)   // 12.34
+        viewModel.deleteLast()                                // 1.23
+        #expect(viewModel.amount == Decimal(string: "1.23"))
+        viewModel.deleteLast()                                // 0.12
+        #expect(viewModel.amount == Decimal(string: "0.12"))
+        viewModel.deleteLast()                                // 0.01
+        #expect(viewModel.amount == Decimal(string: "0.01"))
+        viewModel.deleteLast()                                // 0
+        #expect(viewModel.amount == Decimal.zero)
     }
 
     @Test("Leading zero is ignored, then digits still work")
     func preDottedLeadingZero() {
-        let vm = pad(.preDotted)
-        vm.tap(0)                                      // still empty
-        #expect(vm.amount == Decimal.zero)
-        vm.tap(5)                                      // 0.05
-        #expect(vm.amount == Decimal(string: "0.05"))
+        let viewModel = pad(.preDotted)
+        viewModel.tap(0)                                      // still empty
+        #expect(viewModel.amount == Decimal.zero)
+        viewModel.tap(5)                                      // 0.05
+        #expect(viewModel.amount == Decimal(string: "0.05"))
     }
 
     @Test("Amount cap stops input at 100,000,000")
     func preDottedCap() {
-        let vm = pad(.preDotted)
-        for _ in 0..<12 { vm.tap(9) }
-        #expect(vm.amount < 100_000_000)
-        #expect(vm.isInputDisabled)
+        let viewModel = pad(.preDotted)
+        for _ in 0..<12 { viewModel.tap(9) }
+        #expect(viewModel.amount < 100_000_000)
+        #expect(viewModel.isInputDisabled)
     }
 
     // MARK: - Cent-less (Type 2)
 
     @Test("Whole-number entry, then cents after the decimal key")
     func centlessEntry() {
-        let vm = pad(.centless)
-        vm.tap(1); vm.tap(2)
-        #expect(vm.amount == Decimal(string: "12"))
-        #expect(vm.amountString == "12")
+        let viewModel = pad(.centless)
+        viewModel.tap(1); viewModel.tap(2)
+        #expect(viewModel.amount == Decimal(string: "12"))
+        #expect(viewModel.amountString == "12")
 
-        vm.enterDecimal()
-        vm.tap(3); vm.tap(4)
-        #expect(vm.amount == Decimal(string: "12.34"))
-        #expect(vm.amountString == "12.34")
+        viewModel.enterDecimal()
+        viewModel.tap(3); viewModel.tap(4)
+        #expect(viewModel.amount == Decimal(string: "12.34"))
+        #expect(viewModel.amountString == "12.34")
     }
 
     @Test("Only two cent digits are accepted")
     func centlessMaxTwoCents() {
-        let vm = pad(.centless)
-        vm.tap(5)
-        vm.enterDecimal()
-        vm.tap(1); vm.tap(2); vm.tap(3)
-        #expect(vm.amount == Decimal(string: "5.12"))
+        let viewModel = pad(.centless)
+        viewModel.tap(5)
+        viewModel.enterDecimal()
+        viewModel.tap(1); viewModel.tap(2); viewModel.tap(3)
+        #expect(viewModel.amount == Decimal(string: "5.12"))
     }
 
     @Test("Backspace walks cents then whole part then leaves decimal mode")
     func centlessBackspace() {
-        let vm = pad(.centless)
-        vm.tap(1); vm.tap(2)
-        vm.enterDecimal()
-        vm.tap(3); vm.tap(4)
-        vm.deleteLast()                                // 12.3
-        #expect(vm.amount == Decimal(string: "12.3"))
-        vm.deleteLast()                                // 12.  (still editing)
-        #expect(vm.amount == Decimal(string: "12"))
-        #expect(vm.isEditingDecimal)
-        #expect(vm.amountString == "12.")
-        vm.deleteLast()                                // exit decimal mode
-        #expect(!vm.isEditingDecimal)
-        vm.deleteLast()                                // 1
-        #expect(vm.amount == Decimal(string: "1"))
+        let viewModel = pad(.centless)
+        viewModel.tap(1); viewModel.tap(2)
+        viewModel.enterDecimal()
+        viewModel.tap(3); viewModel.tap(4)
+        viewModel.deleteLast()                                // 12.3
+        #expect(viewModel.amount == Decimal(string: "12.3"))
+        viewModel.deleteLast()                                // 12.  (still editing)
+        #expect(viewModel.amount == Decimal(string: "12"))
+        #expect(viewModel.isEditingDecimal)
+        #expect(viewModel.amountString == "12.")
+        viewModel.deleteLast()                                // exit decimal mode
+        #expect(!viewModel.isEditingDecimal)
+        viewModel.deleteLast()                                // 1
+        #expect(viewModel.amount == Decimal(string: "1"))
     }
 
     // MARK: - Loading an existing amount
 
     @Test("Loading a Double 12.3 keeps exactly 12.30")
     func loadExistingAmount() {
-        let vm = pad(.centless)
-        vm.price = 12.3
-        #expect(vm.amount == Decimal(string: "12.3"))
-        vm.enterDecimal()
-        #expect(vm.amountString == "12.3")
-        #expect(vm.amount == Decimal(string: "12.3"))
+        let viewModel = pad(.centless)
+        viewModel.price = 12.3
+        #expect(viewModel.amount == Decimal(string: "12.3"))
+        viewModel.enterDecimal()
+        #expect(viewModel.amountString == "12.3")
+        #expect(viewModel.amount == Decimal(string: "12.3"))
     }
 
     @Test("Loading 0.1 + 0.2 style drift rounds to cents")
     func loadRoundsToCents() {
-        let vm = pad(.preDotted)
-        vm.price = 0.1 + 0.2                           // 0.30000000000000004
-        #expect(vm.amount == Decimal(string: "0.30"))
+        let viewModel = pad(.preDotted)
+        viewModel.price = 0.1 + 0.2                           // 0.30000000000000004
+        #expect(viewModel.amount == Decimal(string: "0.30"))
     }
 
     @Test("Submit clears the entry")
     func submitClears() {
-        let vm = pad(.preDotted)
-        vm.tap(9); vm.tap(9)
-        vm.submit()
-        #expect(vm.amount == Decimal.zero)
-        #expect(vm.submitTrigger == 1)
+        let viewModel = pad(.preDotted)
+        viewModel.tap(9); viewModel.tap(9)
+        viewModel.submit()
+        #expect(viewModel.amount == Decimal.zero)
+        #expect(viewModel.submitTrigger == 1)
     }
 }
 

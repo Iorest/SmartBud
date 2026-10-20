@@ -14,9 +14,9 @@ struct StepperButtonView: View {
     var action: () -> Void
 
     var body: some View {
-        Button(action: {
+        Button {
             self.action()
-        }) {
+        } label: {
             Image(systemName: left ? "chevron.left" : "chevron.right")
                 .font(.subheadline)
                 .foregroundStyle(Color.SubtitleText)

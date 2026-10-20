@@ -50,7 +50,7 @@ final class SubscriptionManager {
     /// (the existing `refreshEntitlements()` machinery will then take
     /// over without any other code change required).
     ///
-    /// TODO(promo): set to `false` when the limited-time-free period
+    /// Open item (promo): set to `false` when the limited-time-free period
     /// ends. Mark the cut-over in a CHANGELOG entry.
     ///
     /// Read from the app-group defaults (`limitedTimeFree`) so the promo can
@@ -138,30 +138,12 @@ final class SubscriptionManager {
     /// Path to the Terms of Service inside this repository, relative
     /// to the repo root. Used to build the public `termsOfServiceURL`
     /// below. Update both sides if the file moves.
-    private static let termsOfServicePath = "docs/TERMS.md"
+    static let termsOfServicePath = "docs/TERMS.md"
 
     /// Path to the Privacy Policy inside this repository, relative
     /// to the repo root. Used to build the public `privacyPolicyURL`
     /// below. Update both sides if the file moves.
-    private static let privacyPolicyPath = "docs/privacypolicy.md"
-
-    /// Public URL for the SmartBud Terms of Service. The user must
-    /// replace the host with a stable App-Store-friendly URL before
-    /// submission — see `TODO(hosting)` below.
-    static let termsOfServiceURL: URL = {
-        SubscriptionManager.resolveLegalURL(path: termsOfServicePath, kind: "Terms of Service")
-    }()
-
-    /// Public URL for the SmartBud Privacy Policy. The user must
-    /// replace the host with a stable App-Store-friendly URL before
-    /// submission — see `TODO(hosting)` below.
-    static let privacyPolicyURL: URL = {
-        SubscriptionManager.resolveLegalURL(path: privacyPolicyPath, kind: "Privacy Policy")
-    }()
-
-    /// Apple's web "Manage Subscriptions" page. Stable, no maintenance
-    /// required from our side.
-    static let manageSubscriptionsURL = URL(string: "https://apps.apple.com/account/subscriptions")!
+    static let privacyPolicyPath = "docs/privacypolicy.md"
 
     /// Resolves a path like `"docs/TERMS.md"` to a public URL.
     ///
@@ -175,7 +157,7 @@ final class SubscriptionManager {
     /// long as the repo is public, returns the file content with the
     /// right MIME type, and does not require GitHub Pages setup.
     ///
-    /// `TODO(hosting)`: before App Store submission, the maintainer
+    /// `Open item (hosting)`: before App Store submission, the maintainer
     /// should set `SMARTBUD_LEGAL_URL_BASE` to a stable, App-Store-
     /// friendly host. Suggested options, in order of preference:
     ///   1. GitHub Pages under the project org:
@@ -184,7 +166,7 @@ final class SubscriptionManager {
     ///   3. Any other always-on static host.
     /// Plain `github.com/.../blob/...` URLs are NOT preferred — they
     /// render as code in a browser and may be flagged by Apple review.
-    private static func resolveLegalURL(path: String, kind: String) -> URL {
+    static func resolveLegalURL(path: String, kind: String) -> URL {
         if let base = Bundle.main.object(forInfoDictionaryKey: "SMARTBUD_LEGAL_URL_BASE") as? String,
            !base.isEmpty,
            let resolved = URL(string: base + path) {
