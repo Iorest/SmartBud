@@ -14003,24 +14003,24 @@
         }
       }
     },
-    "This action cannot be undone. %@ transactions are kept and become uncategorized." : {
+    "This action cannot be undone. %@ transactions are kept and become uncategorized, and this category's budget is deleted." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This action cannot be undone. %@ transactions are kept and become uncategorized."
+            "value" : "This action cannot be undone. %@ transactions are kept and become uncategorized, and this category's budget is deleted."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此操作不可撤销。%@ 交易会保留，但不再分类。"
+            "value" : "此操作不可撤销。%@ 交易会保留，但不再分类；此分类的预算会一并删除。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此操作無法復原。%@ 交易會保留，但不再分類。"
+            "value" : "此操作無法復原。%@ 交易會保留，但不再分類；此分類的預算會一併刪除。"
           }
         }
       }
@@ -14307,6 +14307,94 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "週期"
+          }
+        }
+      }
+    },
+    "Tips" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tips"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小费"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小費"
+          }
+        }
+      }
+    },
+    "this article" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "this article"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本文"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本文"
+          }
+        }
+      }
+    },
+    "%lld%% spent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%% spent"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用 %lld%%"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已用 %lld%%"
+          }
+        }
+      }
+    },
+    "NO TRANSACTIONS\n%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NO TRANSACTIONS\n%@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无交易\n%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暫無交易\n%@"
           }
         }
       }

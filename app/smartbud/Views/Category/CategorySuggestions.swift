@@ -105,7 +105,7 @@ struct SuggestedCategoriesView: View {
 
                             if !income {
                                 _ = categoryVM.create(
-                                    name: NSLocalizedString(category.name, comment: "category name"),
+                                    name: String.appLocalized(category.name),
                                     emoji: category.emoji,
                                     colour: selectedColour,
                                     income: false,
@@ -126,7 +126,7 @@ struct SuggestedCategoriesView: View {
                                 }
                             } else {
                                 _ = categoryVM.create(
-                                    name: NSLocalizedString(category.name, comment: "category name"),
+                                    name: String.appLocalized(category.name),
                                     emoji: category.emoji,
                                     colour: "#76FBB0",
                                     income: true,
