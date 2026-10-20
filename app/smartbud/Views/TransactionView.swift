@@ -619,7 +619,24 @@ struct TransactionView: View {
             .onTapGesture {
                 self.hideKeyboard()
             }
-            .fullScreenPresentation(isPresented: $deleteMode) {
+            .overlay {
+                datePickerOverlay
+            }
+        }
+        
+        .animation(.easeOut(duration: 0.2), value: showToast)
+        .appBackground()
+        #if os(macOS)
+        // A sheet has no intrinsic size; the entry screen is a fixed
+        // calculator-like surface, so give it one.
+        .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
+        #else
+        .ignoresSafeArea(.keyboard, edges: .all)
+        .frame(maxHeight: .infinity)
+        .ignoresSafeArea(.all)
+        #endif
+        .overlay {
+            if deleteMode {
                 TransactionDeleteConfirmation(
                     income: toDelete?.income ?? income,
                     bottomEdge: bottomEdge,
@@ -639,23 +656,10 @@ struct TransactionView: View {
                         }
                     }
                 )
-            }
-            .overlay {
-                datePickerOverlay
+                    .transition(.opacity)
             }
         }
-        
-        .animation(.easeOut(duration: 0.2), value: showToast)
-        .appBackground()
-        #if os(macOS)
-        // A sheet has no intrinsic size; the entry screen is a fixed
-        // calculator-like surface, so give it one.
-        .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
-        #else
-        .ignoresSafeArea(.keyboard, edges: .all)
-        .frame(maxHeight: .infinity)
-        .ignoresSafeArea(.all)
-        #endif
+        .animation(.easeOut(duration: 0.2), value: deleteMode)
         // Control-dense surface (keypad + fixed rows). Let text grow to the
         // first accessibility size, then stop: beyond that the keypad and the
         // date/category row cannot fit on a phone. Documented exception to
