@@ -110,7 +110,6 @@
 		53D0298028C5BC0300443F2B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D0297F28C5BC0300443F2B /* Currency.swift */; };
 		53D0298128C62BF600443F2B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D0297F28C5BC0300443F2B /* Currency.swift */; };
 		53D0298228C62E1A00443F2B /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B4287C6AFB00F76ADF /* StringExtension.swift */; };
-		53D520FC2AAF1190000AC055 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		53D5F02328A8E0E4004573C8 /* InsightsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D5F02228A8E0E4004573C8 /* InsightsWidget.swift */; };
 		53D5F02428A8E0E4004573C8 /* InsightsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D5F02228A8E0E4004573C8 /* InsightsWidget.swift */; };
 		53D6BDC12AF6648300F5728E /* AlertButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D6BDC02AF6648300F5728E /* AlertButtons.swift */; };
@@ -144,7 +143,6 @@
 		D1550AA12D26000000000002 /* SystemTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1550AA02D26000000000001 /* SystemTheme.swift */; };
 		D1550AA12D26000000000003 /* SystemTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1550AA02D26000000000001 /* SystemTheme.swift */; };
 		D1CE5701500000000000B001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1CE5701500000000000B002 /* InfoPlist.strings */; };
-		D63B20542D8728C300CAFB20 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		D63B205C2D8728C300CAFB31 /* BarGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205C2D8728C300CAFB30 /* BarGraph.swift */; };
 		D63B205D2D8728C300CAFB41 /* CategoryBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205D2D8728C300CAFB40 /* CategoryBreakdownView.swift */; };
 		D63B205E2D8728C300CAFC01 /* SettingsLanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63B205E2D8728C300CAFC00 /* SettingsLanguageView.swift */; };
@@ -1177,7 +1175,6 @@
 			files = (
 				533182D328A0D61D00DEBFA3 /* Assets.xcassets in Resources */,
 				53B1D193288ED87000E28062 /* Assets.xcassets in Resources */,
-				D63B20542D8728C300CAFB20 /* (null) in Resources */,
 				D6A1B2C3D4E5F6071829A0C6 /* Localizable.xcstrings in Resources */,
 				AAAA00000000000000000004 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -1412,7 +1409,6 @@
 				78F2F524B4074779A916588C /* WidgetEnums.swift in Sources */,
 				7AC1901BBB8747D699DA97BB /* WidgetConfigurationIntents.swift in Sources */,
 				5321E1DE291FE2CE00D5A931 /* CategoryCreationErrors.swift in Sources */,
-				53D520FC2AAF1190000AC055 /* (null) in Sources */,
 				53980E5D28A77B62009CC4E2 /* Helper.swift in Sources */,
 				53D0298128C62BF600443F2B /* Currency.swift in Sources */,
 				53A32B3928AB6C8700628905 /* Line.swift in Sources */,

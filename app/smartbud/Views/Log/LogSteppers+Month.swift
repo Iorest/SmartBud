@@ -142,17 +142,3 @@ func timeConverterAccessibilityLabel(date: Date) -> String {
 
     return dateFormatter.string(from: date)
 }
-
-func dayTotal(dayTransaction: [TransactionModel]) -> Double {
-    var total = 0.0
-
-    dayTransaction.forEach { transaction in
-        if transaction.income {
-            total += transaction.amount
-        } else {
-            total -= transaction.amount
-        }
-    }
-
-    return total
-}

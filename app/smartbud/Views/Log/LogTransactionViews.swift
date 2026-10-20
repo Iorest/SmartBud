@@ -153,8 +153,6 @@ struct SingleTransactionView: View {
                         transactionManager.future = future
                         transactionManager.showPopup = true
 
-//                        toDelete = transaction
-//                        deleteMode = true
                     } label: {
                         Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
                     }
@@ -230,9 +228,6 @@ struct SingleTransactionView: View {
                         transactionManager.future = future
                         transactionManager.toDelete = transaction
                         transactionManager.showPopup = true
-//
-//                        toDelete = transaction
-//                        deleteMode = true
                     } else {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             offset = 0
@@ -251,7 +246,6 @@ struct SingleTransactionView: View {
             if newValue == nil {
                 deleted = false
                 offset = 0
-//                   offset = 0
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)

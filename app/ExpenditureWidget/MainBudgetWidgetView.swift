@@ -11,18 +11,7 @@ struct MainBudgetWidgetEntryView: View {
     let entry: MainBudgetWidgetProvider.Entry
 
     var budgetType: String {
-        switch entry.type {
-        case 1:
-            return String.appLocalized("today")
-        case 2:
-            return String.appLocalized("this week")
-        case 3:
-            return String.appLocalized("this month")
-        case 4:
-            return String.appLocalized("this year")
-        default:
-            return String.appLocalized("this week")
-        }
+        budgetPeriodLabel(entry.type)
     }
 
     var headingText: String {
@@ -40,7 +29,6 @@ struct MainBudgetWidgetEntryView: View {
                 return formatDateRange(date1: entry.startDate, date2: entry.startDate)
             }
             return formatDateRange(date1: entry.startDate, date2: endWeekDate)
-//            return dateFormatter.string(from: entry.startDate) + " - " + dateFormatter.string(from: endWeekDate)
         case 3:
             dateFormatter.dateFormat = "d MMM"
             let endComponents = DateComponents(month: 1, second: -1)
@@ -48,7 +36,6 @@ struct MainBudgetWidgetEntryView: View {
                 return formatDateRange(date1: entry.startDate, date2: entry.startDate)
             }
             return formatDateRange(date1: entry.startDate, date2: endWeekDate)
-//            return dateFormatter.string(from: entry.startDate) + " - " + dateFormatter.string(from: endWeekDate)
         case 4:
             dateFormatter.dateFormat = "d MMM yy"
             return dateFormatter.string(from: entry.startDate)

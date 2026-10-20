@@ -60,7 +60,7 @@ struct InsightsWidgetEntryView: View {
             let formatter = DateFormatter()
             formatter.locale = Locale.appLocale
             formatter.dateFormat = "yyyy"
-            return String(localized: "in \\(formatter.string(from: Date.now))").uppercased()
+            return String.appFormatted("in %@", formatter.string(from: Date.now)).uppercased()
         }
     }
 

@@ -161,30 +161,4 @@ extension String {
     static func appFormatted(_ key: String, _ arguments: CVarArg...) -> String {
         String(format: appLocalized(key), arguments: arguments)
     }
-
-    /// Overload for `String(appLocalized: "...\(var)...")`-style call sites
-    /// that wrap a String in `String.LocalizationValue`. Kept for parity
-    /// with the original Foundation-style API; current call sites all
-    /// pass plain Strings via the overload above. Uses `Mirror` to extract
-    /// the underlying string, because `String.LocalizationValue` does not
-    /// expose its storage as a public `value` property in this Swift
-    /// version and `"\(key)"` returns the struct's debug description
-    /// (e.g. `"LocalizationValue(arguments: [])"`).
-    static func appLocalized(
-        _ key: String.LocalizationValue,
-        table: String? = nil,
-        bundle: Bundle? = nil,
-        comment: StaticString? = nil
-    ) -> String {
-        // Swift 6 stores the literal in a `key` child (older builds used
-        // `value`/`_value`); missing every label returned "" and the UI
-        // silently dropped the whole Text.
-        let keyString = Mirror(reflecting: key).children
-            .first(where: { $0.label == "value" || $0.label == "_value" || $0.label == "key" })
-            .map { "\($0.value)" } ?? ""
-        let code = resolvedAppLanguageCode()
-        let target = bundle ?? .main
-        let languages = appLookupLanguages(forAppLanguageCode: code)
-        return target.localizedString(forKey: keyString, value: keyString, table: table, localizations: languages)
-    }
 }

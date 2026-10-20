@@ -158,18 +158,7 @@ struct BudgetWidgetEntryView: View {
     let entry: BudgetWidgetProvider.Entry
 
     var budgetType: String {
-        switch entry.budget.type {
-        case 1:
-            return String.appLocalized("today")
-        case 2:
-            return String.appLocalized("this week")
-        case 3:
-            return String.appLocalized("this month")
-        case 4:
-            return String.appLocalized("this year")
-        default:
-            return String.appLocalized("this week")
-        }
+        budgetPeriodLabel(entry.budget.type)
     }
 
     var difference: Double {

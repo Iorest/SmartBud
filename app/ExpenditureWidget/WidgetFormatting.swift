@@ -28,6 +28,12 @@ func budgetDeepLink(_ name: String) -> URL? {
     return URL(string: "smartbud://budget?budget=\(encoded)")
 }
 
+/// Period label shared by the budget widgets ("today" … "this year").
+/// Mirrors the keys the app uses on its budget cards.
+func budgetPeriodLabel(_ type: Int) -> String {
+    String.appLocalized(BudgetPeriod.labelKey(for: type))
+}
+
 /// Category swatch for the breakdown bars. Income categories have no stored
 /// colour, so they follow the palette order instead.
 func widgetCategoryColor(_ category: HoldingCategory,

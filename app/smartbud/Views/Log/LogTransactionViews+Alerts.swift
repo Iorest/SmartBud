@@ -76,15 +76,6 @@ struct DeleteTransactionAlert: View {
             .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: SBRadius.card)
                 .stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
-//                DragGesture()
-//                            offset = gesture.translation.height / 3
-//                        } else {
-//                            offset = gesture.translation.height
-//                            dismiss()
-//                        } else {
-//                                offset = 0
-//
-//            )
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)
         }

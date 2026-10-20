@@ -25,7 +25,6 @@ struct CategoryView: View {
     /// no way to actually pick a category for the transaction.
     var onSelect: ((CategoryModel) -> Void)?
     @Environment(\.dismiss) var dismiss
-//    @Environment(\.colorScheme) var colorScheme
     @State var income = false
     @Namespace var animation
 

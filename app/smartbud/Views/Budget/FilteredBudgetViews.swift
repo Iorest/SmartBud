@@ -62,12 +62,6 @@ struct FilteredCategoryDayBudgetView: View {
         .onChange(of: transactions.map(\.amount)) { _, _ in
             totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedAmount }
         }
-//            toDelete = nil
-//        }) { transaction in
-//            DeleteTransactionAlert(toDelete: transaction, stopRecurring: false)
-//            toEdit = nil
-//        }) { transaction in
-//            TransactionView(toEdit: transaction)
         .frame(maxHeight: .infinity)
     }
 
