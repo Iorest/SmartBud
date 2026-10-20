@@ -25,7 +25,7 @@ struct BudgetDollarView: View {
     }
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 1.3) {
+        HStack(alignment: .lastTextBaseline, spacing: currencySymbol.count > 1 ? 6 : 1.3) {
             Text(currencySymbol)
                 .font(.system(dynamicTypeSizes.symbol).weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.SubtitleText)
@@ -49,7 +49,7 @@ struct DetailedBudgetDollarView: View {
     }
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 1.3) {
+        HStack(alignment: .lastTextBaseline, spacing: currencySymbol.count > 1 ? 6 : 1.3) {
             Text(currencySymbol)
                 .font(.title2.weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
@@ -75,7 +75,7 @@ struct DetailedBudgetDifferenceDollarView: View {
     }
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 1.3) {
+        HStack(alignment: .lastTextBaseline, spacing: currencySymbol.count > 1 ? 6 : 1.3) {
             Text(currencySymbol)
                 .font(.title2.weight(.medium))
                 .foregroundStyle(red ? Color.AlertRed : Color.SubtitleText)
