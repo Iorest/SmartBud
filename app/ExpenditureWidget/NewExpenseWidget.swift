@@ -66,7 +66,7 @@ struct NewExpenseWidgetEntryView: View {
                 .foregroundStyle(Color.SecondaryBackground)
                 .padding(.vertical, 2)
                 .frame(maxWidth: .infinity)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
+                .background(Color.white, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous))
                 .padding(.horizontal, 9)
         }
         .widgetURL(URL(string: "smartbud://newExpense"))

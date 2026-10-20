@@ -729,7 +729,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             } else {
-                Text(String(localized: "NO TRANSACTIONS\n\\(subtitleText1)"))
+                Text(String.appFormatted("NO TRANSACTIONS\n%@", subtitleText1))
                     .font(.system(size: 10,
                                   weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -748,7 +748,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                 }
                 .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)
-                .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(ios17 ? Color.SecondaryBackground : Color.PrimaryBackground))
+                .background(RoundedRectangle(cornerRadius: SBRadius.chip).fill(ios17 ? Color.SecondaryBackground : Color.PrimaryBackground))
             }
         }
     }
