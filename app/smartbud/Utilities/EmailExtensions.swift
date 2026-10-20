@@ -29,13 +29,13 @@ extension UIDevice {
         let identifier: String
         let model: String
         static var all: [DeviceModel] {
-            Bundle.main.decode([DeviceModel].self, from: "DeviceModels.json")
+            Bundle.main.decode([DeviceModel].self, from: "DeviceModels.json") ?? []
         }
     }
 
     var modelName: String {
         #if targetEnvironment(simulator)
-            let identifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"]!
+            let identifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? "simulator"
         #else
             var systemInfo = utsname()
             uname(&systemInfo)
@@ -80,22 +80,18 @@ enum DeviceInfo {
 }
 
 extension Bundle {
+    /// Returns `nil` when the resource is missing or malformed instead of
+    /// trapping: the only caller (device model lookup for support mail) can
+    /// fall back to the raw hardware identifier.
     func decode<T: Decodable>(_: T.Type,
                               from file: String,
                               dateDecodingStategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,
-                              keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys) -> T {
-        guard let url = url(forResource: file, withExtension: nil) else {
-            fatalError("Error: Failed to locate \(file) in bundle.")
-        }
-        guard let data = try? Data(contentsOf: url) else {
-            fatalError("Error: Failed to load \(file) from bundle.")
-        }
+                              keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys) -> T? {
+        guard let url = url(forResource: file, withExtension: nil),
+              let data = try? Data(contentsOf: url) else { return nil }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = dateDecodingStategy
         decoder.keyDecodingStrategy = keyDecodingStrategy
-        guard let loaded = try? decoder.decode(T.self, from: data) else {
-            fatalError("Error: Failed to decode \(file) from bundle.")
-        }
-        return loaded
+        return try? decoder.decode(T.self, from: data)
     }
 }
