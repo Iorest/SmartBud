@@ -79,94 +79,6 @@ final class InsightsViewModel{
 
     // Analytics wrappers
 
-    func getTotalSpent(type: Int) -> Double {
-        let all = repo.fetch(TransactionModel.self)
-        return Money.double(Money.sum(all.filter { periodMatch($0, type: type) && !$0.income }.map(\.amount)))
-    }
-
-    func getTotalIncome(type: Int) -> Double {
-        let all = repo.fetch(TransactionModel.self)
-        return Money.double(Money.sum(all.filter { periodMatch($0, type: type) && $0.income }.map(\.amount)))
-    }
-
-    func getTotalNet(type: Int) -> (value: Double, positive: Bool) {
-        let all = repo.fetch(TransactionModel.self)
-        let filtered = all.filter { periodMatch($0, type: type) }
-        let net = Money.sum(filtered.map { $0.income ? $0.amount : -$0.amount })
-        return (Money.double(abs(net)), net >= 0)
-    }
-
-    func getLineGraphDataNet(type: Int) -> [LineGraphDataPoint] {
-        let all = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .forward)])
-        let cal = Calendar.current
-        let today = cal.startOfDay(for: Date.now)
-        let start: Date; let step: Calendar.Component; let count: Int
-        switch type {
-        case 1, 2: start = cal.date(byAdding: .day, value: -7, to: today) ?? today; step = .day; count = 7
-        case 3: start = cal.date(byAdding: .day, value: -30, to: today) ?? today; step = .day; count = 30
-        default: start = cal.date(byAdding: .month, value: -12, to: today) ?? today; step = .month; count = 12
-        }
-        var result = [LineGraphDataPoint]()
-        var cursor = start
-        for _ in 0..<count {
-            let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
-            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }
-                .map { $0.income ? $0.amount : -$0.amount })
-            result.append(LineGraphDataPoint(date: cursor, amount: Money.double(sum)))
-            cursor = next
-        }
-        return result
-    }
-
-    func getInsights(type: Int, date: Date, income: Bool) -> (amount: Double, maximum: Double, average: Double, numberOfDays: Int, dates: [Date], dateDictionary: [Date: Double]) {
-        let all = repo.fetch(TransactionModel.self).filter { ($0.date ?? .distantPast) >= date && $0.income == income }
-        var iter = date; let cal = Calendar.current
-        let count: Int
-        switch type {
-        case 1: count = 7
-        case 2: count = cal.range(of: .day, in: .month, for: date)?.count ?? 30
-        default: count = 12
-        }
-        var dates = [Date](); var dict = [Date: Double](); var total = Decimal.zero; var maxAmount = Decimal.zero; var days = 0
-        let step: Calendar.Component = type == 3 ? .month : .day
-        for _ in 0..<count {
-            let next = cal.date(byAdding: step, value: 1, to: iter) ?? iter
-            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= iter && ($0.date ?? .distantPast) < next }.map(\.amount))
-            total += sum; dict[iter] = Money.double(sum)
-            if sum > maxAmount { maxAmount = sum }; if sum != 0 { days += 1 }
-            dates.append(iter); iter = next
-        }
-        return (Money.double(total), Money.double(maxAmount),
-                Money.double(total / Decimal(max(count, 1))), days, dates, dict)
-    }
-
-    func getInsightsSummary(type: Int, date: Date) -> (spent: Double, income: Double, net: Double, positive: Bool, average: Double) {
-        let all = repo.fetch(TransactionModel.self).filter { ($0.date ?? .distantPast) >= date }
-        let spent = Money.sum(all.filter { !$0.income }.map(\.amount))
-        let inc = Money.sum(all.filter(\.income).map(\.amount))
-        let net = inc - spent
-        // Month averages divide by the real day count (was hardcoded 30).
-        let divisor: Int = switch type {
-        case 1: 7
-        case 2: Calendar.current.range(of: .day, in: .month, for: date)?.count ?? 30
-        default: 12
-        }
-        return (Money.double(spent), Money.double(inc), Money.double(abs(net)), net >= 0,
-                Money.double(abs(net) / Decimal(max(1, divisor))))
-    }
-
-    private func periodMatch(_ txn: TransactionModel, type: Int) -> Bool {
-        let d = txn.date ?? .distantPast
-        let cal = Calendar.current
-        let now = Date.now
-        switch type {
-        case 1: return d >= cal.startOfDay(for: now)
-        case 2: return d >= (cal.date(byAdding: .day, value: -7, to: now) ?? now)
-        case 3: return d >= (cal.date(byAdding: .month, value: -1, to: now) ?? now)
-        default: return d >= (cal.date(byAdding: .year, value: -1, to: now) ?? now)
-        }
-    }
-
     // MARK: - Log View (LogView filter periods: 1=today, 2=week, 3=month, 4=year, 5=all time)
 
     /// Start of the period for LogView's timeframe control, respecting the user's
@@ -311,7 +223,7 @@ final class InsightsViewModel{
         let showCents = defaults.bool(forKey: "showCents")
 
         let amount: Double
-        let headingKey: String.LocalizationValue
+        let headingKey: String
         switch insightsType {
         case 2:
             amount = totalIncome
@@ -324,7 +236,7 @@ final class InsightsViewModel{
             headingKey = "Net total"
         }
 
-        let rangeLabelKey: String.LocalizationValue
+        let rangeLabelKey: String
         switch timeframe {
         case 1: rangeLabelKey = "today"
         case 3: rangeLabelKey = "this month"
@@ -607,72 +519,12 @@ final class InsightsViewModel{
         return entries.sorted { $0.percent > $1.percent }
     }
 
-    func getTodayTransactions() -> [TransactionModel] {
-        let cal = configuredCalendar
-        let today = cal.startOfDay(for: .now)
-        let tomorrow = cal.date(byAdding: .day, value: 1, to: today) ?? today
-        return repo.fetch(TransactionModel.self)
-            .filter { if let d = $0.date { return d >= today && d < tomorrow } else { return false } }
-            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
-    }
-
-    func getYesterdayTransactions() -> [TransactionModel] {
-        let cal = configuredCalendar
-        let today = cal.startOfDay(for: .now)
-        let yesterday = cal.date(byAdding: .day, value: -1, to: today) ?? today
-        return repo.fetch(TransactionModel.self)
-            .filter { if let d = $0.date { return d >= yesterday && d < today } else { return false } }
-            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
-    }
-
-    func getPeriodAverage(for period: Int) -> Double {
-        let (start, end) = getPeriodDateRange(for: period)
-        let all = repo.fetch(TransactionModel.self).filter { if let d = $0.date { return d >= start && d < end } else { return false } }
-        let net = Money.sum(all.map { $0.income ? $0.amount : -$0.amount })
-        let divisor: Int
-        switch period {
-        case 1: divisor = 7
-        case 3: divisor = 12
-        default:
-            let cal = configuredCalendar
-            divisor = cal.range(of: .day, in: .month, for: start)?.count ?? 30
-        }
-        return Money.double(abs(net) / Decimal(max(1, divisor)))
-    }
-
-    func getPeriodTotalIncome(for period: Int) -> Double {
-        let (start, end) = getPeriodDateRange(for: period)
-        return Money.double(Money.sum(repo.fetch(TransactionModel.self)
-            .filter { if let d = $0.date { return d >= start && d < end && $0.income } else { return false } }
-            .map(\.amount)))
-    }
-
-    func getPeriodTotalSpent(for period: Int) -> Double {
-        let (start, end) = getPeriodDateRange(for: period)
-        return Money.double(Money.sum(repo.fetch(TransactionModel.self)
-            .filter { if let d = $0.date { return d >= start && d < end && !$0.income } else { return false } }
-            .map(\.amount)))
-    }
-
-    func getPeriodTotalNet(for period: Int) -> (value: Double, positive: Bool) {
-        let (start, end) = getPeriodDateRange(for: period)
-        let all = repo.fetch(TransactionModel.self).filter { if let d = $0.date { return d >= start && d < end } else { return false } }
-        let net = Money.sum(all.map { $0.income ? $0.amount : -$0.amount })
-        return (Money.double(abs(net)), net >= 0)
-    }
-
     /// Formats `amount` using the current `currency` and `showCents` settings. Pass `sign` to force
     /// a leading "+" / "-" (e.g. for net totals).
     func formattedCurrency(_ amount: Double, withCents: Bool? = nil, sign: Bool = false) -> String {
-        let cents = withCents ?? showCents
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currency
-        formatter.maximumFractionDigits = cents ? 2 : 0
-        let str = formatter.string(from: NSNumber(value: abs(amount))) ?? "0"
-        if !sign { return str }
-        return amount >= 0 ? "+\(str)" : "-\(str)"
+        Money.format(amount, currencyCode: currency,
+                     showsCents: withCents ?? showCents,
+                     plus: sign ? amount >= 0 : nil)
     }
 
     /// Period text shown above the totals: "5 FEB - 11 FEB" / "1 - 30 APR" / "2024".

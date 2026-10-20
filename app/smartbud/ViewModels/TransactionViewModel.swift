@@ -114,10 +114,6 @@ final class TransactionViewModel{
     }
 
     /// All templates ordered by `order` (used by the quick-add widget editor).
-    func allTemplates() -> [TemplateTransactionModel] {
-        repo.fetch(TemplateTransactionModel.self, sort: [SortDescriptor(\.order)])
-    }
-
     /// Inserts a new template at `order`, or updates the existing template at that `order`.
     @discardableResult
     func createOrUpdateTemplate(order: Int, note: String, category: CategoryModel?, income: Bool,
@@ -166,25 +162,27 @@ final class TransactionViewModel{
     // MARK: Suggestions
 
     func suggestedNotes(query: String, category: CategoryModel?, income: Bool) -> [TransactionModel] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        // `localizedStandardContains` is a Foundation convenience that
+        // CoreData cannot translate; putting it in a #Predicate raises
+        // NSInvalidArgumentException inside NSSQLGenerator and aborts the
+        // app. Match by income in SQL, then filter the (small) result set
+        // in memory.
         let txns = repo.fetch(TransactionModel.self,
-            predicate: #Predicate { ($0.note ?? "").localizedStandardContains(query) && $0.income == income },
+            predicate: #Predicate { $0.income == income },
             sort: [SortDescriptor(\.date, order: .reverse)])
         let filtered = category.map { cat in txns.filter { $0.category?.id == cat.id } } ?? txns
+
         var seen = Set<String>()
-        return filtered.filter { seen.insert($0.wrappedNote).inserted }
+        return filtered.filter { transaction in
+            guard transaction.wrappedNote.localizedStandardContains(trimmed) else { return false }
+            return seen.insert(transaction.wrappedNote).inserted
+        }
     }
 
     // MARK: Budget Dates
-
-    func updateBudgetDates() {
-        for b in repo.fetch(BudgetModel.self) {
-            if let start = BudgetRollover.roll(startDate: b.startDate, type: b.type) { b.startDate = start }
-        }
-        for m in repo.fetch(MainBudgetModel.self) {
-            if let start = BudgetRollover.roll(startDate: m.startDate, type: m.type) { m.startDate = start }
-        }
-        repo.save()
-    }
 
     // MARK: Editing / Deletion
 
@@ -199,50 +197,59 @@ final class TransactionViewModel{
         repo.save()
     }
 
-    // MARK: Staged delete (supports "undo" toast before the delete is committed)
+    // MARK: Staged delete (supports "undo" before the delete is committed)
 
-    /// Marks a transaction for deletion without saving yet, so it can still be rolled back.
-    /// Unsaved edits are committed first so a later `rollback()` only reverts
-    /// the staged delete, not unrelated pending changes.
+    struct PendingDelete: Identifiable {
+        let snapshot: TransactionSnapshot
+        var id: UUID { snapshot.id }
+    }
+
+    private(set) var pendingDelete: PendingDelete?
+    private var pendingDeleteTask: Task<Void, Never>?
+    private static let undoWindow: Duration = .seconds(6)
+
+    /// Deletes without saving so the row can be restored, and owns the
+    /// commit timer here (not in a view's `.task`) so cancellation can never
+    /// commit a delete behind the user's back.
     func stageDelete(_ txn: TransactionModel) {
-        repo.save()
+        commitPendingDelete()
+        pendingDeleteTask?.cancel()
+
+        let snapshot = TransactionSnapshot(txn)
         repo.delete(txn)
+        pendingDelete = PendingDelete(snapshot: snapshot)
+
+        pendingDeleteTask = Task { [weak self] in
+            try? await Task.sleep(for: Self.undoWindow)
+            guard !Task.isCancelled, let self, self.pendingDelete?.id == snapshot.id else { return }
+            self.commitPendingDelete()
+        }
     }
 
-    /// Commits any staged (unsaved) changes, such as a staged delete.
-    func commitPendingChanges() {
+    /// Commits the staged delete immediately (or does nothing if there is none).
+    func commitPendingDelete() {
+        pendingDeleteTask?.cancel()
+        pendingDeleteTask = nil
+        guard pendingDelete != nil else { return }
+        pendingDelete = nil
         repo.save()
     }
 
-    /// Reverts any staged (unsaved) changes, such as a staged delete.
-    func rollback() {
-        repo.rollback()
-    }
+    /// Restores the staged row. `rollback()` normally brings the original
+    /// object back intact; the snapshot is a fallback for the rare case where
+    /// the context already committed it.
+    func undoPendingDelete() {
+        pendingDeleteTask?.cancel()
+        pendingDeleteTask = nil
+        guard let pending = pendingDelete else { return }
+        pendingDelete = nil
 
-    /// Undo for the "deleted, tap to undo" toast.
-    ///
-    /// `context.rollback()` alone proved unreliable here (the delete could
-    /// already be committed by the time the user taps), so this drops any
-    /// pending change first and then verifies the row exists; if it doesn't,
-    /// it re-inserts a copy of the snapshot.
-    func undoDelete(_ txn: TransactionModel) {
-        let id = txn.id
-        let note = txn.wrappedNote
-        let amount = txn.amount
-        let date = txn.wrappedDate
-        let category = txn.category
-        let income = txn.income
         repo.rollback()
-        if repo.fetchOne(TransactionModel.self, predicate: #Predicate { $0.id == id }) == nil {
-            let copy = TransactionModel(
-                note: note,
-                category: category,
-                income: income,
-                amount: amount,
-                date: date
-            )
-            repo.insert(copy)
+        let pendingID = pending.id
+        if repo.fetchOne(TransactionModel.self, predicate: #Predicate { $0.id == pendingID }) == nil {
+            repo.insert(pending.snapshot.makeTransaction())
             repo.save()
         }
     }
+
 }

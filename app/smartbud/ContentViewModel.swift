@@ -8,7 +8,6 @@
 //
 //  Why this exists:
 //    1. `ContentView` had a hard crash on `currency = NSUbiquitousKeyValueStore
-//       .default.string(forKey: "currency")!` (old line 97). The currency
 //       migration now uses `if let` and falls back to the device locale.
 //    2. The first-run defaults, the iCloud currency migration, the update
 //       sheet scheduling, and the notification-authorization reconciliation
@@ -38,23 +37,16 @@ final class ContentViewModel {
     // re-synthesising `_colourScheme`, `_currency`, etc. Without this,
     // Swift 6 emits "invalid redeclaration of synthesized property"
     // for every `@AppStorage` on an `@Observable` class.
-    @ObservationIgnored @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
     @ObservationIgnored @AppStorage("showNotifications", store: .appGroup) var showNotifications: Bool = false
     @ObservationIgnored @AppStorage("notificationsEnabled", store: .appGroup) var notificationsEnabled: Bool = true
     @ObservationIgnored @AppStorage("firstLaunch", store: .appGroup) var firstLaunch: Bool = true
     @ObservationIgnored @AppStorage("dataMigration1", store: .appGroup) var dataMigration1: Bool = true
     @ObservationIgnored @AppStorage("dataMigration2", store: .appGroup) var dataMigration2: Bool = true
     @ObservationIgnored @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
-    @ObservationIgnored @AppStorage("topEdge", store: .appGroup) var savedTopEdge: Double = 30
-    @ObservationIgnored @AppStorage("bottomEdge", store: .appGroup) var savedBottomEdge: Double = 15
-    @ObservationIgnored @AppStorage("previousVersion", store: .appGroup) var previousVersionString: String = "Version \(UIApplication.appVersion) (\(UIApplication.buildNumber))"
-    @ObservationIgnored @AppStorage("showUpdateSheet", store: .appGroup) var showUpdateSheet: Bool = true
-    @ObservationIgnored @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
 
     // MARK: - Transient presentation state
 
     var showIntro: Bool = false
-    var showUpdate: Bool = false
 
     @ObservationIgnored private let defaults: UserDefaults
 
@@ -74,7 +66,6 @@ final class ContentViewModel {
         if firstLaunch {
             showIntro = true
             firstLaunch = false
-            showUpdateSheet = false
             dataMigration1 = false
             dataMigration2 = false
 
@@ -98,20 +89,7 @@ final class ContentViewModel {
         dataMigration1 = false
         dataMigration2 = false
 
-        if showUpdateSheet {
-            showUpdate = true
-            showUpdateSheet = false
-        }
-
         reconcileNotificationAuthorization()
-    }
-
-    /// Persists the safe-area insets measured by the outer `GeometryReader`
-    /// so other views (e.g. `HomeView`) can read them back without a
-    /// second geometry pass.
-    func updateInsets(top: Double, bottom: Double) {
-        savedTopEdge = top
-        savedBottomEdge = bottom
     }
 
     /// Called by `ContentView` when the scene transitions back to

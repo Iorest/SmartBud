@@ -8,14 +8,6 @@ final class SettingsViewModel{
     static let shared = SettingsViewModel()
     private let repo = DataRepository.shared
 
-    func fetchAllTransactions() -> [TransactionModel] {
-        repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
-    }
-
-    func eraseAllData() {
-        repo.deleteAll()
-    }
-
     /// "Erase All Data" — wipes local records AND the CloudKit zone
     /// for App Store Guideline 5.1.1(v) compliance. See
     /// `DataRepository.wipeEverything()` for the full path.

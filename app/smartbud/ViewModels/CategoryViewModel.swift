@@ -16,6 +16,39 @@ final class CategoryViewModel{
         expenseCategories = repo.fetch(CategoryModel.self, predicate: #Predicate { $0.income == false }, sort: [SortDescriptor(\.order)])
     }
 
+    /// Starter categories for a fresh install. Without these the picker has
+    /// nothing to choose from and a first transaction cannot be categorised.
+    private static let starterCategories: [(name: String, emoji: String, colour: String, income: Bool)] = [
+        ("餐饮", "🍔", "#EC7A58", false),
+        ("交通", "🚆", "#279AF4", false),
+        ("购物", "🛍️", "#C56AF7", false),
+        ("居住", "🏠", "#6E7BF1", false),
+        ("娱乐", "🎮", "#F3BF56", false),
+        ("医疗", "💊", "#ED80A2", false),
+        ("工资", "💼", "#4DBF73", true),
+        ("理财", "📈", "#408CF2", true)
+    ]
+
+    /// Adds any starter category the user does not already have. Existing
+    /// categories are never renamed or reordered.
+    func seedStarterCategories() {
+        load()
+        for starter in Self.starterCategories {
+            let pool = starter.income ? incomeCategories : expenseCategories
+            guard !pool.contains(where: { $0.name == starter.name }) else { continue }
+            let cat = CategoryModel(
+                name: starter.name,
+                emoji: starter.emoji,
+                colour: starter.colour,
+                income: starter.income,
+                order: pool.count
+            )
+            repo.insert(cat)
+        }
+        repo.save()
+        load()
+    }
+
     func create(name: String, emoji: String, colour: String, income: Bool, order: Int) -> CategoryModel {
         let cat = CategoryModel(name: name, emoji: emoji, colour: colour, income: income, order: order)
         repo.insert(cat)
@@ -33,6 +66,19 @@ final class CategoryViewModel{
     }
 
     func delete(_ category: CategoryModel) {
+        // Deleting a category must not take its history with it: SwiftData's
+        // default rule nullifies the relationship, but a future delete rule
+        // change would silently cascade. Clear the link explicitly so the
+        // confirmation copy is always true.
+        let id = category.id
+        let affected = repo.fetch(
+            TransactionModel.self,
+            predicate: #Predicate { $0.category?.id == id }
+        )
+        for transaction in affected {
+            transaction.category = nil
+        }
+
         repo.delete(category)
         repo.save()
         load()
