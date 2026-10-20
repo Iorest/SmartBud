@@ -4094,75 +4094,6 @@
         }
       }
     },
-    "export.failed" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export Failed"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "导出失败"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "導出失敗"
-          }
-        }
-      }
-    },
-    "export.type.expense" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expense"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "支出"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "支出"
-          }
-        }
-      }
-    },
-    "export.type.income" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Income"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        }
-      }
-    },
     "Extract leftover amount for a particular budget" : {
       "localizations" : {
         "en" : {
@@ -5811,29 +5742,6 @@
         }
       }
     },
-    "Monday" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monday"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "星期一"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "星期一"
-          }
-        }
-      }
-    },
     "Monitor how you are sticking to your budgets." : {
       "localizations" : {
         "en" : {
@@ -5966,29 +5874,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "每月"
-          }
-        }
-      }
-    },
-    "monthNewBudget" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "month"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月"
           }
         }
       }
@@ -8105,30 +7990,6 @@
         }
       }
     },
-    "settings.erase.progress" : {
-      "comment" : "",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erasing…"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在清除…"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在清除…"
-          }
-        }
-      }
-    },
     "settings.erase.success" : {
       "comment" : "",
       "extractionState" : "manual",
@@ -8293,30 +8154,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "將你的交易、分類、預算和範本另存為 JSON 檔案。你可以保存為備份、遷移到其他應用，或在需要協助時發送給我們。"
-          }
-        }
-      }
-    },
-    "settings.export.success" : {
-      "comment" : "",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export ready. Use the share sheet to save or send it."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "导出文件已就绪，请用分享面板保存或发送。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "匯出檔案已就緒，請用分享面板儲存或傳送。"
           }
         }
       }
@@ -8850,30 +8687,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購買失敗，請重試。"
-          }
-        }
-      }
-    },
-    "settings.pro.error.restore" : {
-      "comment" : "",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not restore purchases. Please try again."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法恢复购买，请重试。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無法恢復購買，請重試。"
           }
         }
       }
@@ -9420,29 +9233,6 @@
         }
       }
     },
-    "settings.row.featureLab" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feature Lab"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "实验功能"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "實驗功能"
-          }
-        }
-      }
-    },
     "settings.row.featureRequest" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9489,29 +9279,6 @@
         }
       }
     },
-    "settings.row.iCloudSync" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud Sync"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 同步"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 同步"
-          }
-        }
-      }
-    },
     "settings.row.importData" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9531,29 +9298,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "導入資料"
-          }
-        }
-      }
-    },
-    "settings.row.incomeTracking" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Income Tracking"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
           }
         }
       }
@@ -9834,29 +9578,6 @@
         }
       }
     },
-    "settings.section.pro" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PRO"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PRO"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PRO"
-          }
-        }
-      }
-    },
     "settings.theme.dark" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9972,29 +9693,6 @@
         }
       }
     },
-    "settings.toggle.on" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "On"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開"
-          }
-        }
-      }
-    },
     "settings.upcoming.hidden" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10037,52 +9735,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示"
-          }
-        }
-      }
-    },
-    "settings.weekday.monday" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monday"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "周一"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週一"
-          }
-        }
-      }
-    },
-    "settings.weekday.sunday" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sunday"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "周日"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週日"
           }
         }
       }
@@ -10701,29 +10353,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "建議已隱藏"
-          }
-        }
-      }
-    },
-    "Sunday" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sunday"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "星期日"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "星期日"
           }
         }
       }
@@ -12030,29 +11659,6 @@
         }
       }
     },
-    "weekNewBudget" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "week"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "周"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週"
-          }
-        }
-      }
-    },
     "weeks" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12390,29 +11996,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "每年"
-          }
-        }
-      }
-    },
-    "yearNewBudget" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "year"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "年"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "年"
           }
         }
       }
