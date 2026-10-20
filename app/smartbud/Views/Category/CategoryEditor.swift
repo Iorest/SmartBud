@@ -323,7 +323,6 @@ extension CategoryEditor {
                                 .background(RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
                                     .fill(Color.SecondaryBackground))
                         }
-                    //
                     Button {
                         verification()
                     } label: {

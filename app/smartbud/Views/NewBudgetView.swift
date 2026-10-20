@@ -116,7 +116,7 @@ struct BrandNewBudgetView: View {
 
     // MARK: - Page 1: details
 
-    var weekdaySymbols: [String] {
+    private var weekdaySymbols: [String] {
         var calendar = Calendar.current
         calendar.locale = Locale.appLocale
         return calendar.weekdaySymbols
@@ -170,7 +170,7 @@ struct BrandNewBudgetView: View {
     }
 
     @ViewBuilder
-    var startDaySection: some View {
+    private var startDaySection: some View {
         switch budgetTimeFrame {
         case .day:
             EmptyView()

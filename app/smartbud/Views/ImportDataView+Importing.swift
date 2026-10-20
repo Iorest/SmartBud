@@ -126,6 +126,8 @@ extension ImportDataView {
         }
 
         guard DataRepository.shared.save() else {
+            // Drop the staged rows so a later save can't commit half an import.
+            DataRepository.shared.rollback()
             processingState = .error
             errorMessage = DataRepository.shared.lastSaveError
                 ?? String.appLocalized("导入失败，未写入任何数据。")
@@ -137,6 +139,7 @@ extension ImportDataView {
             confettiNumber += 1
         }
     }
+
     /// Rejects an incomplete wizard before any parsing happens.
     private func importSelectionIsValid() -> Bool {
         if selectedColumns.count <= 3 {

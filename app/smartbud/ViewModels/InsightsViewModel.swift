@@ -37,7 +37,7 @@ final class InsightsViewModel {
     var currencySymbol: String = Locale.appLocale.currencySymbol ?? "$"
 
     /// Gregorian calendar with the user's first-weekday preference applied.
-    var configuredCalendar: Calendar {
+    private var configuredCalendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
         let defaults = UserDefaults.appGroup
         cal.firstWeekday = defaults.integer(forKey: "firstWeekday")
@@ -250,7 +250,7 @@ final class InsightsViewModel {
         }
     }
 
-    func currencySymbolFor(code: String) -> String {
+    private func currencySymbolFor(code: String) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = code

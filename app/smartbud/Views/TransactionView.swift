@@ -59,7 +59,7 @@ struct TransactionView: View {
 
     // sensory feedback triggers
     @State var errorHaptic = 0
-    @State var isSubmitting = false
+    @State private var isSubmitting = false
     @State var successHaptic = 0
     @State var lightHaptic = 0
 

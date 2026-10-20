@@ -107,7 +107,6 @@ extension ImportDataView {
                                                 .padding(.horizontal, 8)
                                                 .frame(width: columnWidth, height: 30, alignment: .leading)
                                                 .overlay(Rectangle().stroke(Color.Outline, lineWidth: 1))
-                                            //
                                         }
                                     }
                                     .onTapGesture {

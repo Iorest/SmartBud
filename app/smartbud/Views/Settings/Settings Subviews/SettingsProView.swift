@@ -25,7 +25,7 @@ struct SettingsProView: View {
     @Environment(\.dismiss) var dismiss
 
     @State var subscription = SubscriptionManager.shared
-    @State var settingsVM = SettingsViewModel.shared
+    @State private var settingsVM = SettingsViewModel.shared
 
     @State var isPresentingError: Bool = false
     @State var pendingErrorMessage: String = ""
@@ -46,7 +46,7 @@ struct SettingsProView: View {
         let subtitleKey: String
     }
 
-    var features: [ProFeature] = [
+    private var features: [ProFeature] = [
         ProFeature(icon: "chart.bar.xaxis", color: "103", titleKey: "Advanced Insights",
                    subtitleKey: "Deeper breakdowns, custom date ranges, exportable charts"),
         ProFeature(icon: "paintpalette.fill", color: "100", titleKey: "Exclusive Themes",
@@ -72,7 +72,7 @@ struct SettingsProView: View {
         .padding(.bottom, 20)
     }
 
-    var hero: some View {
+    private var hero: some View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
@@ -138,7 +138,7 @@ struct SettingsProView: View {
         }
     }
 
-    var proActiveBadge: some View {
+    private var proActiveBadge: some View {
         VStack(spacing: 12) {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 56))
@@ -162,7 +162,7 @@ struct SettingsProView: View {
     ///
     /// Kept as a small inline banner so it doesn't visually compete
     /// with the price list and feature list below it.
-    var limitedTimeFreeBanner: some View {
+    private var limitedTimeFreeBanner: some View {
         HStack(alignment: .center, spacing: 10) {
             Image(systemName: "gift.fill")
                 .font(.body)
@@ -185,7 +185,7 @@ struct SettingsProView: View {
         )
     }
 
-    var featuresList: some View {
+    private var featuresList: some View {
         VStack(spacing: 0) {
             ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
                 HStack(spacing: 14) {
@@ -221,7 +221,7 @@ struct SettingsProView: View {
     }
 
     @ViewBuilder
-    var subscribeSection: some View {
+    private var subscribeSection: some View {
         if subscription.loadedProducts.isEmpty {
             VStack(spacing: 8) {
                 Text(String.appLocalized("Coming Soon"))
@@ -256,7 +256,7 @@ struct SettingsProView: View {
     /// list is fine — the `subscribeSection` outer guard handles
     /// "no products at all", but a Store can return only the lifetime
     /// product, in which case this group is omitted.
-    var subscriptionsGroup: some View {
+    private var subscriptionsGroup: some View {
         VStack(alignment: .leading, spacing: 10) {
             sectionHeader(SettingsKey.proSectionSubscriptions)
             VStack(spacing: 12) {
@@ -287,7 +287,7 @@ struct SettingsProView: View {
     /// Store didn't return the lifetime product (e.g. a sandbox that
     /// only has subscriptions configured).
     @ViewBuilder
-    var lifetimeGroup: some View {
+    private var lifetimeGroup: some View {
         if let lifetime = subscription.lifetimeProduct {
             VStack(alignment: .leading, spacing: 10) {
                 sectionHeader(SettingsKey.proSectionLifetime)
@@ -313,7 +313,7 @@ struct SettingsProView: View {
     /// Small uppercase label used to head each product group on the
     /// Pro screen. Kept as a separate helper so the visual style stays
     /// consistent if the grouping expands in the future.
-    func sectionHeader(_ key: String) -> some View {
+    private func sectionHeader(_ key: String) -> some View {
         Text(String.appLocalized(key).uppercased())
             .font(.caption2.weight(.semibold))
             .foregroundStyle(Color.SubtitleText)
