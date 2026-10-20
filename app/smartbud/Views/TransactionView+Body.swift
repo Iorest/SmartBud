@@ -225,7 +225,7 @@ extension TransactionView {
         if showingNotePicker {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(suggestedTransactions, id: \.self) { transaction in
+                    ForEach(suggestedTransactions, id: \.id) { transaction in
                         Button {
                             note = transaction.wrappedNote
                             withAnimation {
@@ -351,40 +351,42 @@ extension TransactionView {
 
     @ViewBuilder
     var expenseToggleButton: some View {
-        Text(String.appLocalized("Expense"))
-            .font(.body.weight(.semibold))
-            .lineLimit(1)
-            .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-            .padding(6)
-            .frame(width: capsuleWidth)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                DispatchQueue.main.async {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        income = false
-                        swipingOffset = 0
-                    }
-                }
+        Button {
+            withAnimation(.easeIn(duration: 0.15)) {
+                income = false
+                swipingOffset = 0
             }
+        } label: {
+            Text(String.appLocalized("Expense"))
+                .font(.body.weight(.semibold))
+                .lineLimit(1)
+                .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
+                .padding(6)
+                .frame(width: capsuleWidth)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(income == false ? .isSelected : [])
     }
 
     @ViewBuilder
     var incomeToggleButton: some View {
-        Text(String.appLocalized("transaction-view-income-picker"))
-            .font(.body.weight(.semibold))
-            .lineLimit(1)
-            .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-            .padding(6)
-            .frame(width: capsuleWidth)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                DispatchQueue.main.async {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        income = true
-                        swipingOffset = capsuleWidth
-                    }
-                }
+        Button {
+            withAnimation(.easeIn(duration: 0.15)) {
+                income = true
+                swipingOffset = capsuleWidth
             }
+        } label: {
+            Text(String.appLocalized("transaction-view-income-picker"))
+                .font(.body.weight(.semibold))
+                .lineLimit(1)
+                .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
+                .padding(6)
+                .frame(width: capsuleWidth)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(income == true ? .isSelected : [])
     }
 
     var dateString: String {

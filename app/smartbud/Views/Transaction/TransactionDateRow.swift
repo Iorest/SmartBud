@@ -16,21 +16,25 @@ struct TransactionDateRow: View {
     let onTap: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            row(withTime: true)
-            row(withTime: false)
+        Button(action: onTap) {
+            ViewThatFits(in: .horizontal) {
+                row(withTime: true)
+                row(withTime: false)
+            }
+            .foregroundStyle(Color.PrimaryText)
+            .padding(.vertical, 8.5)
+            .padding(.horizontal, 10)
+            .animation(.default, value: TransactionDates.isToday(date))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(
+                RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
+                    .strokeBorder(Color.Outline, lineWidth: 1.5)
+            )
+            .contentShape(Rectangle())
         }
-        .foregroundStyle(Color.PrimaryText)
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .animation(.default, value: TransactionDates.isToday(date))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(
-            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                .strokeBorder(Color.Outline, lineWidth: 1.5)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture(perform: onTap)
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(String.appLocalized("Date") + ": "
+            + TransactionDates.day(date) + " " + TransactionDates.time(date)))
     }
 
     private func row(withTime: Bool) -> some View {
@@ -78,16 +82,15 @@ enum TransactionDates {
     }
 
     static func day(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.setLocalizedDateFormatFromTemplate(isToday(date) ? "MMMd" : "MMMdEEE")
-        return formatter.string(from: date)
+        let style: Date.FormatStyle = isToday(date)
+            ? .dateTime.month(.abbreviated).day()
+            : .dateTime.month(.abbreviated).day().weekday(.abbreviated)
+        return date.formatted(style.locale(Locale.appLocale))
     }
 
     static func time(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: date)
+        // Let the locale decide between 24h and 12h; a hardcoded "HH:mm"
+        // disagreed with the log list on 12-hour devices.
+        date.formatted(.dateTime.hour().minute().locale(Locale.appLocale))
     }
 }

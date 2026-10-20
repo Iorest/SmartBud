@@ -27,21 +27,34 @@ struct TransactionCategoryRow: View {
         if !hasCategories {
             emptyButton
         } else {
-            Group {
-                if isPickerOpen {
-                    closePill
-                } else if let category {
-                    chip(category)
-                } else {
-                    emptySlot
-                        .offset(x: shake ? -5 : 0)
-                }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
+            Button {
                 withAnimation(.easeInOut) { isPickerOpen.toggle() }
+            } label: {
+                Group {
+                    if isPickerOpen {
+                        closePill
+                    } else if let category {
+                        chip(category)
+                    } else {
+                        emptySlot
+                            .offset(x: shake ? -5 : 0)
+                    }
+                }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(accessibilityTitle)
         }
+    }
+
+    private var accessibilityTitle: String {
+        if isPickerOpen {
+            return String.appLocalized("Close")
+        }
+        if let category {
+            return String.appLocalized("Category") + ": " + category.wrappedName
+        }
+        return String.appLocalized("Category")
     }
 
     private var closePill: some View {
@@ -72,10 +85,20 @@ struct TransactionCategoryRow: View {
         .background(color.opacity(0.35),
                     in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous))
         .contentShape(Rectangle())
-        .onTapGesture { isPickerOpen = true }
     }
 
     private var emptyButton: some View {
+        Button {
+            // Always use the grid picker, even before any category exists;
+            // its empty state offers starter categories.
+            withAnimation(.easeInOut) { isPickerOpen = true }
+        } label: {
+            emptyButtonLabel
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var emptyButtonLabel: some View {
         HStack(spacing: 4) {
             Image(systemName: "plus")
                 .font(.subheadline.weight(.semibold))
@@ -97,11 +120,6 @@ struct TransactionCategoryRow: View {
         .drawingGroup()
         .offset(x: shake ? -5 : 0)
         .contentShape(Rectangle())
-        .onTapGesture {
-            // Always use the grid picker, even before any category exists;
-            // its empty state offers starter categories.
-            withAnimation(.easeInOut) { isPickerOpen = true }
-        }
     }
 
     private var emptySlot: some View {
