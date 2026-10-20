@@ -193,11 +193,11 @@ struct MainBudgetView: View {
     }
 
     var percentString: String {
-        return "\(Int(round(100 - (totalSpent / budgetAmount) * 100)))%"
+        return "\(Int(round(100 - Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
     var percentString1: String {
-        return "\(Int(round((totalSpent / budgetAmount) * 100)))%"
+        return "\(Int(round(Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
     var body: some View {

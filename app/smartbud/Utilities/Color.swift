@@ -59,10 +59,15 @@ extension Color {
     }
 
     func luminance() -> Double {
-        let components = UIColor(self).cgColor.components
-        let red = components?[0] ?? 0
-        let green = components?[1] ?? 0
-        let blue = components?[2] ?? 0
+        guard let components = UIColor(self).cgColor.components, !components.isEmpty else {
+            return 0
+        }
+        // Grayscale colour spaces carry white (+ optional alpha) only, so the
+        // RGB slots are absent rather than zero.
+        guard components.count >= 3 else { return Double(components[0]) }
+        let red = components[0]
+        let green = components[1]
+        let blue = components[2]
         return 0.299 * Double(red) + 0.587 * Double(green) + 0.114 * Double(blue)
     }
 
@@ -199,7 +204,9 @@ func blend(over color: Color, withAlpha alpha: CGFloat) -> Color {
     let uiColor = UIColor(color)
     let alphaClamped = min(max(alpha, 0), 1)
 
-    guard let inputRGBComponents = uiColor.cgColor.components else {
+    guard let inputRGBComponents = uiColor.cgColor.components,
+          inputRGBComponents.count >= 3 else {
+        // Grayscale and pattern colours have no RGB slots to blend.
         return color
     }
 

@@ -172,16 +172,16 @@ struct BudgetTimeView: View {
             return 7 - (components.day ?? 0)
         } else if budgetType == 3 {
             let components1 = calendar.dateComponents([.day], from: budgetStart, to: endDate)
-            let numberOfDays = components1.day!
+            let numberOfDays = components1.day ?? 0
             let components2 = calendar.dateComponents([.day], from: budgetStart, to: Date.now)
-            let numberOfDaysPast = components2.day!
+            let numberOfDaysPast = components2.day ?? 0
 
             return Int(numberOfDays - numberOfDaysPast)
         } else if budgetType == 4 {
             let components1 = calendar.dateComponents([.day], from: budgetStart, to: endDate)
-            let numberOfDays = components1.day!
+            let numberOfDays = components1.day ?? 0
             let components2 = calendar.dateComponents([.day], from: budgetStart, to: Date.now)
-            let numberOfDaysPast = components2.day!
+            let numberOfDaysPast = components2.day ?? 0
             return Int(numberOfDays - numberOfDaysPast)
         } else {
             return 0
@@ -189,11 +189,10 @@ struct BudgetTimeView: View {
     }
 
     var leftPerDay: Double {
-        if budgetType >= 2 {
-            return (budgetAmount - totalSpent) / Double(daysLeftNumber)
-        } else {
-            return 0
-        }
+        // The last day of a period has 0 days left; dividing by it would
+        // render "∞ per day".
+        guard budgetType >= 2, daysLeftNumber > 0 else { return 0 }
+        return (budgetAmount - totalSpent) / Double(daysLeftNumber)
     }
 
     var showExtraDetails: Bool {

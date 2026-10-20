@@ -70,19 +70,19 @@ final class BudgetViewModel {
             calendar.firstWeekday = 1
             calendar.minimumDaysInFirstWeek = 4
             let components = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: day)
-            let sunday = calendar.date(from: components)!
-            let holding = calendar.date(byAdding: .day, value: chosenDayWeek - 1, to: sunday)!
+            let sunday = calendar.date(from: components) ?? day
+            let holding = calendar.date(byAdding: .day, value: chosenDayWeek - 1, to: sunday) ?? sunday
             if holding > day {
-                return calendar.date(byAdding: .day, value: -7, to: holding)!
+                return calendar.date(byAdding: .day, value: -7, to: holding) ?? holding
             }
             return holding
         case 2: // .month
             let calendar = Calendar.current
             let components = calendar.dateComponents([.month, .year], from: day)
-            let startOfMonth = calendar.date(from: components)!
-            let holding = calendar.date(byAdding: .day, value: chosenDayMonth - 1, to: startOfMonth)!
+            let startOfMonth = calendar.date(from: components) ?? day
+            let holding = calendar.date(byAdding: .day, value: chosenDayMonth - 1, to: startOfMonth) ?? startOfMonth
             if holding > day {
-                return calendar.date(byAdding: .month, value: -1, to: holding)!
+                return calendar.date(byAdding: .month, value: -1, to: holding) ?? holding
             }
             return holding
         case 3: // .year
@@ -99,10 +99,16 @@ final class BudgetViewModel {
     func save() { repo.save(); load() }
 
     func leftover(_ budget: BudgetModel) -> Double {
+        // An unlinked budget (legacy data, or a category removed outside the
+        // app) matches every uncategorized row through `nil == nil`; count
+        // nothing rather than the whole ledger.
+        guard let categoryID = budget.category?.id else {
+            return Money.double(Money.cents(budget.amount))
+        }
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
             return date >= budget.startDate && date <= Date.now
-                && !txn.income && txn.category?.id == budget.category?.id
+                && !txn.income && txn.category?.id == categoryID
         }.map(\.amount))
         return Money.double(Money.cents(budget.amount) - spent)
     }

@@ -10,9 +10,16 @@
 import Foundation
 
 enum Money {
+    /// Largest single amount any entry path accepts (number pad, import,
+    /// Shortcuts), so imported rows cannot bypass the on-screen cap.
+    static let maxAmount: Double = 100_000_000
+
     /// Converts a stored amount to Decimal, rounded to cents first so the
     /// binary floating-point tail (12.299999… for 12.3) never enters a sum.
     static func cents(_ value: Double) -> Decimal {
+        // `Decimal(Double.infinity)` traps; a corrupted or imported value
+        // must not take the process down.
+        guard value.isFinite else { return .zero }
         var source = Decimal(value)
         var result = Decimal()
         NSDecimalRound(&result, &source, 2, .plain)
@@ -22,6 +29,18 @@ enum Money {
     /// Exact sum of a list of stored amounts.
     static func sum<S: Sequence>(_ values: S) -> Decimal where S.Element == Double {
         values.reduce(Decimal.zero) { $0 + cents($1) }
+    }
+
+    /// Fraction of `budget` already spent, clamped to finite values.
+    ///
+    /// A non-positive or non-finite budget counts as fully used as soon as
+    /// anything has been spent, so callers can safely pass the result to
+    /// `Int(round(_:))` — dividing by zero there would trap.
+    static func spendFraction(_ spent: Double, of budget: Double) -> Double {
+        guard budget > 0, budget.isFinite, spent.isFinite else {
+            return spent.isFinite && spent > 0 ? 1 : 0
+        }
+        return spent / budget
     }
 
     /// Rounds to whole cents (half away from zero at the third decimal).

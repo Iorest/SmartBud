@@ -65,7 +65,7 @@ struct MonthStepperView: View {
         .onAppear {
             let calendar = Calendar(identifier: .gregorian)
 
-            let date = transactionsReversed[0].day ?? Date.now
+            let date = transactionsReversed.first?.day ?? Date.now
 
             let dateComponents = calendar.dateComponents([.month, .year], from: date)
 

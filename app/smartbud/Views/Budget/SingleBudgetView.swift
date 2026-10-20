@@ -83,7 +83,7 @@ struct SingleBudgetView: View {
     }
 
     var percentString1: String {
-        return "\(Int(round((totalSpent / budgetAmount) * 100)))%"
+        return "\(Int(round(Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
     var targetPercent: Double {
@@ -93,8 +93,9 @@ struct SingleBudgetView: View {
         let numberOfDays = components1.day ?? 0
 
         let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
-        let numberOfDaysPast = components2.day ?? 0 + 1
+        let numberOfDaysPast = (components2.day ?? 0) + 1
 
+        guard numberOfDays > 0 else { return 0 }
         return Double(numberOfDays - numberOfDaysPast) / Double(numberOfDays)
     }
 

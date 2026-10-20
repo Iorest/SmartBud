@@ -102,6 +102,17 @@ final class CategoryViewModel {
             transaction.category = nil
         }
 
+        // A category budget has no meaning without its category: keeping it
+        // would leave an unnamed budget whose `nil == nil` category match
+        // counts every uncategorized row.
+        let attachedBudgets = repo.fetch(
+            BudgetModel.self,
+            predicate: #Predicate { $0.category?.id == id }
+        )
+        for budget in attachedBudgets {
+            repo.delete(budget)
+        }
+
         repo.delete(category)
         repo.save()
         load()

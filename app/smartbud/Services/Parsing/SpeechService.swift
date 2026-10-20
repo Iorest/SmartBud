@@ -20,6 +20,7 @@ final class SpeechService {
     private let audioEngine = AVAudioEngine()
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
+    private var tapInstalled = false
 
     init() {
         // Follow the app language; fall back to English for other locales.
@@ -54,10 +55,20 @@ final class SpeechService {
 
     private func installAudioTap() {
         let input = audioEngine.inputNode
+        // A previous start that failed after installing the tap leaves it in
+        // place; installing twice raises an ObjC exception.
+        removeAudioTap()
         input.installTap(onBus: 0, bufferSize: 1024,
                          format: input.outputFormat(forBus: 0)) { [weak self] buffer, _ in
             self?.request?.append(buffer)
         }
+        tapInstalled = true
+    }
+
+    private func removeAudioTap() {
+        guard tapInstalled else { return }
+        audioEngine.inputNode.removeTap(onBus: 0)
+        tapInstalled = false
     }
 
     func startRecording(completion: @escaping (String) -> Void) {
@@ -110,12 +121,13 @@ final class SpeechService {
             isRecording = true
         } catch {
             errorMessage = String.appLocalized("无法启动录音。")
+            removeAudioTap()
         }
     }
 
     func stopRecording() {
         audioEngine.stop()
-        audioEngine.inputNode.removeTap(onBus: 0)
+        removeAudioTap()
         request?.endAudio()
         task?.cancel()
         isRecording = false

@@ -328,7 +328,7 @@ struct WeekStepperView: View {
             calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
             calendar.minimumDaysInFirstWeek = 4
 
-            let date = transactionsReversed[0].day ?? Date.now
+            let date = transactionsReversed.first?.day ?? Date.now
 
             let dateComponents = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: date)
 

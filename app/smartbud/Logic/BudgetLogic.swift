@@ -80,6 +80,10 @@ enum BudgetAnchor {
 /// 3=every N months). Returns `nil` for an unusable recurrence (unknown type
 /// or `coefficient <= 0`) so callers stop the loop instead of spinning forever.
 enum Recurrence {
+    /// Upper bound on rows materialised in one catch-up pass. One year of
+    /// daily occurrences is already far more than a ledger should backfill.
+    static let maxCatchUp = 366
+
     static func nextOccurrence(after day: Date, type: Int, coefficient: Int,
                                calendar: Calendar = .current) -> Date? {
         switch type {

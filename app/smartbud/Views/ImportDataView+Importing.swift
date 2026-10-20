@@ -184,7 +184,11 @@ extension ImportDataView {
             guard let rowCategory = categories[row[indexes.category]] else {
                 return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的分类未匹配。"), line)))
             }
-            guard let transactionAmount = Double(row[indexes.amount]) else {
+            // `Double("inf")` / `Double("1e400")` parse successfully and would
+            // reach Decimal maths as a non-finite value, so screen them here.
+            guard let transactionAmount = Double(row[indexes.amount]),
+                  transactionAmount.isFinite,
+                  abs(transactionAmount) <= Money.maxAmount else {
                 return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的金额无法解析。"), line)))
             }
 
@@ -221,7 +225,7 @@ extension ImportDataView {
     }
 
     func makeAttributedString() -> AttributedString {
-        var string = AttributedString("this article")
+        var string = AttributedString(String.appLocalized("this article"))
         string.foregroundColor = Color.PrimaryText
         let reference = "https://pro.arcgis.com/en/pro-app/latest/help/mapping/time/"
             + "convert-string-or-numeric-time-values-into-data-format.htm"

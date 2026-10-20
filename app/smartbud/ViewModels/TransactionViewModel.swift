@@ -97,8 +97,11 @@ final class TransactionViewModel {
             var cursor = txn.nextTransactionDate
             // `nextOccurrence` returns nil for an unusable recurrence
             // (unknown type or coefficient <= 0), terminating the loop
-            // instead of spinning forever.
-            while cursor <= today,
+            // instead of spinning forever. The count cap stops a daily
+            // recurrence anchored years back from inserting thousands of
+            // rows on the main thread (watchdog kill + iCloud storm).
+            var generated = 0
+            while cursor <= today, generated < Recurrence.maxCatchUp,
                   let next = Recurrence.nextOccurrence(
                       after: Calendar.current.startOfDay(for: cursor),
                       type: txn.recurringType,
@@ -108,6 +111,7 @@ final class TransactionViewModel {
                 repo.insert(new)
                 new.onceRecurring = true
                 cursor = next
+                generated += 1
             }
             txn.recurringType = 0
         } else if Calendar.current.isDateInToday(txn.nextTransactionDate) {
