@@ -1,3 +1,4 @@
 /* Localized Info.plist keys for Traditional Chinese */
 
 "CFBundleDisplayName" = "智賬";
+"NSLocalNetworkUsageDescription" = "連線到本機網路上執行的 AI 模型（例如 Ollama、LM Studio）來分析帳本。";

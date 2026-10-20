@@ -1,3 +1,4 @@
 /* Localized Info.plist keys for English */
 
 "CFBundleDisplayName" = "SmartBud";
+"NSLocalNetworkUsageDescription" = "Connects to AI models on your local network, such as Ollama or LM Studio, to analyze your ledger.";
