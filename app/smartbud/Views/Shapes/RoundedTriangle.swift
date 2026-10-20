@@ -16,8 +16,6 @@ struct RoundedTriangle: Shape {
         let weirdLength = cornerRadius / tan(cornerAngle / 2)
 
         let firstControlPointFrom = CGPoint(x: weirdLength, y: rect.minY)
-//        let firstControlPoint = CGPoint(x: rect.minX, y: rect.minY)
-//        let firstControlPointTo = CGPoint(x: (weirdLength * sin((CGFloat.pi / 2) - cornerAngle)), y: (weirdLength * cos((CGFloat.pi / 2) - cornerAngle)))
 
         var path = Path()
 
@@ -33,8 +31,6 @@ struct RoundedTriangle: Shape {
         let weirdHeight = weirdHypot * sin(cornerAngle)
 
         let secondControlPointFrom = CGPoint(x: (rect.width / 2) - weirdWidth, y: rect.height - weirdHeight)
-//        let secondControlPoint = CGPoint(x: rect.midX, y: rect.maxY)
-//        let secondControlPointTo = CGPoint(x: ((rect.width / 2) + weirdWidth), y: (rect.height - weirdHeight))
 
         let weirderLength = cornerRadius / sin((CGFloat.pi / 2) - cornerAngle)
         let secondCentre = CGPoint(x: rect.midX, y: rect.height - weirderLength)
@@ -44,8 +40,6 @@ struct RoundedTriangle: Shape {
 //        path.addQuadCurve(to: secondControlPointTo, control: secondControlPoint)
 
         let thirdControlPointFrom = CGPoint(x: rect.width - weirdLength + (cornerRadius * cos(CGFloat.pi / 2 - cornerAngle)), y: cornerRadius + (cornerRadius * sin(CGFloat.pi / 2 - cornerAngle)))
-//        let thirdControlPoint = CGPoint(x: rect.maxX, y: rect.minY)
-//        let thirdControlPointTo = CGPoint(x: (rect.width - weirdLength), y: rect.minY)
 
         let thirdCentre = CGPoint(x: rect.width - weirdLength, y: cornerRadius)
 

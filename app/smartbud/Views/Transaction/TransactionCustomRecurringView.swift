@@ -6,7 +6,6 @@ struct CustomRecurringView: View {
     @Binding var repeatCoefficient: Int
     @Binding var showPicker: Bool
 
-    @Environment(\.colorScheme) var systemColorScheme
     var stringArray: [String] {
         return [
             "", "\(holdingCoefficient) days", "\(holdingCoefficient) weeks",
@@ -28,9 +27,8 @@ struct CustomRecurringView: View {
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .font(.subheadline.weight(.semibold))
                         
-                    //                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.SubtitleText)
                         .padding(7)
                         .background(Color.SecondaryBackground, in: Circle())
@@ -40,9 +38,8 @@ struct CustomRecurringView: View {
                 Spacer()
 
                 Text(String.appLocalized("Custom Interval"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
                     
-                //                    .font(.system(size: 18, weight: .semibold, design: .rounded))
 
                 Spacer()
 
@@ -56,9 +53,8 @@ struct CustomRecurringView: View {
 
                 } label: {
                     Image(systemName: "checkmark")
-                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .font(.subheadline.weight(.semibold))
                         
-                    //                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color.IncomeGreen)
                         .padding(7)
                         .background(Color.IncomeGreen.opacity(0.23), in: Circle())
@@ -68,7 +64,7 @@ struct CustomRecurringView: View {
 
             HStack(spacing: 10) {
                 Text(String.appLocalized("Repeats every"))
-                    .font(.system(size: 23, weight: .medium, design: .rounded))
+                    .font(.system(size: 23, weight: .medium))
                     .foregroundStyle(Color.PrimaryText)
                     .padding(.trailing, 3)
 
@@ -81,7 +77,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 30 ? 0.25 : 1)
@@ -89,10 +85,10 @@ struct CustomRecurringView: View {
                     .disabled(holdingCoefficient == 30)
 
                     Text("\(holdingCoefficient)")
-                        .font(.system(size: 23, weight: .medium, design: .rounded))
+                        .font(.system(size: 23, weight: .medium))
                         .padding(7)
                         .background {
-                            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                 .fill(Color.SecondaryBackground)
                                 .frame(width: 40, height: 40)
                         }
@@ -105,7 +101,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingCoefficient == 2 ? 0.25 : 1)
@@ -122,7 +118,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 1 ? 0.25 : 1)
@@ -131,17 +127,17 @@ struct CustomRecurringView: View {
 
                     Group {
                         if holdingType == 1 {
-                            Text(String(localized: "^[\(holdingCoefficient) days](inflect: true)"))
+                            Text(String.appFormatted("^[%lld days](inflect: true)", holdingCoefficient))
                         } else if holdingType == 2 {
-                            Text(String(localized: "^[\(holdingCoefficient) weeks](inflect: true)"))
+                            Text(String.appFormatted("^[%lld weeks](inflect: true)", holdingCoefficient))
                         } else if holdingType == 3 {
-                            Text(String(localized: "^[\(holdingCoefficient) months](inflect: true)"))
+                            Text(String.appFormatted("^[%lld months](inflect: true)", holdingCoefficient))
                         }
                     }
-                    .font(.system(size: 23, weight: .medium, design: .rounded))
+                    .font(.system(size: 23, weight: .medium))
                     .padding(7)
                     .background {
-                        RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                        RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                             .fill(Color.SecondaryBackground)
                             .frame(height: 40)
                     }
@@ -154,7 +150,7 @@ struct CustomRecurringView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(
-                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
+                                Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             )
                             .contentShape(Circle())
                             .opacity(holdingType == 3 ? 0.25 : 1)

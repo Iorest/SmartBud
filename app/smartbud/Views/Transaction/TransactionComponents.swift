@@ -10,13 +10,6 @@ struct NumPadButton: ButtonStyle {
     }
 }
 
-func getDollarOffset(big: CGFloat, small: CGFloat) -> CGFloat {
-    let bigFont = UIFont.rounded(ofSize: big, weight: .regular)
-    let smallFont = UIFont.rounded(ofSize: small, weight: .light)
-
-    return bigFont.capHeight - smallFont.capHeight - 1
-}
-
 struct NoteView: View {
     @Binding var note: String
     @Binding var focused: Bool
@@ -24,15 +17,17 @@ struct NoteView: View {
     @FocusState private var textFocused: Bool
     let characterLimit = 50
 
-    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    // Must match the rendered .body size, including any dynamicTypeSize cap
+    // applied by the parent, or the pill is measured too narrow and the
+    // placeholder truncates at accessibility sizes.
+    @ScaledMetric(relativeTo: .body) private var fontSize: CGFloat = 17
 
     var noteWidth: CGFloat {
-        let fontSize: CGFloat = UIFont.getBodyFontSize(dynamicTypeSize: dynamicTypeSize)
-        //        let fontSize: CGFloat = fontSize
         let systemFont = UIFont.systemFont(ofSize: fontSize, weight: .semibold)
         let roundedFont: UIFont
         if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
-            roundedFont = UIFont(descriptor: descriptor, size: fontSize)
+            let rounded: UIFont? = UIFont(descriptor: descriptor, size: fontSize)
+            roundedFont = rounded ?? systemFont
         } else {
             roundedFont = systemFont
         }
@@ -47,18 +42,18 @@ struct NoteView: View {
         if !note.isEmpty {
             return size.width + 2
         } else {
-            return placeholderSize.width
+            // CJK placeholders measure to the exact glyph width, which then
+            // truncates to "…" once rounded — leave a hair of slack.
+            return placeholderSize.width + 4
         }
 
-        //        return max(size.width + 2, (placeholderSize.width + 1))
     }
 
     var body: some View {
         HStack(spacing: 7) {
             Image(systemName: "text.alignleft")
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 
-            //                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.SubtitleText)
 
             ZStack(alignment: .leading) {
@@ -74,12 +69,15 @@ struct NoteView: View {
                 if note.isEmpty {
                     Text(String.appLocalized("Add Note"))
                         .foregroundStyle(Color.SubtitleText)
+                        // Measured and rendered text width can differ by a
+                        // hair at large sizes; shrink instead of truncating.
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                 }
             }
-            .font(.system(.body, design: .rounded).weight(.semibold))
+            .font(.body.weight(.semibold))
             
-            //            .font(.system(size: 16, weight: .semibold, design: .rounded))
-            .frame(width: min(noteWidth, ScreenSize.width / 1.5), alignment: .center)
+            .frame(maxWidth: noteWidth, alignment: .center)
         }
         .onTapGesture {
             textFocused = true
@@ -87,7 +85,7 @@ struct NoteView: View {
         .padding(.vertical, 7)
         .padding(.horizontal, 10)
         .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
                 .stroke(Color.Outline, lineWidth: 1.5)
         )
         .onChange(of: textFocused) { _, newValue in

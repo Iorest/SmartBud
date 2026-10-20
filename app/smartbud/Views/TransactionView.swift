@@ -16,7 +16,11 @@ struct TransactionView: View {
 
     @Environment(\.colorScheme) var colorScheme
     var boldText: Bool {
+        #if os(macOS)
+        false
+        #else
         UIAccessibility.isBoldTextEnabled
+        #endif
     }
 
     @AppStorage("topEdge", store: .appGroup) var topEdge:
@@ -73,6 +77,7 @@ struct TransactionView: View {
 
     // sensory feedback triggers
     @State private var errorHaptic = 0
+    @State private var isSubmitting = false
     @State private var successHaptic = 0
     @State private var lightHaptic = 0
 
@@ -117,7 +122,7 @@ struct TransactionView: View {
     @ViewBuilder
     var repeatIconWithOverlay: some View {
         Image(systemName: "repeat")
-            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+            .font(.subheadline.weight(.semibold))
             
             .overlay(alignment: .topTrailing) {
                 repeatOverlayText
@@ -130,7 +135,7 @@ struct TransactionView: View {
 
     var repeatOverlayText: some View {
         Text(repeatChar)
-            .font(.system(size: 6, weight: .black, design: .rounded))
+            .font(.system(size: 6, weight: .black))
             .foregroundStyle(Color.IncomeGreen)
             .frame(width: 10, alignment: .leading)
             .offset(x: 5.7, y: 1.5)
@@ -147,11 +152,11 @@ struct TransactionView: View {
 
             suggestedAmountChip(transaction)
         }
-        .font(.system(.body, design: .rounded).weight(.semibold))
+        .font(.body.weight(.semibold))
         .padding(5)
         .background(
             Color.SecondaryBackground,
-            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous))
+            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous))
     }
 
     @ViewBuilder
@@ -164,14 +169,14 @@ struct TransactionView: View {
             .padding(.horizontal, 5)
             .background(
                 color.opacity(0.23),
-                in: RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous))
+                in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous))
     }
 
     @ViewBuilder
     var dateDisplayText: some View {
         let dateStr = getDateString(date: date)
         if isDateToday(date: date) {
-            Text(String(localized: "Today, \(dateStr)"))
+            Text(String.appLocalized("Today") + " · " + dateStr)
                 .lineLimit(1)
         } else {
             Text(dateStr)
@@ -182,35 +187,35 @@ struct TransactionView: View {
     @ViewBuilder
     func deleteButtonLabel(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .font(.title3.weight(.semibold))
             .foregroundStyle(.white)
             .frame(height: 45)
             .frame(maxWidth: .infinity)
             .background(
-                color, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                color, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
     }
 
     @ViewBuilder
     func cancelButtonLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(.title3, design: .rounded).weight(.semibold))
+            .font(.title3.weight(.semibold))
             .foregroundStyle(Color.PrimaryText.opacity(0.9))
             .frame(height: 45)
             .frame(maxWidth: .infinity)
             .background(
                 Color.SecondaryBackground,
-                in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
     }
 
     @ViewBuilder
     var deleteConfirmationHeader: some View {
         Group {
             Text(String.appLocalized("Delete Expense?"))
-                .font(.system(.title3, design: .rounded).weight(.medium))
+                .font(.title3.weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
 
             Text(String.appLocalized("This action cannot be undone."))
-                .font(.system(.callout, design: .rounded).weight(.medium))
+                .font(.callout.weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
                 .padding(.bottom, 15)
         }
@@ -219,7 +224,7 @@ struct TransactionView: View {
     @ViewBuilder
     var deleteButtonIcon: some View {
         Image(systemName: "trash.fill")
-            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+            .font(.subheadline.weight(.semibold))
             
             .foregroundStyle(Color.AlertRed)
             .padding(7)
@@ -240,7 +245,7 @@ struct TransactionView: View {
                 }
             } label: {
                 Text(String.appLocalized("Cancel"))
-                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 4)
@@ -341,18 +346,18 @@ struct TransactionView: View {
             if showToast {
                 HStack(spacing: 6.5) {
                     Image(systemName: toastImage)
-                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.AlertRed)
 
                     Text(toastTitle)
-                        .font(.system(.body, design: .rounded).weight(.semibold))
+                        .font(.body.weight(.semibold))
                         .lineLimit(1)
                         .foregroundStyle(Color.AlertRed)
                 }
                 .padding(8)
                 .background(
                     Color.AlertRed.opacity(0.23),
-                    in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                    in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                 )
                 .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                 .frame(maxWidth: dynamicTypeSize > .xLarge ? 250 : 200)
@@ -376,30 +381,38 @@ struct TransactionView: View {
         }
     }
 
+    private var smartEntryButton: some View {
+        Button {
+            showSmartEntry = true
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "sparkles")
+                Text(String.appLocalized("智能"))
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(Color.SubtitleText)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 7)
+            .overlay(
+                RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
+                    .stroke(Color.Outline, lineWidth: 1.5)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(String.appLocalized("智能记账")))
+    }
+
     @ViewBuilder
-    var swipeAndNumberPadArea: some View {        VStack(spacing: 0) {
+    var swipeAndNumberPadArea: some View {
+        VStack(spacing: 0) {
             VStack(spacing: 8) {
                 NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
+                // The note pill is sized to its text and capped at
+                // screenWidth/1.5, so it still fits next to the smart entry
+                // button at accessibility sizes — no need to stack them.
                 HStack(spacing: 8) {
                     NoteView(note: $note, focused: $textFieldFocused)
-                    Button {
-                        showSmartEntry = true
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "sparkles")
-                            Text(String.appLocalized("智能"))
-                                .font(.system(.caption, design: .rounded).weight(.semibold))
-                        }
-                        .foregroundStyle(Color.SubtitleText)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 7)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
-                                .stroke(Color.Outline, lineWidth: 1.5)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(String.appLocalized("智能记账")))
+                    smartEntryButton
                 }
             }
             // Bottom spacer absorbs every remaining point in the parent VStack
@@ -438,22 +451,34 @@ struct TransactionView: View {
             }
             .padding(.bottom, 5)
         } else {
-            HStack(spacing: 8) {
-                dateButton
+            if usesLargeTextLayout {
+                // Large text: two chips side by side would truncate the date.
+                VStack(alignment: .leading, spacing: 8) {
+                    dateButton
+                    categoryButtonArea
+                }
+                .padding(.bottom, 5)
+            } else {
+                HStack(spacing: 8) {
+                    dateButton
 
-                categoryButtonArea
+                    categoryButtonArea
+                }
+                .padding(.bottom, 5)
             }
-            .padding(.bottom, 5)
         }
     }
 
     @ViewBuilder
     var categoryPickerOrNumberPad: some View {
         if showCategoryPicker {
-            NewCategoryPickerView(
-                category: $category, showPicker: $showCategoryPicker,
-                showSheet: $showCategorySheet, income: income
+            TransactionCategoryGrid(
+                category: $category,
+                showPicker: $showCategoryPicker,
+                showingCategoryView: $showCategorySheet,
+                income: income
             )
+            .environment(categoryVM)
             .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
         } else {
             NumberPad(
@@ -483,7 +508,7 @@ struct TransactionView: View {
                 .datePickerStyle(.graphical)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
-                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card))
+                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card))
                 .padding(17)
                 .onChange(of: dateString) { _, _ in
                     handleDateChanged()
@@ -511,6 +536,31 @@ struct TransactionView: View {
 
     @ViewBuilder
     var dateButton: some View {
+        // Two candidate layouts: date + time, or date alone when the row is
+        // too narrow. `ViewThatFits` measures the real container, which is
+        // what the old screen-width arithmetic was approximating.
+        ViewThatFits(in: .horizontal) {
+            dateRow(withTime: true)
+            dateRow(withTime: false)
+        }
+        .foregroundStyle(Color.PrimaryText)
+        .padding(.vertical, 8.5)
+        .padding(.horizontal, 10)
+        .animation(.default, value: isDateToday(date: date))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(
+            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
+                .strokeBorder(Color.Outline, lineWidth: 1.5)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            hideKeyboard()
+            showingDatePicker = true
+        }
+    }
+
+    @ViewBuilder
+    private func dateRow(withTime: Bool) -> some View {
         HStack(spacing: 7) {
             Group {
                 if date < Date.now {
@@ -523,33 +573,19 @@ struct TransactionView: View {
                 }
             }
             .foregroundStyle(Color.SubtitleText)
-            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+            .font(.subheadline.weight(.semibold))
 
             Group {
                 dateDisplayText
             }
-            .font(.system(.body, design: .rounded).weight(.semibold))
+            .font(.body.weight(.semibold))
 
-            if showTime {
-                Spacer()
+            if withTime {
+                Spacer(minLength: 8)
 
                 Text(getTimeString(date: date))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
             }
-        }
-        .foregroundStyle(Color.PrimaryText)
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .animation(.default, value: isDateToday(date: date))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
-                .strokeBorder(Color.Outline, lineWidth: 1.5)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            UIApplication.shared.endEditing()
-            showingDatePicker = true
         }
     }
 
@@ -562,7 +598,7 @@ struct TransactionView: View {
                 if showCategoryPicker {
                     HStack(spacing: 10) {
                         Text(String.appLocalized("Close"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             .lineLimit(1)
                     }
                     .padding(.vertical, 8.5)
@@ -570,7 +606,7 @@ struct TransactionView: View {
                     .frame(width: widthOfCategoryButton)
                     .foregroundStyle(Color.AlertRed)
                     .background(Color.AlertRed.opacity(0.23),
-                        in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+                        in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
                     )
                 } else {
                     if let unwrappedCategory = category {
@@ -595,10 +631,10 @@ struct TransactionView: View {
         let color = chipColor(category.wrappedColour)
         HStack(spacing: 5) {
             Text(category.wrappedEmoji)
-                .font(.system(.footnote, design: .rounded).weight(.semibold))
+                .font(.footnote.weight(.semibold))
 
             Text(category.wrappedName)
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .lineLimit(1)
         }
         .padding(.vertical, 8.5)
@@ -606,7 +642,7 @@ struct TransactionView: View {
         .foregroundStyle(color)
         .background(
             color.opacity(0.35),
-            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -618,10 +654,10 @@ struct TransactionView: View {
     var emptyCategoryButton: some View {
         HStack(spacing: 4) {
             Image(systemName: "plus")
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.subheadline.weight(.semibold))
 
             Text(String.appLocalized("Category"))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .lineLimit(1)
         }
         .padding(.vertical, 8.5)
@@ -629,18 +665,22 @@ struct TransactionView: View {
         .foregroundStyle(categoryButtonTextColor)
         .background(
             categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
         )
         .contentShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
                 .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
         )
         .drawingGroup()
         .offset(x: shake ? -5 : 0)
         .contentShape(Rectangle())
         .onTapGesture {
-            showCategorySheet = true
+            // Always use the grid picker, even before any category exists;
+            // its empty state offers starter categories.
+            withAnimation(.easeInOut) {
+                showCategoryPicker = true
+            }
         }
     }
 
@@ -648,13 +688,13 @@ struct TransactionView: View {
     var noCategoryButton: some View {
         HStack(spacing: 5.5) {
                 Image(systemName: "circle.grid.2x2")
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .symbolEffect(
                         .bounce.up.byLayer, options: .repeating.speed(0.5),
                         value: showCategoryPicker)
 
             Text(String.appLocalized("Category"))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .lineLimit(1)
         }
         .padding(.vertical, 8.5)
@@ -663,10 +703,10 @@ struct TransactionView: View {
         .foregroundStyle(categoryButtonTextColor)
         .background(
             categoryButtonBackgroundColor,
-            in: RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            in: RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
+            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
                 .strokeBorder(categoryButtonOutlineColor, lineWidth: 1.5)
         )
         .drawingGroup()
@@ -675,7 +715,7 @@ struct TransactionView: View {
     @ViewBuilder
     var expenseToggleButton: some View {
         Text(String.appLocalized("Expense"))
-            .font(.system(.body, design: .rounded).weight(.semibold))
+            .font(.body.weight(.semibold))
             .lineLimit(1)
             .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
             .padding(6)
@@ -694,7 +734,7 @@ struct TransactionView: View {
     @ViewBuilder
     var incomeToggleButton: some View {
         Text(String.appLocalized("transaction-view-income-picker"))
-            .font(.system(.body, design: .rounded).weight(.semibold))
+            .font(.body.weight(.semibold))
             .lineLimit(1)
             .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
             .padding(6)
@@ -770,9 +810,9 @@ struct TransactionView: View {
                 }
             }
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: GlassRadius.card).stroke(
+                RoundedRectangle(cornerRadius: SBRadius.card).stroke(
                     systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
             )
             .offset(y: offset)
@@ -801,38 +841,6 @@ struct TransactionView: View {
         }
         .ignoresSafeArea(.all)
         .background(BackgroundBlurView())
-    }
-
-    var showTime: Bool {
-        let roundedFont = UIFont.rounded(ofSize: fontSize, weight: .semibold)
-
-        let attributes = [NSAttributedString.Key.font: roundedFont]
-
-        let dateSize: CGSize
-
-        if isDateToday(date: date) {
-            dateSize = (("Today, " + getDateString(date: date)) as NSString).size(
-                withAttributes: attributes)
-        } else {
-            dateSize = (getDateString(date: date) as NSString).size(withAttributes: attributes)
-        }
-
-        let categorySize = (category?.fullName ?? "X Category").size(withAttributes: attributes)
-        let timeSize = (getTimeString(date: date) as NSString).size(withAttributes: attributes)
-
-        let screenWidth: CGFloat
-
-        if boldText {
-            screenWidth = (ScreenSize.width - 200)
-        } else {
-            screenWidth = (ScreenSize.width - 150)
-        }
-
-        if (dateSize.width + categorySize.width + timeSize.width) > screenWidth {
-            return false
-        } else {
-            return true
-        }
     }
 
     @AppStorage("colourScheme", store: .appGroup)
@@ -906,12 +914,16 @@ struct TransactionView: View {
         return "Category".widthOfRoundedString(size: fontSize, weight: .semibold) + 50
     }
 
+    /// Two chips and the header no longer fit on a 375pt phone from xxLarge
+    /// up, so switch to the stacked layout there (not just at AX sizes).
+    var usesLargeTextLayout: Bool {
+        dynamicTypeSize >= .xxLarge
+    }
+
     var capsuleWidth: CGFloat {
-        if dynamicTypeSize > .xLarge {
-            return 120
-        } else {
-            return 100
-        }
+        // Stacked header at large sizes, so each half can be wide enough for
+        // the localized "Expense"/"Income" labels.
+        usesLargeTextLayout ? 140 : 100
     }
 
     @State private var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
@@ -922,17 +934,31 @@ struct TransactionView: View {
     /// here. We just need the `currencySymbol` derived from the existing
     /// `currency` value to pass into `NumberPadTextView`.
 
-    var body: some View {
-        GeometryReader { proxy in
+    @ViewBuilder
+    var headerArea: some View {
+        if usesLargeTextLayout {
+            // At large sizes the Cancel/repeat buttons overlap the
+            // income/expense capsule on narrow phones, so give each its row.
             VStack(spacing: 8) {
-                // income/expense picker
+                topBarButtons
                 toastOrIncomeExpensePicker
-                //                .frame(height: 50, alignment: .top)
+            }
+            .padding(.top, topEdge)
+        } else {
+            toastOrIncomeExpensePicker
                 .frame(maxWidth: .infinity)
                 .overlay {
                     topBarButtons
                 }
                 .padding(.top, topEdge)
+        }
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            VStack(spacing: 8) {
+                // income/expense picker
+                headerArea
 
                 swipeAndNumberPadArea
 
@@ -951,7 +977,7 @@ struct TransactionView: View {
             .onTapGesture {
                 self.hideKeyboard()
             }
-            .fullScreenCover(isPresented: $deleteMode) {
+            .fullScreenPresentation(isPresented: $deleteMode) {
                 deleteConfirmationOverlay
             }
             .overlay {
@@ -960,10 +986,16 @@ struct TransactionView: View {
         }
         
         .animation(.easeOut(duration: 0.2), value: showToast)
+        .appBackground()
+        #if os(macOS)
+        // A sheet has no intrinsic size; the entry screen is a fixed
+        // calculator-like surface, so give it one.
+        .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
+        #else
         .ignoresSafeArea(.keyboard, edges: .all)
         .frame(maxHeight: .infinity)
-        .appBackground()
         .ignoresSafeArea(.all)
+        #endif
         // Control-dense surface (keypad + fixed rows). Let text grow to the
         // first accessibility size, then stop: beyond that the keypad and the
         // date/category row cannot fit on a phone. Documented exception to
@@ -977,9 +1009,14 @@ struct TransactionView: View {
                 }
             }
         }
-        .onChange(of: income) { _, _ in
+        .onChange(of: income) { _, newValue in
             lightHaptic &+= 1
-            category = nil
+            // Only drop a category that belongs to the other side; clearing
+            // unconditionally wiped the category when editing an income
+            // transaction (onAppear sets `income` after `category`).
+            if let category, category.income != newValue {
+                self.category = nil
+            }
         }
         .onChange(of: numberEntryType) { _, new in
             padVM.numberEntryType = new
@@ -999,6 +1036,11 @@ struct TransactionView: View {
         }
         .onAppear {
             categoryVM.load()
+            // The init can't read `capsuleWidth`, so re-align the income
+            // capsule once the environment (and its type size) is known.
+            if income {
+                swipingOffset = capsuleWidth
+            }
             // Sync the pad's numberEntryType with the AppStorage flag at the
             // moment the view first appears. Subsequent changes are picked up
             // by the `.onChange(of: numberEntryType)` modifier above.
@@ -1066,16 +1108,10 @@ struct TransactionView: View {
     func getDateString(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale.appLocale
-
-        if isDateToday(date: date) {
-            formatter.dateFormat = "d MMM"
-
-            return formatter.string(from: date)
-        } else {
-            formatter.dateFormat = "E, d MMM"
-
-            return formatter.string(from: date)
-        }
+        // Localized template: zh gives "10月19日", en gives "Oct 19".
+        // A fixed "d MMM" pattern rendered as "19 10月" in Chinese.
+        formatter.setLocalizedDateFormatFromTemplate(isDateToday(date: date) ? "MMMd" : "MMMdEEE")
+        return formatter.string(from: date)
     }
 
     func getTimeString(date: Date) -> String {
@@ -1134,6 +1170,10 @@ struct TransactionView: View {
     }
 
     func submit() {
+        // A fast double tap on the checkmark used to create two rows.
+        guard !isSubmitting else { return }
+        isSubmitting = true
+
         let amount = padVM.price
 
         if amount == 0 && category == nil {
@@ -1143,6 +1183,7 @@ struct TransactionView: View {
             toggleFieldColors()
 
             errorHaptic &+= 1
+            isSubmitting = false
 
             return
         } else if amount == 0 {
@@ -1150,6 +1191,7 @@ struct TransactionView: View {
             toastTitle = String.appLocalized("Missing Amount")
             showToast = true
             errorHaptic &+= 1
+            isSubmitting = false
             return
         } else if category == nil {
             toastImage = "tray"
@@ -1159,6 +1201,7 @@ struct TransactionView: View {
             toggleFieldColors()
 
             errorHaptic &+= 1
+            isSubmitting = false
             return
         }
 

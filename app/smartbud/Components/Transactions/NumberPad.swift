@@ -12,7 +12,7 @@
 //    `.frame(width:height:)` on the VStack. The pad now always fills its
 //    parent (set by `.keyboardAwareHeight`).
 //  - `sensoryFeedback(_:trigger:)` replaces the old CHHapticEngine plumbing.
-//  - `GlassEffectContainer(spacing:)` batches the per-button `glassChip`
+//  - The keypad is a plain grid of system surfaces
 //    effects for cheaper rendering (iOS 26 performance API).
 //  - `foregroundStyle` instead of `foregroundColor`.
 //
@@ -32,7 +32,7 @@ struct NumberPad: View {
     var submit: () -> Void = {}
 
     private let numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    private let rowShape = RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
+    private let rowShape = RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
 
     /// Fixed row height (was `frame(maxHeight: .infinity)` in the previous
     /// rewrite — that made each row greedy and the bottom row clipped off-screen
@@ -41,17 +41,26 @@ struct NumberPad: View {
     /// spilling into the rest of the add-transaction layout.
     @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 72
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// From xxLarge the scaled rows push the entry screen past the viewport
+    /// on 4.7" phones, so the cells stop at their base height.
+    private var cellHeight: CGFloat {
+        // Accessibility sizes need headroom for the note/date/category rows
+        // above the pad; at 72pt the last key row sat under the home indicator.
+        if dynamicTypeSize.isAccessibilitySize { return 64 }
+        return dynamicTypeSize >= .xxLarge ? min(rowHeight, 72) : rowHeight
+    }
+
     /// Fires on every digit tap, with intensity driven by the user's
     /// `haptics` preference (computed in the VM). Skipped entirely when
     /// haptics are disabled, matching the old `if hapticType == 2` guard.
     var body: some View {
-        GlassEffectContainer(spacing: 8) {
-            VStack(spacing: 8) {
-                ForEach(numPadNumbers, id: \.self) { row in
-                    numberRow(row)
-                }
-                bottomRow
+        VStack(spacing: 8) {
+            ForEach(numPadNumbers, id: \.self) { row in
+                numberRow(row)
             }
+            bottomRow
         }
         .padding(.bottom, 15)
         .keyboardAwareHeight(showToolbar: showingNotePicker)
@@ -73,7 +82,7 @@ struct NumberPad: View {
                 digitButton(digit)
             }
         }
-        .frame(height: rowHeight)
+        .frame(height: cellHeight)
     }
 
     @ViewBuilder
@@ -87,7 +96,7 @@ struct NumberPad: View {
             digitButton(0)
             checkmarkButton
         }
-        .frame(height: rowHeight)
+        .frame(height: cellHeight)
     }
 
     // MARK: - Buttons
@@ -107,13 +116,17 @@ struct NumberPad: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 Text("\(digit)")
-                    .font(.system(.title2, design: .rounded))
+                    .font(.title2)
                     .foregroundStyle(Color.PrimaryText)
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(rowShape.fill(.clear))
-            .glassChip(in: rowShape)
+            .background(Color.SecondaryBackground, in: rowShape)
+            .overlay {
+                rowShape.strokeBorder(Color.Outline.opacity(0.5), lineWidth: 0.5)
+            }
+            // Without this, only the glyph is tappable, not the whole key.
+            .contentShape(Rectangle())
             .opacity(disabled ? 0.6 : 1)
         }
         .disabled(disabled)
@@ -128,15 +141,17 @@ struct NumberPad: View {
         } label: {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
-                Image("tag-cross")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-                    .foregroundStyle(Color.LightIcon)
+                Image(systemName: "delete.left.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color.PrimaryText)
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.DarkBackground, in: rowShape)
+            .background(Color.TertiaryBackground, in: rowShape)
+            .overlay {
+                rowShape.strokeBorder(Color.Outline.opacity(0.5), lineWidth: 0.5)
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text(String.appLocalized("Delete")))
@@ -150,13 +165,17 @@ struct NumberPad: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 Text(Locale.appLocale.decimalSeparator ?? ".")
-                    .font(.system(.title2, design: .rounded))
+                    .font(.title2)
                     .foregroundStyle(Color.PrimaryText)
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(rowShape.fill(.clear))
-            .glassChip(in: rowShape)
+            .background(Color.SecondaryBackground, in: rowShape)
+            .overlay {
+                rowShape.strokeBorder(Color.Outline.opacity(0.5), lineWidth: 0.5)
+            }
+            // Without this, only the glyph is tappable, not the whole key.
+            .contentShape(Rectangle())
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text("Decimal point"))
@@ -177,13 +196,14 @@ struct NumberPad: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 Image(systemName: "checkmark")
-                    .font(.system(.title2, design: .rounded).weight(.semibold))
+                    .font(.title2.weight(.semibold))
                     .symbolEffect(.bounce.up.byLayer, value: canSubmit)
                     .foregroundStyle(Color.LightIcon)
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.accentColor.opacity(canSubmit ? 1 : 0.4), in: rowShape)
+            .contentShape(Rectangle())
         }
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
@@ -228,11 +248,11 @@ struct NumberPadTextView: View {
         HStack(spacing: 10) {
             HStack(alignment: .lastTextBaseline, spacing: 1) {
                 Text(currencySymbol)
-                    .font(.system(.largeTitle, design: .rounded))
+                    .font(.largeTitle)
                     .foregroundStyle(Color.SubtitleText)
 
                 Text(vm.amountString)
-                    .font(.system(size: fontSize, weight: .regular, design: .rounded))
+                    .font(.system(size: fontSize, weight: .regular))
                     .foregroundStyle(Color.PrimaryText)
                     .contentTransition(.numericText())
             }
@@ -256,7 +276,7 @@ struct NumberPadTextView: View {
                 .foregroundStyle(Color.SubtitleText)
                 // 44pt minimum touch target (was 35×32).
                 .frame(width: 44, height: 44)
-                .glassChip(in: Circle())
+                .systemChip(in: Circle())
                 .contentShape(Circle())
         }
         .disabled(vm.price == 0 && !vm.isEditingDecimal)

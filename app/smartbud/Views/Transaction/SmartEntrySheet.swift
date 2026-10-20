@@ -32,7 +32,7 @@ struct SmartEntrySheet: View {
             if let parsed { preview(parsed) }
             if let errorMessage {
                 Text(errorMessage)
-                    .font(.system(.footnote, design: .rounded))
+                    .font(.footnote)
                     .foregroundStyle(Color.AlertRed)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -49,7 +49,7 @@ struct SmartEntrySheet: View {
     private var header: some View {
         HStack {
             Text(String.appLocalized("智能记账"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
             Spacer()
             Button { dismiss() } label: {
@@ -65,10 +65,10 @@ struct SmartEntrySheet: View {
         HStack(spacing: 8) {
             TextField(String.appLocalized("例如：午餐 35 元"), text: $text)
                 .textFieldStyle(.plain)
-                .font(.system(.body, design: .rounded))
+                .font(.body)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
-                .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
+                .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
                 .submitLabel(.done)
                 .onSubmit(parseText)
 
@@ -91,7 +91,7 @@ struct SmartEntrySheet: View {
                     speech.isRecording ? String.appLocalized("停止") : String.appLocalized("语音"),
                     systemImage: speech.isRecording ? "stop.circle.fill" : "mic.fill"
                 )
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
             }
@@ -100,7 +100,7 @@ struct SmartEntrySheet: View {
 
             PhotosPicker(selection: $photoItem, matching: .images) {
                 Label(String.appLocalized("截图"), systemImage: "photo.on.rectangle")
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
             }
@@ -117,21 +117,21 @@ struct SmartEntrySheet: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(parsed.isIncome ? String.appLocalized("Income") : String.appLocalized("Expense"))
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
                 Spacer()
                 Text(parsed.amount.formatted(.number.precision(.fractionLength(2))))
-                    .font(.system(.title3, design: .rounded).weight(.bold))
+                    .font(.title3.weight(.bold))
                     .foregroundStyle(Color.PrimaryText)
             }
             if let category = resolvedCategory(parsed) {
                 Text(category.fullName)
-                    .font(.system(.subheadline, design: .rounded))
+                    .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
             }
             if let merchant = parsed.merchant {
                 Text(merchant)
-                    .font(.system(.subheadline, design: .rounded))
+                    .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
             }
             Button {
@@ -139,7 +139,7 @@ struct SmartEntrySheet: View {
                 dismiss()
             } label: {
                 Text(String.appLocalized("填入表单"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
             }
@@ -147,7 +147,7 @@ struct SmartEntrySheet: View {
             .padding(.top, 4)
         }
         .padding(14)
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
     }
 
     // MARK: - Actions

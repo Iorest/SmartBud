@@ -15,7 +15,6 @@ struct RecurringPickerView: View {
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
 
-    @State private var offset: CGFloat = 0
 
     @State var holdingType = 0
     @State var holdingCoefficient = 0
@@ -34,24 +33,22 @@ struct RecurringPickerView: View {
             ForEach(Array(stringArray.enumerated()), id: \.element) { index, string in
                 HStack {
                     Text(LocalizedStringKey(string))
-                        .font(.system(.body, design: .rounded).weight(.medium))
+                        .font(.body.weight(.medium))
                         
                         .lineLimit(1)
                     Spacer()
 
                     if repeatType == index && repeatCoefficient == 1 {
                         Image(systemName: "checkmark")
-                            .font(.system(.footnote, design: .rounded).weight(.medium))
+                            .font(.footnote.weight(.medium))
                             
-                        //                            .font(.system(size: 14, weight: .medium))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                //                .font(.system(size: 18, weight: .medium, design: .rounded))
                 .padding(5)
                 .background {
                     if repeatType == index && repeatCoefficient == 1 {
-                        RoundedRectangle(cornerRadius: GlassRadius.pill)
+                        RoundedRectangle(cornerRadius: SBRadius.pill)
                             .fill(
                                 darkMode
                                 ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground")
@@ -94,20 +91,18 @@ struct RecurringPickerView: View {
 
                 if repeatCoefficient > 1 {
                     Image(systemName: "checkmark")
-                        .font(.system(.footnote, design: .rounded).weight(.medium))
+                        .font(.footnote.weight(.medium))
                         
-                    //                        .font(.system(size: 14, weight: .medium))
                 }
             }
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .font(.system(.body, design: .rounded).weight(.medium))
+            .font(.body.weight(.medium))
             
-            //            .font(.system(size: 18, weight: .medium, design: .rounded))
             .padding(5)
             .background {
                 if repeatCoefficient > 1 {
-                    RoundedRectangle(cornerRadius: GlassRadius.pill)
+                    RoundedRectangle(cornerRadius: SBRadius.pill)
                         .fill(
                             darkMode
                             ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground")
@@ -143,26 +138,13 @@ struct RecurringPickerView: View {
         .padding(4)
         .frame(width: 150)
         .background(
-            RoundedRectangle(cornerRadius: GlassRadius.chip).fill(
+            RoundedRectangle(cornerRadius: SBRadius.chip).fill(
                 darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")
             ).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(
+            RoundedRectangle(cornerRadius: SBRadius.chip).stroke(
                 darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 }
 
-struct ButtonView: View {
-    let number: Int
-    let size: CGSize
-
-    var body: some View {
-        Text("\(number)")
-            .font(.system(size: 34, weight: .regular, design: .rounded))
-            .frame(width: size.width * 0.3, height: size.height * 0.22)
-            .background(Color.SecondaryBackground)
-            .foregroundStyle(Color.PrimaryText)
-            .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip))
-    }
-}
