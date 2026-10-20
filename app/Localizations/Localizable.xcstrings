@@ -3224,6 +3224,28 @@
         }
       }
     },
+    "Delete Income?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Income?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除这笔收入？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除這筆收入？"
+          }
+        }
+      }
+    },
     "Delete Expense?" : {
       "localizations" : {
         "en" : {

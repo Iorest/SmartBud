@@ -102,7 +102,6 @@ struct TransactionView: View {
     @AppStorage("bottomEdge", store: .appGroup)
     var bottomEdge: Double = 15
 
-    @State private var offset: CGFloat = 0
 
     let repeatOverlays = ["D", "W", "M"]
     let numberArray = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
@@ -181,43 +180,6 @@ struct TransactionView: View {
         } else {
             Text(dateStr)
                 .lineLimit(1)
-        }
-    }
-
-    @ViewBuilder
-    func deleteButtonLabel(_ text: String, color: Color) -> some View {
-        Text(text)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(.white)
-            .frame(height: 45)
-            .frame(maxWidth: .infinity)
-            .background(
-                color, in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-    }
-
-    @ViewBuilder
-    func cancelButtonLabel(_ text: String) -> some View {
-        Text(text)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(Color.PrimaryText.opacity(0.9))
-            .frame(height: 45)
-            .frame(maxWidth: .infinity)
-            .background(
-                Color.SecondaryBackground,
-                in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-    }
-
-    @ViewBuilder
-    var deleteConfirmationHeader: some View {
-        Group {
-            Text(String.appLocalized("Delete Expense?"))
-                .font(.title3.weight(.medium))
-                .foregroundStyle(Color.PrimaryText)
-
-            Text(String.appLocalized("This action cannot be undone."))
-                .font(.callout.weight(.medium))
-                .foregroundStyle(Color.SubtitleText)
-                .padding(.bottom, 15)
         }
     }
 
@@ -754,80 +716,6 @@ struct TransactionView: View {
         }
     }
 
-    @ViewBuilder
-    var deleteConfirmationOverlay: some View {
-        ZStack(alignment: .bottom) {
-            Color.clear
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    deleteMode = false
-                    toDelete = nil
-                }
-
-            VStack(alignment: .leading, spacing: 1.5) {
-                deleteConfirmationHeader
-
-                Button {
-                    deleteMode = false
-
-                    withAnimation {
-                        if let itemToDelete = toDelete {
-                            transactionVM.delete(itemToDelete)
-                        }
-                    }
-
-                    dismiss()
-
-                } label: {
-                    deleteButtonLabel(String.appLocalized("Delete"), color: Color.AlertRed)
-                }
-                .padding(.bottom, 8)
-
-                Button {
-                    withAnimation(.easeOut(duration: 0.7)) {
-                        deleteMode = false
-                        toDelete = nil
-                    }
-
-                } label: {
-                    cancelButtonLabel(String.appLocalized("Cancel"))
-                }
-            }
-            .padding(13)
-            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: SBRadius.card).stroke(
-                    systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
-            )
-            .offset(y: offset)
-            .gesture(
-                DragGesture()
-                    .onChanged { gesture in
-                        if gesture.translation.height < 0 {
-                            offset = gesture.translation.height / 3
-                        } else {
-                            offset = gesture.translation.height
-                        }
-                    }
-                    .onEnded { value in
-                        if value.translation.height > 20 {
-                            deleteMode = false
-                            toDelete = nil
-                        } else {
-                            withAnimation {
-                                offset = 0
-                            }
-                        }
-                    }
-            )
-            .padding(.horizontal, 17)
-            .padding(.bottom, bottomEdge == 0 ? 12 : bottomEdge - 3)
-        }
-        .ignoresSafeArea(.all)
-        .background(BackgroundBlurView())
-    }
-
     @AppStorage("colourScheme", store: .appGroup)
     var colourScheme: Int = 0
 
@@ -963,7 +851,25 @@ struct TransactionView: View {
                 self.hideKeyboard()
             }
             .fullScreenPresentation(isPresented: $deleteMode) {
-                deleteConfirmationOverlay
+                TransactionDeleteConfirmation(
+                    income: toDelete?.income ?? income,
+                    bottomEdge: bottomEdge,
+                    onDelete: {
+                        deleteMode = false
+                        withAnimation {
+                            if let itemToDelete = toDelete {
+                                transactionVM.delete(itemToDelete)
+                            }
+                        }
+                        dismiss()
+                    },
+                    onCancel: {
+                        withAnimation(.easeOut(duration: 0.7)) {
+                            deleteMode = false
+                            toDelete = nil
+                        }
+                    }
+                )
             }
             .overlay {
                 datePickerOverlay
