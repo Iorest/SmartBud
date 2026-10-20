@@ -24,7 +24,8 @@ struct DetailedBudgetViewTopBarButton: View {
                 .padding(8)
                 .background(Circle().fill(.clear))
                 .systemTintedChip(color.opacity(0.5), in: Circle())
-                .contentShape(Circle())
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel(label)
     }

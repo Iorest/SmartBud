@@ -323,7 +323,7 @@ struct SettingsView: View {
           #if os(macOS)
           Image(systemName: "chevron.right")
             .font(.caption.weight(.semibold))
-            .foregroundStyle(Color.SubtitleText.opacity(0.6))
+            .foregroundStyle(Color.SubtitleText)
             .padding(.leading, 8)
           #endif
         }

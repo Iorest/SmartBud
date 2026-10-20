@@ -176,12 +176,12 @@ struct CategoryEditor: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.callout.weight(.semibold))
-
                             .foregroundStyle(Color.SubtitleText)
                             .padding(7)
                             .background(Color.SecondaryBackground, in: Circle())
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
+                            .accessibilityLabel(String.appLocalized("Close"))
                     }
                 }
                 .overlay(alignment: .trailing) {
@@ -273,6 +273,7 @@ struct CategoryEditor: View {
                         Image(systemName: editing == nil ? "plus" : "checkmark")
                             .foregroundStyle(Color.LightIcon)
                             .font(.title3.weight(.semibold))
+                            .accessibilityLabel(String.appLocalized(editing == nil ? "Add" : "Save"))
 
                             .frame(width: 50, height: 50)
                             .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))

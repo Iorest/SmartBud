@@ -69,7 +69,8 @@ struct ActualBudgetView: View {
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(4)
                                 .systemChip(in: Circle())
-                                .contentShape(Circle())
+                                .frame(minWidth: 44, minHeight: 44)
+                                .contentShape(Rectangle())
                         }
 
                         Spacer()

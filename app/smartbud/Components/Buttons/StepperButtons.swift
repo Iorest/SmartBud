@@ -24,6 +24,8 @@ struct StepperButtonView: View {
                 .background(Circle().fill(.clear))
                 .systemChip(in: Circle(), interactive: !disabled)
                 .opacity(disabled ? 0.3 : 1)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel(left ? String.appLocalized("Previous") : String.appLocalized("Next"))
     }

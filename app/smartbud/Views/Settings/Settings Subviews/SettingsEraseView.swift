@@ -72,7 +72,7 @@ struct SettingsEraseView: View {
       )
       .font(.caption.weight(.regular))
       .multilineTextAlignment(.leading)
-      .foregroundStyle(Color.SubtitleText.opacity(0.85))
+      .foregroundStyle(Color.SubtitleText)
       .padding(.horizontal, 15)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.top, 4)

@@ -67,7 +67,7 @@ struct CustomRecurringView: View {
 
             HStack(spacing: 10) {
                 Text(String.appLocalized("Repeats every"))
-                    .font(.system(size: 23, weight: .medium))
+                    .font(.title2.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
                     .padding(.trailing, 3)
 
@@ -90,7 +90,7 @@ struct CustomRecurringView: View {
                     .disabled(holdingCoefficient == 30)
 
                     Text("\(holdingCoefficient)")
-                        .font(.system(size: 23, weight: .medium))
+                        .font(.title2.weight(.medium))
                         .padding(7)
                         .background {
                             RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
@@ -143,7 +143,7 @@ struct CustomRecurringView: View {
                             Text(String.appFormatted("^[%lld months](inflect: true)", holdingCoefficient))
                         }
                     }
-                    .font(.system(size: 23, weight: .medium))
+                    .font(.title2.weight(.medium))
                     .padding(7)
                     .background {
                         RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)

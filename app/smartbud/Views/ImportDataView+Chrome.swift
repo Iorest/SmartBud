@@ -116,7 +116,8 @@ extension ImportDataView {
                                     .foregroundStyle(Color.SubtitleText)
                                     .padding(4)
                                     .background(Color.SecondaryBackground, in: Circle())
-                                    .contentShape(Circle())
+                                    .frame(minWidth: 44, minHeight: 44)
+                                    .contentShape(Rectangle())
                             }
                         }
 

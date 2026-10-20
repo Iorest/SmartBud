@@ -62,7 +62,7 @@ struct NoResultsView: View {
                     .foregroundStyle(Color.SubtitleText)
 
                 Text(String.appLocalized("No entries found."))
-                    .font(.system(size: 21, weight: .medium))
+                    .font(.title3.weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
 
                 Spacer()
