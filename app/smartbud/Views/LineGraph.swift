@@ -91,15 +91,15 @@ struct LineGraph: View {
         VStack(spacing: 0) {
             VStack(spacing: 1) {
                 Text(tooltipDate)
-                    .font(.system(.caption2, design: .rounded).weight(.medium))
+                    .font(.caption2.weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                 Text(currentPlot?.amountString ?? "")
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
             }
             .frame(height: 33)
             .padding(.horizontal, 7)
-            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill))
+            .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill))
             .padding(.bottom, 4)
 
             Rectangle()

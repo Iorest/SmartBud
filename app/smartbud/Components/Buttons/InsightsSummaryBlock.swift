@@ -2,60 +2,49 @@
 //  InsightsSummaryBlock.swift
 //  smartbud
 //
-//  Created by Iorest on 19/11/23.
+//  Read-only income/expense tile on the Insights screen.
 //
 
-import Foundation
 import SwiftUI
 
 struct InsightsSummaryBlockView: View {
     let income: Bool
     let amountString: String
-    let showOverlay: Bool
-    var action: () -> Void
 
-    var color: Color {
-        return income ? Color.IncomeGreen : Color.AlertRed
+    private var color: Color {
+        income ? Color.IncomeGreen : Color.AlertRed
+    }
+
+    private var title: String {
+        String.appLocalized(income ? "Income" : "Expenses")
     }
 
     var body: some View {
-        Button(action: self.action) {
-            HStack(spacing: 6) {
-                Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
-                    .font(.system(size: 18, weight: .semibold))
+        HStack(spacing: SBSpace.xs) {
+            Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(color)
+                .frame(width: 30, height: 30)
+                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.SubtitleText)
+                    .lineLimit(1)
+
+                Text(amountString)
+                    .font(.title3.weight(.medium).monospacedDigit())
                     .foregroundStyle(color)
-                    .padding(5)
-                    .frame(width: 30, height: 30)
-                    .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
-                    .padding(.horizontal, 3)
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(income ? "Income" : "Expenses")
-                        .font(.system(.caption, design: .rounded).weight(.semibold))
-                        .lineLimit(1)
-                        .foregroundStyle(Color.SubtitleText)
-
-                    Text(amountString)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
-                        .foregroundStyle(color)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                }
-            }
-            .padding(7)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-        .overlay {
-            if showOverlay {
-                RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
-                    .stroke(Color.SubtitleText.opacity(0.7), lineWidth: 1.3)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
         }
+        .padding(SBSpace.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(income ? String.appLocalized("Income") : String.appLocalized("Expenses")), \(amountString)")
+        .accessibilityLabel("\(title), \(amountString)")
     }
 }

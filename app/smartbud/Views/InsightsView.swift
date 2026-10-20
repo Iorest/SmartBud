@@ -19,24 +19,6 @@ import WidgetKit
 
 /// Time window for the Insights summary + graph. Matches the integer codes
 /// already used by `InsightsViewModel.selectedPeriod` so App Intents can reuse them.
-enum InsightsPeriod: Int, CaseIterable, Identifiable {
-    case week = 1
-    case month = 2
-    case year = 3
-    case allTime = 5
-
-    var id: Int { rawValue }
-
-    var localizedTitle: LocalizedStringResource {
-        switch self {
-        case .week: return "This Week"
-        case .month: return "This Month"
-        case .year: return "This Year"
-        case .allTime: return "All Time"
-        }
-    }
-}
-
 // MARK: - InsightsView
 
 struct InsightsView: View {
@@ -70,7 +52,8 @@ struct InsightsView: View {
                     yesterdaySection
                 }
             }
-            .padding(.bottom, 40)
+            // Clear the floating add button and the tab bar.
+            .padding(.bottom, 130)
         }
         .background(Color.clear.ignoresSafeArea())
         .onAppear {
@@ -118,7 +101,7 @@ struct InsightsView: View {
 
     private var titleText: some View {
         Text("Insights", comment: "Insights screen title")
-            .font(.system(.title, design: .rounded).weight(.bold))
+            .font(.title.bold())
             .foregroundStyle(Color.PrimaryText)
     }
 
@@ -126,53 +109,24 @@ struct InsightsView: View {
         Button {
             showAIAnalysis = true
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "sparkles")
-                Text(String.appLocalized("AI"))
-                    .font(.system(.caption, design: .rounded).weight(.semibold))
-            }
-            .foregroundStyle(Color.PrimaryText)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(Color.Outline, in: Capsule())
+            Label(String.appLocalized("AI"), systemImage: "sparkles")
+                .font(.subheadline.weight(.medium))
+                .padding(.horizontal, SBSpace.xs)
+                .frame(minHeight: 34)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.bordered)
         .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
     }
 
     private var periodSegmented: some View {
-        HStack(spacing: 0) {
-            periodSegmentButton(label: "week", value: 1)
-            periodSegmentButton(label: "month", value: 2)
-            periodSegmentButton(label: "year", value: 3)
+        Picker("Period", selection: $period) {
+            Text(String.appLocalized("week")).tag(1)
+            Text(String.appLocalized("month")).tag(2)
+            Text(String.appLocalized("year")).tag(3)
         }
-        .frame(maxWidth: 220)
-        .background(Color.Outline, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-                .stroke(Color.SubtitleText.opacity(0.25), lineWidth: 0.5)
-        )
-    }
-
-    private func periodSegmentButton(label: String, value: Int) -> some View {
-        let isSelected = period == value
-        return Button {
-            period = value
-        } label: {
-            Text(String.appLocalized(label))
-                .font(.system(.footnote, design: .rounded).weight(.semibold))
-                .foregroundStyle(isSelected ? Color.PrimaryText : Color.SubtitleText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
-                .background(
-                    isSelected ? Color.PrimaryText.opacity(0.18) : Color.clear,
-                    in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-                )
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .frame(maxWidth: 240)
     }
 
     // MARK: - Date range row
@@ -182,7 +136,7 @@ struct InsightsView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(insightsVM.periodDateRangeText.isEmpty ? "—" : insightsVM.periodDateRangeText)
-                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
 
                 InsightsDollarView(
@@ -199,7 +153,7 @@ struct InsightsView: View {
                 Text(period == 3
                      ? String.appLocalized("AVG/MONTH", comment: "Insights avg per month")
                      : String.appLocalized("AVG/DAY", comment: "Insights avg per day"))
-                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
 
                 InsightsDollarView(
@@ -239,18 +193,14 @@ struct InsightsView: View {
     private var incomeCard: some View {
         InsightsSummaryBlockView(
             income: true,
-            amountString: format(insightsVM.periodTotalIncome),
-            showOverlay: false,
-            action: {}
+            amountString: format(insightsVM.periodTotalIncome)
         )
     }
 
     private var expenseCard: some View {
         InsightsSummaryBlockView(
             income: false,
-            amountString: format(insightsVM.periodTotalSpent),
-            showOverlay: false,
-            action: {}
+            amountString: format(insightsVM.periodTotalSpent)
         )
     }
 
@@ -272,7 +222,7 @@ struct InsightsView: View {
     private var categoryBreakdownSection: some View {
         CategoryBreakdownView(
             categories: insightsVM.categoryBreakdown,
-            currencySymbol: insightsVM.currencySymbol,
+            currencyCode: currency,
             showCents: insightsVM.showCents
         )
         .padding(.horizontal, 30)
@@ -328,11 +278,11 @@ struct InsightsView: View {
     private func sectionHeader(title: String, amount: Double) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.system(.footnote, design: .rounded).weight(.semibold))
+                .font(.footnote.weight(.semibold))
                 .foregroundStyle(Color.SubtitleText)
             Spacer()
             Text(sectionAmountString(amount))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .lineLimit(1)
         }
@@ -341,10 +291,7 @@ struct InsightsView: View {
     // MARK: - Helpers
 
     private func format(_ amount: Double) -> String {
-        abs(amount).formatted(
-            .currency(code: currency)
-                .precision(.fractionLength(showCents ? 2 : 0))
-        )
+        Money.format(amount, currencyCode: currency, showsCents: showCents)
     }
 
     private func sectionAmountString(_ amount: Double) -> String {
@@ -352,11 +299,6 @@ struct InsightsView: View {
         return "\(sign)\(format(amount))"
     }
 
-    private func sectionAmountColor(_ amount: Double) -> Color {
-        if amount > 0 { return Color.IncomeGreen }
-        if amount < 0 { return Color.AlertRed }
-        return Color.PrimaryText
-    }
 }
 
 // MARK: - InsightsDollarView
@@ -385,10 +327,10 @@ private struct InsightsDollarView: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
             Text(symbol)
-                .font(.system(.title3, design: .rounded).weight(.medium))
+                .font(.title3.weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
             Text(formattedAmount)
-                .font(.system(.title, design: .rounded).weight(.medium))
+                .font(.title.weight(.medium))
                 .foregroundStyle(color)
         }
         .lineLimit(1)
@@ -417,18 +359,18 @@ private struct InsightsTransactionRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(transaction.wrappedNote.isEmpty ? (transaction.category?.wrappedName ?? "") : transaction.wrappedNote)
-                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
                     .lineLimit(1)
                 Text(timeLabel(transaction.wrappedDate))
-                    .font(.system(.subheadline, design: .rounded).weight(.medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(amountString)
-                .font(.system(.title3, design: .rounded).weight(.medium))
+                .font(.title3.weight(.medium))
                 .foregroundStyle(transaction.income ? Color.IncomeGreen : Color.PrimaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -451,39 +393,6 @@ private struct InsightsTransactionRow: View {
 
 // MARK: - Filtered views
 //
-// These are stub views referenced from `LogView` (e.g. `FilteredInsightsView(startDate:type:)`).
-// They are intentionally minimal — LogView uses them to render small contextual graphs and the
-// full Insights screen is `InsightsView` above.
-
-struct FilteredCategoryInsightsView: View {
-    let category: CategoryModel?
-    let date: Date
-    let type: ChartTimeFrame
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(category?.wrappedName ?? "")
-                .font(.system(.headline, design: .rounded))
-            Text(date, format: .dateTime.day().month())
-                .font(.system(.caption, design: .rounded))
-                .foregroundStyle(Color.SubtitleText)
-        }
-        .padding(12)
-        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-    }
-}
-
-struct FilteredInsightsView: View {
-    let startDate: Date
-    let type: Int
-
-    var body: some View {
-        Text(startDate, format: .dateTime.day().month().year())
-            .font(.system(.caption, design: .rounded))
-            .foregroundStyle(Color.SubtitleText)
-    }
-}
-
 // MARK: - Preview
 
 #Preview("Insights") {

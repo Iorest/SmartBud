@@ -15,13 +15,16 @@ struct InsightsAIAnalysisView: View {
     @State private var text = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var needsSetup = false
 
     var body: some View {
         VStack(spacing: 16) {
             header
             content
             Spacer(minLength: 0)
-            footer
+            if !needsSetup {
+                footer
+            }
         }
         .padding(20)
         .appBackground()
@@ -31,7 +34,7 @@ struct InsightsAIAnalysisView: View {
     private var header: some View {
         HStack {
             Text(String.appLocalized("AI 账单分析"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.headline)
                 .foregroundStyle(Color.PrimaryText)
             Spacer()
             Button { dismiss() } label: {
@@ -50,22 +53,31 @@ struct InsightsAIAnalysisView: View {
                 VStack(spacing: 10) {
                     ProgressView()
                     Text(String.appLocalized("正在分析本期账单…"))
-                        .font(.system(.footnote, design: .rounded))
+                        .font(.footnote)
                         .foregroundStyle(Color.SubtitleText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, 40)
             } else if let errorMessage {
-                Text(errorMessage)
-                    .font(.system(.footnote, design: .rounded))
-                    .foregroundStyle(Color.AlertRed)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(spacing: SBSpace.s) {
+                    Image(systemName: needsSetup ? "sparkles" : "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundStyle(Color.SubtitleText)
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundStyle(needsSetup ? Color.SubtitleText : Color.AlertRed)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 60)
             } else {
-                Text(text)
-                    .font(.system(.body, design: .rounded))
-                    .foregroundStyle(Color.PrimaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+                SBCard {
+                    Text(text)
+                        .font(.body)
+                        .foregroundStyle(Color.PrimaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
             }
         }
         .scrollIndicators(.hidden)
@@ -76,12 +88,12 @@ struct InsightsAIAnalysisView: View {
             Task { await analyze() }
         } label: {
             Text(String.appLocalized("重新分析"))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 11)
         }
         .buttonStyle(.borderedProminent)
-        .disabled(isLoading || !LLMConfig.load().isConfigured)
+        .disabled(isLoading || !LLMConfig.load().isConfigured || needsSetup)
     }
 
     private func analyze() async {
@@ -90,14 +102,18 @@ struct InsightsAIAnalysisView: View {
         guard config.isConfigured else {
             // One clear message; the error text alone already tells the user
             // where to configure it.
+            needsSetup = true
             errorMessage = String.appLocalized("请先到 设置 → AI 服务 配置服务地址、模型和 API Key。")
             return
         }
+        needsSetup = false
         isLoading = true
         text = ""
         defer { isLoading = false }
         do {
             text = try await LLMClient(config: config).analyze(summary())
+        } catch is CancellationError {
+            return
         } catch {
             errorMessage = error.localizedDescription
         }

@@ -11,7 +11,7 @@ import SwiftUI
 
 struct CategoryBreakdownView: View {
     let categories: [PowerCategory]
-    let currencySymbol: String
+    let currencyCode: String
     let showCents: Bool
 
     /// Stable 6-color palette: red, magenta, blue, orange, green, purple.
@@ -22,7 +22,7 @@ struct CategoryBreakdownView: View {
         VStack(alignment: .leading, spacing: 12) {
             if !categories.isEmpty {
                 Text("Categories", comment: "Insights category breakdown heading")
-                    .font(.system(.callout, design: .rounded).weight(.semibold))
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
 
                 stackedBar
@@ -43,36 +43,36 @@ struct CategoryBreakdownView: View {
             HStack(spacing: proxy.size.width * 0.015) {
                 ForEach(Array(categories.enumerated()), id: \.element.id) { index, category in
                     if category.percent >= 0.005 {
-                        RoundedRectangle(cornerRadius: GlassRadius.pill, style: .continuous)
+                        RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous)
                             .fill(colorForCategory(category, index: index))
                             .frame(width: max(8, usableWidth * category.percent))
                     }
                 }
             }
         }
-        .frame(height: 17)
+        .frame(height: 10)
     }
 
     private func legendRow(category: PowerCategory, index: Int) -> some View {
         let color = colorForCategory(category, index: index)
         return HStack(spacing: 10) {
             Text(category.category.fullName)
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.body.weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .lineLimit(1)
 
             Text(formattedAmount(category.amount))
-                .font(.system(.body, design: .rounded).weight(.medium))
+                .font(.subheadline.monospacedDigit())
                 .foregroundStyle(Color.SubtitleText)
                 .lineLimit(1)
 
             Text("\(Int((category.percent * 100).rounded()))%")
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(color)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 6)
-                .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                .background(color.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
         }
         .frame(maxWidth: .infinity)
     }
@@ -92,9 +92,6 @@ struct CategoryBreakdownView: View {
     }
 
     private func formattedAmount(_ amount: Double) -> String {
-        abs(amount).formatted(
-            .currency(code: currencySymbol)
-                .precision(.fractionLength(showCents ? 2 : 0))
-        )
+        Money.format(amount, currencyCode: currencyCode, showsCents: showCents)
     }
 }

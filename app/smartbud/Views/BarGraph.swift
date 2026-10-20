@@ -57,9 +57,9 @@ struct BarGraph: View {
             // empty state instead.
             VStack(spacing: 8) {
                 Image(systemName: "chart.bar.xaxis")
-                    .font(.system(.title2, design: .rounded))
+                    .font(.title2)
                 Text(String.appLocalized("本期暂无支出"))
-                    .font(.system(.footnote, design: .rounded))
+                    .font(.footnote)
             }
             .foregroundStyle(Color.SubtitleText)
             .frame(maxWidth: .infinity, minHeight: 185)
@@ -74,10 +74,11 @@ struct BarGraph: View {
         Chart(Array(data.indices), id: \.self) { index in
             BarMark(
                 x: .value("Slot", index),
-                y: .value("Amount", data[index].amount)
+                y: .value("Amount", data[index].amount),
+                width: .fixed(data.count > 20 ? 7 : (data.count > 10 ? 14 : 26))
             )
-            .foregroundStyle(Color.DarkBackground)
-            .cornerRadius(6)
+            .foregroundStyle(Color.accentColor)
+            .cornerRadius(4)
 
             if roundedMax > 0 && average > 0 {
                 let ratio = average / yMax
@@ -96,7 +97,7 @@ struct BarGraph: View {
                 AxisValueLabel {
                     if let v = value.as(Double.self) {
                         Text(yAxisLabel(for: v))
-                            .font(.system(.caption2, design: .rounded))
+                            .font(.caption2)
                             .foregroundStyle(Color.SubtitleText)
                     }
                 }
@@ -108,7 +109,7 @@ struct BarGraph: View {
                 AxisValueLabel {
                     if let idx = value.as(Int.self), idx >= 0, idx < data.count {
                         Text(data[idx].label)
-                            .font(.system(period == 1 ? .caption : .caption2, design: .rounded).weight(.bold))
+                            .font(.system(period == 1 ? .caption : .caption2).weight(.bold))
                             .foregroundStyle(Color.SubtitleText)
                             .opacity(labelOpacity(at: idx))
                     }
