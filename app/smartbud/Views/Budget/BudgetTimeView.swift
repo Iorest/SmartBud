@@ -233,7 +233,7 @@ struct BudgetTimeView: View {
             if budgetType >= 2 {
                 HStack(alignment: .top, spacing: 15) {
                     VStack(alignment: showExtraDetails ? .leading : .center, spacing: -4) {
-                        DetailedBudgetDifferenceDollarView(amount: difference, red: totalSpent >= budgetAmount)
+                        BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 3)
 
                         Text(differenceSubtitle)
                             .font(.subheadline.weight(.medium))
@@ -243,7 +243,7 @@ struct BudgetTimeView: View {
 
                     if showExtraDetails {
                         VStack(alignment: .trailing, spacing: -4) {
-                            DetailedBudgetDollarView(amount: leftPerDay)
+                            BudgetDollarView(amount: leftPerDay, scale: 3)
 
                             Text("left each day")
                                 .font(.subheadline.weight(.medium))
@@ -256,7 +256,7 @@ struct BudgetTimeView: View {
                 .padding(.horizontal, 25)
             } else {
                 VStack(spacing: -4) {
-                    DetailedBudgetDifferenceDollarView(amount: difference, red: totalSpent >= budgetAmount)
+                    BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 3)
 
                     Text(differenceSubtitle)
                         .font(.subheadline.weight(.medium))
