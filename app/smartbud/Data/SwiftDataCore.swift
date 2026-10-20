@@ -89,9 +89,9 @@ final class DataRepository {
             #endif
 
             if let cloudConfig,
-               let c = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
-                container = c
-            } else if let c = try? ModelContainer(
+               let cloud = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
+                container = cloud
+            } else if let fallback = try? ModelContainer(
                 for: Self.schema,
                 configurations: ModelConfiguration(
                     Self.storeName,
@@ -101,7 +101,7 @@ final class DataRepository {
                 // App Group reachable but CloudKit isn't (no iCloud
                 // account, iCloud disabled, different Apple ID, or macOS
                 // where CloudKit is not wired up yet).
-                container = c
+                container = fallback
                 #if os(macOS)
                 reason = .cloudKitUnavailable
                 #else
@@ -118,11 +118,11 @@ final class DataRepository {
         //    devices without the App Group entitlement (e.g. preview
         //    builds, store-less test runs).
         if container == nil,
-           let c = try? ModelContainer(
+           let local = try? ModelContainer(
                for: Self.schema,
                configurations: ModelConfiguration(Self.storeName)
            ) {
-            container = c
+            container = local
             if reason == nil { reason = .appGroupUnavailable }
         }
 
@@ -131,14 +131,14 @@ final class DataRepository {
         //    on-disk store. The user sees the fallback banner and can
         //    reinstall or open another device to recover.
         if container == nil,
-           let c = try? ModelContainer(
+           let memoryOnly = try? ModelContainer(
                for: Self.schema,
                configurations: ModelConfiguration(
                    Self.storeName,
                    isStoredInMemoryOnly: true
                )
            ) {
-            container = c
+            container = memoryOnly
             reason = .storageCorrupted
         }
 
@@ -221,10 +221,10 @@ final class DataRepository {
 
     @discardableResult
     func deleteAll() -> Bool {
-        for t in fetch(TransactionModel.self) { context.delete(t) }
-        for c in fetch(CategoryModel.self) { context.delete(c) }
-        for b in fetch(BudgetModel.self) { context.delete(b) }
-        for m in fetch(MainBudgetModel.self) { context.delete(m) }
+        for txn in fetch(TransactionModel.self) { context.delete(txn) }
+        for category in fetch(CategoryModel.self) { context.delete(category) }
+        for budget in fetch(BudgetModel.self) { context.delete(budget) }
+        for mainBudget in fetch(MainBudgetModel.self) { context.delete(mainBudget) }
         for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
         return save()
     }

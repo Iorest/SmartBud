@@ -36,17 +36,17 @@ final class BudgetViewModel {
     }
 
     func createMain(amount: Double, startDate: Date, type: Int) -> MainBudgetModel {
-        let b = MainBudgetModel(amount: amount, startDate: startDate, type: type)
-        repo.insert(b)
+        let budget = MainBudgetModel(amount: amount, startDate: startDate, type: type)
+        repo.insert(budget)
         repo.save()
         load()
-        return b
+        return budget
     }
 
-    func updateMain(_ b: MainBudgetModel, amount: Double, startDate: Date, type: Int) {
-        b.amount = amount
-        b.startDate = startDate
-        b.type = type
+    func updateMain(_ budget: MainBudgetModel, amount: Double, startDate: Date, type: Int) {
+        budget.amount = amount
+        budget.startDate = startDate
+        budget.type = type
         repo.save()
         load()
     }
@@ -93,33 +93,38 @@ final class BudgetViewModel {
     }
 
     func delete(_ budget: BudgetModel) { repo.delete(budget); repo.save(); load() }
-    func deleteMain(_ b: MainBudgetModel) { repo.delete(b); repo.save(); load() }
+    func deleteMain(_ budget: MainBudgetModel) { repo.delete(budget); repo.save(); load() }
 
     /// Persists in-place edits made directly to a BudgetModel/MainBudgetModel (reference types).
     func save() { repo.save(); load() }
 
     func leftover(_ budget: BudgetModel) -> Double {
-        let spent = Money.sum(repo.fetch(TransactionModel.self).filter { t in
-            let d = t.date ?? .distantPast
-            return d >= budget.startDate && d <= Date.now && !t.income && t.category?.id == budget.category?.id
+        let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
+            let date = txn.date ?? .distantPast
+            return date >= budget.startDate && date <= Date.now
+                && !txn.income && txn.category?.id == budget.category?.id
         }.map(\.amount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
     func leftoverOverall(_ budget: MainBudgetModel) -> Double {
-        let spent = Money.sum(repo.fetch(TransactionModel.self).filter { t in
-            let d = t.date ?? .distantPast
-            return d >= budget.startDate && d <= Date.now && !t.income
+        let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
+            let date = txn.date ?? .distantPast
+            return date >= budget.startDate && date <= Date.now && !txn.income
         }.map(\.amount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
     func updateDates() {
-        for b in budgets {
-            if let start = BudgetRollover.roll(startDate: b.startDate, type: b.type) { b.startDate = start }
+        for budget in budgets {
+            if let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type) {
+                budget.startDate = start
+            }
         }
-        for m in mainBudgets {
-            if let start = BudgetRollover.roll(startDate: m.startDate, type: m.type) { m.startDate = start }
+        for mainBudget in mainBudgets {
+            if let start = BudgetRollover.roll(startDate: mainBudget.startDate, type: mainBudget.type) {
+                mainBudget.startDate = start
+            }
         }
         repo.save()
     }

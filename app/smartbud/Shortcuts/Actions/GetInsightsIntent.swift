@@ -15,16 +15,32 @@ struct GetInsightsIntent: AppIntent {
     static let description =
         IntentDescription(LocalizedStringResource("Extracts your total expenditure or income for a particular time period"))
 
-    @Parameter(title: LocalizedStringResource("Type"), description: LocalizedStringResource("Type of Data"), requestValueDialog: IntentDialog(LocalizedStringResource("Which of the following would you like to extract?")))
+    @Parameter(
+        title: LocalizedStringResource("Type"),
+        description: LocalizedStringResource("Type of Data"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Which of the following would you like to extract?"))
+    )
     var type: ShortcutsInsightsType
 
-    @Parameter(title: LocalizedStringResource("Time Frame"), description: LocalizedStringResource("Time Frame of Data"), requestValueDialog: IntentDialog(LocalizedStringResource("Over what time frame would you like to consider?")))
+    @Parameter(
+        title: LocalizedStringResource("Time Frame"),
+        description: LocalizedStringResource("Time Frame of Data"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Over what time frame would you like to consider?"))
+    )
     var timeframe: ShortcutsInsightsTimeFrame
 
-    @Parameter(title: LocalizedStringResource("Category Filters"), description: LocalizedStringResource("Additional Category Filters"), requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?")))
+    @Parameter(
+        title: LocalizedStringResource("Category Filters"),
+        description: LocalizedStringResource("Additional Category Filters"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?"))
+    )
     var incomeCategories: [IncomeCategoryEntity]?
 
-    @Parameter(title: LocalizedStringResource("Category Filters"), description: LocalizedStringResource("Additional Category Filters"), requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?")))
+    @Parameter(
+        title: LocalizedStringResource("Category Filters"),
+        description: LocalizedStringResource("Additional Category Filters"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Which additional category filters do you want to impose?"))
+    )
     var expenseCategories: [ExpenseCategoryEntity]?
 
     @MainActor

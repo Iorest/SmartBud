@@ -196,7 +196,7 @@ struct LogView: View {
                 EmptyView()
             }
         }
-        .padding(.horizontal, SBSpace.m)
+        .padding(.horizontal, SBSpace.medium)
         .padding(.vertical, SBSpace.xs)
         .background(.bar)
         .overlay(alignment: .bottom) {

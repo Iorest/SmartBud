@@ -39,7 +39,7 @@ enum DataExporter {
         var errorDescription: String? {
             switch self {
             case .noData: String.appLocalized(SettingsKey.exportEmpty)
-            case .writeFailed(let e): e.localizedDescription
+            case .writeFailed(let error): error.localizedDescription
             }
         }
     }
@@ -188,11 +188,11 @@ enum DataExporter {
 
         let budgets = repo.fetch(BudgetModel.self)
             .sorted { $0.startDate < $1.startDate }
-            .map { b in
+            .map { budget in
                 BudgetDTO(
-                    id: b.id, amount: b.amount, startDate: b.startDate,
-                    dateCreated: b.dateCreated, type: b.type, green: b.green,
-                    categoryId: b.category?.id, categoryName: b.category?.name
+                    id: budget.id, amount: budget.amount, startDate: budget.startDate,
+                    dateCreated: budget.dateCreated, type: budget.type, green: budget.green,
+                    categoryId: budget.category?.id, categoryName: budget.category?.name
                 )
             }
 
@@ -207,12 +207,13 @@ enum DataExporter {
 
         let templates = repo.fetch(TemplateTransactionModel.self)
             .sorted { $0.order < $1.order }
-            .map { t in
+            .map { template in
                 TemplateTransactionDTO(
-                    id: t.id, amount: t.amount, note: t.note, income: t.income,
-                    order: t.order,
-                    recurringType: t.recurringType, recurringCoefficient: t.recurringCoefficient,
-                    categoryId: t.category?.id, categoryName: t.category?.name
+                    id: template.id, amount: template.amount, note: template.note,
+                    income: template.income, order: template.order,
+                    recurringType: template.recurringType,
+                    recurringCoefficient: template.recurringCoefficient,
+                    categoryId: template.category?.id, categoryName: template.category?.name
                 )
             }
 

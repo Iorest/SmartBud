@@ -78,11 +78,11 @@ extension Locale {
     /// so we fall back to `Locale.current`, and finally to the raw currency
     /// code itself as a last resort.
     static func appCurrencySymbol(forCurrencyCode code: String) -> String {
-        if let s = appLocale.localizedCurrencySymbol(forCurrencyCode: code), !s.isEmpty {
-            return s
+        if let symbol = appLocale.localizedCurrencySymbol(forCurrencyCode: code), !symbol.isEmpty {
+            return symbol
         }
-        if let s = Locale.current.localizedCurrencySymbol(forCurrencyCode: code), !s.isEmpty {
-            return s
+        if let symbol = Locale.current.localizedCurrencySymbol(forCurrencyCode: code), !symbol.isEmpty {
+            return symbol
         }
         return code
     }

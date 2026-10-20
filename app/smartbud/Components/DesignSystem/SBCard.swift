@@ -17,7 +17,7 @@ struct SBCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: SBSpace.s) {
+        VStack(alignment: .leading, spacing: SBSpace.small) {
             if let title {
                 Text(title)
                     .font(.sbSectionHeader)
@@ -25,7 +25,7 @@ struct SBCard<Content: View>: View {
             }
             content
         }
-        .padding(SBSpace.m)
+        .padding(SBSpace.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             Color.SecondaryBackground,

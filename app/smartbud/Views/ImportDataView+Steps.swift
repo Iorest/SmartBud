@@ -30,7 +30,7 @@ extension ImportDataView {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 22) {
                     ForEach(pointers.indices, id: \.self) { index in
-                        PointerView(number: index + 1, text: pointers[index])
+                        pointerView(number: index + 1, text: pointers[index])
                     }
                 }
             }
@@ -211,11 +211,11 @@ extension ImportDataView {
     /// Step 7: confirmation before writing.
     @ViewBuilder
     var stepSummary: some View {
-            VStack(alignment: .leading, spacing: SBSpace.s) {
+            VStack(alignment: .leading, spacing: SBSpace.small) {
                 Text(String.appFormatted("%lld/^[%lld category](inflect: true) linked", numberOfLinkedCategories, uniqueCategories.count))
                     .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
-                    .padding(.horizontal, SBSpace.m)
+                    .padding(.horizontal, SBSpace.medium)
 
                 List {
                     ForEach(uniqueCategories.indices, id: \.self) { categoryIndex in
@@ -223,7 +223,7 @@ extension ImportDataView {
                         let pool = isIncome ? incomeCategories : expenseCategories
 
                         VStack(alignment: .leading, spacing: SBSpace.xs) {
-                            HStack(spacing: SBSpace.s) {
+                            HStack(spacing: SBSpace.small) {
                                 Text(uniqueCategories[categoryIndex].excelValue)
                                     .font(.headline)
                                     .lineLimit(1)

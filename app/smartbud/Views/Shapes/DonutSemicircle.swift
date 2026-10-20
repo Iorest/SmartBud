@@ -33,7 +33,10 @@ struct DonutSemicircle: Shape {
         let weirdLength = sqrt(((radius - cornerRadius) * (radius - cornerRadius)) - (cornerRadius * cornerRadius))
         let weirderLength = radius - weirdLength
         let innerRadius = radius - width
-        let stupidAngle = acos(((innerRadius + cornerRadius) * (innerRadius + cornerRadius) + (innerRadius + weirderLength) * (innerRadius + weirderLength) - cornerRadius * cornerRadius) / (2 * (innerRadius + cornerRadius) * (innerRadius + weirderLength)))
+        let innerLeg = innerRadius + cornerRadius
+        let outerLeg = innerRadius + weirderLength
+        let stupidAngle = acos((innerLeg * innerLeg + outerLeg * outerLeg - cornerRadius * cornerRadius)
+                               / (2 * innerLeg * outerLeg))
         let dumbassAngle = asin(cornerRadius / (innerRadius + cornerRadius))
 
         var path = Path()
@@ -55,18 +58,34 @@ struct DonutSemicircle: Shape {
         var thirdControlPointTo: CGPoint
 
         if percent > 0.5 {
-            secondControlPoint = CGPoint(x: radius + radius * cos(CGFloat(180 * (1 - percent)).toRadians()), y: radius - radius * sin(CGFloat(180 * (1 - percent)).toRadians()))
-            secondControlPointTo = CGPoint(x: radius + weirdLength * cos(CGFloat(180 * (1 - percent)).toRadians()), y: radius - weirdLength * sin(CGFloat(180 * (1 - percent)).toRadians()))
-            thirdControlPointFrom = CGPoint(x: radius + (innerRadius + weirderLength) * cos(CGFloat(180 * (1 - percent)).toRadians()), y: radius - (innerRadius + weirderLength) * sin(CGFloat(180 * (1 - percent)).toRadians()))
-            thirdControlPoint = CGPoint(x: radius + innerRadius * cos(CGFloat(180 * (1 - percent)).toRadians()), y: radius - innerRadius * sin(CGFloat(180 * (1 - percent)).toRadians()))
-            thirdControlPointTo = CGPoint(x: radius + innerRadius * cos(stupidAngle + CGFloat(180 * (1 - percent)).toRadians()), y: radius - innerRadius * sin(stupidAngle + CGFloat(180 * (1 - percent)).toRadians()))
+            let sweep = CGFloat(180 * (1 - percent)).toRadians()
+            let sweepCosine = cos(sweep)
+            let sweepSine = sin(sweep)
+            secondControlPoint = CGPoint(x: radius + radius * sweepCosine,
+                                         y: radius - radius * sweepSine)
+            secondControlPointTo = CGPoint(x: radius + weirdLength * sweepCosine,
+                                           y: radius - weirdLength * sweepSine)
+            thirdControlPointFrom = CGPoint(x: radius + outerLeg * sweepCosine,
+                                            y: radius - outerLeg * sweepSine)
+            thirdControlPoint = CGPoint(x: radius + innerRadius * sweepCosine,
+                                        y: radius - innerRadius * sweepSine)
+            thirdControlPointTo = CGPoint(x: radius + innerRadius * cos(stupidAngle + sweep),
+                                          y: radius - innerRadius * sin(stupidAngle + sweep))
 
         } else if percent < 0.5 {
-            secondControlPoint = CGPoint(x: radius - radius * cos(CGFloat(180 * percent).toRadians()), y: radius - radius * sin(CGFloat(180 * percent).toRadians()))
-            secondControlPointTo = CGPoint(x: radius - weirdLength * cos(CGFloat(180 * percent).toRadians()), y: radius - weirdLength * sin(CGFloat(180 * percent).toRadians()))
-            thirdControlPointFrom = CGPoint(x: radius - (innerRadius + weirderLength) * cos(CGFloat(180 * percent).toRadians()), y: radius - (innerRadius + weirderLength) * sin(CGFloat(180 * percent).toRadians()))
-            thirdControlPoint = CGPoint(x: radius - innerRadius * cos(CGFloat(180 * percent).toRadians()), y: radius - innerRadius * sin(CGFloat(180 * percent).toRadians()))
-            thirdControlPointTo = CGPoint(x: radius - innerRadius * cos(-stupidAngle + CGFloat(180 * percent).toRadians()), y: radius - innerRadius * sin(-stupidAngle + CGFloat(180 * percent).toRadians()))
+            let sweep = CGFloat(180 * percent).toRadians()
+            let sweepCosine = cos(sweep)
+            let sweepSine = sin(sweep)
+            secondControlPoint = CGPoint(x: radius - radius * sweepCosine,
+                                         y: radius - radius * sweepSine)
+            secondControlPointTo = CGPoint(x: radius - weirdLength * sweepCosine,
+                                           y: radius - weirdLength * sweepSine)
+            thirdControlPointFrom = CGPoint(x: radius - outerLeg * sweepCosine,
+                                            y: radius - outerLeg * sweepSine)
+            thirdControlPoint = CGPoint(x: radius - innerRadius * sweepCosine,
+                                        y: radius - innerRadius * sweepSine)
+            thirdControlPointTo = CGPoint(x: radius - innerRadius * cos(-stupidAngle + sweep),
+                                          y: radius - innerRadius * sin(-stupidAngle + sweep))
         } else {
             secondControlPoint = CGPoint(x: rect.midX, y: rect.minY)
             secondControlPointTo = CGPoint(x: rect.midX, y: radius - weirdLength)

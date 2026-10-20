@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-
 #if !os(macOS)
 struct ActivityViewController: UIViewControllerRepresentable {
     var activityItems: [Any]

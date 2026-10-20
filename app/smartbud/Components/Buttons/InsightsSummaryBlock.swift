@@ -41,7 +41,7 @@ struct InsightsSummaryBlockView: View {
                     .minimumScaleFactor(0.6)
             }
         }
-        .padding(SBSpace.s)
+        .padding(SBSpace.small)
         .frame(maxWidth: .infinity, alignment: .leading)
         .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .accessibilityElement(children: .combine)

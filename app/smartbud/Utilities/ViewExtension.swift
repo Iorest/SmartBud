@@ -39,18 +39,18 @@ struct ConfettiModifier: ViewModifier {
                         let now = timeline.date.timeIntervalSinceReferenceDate
                         let seed = Int(now * 20)
 
-                        for i in 0..<particleCount {
-                            var rng = SeededRNG(seed: seed + i)
-                            let x = rng.next() * size.width
-                            let y = rng.next() * size.height - 100
-                            let progress = (rng.next() + sin(now * 3 + Double(i))) * size.height
+                        for particle in 0..<particleCount {
+                            var rng = SeededRNG(seed: seed + particle)
+                            let startX = rng.next() * size.width
+                            let startY = rng.next() * size.height - 100
+                            let progress = (rng.next() + sin(now * 3 + Double(particle))) * size.height
                             let angle = rng.next() * .pi * 2
                             let hue = rng.next()
 
                             let color = Color(hue: hue, saturation: 0.8, brightness: 0.9)
                             let rect = CGRect(
-                                x: x + cos(angle) * 30,
-                                y: y + progress,
+                                x: startX + cos(angle) * 30,
+                                y: startY + progress,
                                 width: 6 + rng.next() * 4,
                                 height: 6 + rng.next() * 4
                             )

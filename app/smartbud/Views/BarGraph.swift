@@ -95,8 +95,8 @@ struct BarGraph: View {
             AxisMarks(position: .leading, values: [0, yMax]) { value in
                 AxisGridLine().foregroundStyle(.clear)
                 AxisValueLabel {
-                    if let v = value.as(Double.self) {
-                        Text(yAxisLabel(for: v))
+                    if let amount = value.as(Double.self) {
+                        Text(yAxisLabel(for: amount))
                             .font(.caption2)
                             .foregroundStyle(Color.SubtitleText)
                     }

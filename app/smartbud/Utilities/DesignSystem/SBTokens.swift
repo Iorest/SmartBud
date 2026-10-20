@@ -12,9 +12,9 @@ import CoreGraphics
 enum SBSpace {
     static let xxs: CGFloat = 4
     static let xs: CGFloat = 8
-    static let s: CGFloat = 12
-    static let m: CGFloat = 16
-    static let l: CGFloat = 24
+    static let small: CGFloat = 12
+    static let medium: CGFloat = 16
+    static let large: CGFloat = 24
     static let xl: CGFloat = 32
 }
 

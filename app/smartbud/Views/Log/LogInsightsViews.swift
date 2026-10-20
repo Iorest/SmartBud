@@ -68,8 +68,8 @@ struct LogInsightsView: View {
                     .padding(.top, SBSpace.xxs)
             }
         }
-        .padding(.horizontal, SBSpace.m)
-        .padding(.vertical, SBSpace.s)
+        .padding(.horizontal, SBSpace.medium)
+        .padding(.vertical, SBSpace.small)
         .contentShape(Rectangle())
         .contextMenu {
             if insightsType != 3 {

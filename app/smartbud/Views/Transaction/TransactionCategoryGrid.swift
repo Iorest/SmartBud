@@ -52,7 +52,7 @@ struct TransactionCategoryGrid: View {
                             tile(item)
                         }
                     }
-                    .padding(SBSpace.s)
+                    .padding(SBSpace.small)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -63,7 +63,7 @@ struct TransactionCategoryGrid: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: SBSpace.s) {
+        VStack(spacing: SBSpace.small) {
             Image(systemName: "square.grid.2x2")
                 .font(.largeTitle)
                 .foregroundStyle(Color.SubtitleText)
@@ -80,7 +80,7 @@ struct TransactionCategoryGrid: View {
             .padding(.top, SBSpace.xxs)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(SBSpace.l)
+        .padding(SBSpace.large)
     }
 
     private func tile(_ item: CategoryModel) -> some View {
@@ -107,7 +107,7 @@ struct TransactionCategoryGrid: View {
                         .foregroundStyle(Color.accentColor)
                 }
             }
-            .padding(.horizontal, SBSpace.s)
+            .padding(.horizontal, SBSpace.small)
             .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
             .background(
                 Color.SecondaryBackground,
@@ -128,7 +128,7 @@ struct TransactionCategoryGrid: View {
     }
 
     private var actions: some View {
-        HStack(spacing: SBSpace.m) {
+        HStack(spacing: SBSpace.medium) {
             Button {
                 showPicker = false
                 showingCategoryView = true
@@ -151,7 +151,7 @@ struct TransactionCategoryGrid: View {
             }
             .buttonStyle(.borderless)
         }
-        .padding(.horizontal, SBSpace.m)
+        .padding(.horizontal, SBSpace.medium)
         .padding(.vertical, SBSpace.xxs)
     }
 }

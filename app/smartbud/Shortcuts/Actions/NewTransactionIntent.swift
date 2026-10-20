@@ -15,16 +15,34 @@ struct NewTransactionIntent: AppIntent {
     static let description =
         IntentDescription(LocalizedStringResource("Log new transactions in a blink"))
 
-    @Parameter(title: LocalizedStringResource("Type"), description: LocalizedStringResource("Type of the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("Would you like to log an income or expense?")))
+    @Parameter(
+        title: LocalizedStringResource("Type"),
+        description: LocalizedStringResource("Type of the transaction"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("Would you like to log an income or expense?"))
+    )
     var income: TransactionType
 
-    @Parameter(title: LocalizedStringResource("Amount"), description: LocalizedStringResource("Value of the transaction"), controlStyle: .field, inclusiveRange: (lowerBound: 0.01, upperBound: 100_000_000), requestValueDialog: IntentDialog(LocalizedStringResource("How much was transacted?")))
+    @Parameter(
+        title: LocalizedStringResource("Amount"),
+        description: LocalizedStringResource("Value of the transaction"),
+        controlStyle: .field,
+        inclusiveRange: (lowerBound: 0.01, upperBound: 100_000_000),
+        requestValueDialog: IntentDialog(LocalizedStringResource("How much was transacted?"))
+    )
     var amount: Double
 
-    @Parameter(title: LocalizedStringResource("Category"), description: LocalizedStringResource("Category associated with the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?")))
+    @Parameter(
+        title: LocalizedStringResource("Category"),
+        description: LocalizedStringResource("Category associated with the transaction"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?"))
+    )
     var incomeCategory: IncomeCategoryEntity?
 
-    @Parameter(title: LocalizedStringResource("Category"), description: LocalizedStringResource("Category associated with the transaction"), requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?")))
+    @Parameter(
+        title: LocalizedStringResource("Category"),
+        description: LocalizedStringResource("Category associated with the transaction"),
+        requestValueDialog: IntentDialog(LocalizedStringResource("What category does it come under?"))
+    )
     var expenseCategory: ExpenseCategoryEntity?
 
     @Parameter(title: LocalizedStringResource("Note"))
@@ -70,7 +88,15 @@ struct NewTransactionIntent: AppIntent {
                         throw $expenseCategory.needsValueError()
                     }
 
-                    let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: false, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
+                    let transaction = TransactionViewModel.shared.create(
+                        note: note ?? "",
+                        category: category,
+                        income: false,
+                        amount: amount,
+                        date: Date.now,
+                        repeatType: repeatType,
+                        repeatCoefficient: 1
+                    )
 
                     return .result(dialog: IntentDialog(LocalizedStringResource("Expense successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)
@@ -84,7 +110,15 @@ struct NewTransactionIntent: AppIntent {
                         throw $incomeCategory.needsValueError()
                     }
 
-                    let transaction = TransactionViewModel.shared.create(note: note ?? "", category: category, income: true, amount: amount, date: Date.now, repeatType: repeatType, repeatCoefficient: 1)
+                    let transaction = TransactionViewModel.shared.create(
+                        note: note ?? "",
+                        category: category,
+                        income: true,
+                        amount: amount,
+                        date: Date.now,
+                        repeatType: repeatType,
+                        repeatCoefficient: 1
+                    )
 
                     return .result(dialog: IntentDialog(LocalizedStringResource("Income successfully logged."))) {
                         ShortcutTransactionView(transaction: transaction)

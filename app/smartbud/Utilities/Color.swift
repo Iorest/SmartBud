@@ -17,16 +17,16 @@ extension Color {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt64()
         Scanner(string: hex).scanHexInt64(&int)
-        let r, g, b: UInt64
+        let red, green, blue: UInt64
         switch hex.count {
         case 6: // RGB (12-bit)
-            (r, g, b) = (int >> 16, int >> 8 & 0xFF, int & 0xFF)
+            (red, green, blue) = (int >> 16, int >> 8 & 0xFF, int & 0xFF)
         case 8: // ARGB (16-bit)
-            (_, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+            (_, red, green, blue) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
-            (r, g, b) = (0, 0, 0)
+            (red, green, blue) = (0, 0, 0)
         }
-        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255)
+        self.init(.sRGB, red: Double(red) / 255, green: Double(green) / 255, blue: Double(blue) / 255)
     }
 
     func toHex() -> String? {
@@ -34,19 +34,19 @@ extension Color {
         guard let components = uic.cgColor.components, components.count >= 3 else {
             return nil
         }
-        let r = Float(components[0])
-        let g = Float(components[1])
-        let b = Float(components[2])
-        var a = Float(1.0)
+        let red = Float(components[0])
+        let green = Float(components[1])
+        let blue = Float(components[2])
+        var alpha = Float(1.0)
 
         if components.count >= 4 {
-            a = Float(components[3])
+            alpha = Float(components[3])
         }
 
-        if a != Float(1.0) {
-            return "#" + hexByte(r) + hexByte(g) + hexByte(b) + hexByte(a)
+        if alpha != Float(1.0) {
+            return "#" + hexByte(red) + hexByte(green) + hexByte(blue) + hexByte(alpha)
         } else {
-            return "#" + hexByte(r) + hexByte(g) + hexByte(b)
+            return "#" + hexByte(red) + hexByte(green) + hexByte(blue)
         }
     }
 
@@ -60,10 +60,10 @@ extension Color {
 
     func luminance() -> Double {
         let components = UIColor(self).cgColor.components
-        let r = components?[0] ?? 0
-        let g = components?[1] ?? 0
-        let b = components?[2] ?? 0
-        return 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b)
+        let red = components?[0] ?? 0
+        let green = components?[1] ?? 0
+        let blue = components?[2] ?? 0
+        return 0.299 * Double(red) + 0.587 * Double(green) + 0.114 * Double(blue)
     }
 
     // MARK: - Semantic colors (system-native)

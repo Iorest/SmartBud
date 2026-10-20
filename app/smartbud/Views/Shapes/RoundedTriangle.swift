@@ -36,7 +36,10 @@ struct RoundedTriangle: Shape {
         let secondCentre = CGPoint(x: rect.midX, y: rect.height - weirderLength)
 
         path.addLine(to: secondControlPointFrom)
-        path.addArc(center: secondCentre, radius: cornerRadius, startAngle: Angle(degrees: 90) + Angle(radians: cornerAngle), endAngle: Angle(degrees: 90) - Angle(radians: cornerAngle), clockwise: true)
+        let arcStart = Angle(degrees: 90) + Angle(radians: cornerAngle)
+        let arcEnd = Angle(degrees: 90) - Angle(radians: cornerAngle)
+        path.addArc(center: secondCentre, radius: cornerRadius,
+                    startAngle: arcStart, endAngle: arcEnd, clockwise: true)
 //        path.addQuadCurve(to: secondControlPointTo, control: secondControlPoint)
 
         let thirdControlPointFrom = CGPoint(x: rect.width - weirdLength + (cornerRadius * cos(CGFloat.pi / 2 - cornerAngle)), y: cornerRadius + (cornerRadius * sin(CGFloat.pi / 2 - cornerAngle)))

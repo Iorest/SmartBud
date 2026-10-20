@@ -386,10 +386,10 @@ enum SubscriptionError: Error, Identifiable, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .loadProductsFailed(let e),
-             .purchaseFailed(let e),
-             .restoreFailed(let e):
-            e.localizedDescription
+        case .loadProductsFailed(let error),
+             .purchaseFailed(let error),
+             .restoreFailed(let error):
+            error.localizedDescription
         case .purchasePending:
             String.appLocalized("settings.pro.error.pending")
         }

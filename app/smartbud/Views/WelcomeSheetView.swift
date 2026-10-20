@@ -48,10 +48,10 @@ struct WelcomeSheetView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 48)
 
-                    VStack(alignment: .leading, spacing: SBSpace.l) {
+                    VStack(alignment: .leading, spacing: SBSpace.large) {
                         ForEach(welcomeFeatures.indices, id: \.self) { rowIndex in
                             if rowIndex < visibleLines {
-                                HStack(alignment: .top, spacing: SBSpace.s) {
+                                HStack(alignment: .top, spacing: SBSpace.small) {
                                     Image(systemName: welcomeFeatures[rowIndex].icon)
                                         .font(.title2)
                                         .foregroundStyle(Color.SubtitleText)
@@ -95,7 +95,7 @@ struct WelcomeSheetView: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                 }
-                .padding(SBSpace.l)
+                .padding(SBSpace.large)
             } else {
                 CategoryView(mode: .welcome)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

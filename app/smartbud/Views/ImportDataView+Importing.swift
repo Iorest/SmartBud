@@ -201,7 +201,7 @@ extension ImportDataView {
     }
 
     @ViewBuilder
-    func PointerView(number: Int, text: String) -> some View {
+    func pointerView(number: Int, text: String) -> some View {
         HStack(alignment: .top, spacing: 15) {
             ZStack {
                 Circle()

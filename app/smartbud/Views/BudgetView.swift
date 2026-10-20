@@ -169,7 +169,6 @@ struct MainBudgetView: View {
         budgetAmount - budgetVM.leftoverOverall(budget)
     }
 
-
     var budgetAmount: Double {
         return budget.amount
     }
@@ -196,7 +195,7 @@ struct MainBudgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: SBSpace.s) {
+        VStack(alignment: .leading, spacing: SBSpace.small) {
             HStack(alignment: .firstTextBaseline, spacing: SBSpace.xs) {
                 Label(String.appLocalized("Total Budget"), systemImage: "chart.pie.fill")
                     .font(.headline)
@@ -238,7 +237,7 @@ struct MainBudgetView: View {
                 .font(.caption)
                 .foregroundStyle(Color.SubtitleText)
         }
-        .padding(SBSpace.m)
+        .padding(SBSpace.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
         .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))

@@ -175,7 +175,7 @@ struct HomeView: View {
                 undoBanner
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .padding(.bottom, 100)
-                    .padding(.horizontal, SBSpace.m)
+                    .padding(.horizontal, SBSpace.medium)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 

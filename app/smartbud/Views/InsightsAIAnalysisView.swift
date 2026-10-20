@@ -59,7 +59,7 @@ struct InsightsAIAnalysisView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.top, 40)
             } else if let errorMessage {
-                VStack(spacing: SBSpace.s) {
+                VStack(spacing: SBSpace.small) {
                     Image(systemName: needsSetup ? "sparkles" : "exclamationmark.triangle")
                         .font(.largeTitle)
                         .foregroundStyle(Color.SubtitleText)

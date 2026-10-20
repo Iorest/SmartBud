@@ -13,7 +13,7 @@ struct SBSaveErrorBanner: View {
     let dismiss: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: SBSpace.s) {
+        HStack(alignment: .top, spacing: SBSpace.small) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(Color.Alert)
 
@@ -33,7 +33,7 @@ struct SBSaveErrorBanner: View {
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("关闭")))
         }
-        .padding(SBSpace.s)
+        .padding(SBSpace.small)
         .background(
             Color.SecondaryBackground,
             in: RoundedRectangle(cornerRadius: SBRadius.control, style: .continuous)

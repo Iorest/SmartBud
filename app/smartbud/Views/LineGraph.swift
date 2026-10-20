@@ -78,9 +78,9 @@ struct LineGraph: View {
             // Estimate x-position: equal spacing across width.
             GeometryReader { proxy in
                 let count = max(data.count - 1, 1)
-                let x = proxy.size.width * CGFloat(index) / CGFloat(count)
+                let xPosition = proxy.size.width * CGFloat(index) / CGFloat(count)
                 tooltipContent
-                    .offset(x: max(40, min(x - 40, proxy.size.width - 80)), y: 0)
+                    .offset(x: max(40, min(xPosition - 40, proxy.size.width - 80)), y: 0)
                     .frame(width: 80, alignment: .center)
             }
             .allowsHitTesting(false)

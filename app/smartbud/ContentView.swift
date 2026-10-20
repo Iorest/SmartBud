@@ -58,7 +58,7 @@ struct ContentView: View {
                     SBSaveErrorBanner(message: saveError) {
                         dataRepo.clearSaveError()
                     }
-                    .padding(.horizontal, SBSpace.m)
+                    .padding(.horizontal, SBSpace.medium)
                     .padding(.bottom, bottomEdge + 68)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .transition(.move(edge: .bottom).combined(with: .opacity))

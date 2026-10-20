@@ -18,9 +18,7 @@ struct CategoryListView: View {
     @Environment(\.colorScheme) var systemColorScheme
     @Environment(CategoryViewModel.self) var categoryVM
 
-
     @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true
-
 
     var categories: [CategoryModel] {
         income ? categoryVM.incomeCategories : categoryVM.expenseCategories
@@ -51,6 +49,24 @@ struct CategoryListView: View {
             return "EXPENSE CATEGORIES"
         }
     }
+
+    private func moveItem(at sets: IndexSet, destination: Int) {
+        categoryVM.reorder(from: sets, to: destination, income: income)
+    }
+
+    init(income: Binding<Bool>, mode: CategoryViewMode, onSelect: ((CategoryModel) -> Void)? = nil,
+         showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
+        _income = income
+        _showToast = showToast
+        _toastTitle = toastTitle
+        _toastImage = toastImage
+        _positive = positive
+        self.mode = mode
+        self.onSelect = onSelect
+    }
+}
+
+extension CategoryListView {
 
     var body: some View {
         VStack(spacing: 5) {
@@ -413,20 +429,5 @@ struct CategoryListView: View {
                 positive = true
             }
         }
-    }
-
-    private func moveItem(at sets: IndexSet, destination: Int) {
-        categoryVM.reorder(from: sets, to: destination, income: income)
-    }
-
-    init(income: Binding<Bool>, mode: CategoryViewMode, onSelect: ((CategoryModel) -> Void)? = nil,
-         showToast: Binding<Bool>, toastTitle: Binding<String>, toastImage: Binding<String>, positive: Binding<Bool>) {
-        _income = income
-        _showToast = showToast
-        _toastTitle = toastTitle
-        _toastImage = toastImage
-        _positive = positive
-        self.mode = mode
-        self.onSelect = onSelect
     }
 }

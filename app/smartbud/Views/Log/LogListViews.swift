@@ -60,7 +60,7 @@ struct FutureListView: View {
                     .foregroundStyle(Color.SubtitleText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, SBSpace.xs)
-                    .padding(.top, SBSpace.s)
+                    .padding(.top, SBSpace.small)
                     .padding(.bottom, SBSpace.xxs)
 
                 ForEach(transactions) { transaction in

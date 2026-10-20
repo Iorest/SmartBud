@@ -97,7 +97,11 @@ struct ColourPickerView: View {
         }
         .padding(6)
         .frame(width: 282)
-        .background(RoundedRectangle(cornerRadius: SBRadius.chip).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
+        .background(
+            RoundedRectangle(cornerRadius: SBRadius.chip)
+                .fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground"))
+                .shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6)
+        )
         .overlay(RoundedRectangle(cornerRadius: SBRadius.chip).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
     }
 

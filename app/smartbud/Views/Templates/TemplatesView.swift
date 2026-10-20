@@ -103,7 +103,7 @@ struct TemplatesView: View {
                 }
             }
         } label: {
-            HStack(spacing: SBSpace.s) {
+            HStack(spacing: SBSpace.small) {
                 EmojiLogView(
                     emoji: template.wrappedEmoji,
                     colour: template.wrappedColour,

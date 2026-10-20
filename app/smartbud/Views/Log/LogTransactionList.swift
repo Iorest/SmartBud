@@ -127,7 +127,7 @@ struct LogTransactionRow: View {
     }
 
     var body: some View {
-        HStack(spacing: SBSpace.s) {
+        HStack(spacing: SBSpace.small) {
             EmojiLogView(
                 emoji: transaction.category?.wrappedEmoji ?? "",
                 colour: transaction.category?.wrappedColour ?? "#FFFFFF",
@@ -288,8 +288,8 @@ struct LogTransactionList<Header: View>: View {
                     Text(date, format: .dateTime.year().month(.wide))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.SubtitleText)
-                        .padding(.top, SBSpace.s)
-                        .padding(.horizontal, SBSpace.m)
+                        .padding(.top, SBSpace.small)
+                        .padding(.horizontal, SBSpace.medium)
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                 case .day(let day):

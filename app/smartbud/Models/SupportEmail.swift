@@ -28,7 +28,9 @@ struct SupportEmail {
     }
 
     func send(openURL: OpenURLAction) {
-        let urlString = "mailto:\(toAddress)?subject=\(subject.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")&body=\(body.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
+        let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        let urlString = "mailto:\(toAddress)?subject=\(encodedSubject)&body=\(encodedBody)"
         guard let url = URL(string: urlString) else { return }
         openURL(url)
     }
