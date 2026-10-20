@@ -36,9 +36,9 @@ struct SmartBudMacApp: App {
                 .environment(budgetVM)
                 .environment(insightsVM)
                 .environment(settingsVM)
-                .frame(minWidth: 880, minHeight: 620)
+                .frame(minWidth: 960, minHeight: 640)
         }
-        .defaultSize(width: 1120, height: 760)
+        .defaultSize(width: 1180, height: 780)
         .windowResizability(.contentMinSize)
     }
 }
