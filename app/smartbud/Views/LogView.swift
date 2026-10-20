@@ -2,7 +2,9 @@
 //  LogView.swift
 //  smartbud
 //
-//  Created by Iorest on 19/5/22.
+//  Native log: `NavigationStack` + `List`, months as sections, day headers,
+//  and real search. The previous version stacked a custom scroll view,
+//  hand-drawn dividers, a bespoke swipe gesture and a separate search screen.
 //
 
 import Foundation
@@ -10,309 +12,303 @@ import SwiftData
 import SwiftUI
 
 struct LogView: View {
-    @Query private var transactions: [TransactionModel]
+    @Query(sort: [SortDescriptor(\TransactionModel.date, order: .reverse)])
+    private var allTransactions: [TransactionModel]
 
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(\.scenePhase) private var scenePhase
 
-    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
-
-    var topEdge: CGFloat
-
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
-    var currencySymbol: String {
-        return Locale.appCurrencySymbol(forCurrencyCode: currency)
-    }
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
+    @AppStorage("showUpcomingTransactions", store: .appGroup) var showUpcoming: Bool = true
+    @AppStorage("showUpcomingTransactionsWhenUpcoming", store: .appGroup) var showSoon: Bool = false
 
-    @State var addTransaction = false
-
-    // searching
-    @State var searchMode = false
-
-    // top bar
-    @State var navBarText = ""
-    @State var showMenu = false
-    @AppStorage("logTimeFrame", store: .appGroup) var logTimeFrame = 2
-
-    // show filter menu
-    @State var showFilter = false
-    @State var filter = FilterType.all
-
-    // filters
-    @State var categoryFilter: CategoryModel?
-    @State var dateFilter = Date.now
-    @State var weekFilter = Date.now
-    @State var monthFilter = Date.now
-    @State var income = false
-
-    // to show/hide tab bar
-    var bottomEdge: CGFloat
     var launchSearch: Bool
-    /// Invoked by the empty state's primary button ("Add entry").
+    /// Invoked by the empty state's primary button ("Add Entry").
     var onAdd: () -> Void = {}
 
-    // drag to open
-//    enum PullToReach {
-//        case none, search, filter
-//    }
+    @State private var searchText = ""
+    @State private var searchPresented = false
+    @State private var navBarText = ""
 
-    @State var progress = 0.0
+    @State private var filter = FilterType.all
+    @State private var categoryFilter: CategoryModel?
+    @State private var dateFilter = Date.now
+    @State private var weekFilter = Date.now
+    @State private var monthFilter = Date.now
+    @State private var income = false
+
+    private var currencySymbol: String {
+        Locale.appCurrencySymbol(forCurrencyCode: currency)
+    }
 
     var body: some View {
-        if transactions.isEmpty {
-            VStack(spacing: 5) {
-                Image("dropbox")
-                    .resizable()
-                    .frame(width: 75, height: 75)
-                    .padding(.bottom, 20)
-                    .accessibilityHidden(true)
+        #if os(iOS)
+        NavigationStack {
+            content
+        }
+        #else
+        content
+        #endif
+    }
 
-                Text(String.appLocalized("Your Log is Empty"))
-                    .font(.system(.title2, design: .rounded).weight(.medium))
-//                    .font(.system(size: 23.5, weight: .medium, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.PrimaryText.opacity(0.8))
+    // MARK: - Content
 
-                Text(String.appLocalized("Record your first expense or income to get started"))
-                    .font(.system(.body, design: .rounded).weight(.medium))
-                    .multilineTextAlignment(.center)
-                    // Full-strength secondary text: the old 0.7 opacity sat
-                    // below the 4.5:1 contrast floor on the gradient.
-                    .foregroundStyle(Color.SubtitleText)
-
-                Button(action: onAdd) {
-                    Text(String.appLocalized("Add Entry"))
-                        .font(.system(.body, design: .rounded).weight(.semibold))
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 6)
+    private var content: some View {
+        Group {
+            if allTransactions.isEmpty {
+                SBEmptyState(
+                    systemImage: "list.bullet.rectangle.portrait",
+                    title: String.appLocalized("Your Log is Empty"),
+                    message: String.appLocalized("Record your first expense or income to get started"),
+                    actionTitle: String.appLocalized("Add Entry"),
+                    action: onAdd
+                )
+            } else {
+                logList
             }
-            .padding(.horizontal, 30)
-            .frame(height: 250, alignment: .top)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.clear)
+        }
+        .navigationTitle(String.appLocalized("Log"))
+        #if os(iOS)
+        // Inline keeps the title visible while the filter bar is pinned above
+        // the list; a large title would collapse as soon as the inset appears.
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        #if os(iOS)
+        .searchable(
+            text: $searchText,
+            isPresented: $searchPresented,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: Text(String.appLocalized("Search notes, categories, amounts"))
+        )
+        #else
+        .searchable(
+            text: $searchText,
+            isPresented: $searchPresented,
+            prompt: Text(String.appLocalized("Search notes, categories, amounts"))
+        )
+        #endif
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                filterMenu
+                Button {
+                    onAdd()
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel(Text(String.appLocalized("Add New Transaction")))
+            }
+        }
+        .onChange(of: launchSearch) { _, newValue in
+            if newValue { searchPresented = true }
+        }
+        .onOpenURL { url in
+            if url.host == "search" { searchPresented = true }
+        }
+        .onChange(of: scenePhase) { _, new in
+            if new == .active,
+               !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
+                transactionVM.updateAllRecurring()
+            }
+        }
+        .onAppear {
+            if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
+                transactionVM.updateAllRecurring()
+            }
+        }
+    }
 
-        } else {
-            VStack(spacing: 0) {
-                VStack(spacing: 18) {
-                    HStack {
-                        Button {
-                            searchMode = true
-                        } label: {
-                            Image(systemName: "magnifyingglass")
-//                                .font(.system(size: 23, weight: .regular))
-                                .font(.system(.title2, design: .rounded).weight(.regular))
-                                
-                                .foregroundStyle(Color.DarkIcon)
-                                .padding(5)
-                                .contentShape(Rectangle())
-                                .background {
-                                    RoundedRectangle(cornerRadius: GlassRadius.chip)
-                                        .fill(Color.SecondaryBackground)
-                                        .scaleEffect(progress == 1 ? 1.5 : 1.0)
-                                        .opacity(progress)
-                                }
-                        }
-                        .accessibilityLabel(Text(String.appLocalized("Search")))
+    // MARK: - List
 
-                        Spacer()
-
-                        switch filter {
-                        case .all:
-//                            Text(navBarText)
-//                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-//                            .opacity(0)
-                            EmptyView()
-                        case .category:
-                            filterTagView(text: "filter-tag-category")
-                        case .day:
-                            filterTagView(text: "filter-tag-day")
-                        case .week:
-                            filterTagView(text: "filter-tag-week")
-                        case .month:
-                            filterTagView(text: "filter-tag-month")
-                        case .recurring:
-                            filterTagView(text: "filter-tag-recurring")
-                        case .type:
-                            filterTagView(text: "filter-tag-type")
-                        case .upcoming:
-                            filterTagView(text: "filter-tag-upcoming")
-                        }
-
-                        Spacer()
-
-                        Button {
-                            showFilter = true
-                        } label: {
-                            Image(systemName: filter == .all ? "triangle" : "triangle.tophalf.filled")
-                                .font(.system(.title2, design: .rounded).weight(.regular))
-                                
-                                .foregroundStyle(Color.DarkIcon)
-                                .rotationEffect(Angle(degrees: 180))
-                                .padding(5)
-                                .contentShape(Rectangle())
-                                .background {
-                                    if showFilter {
-                                        RoundedRectangle(cornerRadius: GlassRadius.chip)
-                                            .fill(Color.SecondaryBackground)
-                                    }
-//                                    if pullStatus == .filter || showFilter {
-//                                        RoundedRectangle(cornerRadius: GlassRadius.chip)
-//                                            .fill(Color.SecondaryBackground)
-//                                            .scaleEffect(released == .filter ? 1.2 : 1.0)
-//                                            .opacity(released  == .filter ? 0.5 : 1.0)
-//                                    }
-                                }
-                        }
-                        .accessibilityLabel(Text(String.appLocalized("Filter")))
-                        .popover(isPresented: $showFilter) {
-                            FilterPickerView(filterType: $filter, showMenu: $showFilter)
-                        }
-                    }
-
-                    switch filter {
-                    case .all:
-                        EmptyView()
-                    case .category:
-                        CategoryStepperView(categoryFilter: $categoryFilter)
-                    case .day:
-                        DateStepperView(date: $dateFilter)
-                    case .week:
-                        WeekStepperView(showingDate: $weekFilter)
-                    case .month:
-                        MonthStepperView(showingDate: $monthFilter)
-                    case .recurring:
-                        EmptyView()
-                    case .type:
-                        IncomeFilterToggleView(income: $income)
-                    case .upcoming:
-                        EmptyView()
+    private var logList: some View {
+        Group {
+            if visibleTransactions.isEmpty {
+                emptyResultView
+            } else {
+                LogTransactionList(
+                    transactions: visibleTransactions,
+                    future: filter == .upcoming,
+                    upcoming: upcomingTransactions
+                ) {
+                    if filter == .all && searchText.isEmpty {
+                        LogInsightsView(
+                            navBarText: $navBarText,
+                            showCents: showCents,
+                            currencySymbol: currencySymbol
+                        )
                     }
                 }
-                .padding(.horizontal, 25)
-                .frame(height: (filter == .all || filter == .recurring || filter == .upcoming) ? 50 : 110, alignment: .top)
-                .padding(.top, topEdge + 10)
-
-                ScrollView(showsIndicators: false) {
-                    if filter == .all {
-                        LogInsightsView(navBarText: $navBarText, showCents: showCents, currencySymbol: currencySymbol)
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if showsStepper {
+                        stepperBar
                     }
-
-                    TransactionsList(filter: filter, category: categoryFilter, date: dateFilter, week: weekFilter, month: monthFilter, income: income)
-                        .zIndex(0)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 70 + bottomEdge)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            }
-            .background(.clear)
-            .fullScreenCover(isPresented: $searchMode) {
-                SearchView()
-            }
-            .onChange(of: scenePhase) { _, new in
-                if new == .active,
-                   !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-                    transactionVM.updateAllRecurring()
-                }
-            }
-            .onChange(of: launchSearch) { _, _ in
-                searchMode = true
-            }
-            .onAppear {
-                if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
-                    transactionVM.updateAllRecurring()
-                }
-            }
-            .onOpenURL { url in
-                guard url.host == "search" else {
-                    return
-                }
-                searchMode = true
             }
         }
     }
 
     @ViewBuilder
-    func filterTagView(text: LocalizedStringKey) -> some View {
-        HStack(spacing: 10) {
-            Text(text)
-                .font(.system(.body, design: .rounded).weight(.medium))
-                
+    private var emptyResultView: some View {
+        if !searchText.isEmpty {
+            ContentUnavailableView.search(text: searchText)
+        } else {
+            ContentUnavailableView {
+                Label(String.appLocalized("No entries found."), systemImage: "tray")
+            } description: {
+                Text(String.appLocalized("Try a different filter or add a new entry."))
+            } actions: {
+                Button(String.appLocalized("Clear Filter")) {
+                    filter = .all
+                    categoryFilter = nil
+                    searchText = ""
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+    }
 
-            Button {
-                withAnimation(.easeIn(duration: 0.15)) {
+    // MARK: - Filters
+
+    private var showsStepper: Bool {
+        switch filter {
+        case .category, .day, .week, .month, .type:
+            return true
+        case .all, .recurring, .upcoming:
+            return false
+        }
+    }
+
+    @ViewBuilder
+    private var stepperBar: some View {
+        Group {
+            switch filter {
+            case .category:
+                CategoryStepperView(categoryFilter: $categoryFilter)
+            case .day:
+                DateStepperView(date: $dateFilter)
+            case .week:
+                WeekStepperView(showingDate: $weekFilter)
+            case .month:
+                MonthStepperView(showingDate: $monthFilter)
+            case .type:
+                IncomeFilterToggleView(income: $income)
+            default:
+                EmptyView()
+            }
+        }
+        .padding(.horizontal, SBSpace.m)
+        .padding(.vertical, SBSpace.xs)
+        .background(.bar)
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
+    }
+
+    private var filterMenu: some View {
+        Menu {
+            Picker(String.appLocalized("Filter"), selection: $filter) {
+                ForEach(FilterType.allCases, id: \.self) { option in
+                    Label(
+                        LocalizedStringKey(option.rawValue),
+                        systemImage: FilterType.imageDictionary[option] ?? "line.3.horizontal.decrease"
+                    )
+                    .tag(option)
+                }
+            }
+
+            if filter != .all {
+                Divider()
+                Button(String.appLocalized("Clear Filter"), systemImage: "xmark.circle") {
                     filter = .all
                 }
-            } label: {
-                Image(systemName: "xmark")
-//                    .resizable()
-//                    .frame(width: 11, height: 11)
-                    .font(.system(.caption, design: .rounded).weight(.regular))
-                    
-                    .foregroundStyle(Color.PrimaryText.opacity(0.7))
             }
-            .accessibilityLabel(Text(String.appLocalized("remove filter")))
+        } label: {
+            Image(systemName: filter == .all
+                  ? "line.3.horizontal.decrease"
+                  : "line.3.horizontal.decrease.circle.fill")
         }
-        .padding(4)
-        .padding(.horizontal, 6)
-        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
-//        .font(.system(size: 17, weight: .medium, design: .rounded))
-        .foregroundStyle(Color.PrimaryText)
+        .accessibilityLabel(Text(String.appLocalized("Filter")))
+    }
+
+    // MARK: - Data
+
+    /// The ledger up to now. Future occurrences live in the Upcoming section
+    /// instead of appearing twice.
+    private var pastTransactions: [TransactionModel] {
+        allTransactions.filter { $0.wrappedDate <= .now }
+    }
+
+    private var upcomingTransactions: [TransactionModel] {
+        let includeUpcoming = filter == .upcoming || (filter == .all && showUpcoming)
+        guard includeUpcoming, searchText.isEmpty else { return [] }
+
+        let calendar = Calendar.current
+        let horizon = calendar.date(byAdding: .weekOfYear, value: 2, to: calendar.startOfDay(for: .now))
+            ?? .distantFuture
+
+        return allTransactions
+            .filter { transaction in
+                guard transaction.recurringType > 0 || transaction.wrappedDate > .now else { return false }
+                guard showSoon else { return true }
+                return nextDate(for: transaction) < horizon
+            }
+            .sorted { nextDate(for: $0) > nextDate(for: $1) }
+    }
+
+    private func nextDate(for transaction: TransactionModel) -> Date {
+        transaction.wrappedDate > .now ? transaction.wrappedDate : transaction.nextTransactionDate
+    }
+
+    private var visibleTransactions: [TransactionModel] {
+        var items: [TransactionModel]
+
+        switch filter {
+        case .upcoming:
+            items = []
+        case .recurring:
+            items = pastTransactions.filter(\.onceRecurring)
+        case .type:
+            items = pastTransactions.filter { $0.income == income }
+        case .category:
+            if let categoryFilter {
+                items = pastTransactions.filter { $0.category?.id == categoryFilter.id }
+            } else {
+                items = pastTransactions
+            }
+        case .day:
+            items = pastTransactions.filter {
+                Calendar.current.isDate($0.wrappedDate, inSameDayAs: dateFilter)
+            }
+        case .week:
+            let interval = Calendar.current.dateInterval(of: .weekOfYear, for: weekFilter)
+            items = pastTransactions.filter {
+                interval?.contains($0.wrappedDate) ?? false
+            }
+        case .month:
+            let interval = Calendar.current.dateInterval(of: .month, for: monthFilter)
+            items = pastTransactions.filter {
+                interval?.contains($0.wrappedDate) ?? false
+            }
+        case .all:
+            items = pastTransactions
+        }
+
+        if filter == .all, !searchText.isEmpty {
+            items = items.filter(matchesSearch)
+        }
+
+        return items.sorted { $0.wrappedDate > $1.wrappedDate }
+    }
+
+    private func matchesSearch(_ transaction: TransactionModel) -> Bool {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return true }
+
+        if transaction.wrappedNote.localizedStandardContains(query) { return true }
+        if transaction.wrappedCategoryName.localizedStandardContains(query) { return true }
+        if (transaction.category?.wrappedEmoji ?? "").contains(query) { return true }
+
+        let amount = String(format: "%.2f", transaction.amount)
+        return amount.contains(query)
     }
 }
-
-struct NumberView: View {
-    let number: Double
-    let dynamicTypeSize: DynamicTypeSize
-    let netTotal: Bool
-    let positive: Bool
-    let showCents: Bool
-    let currencySymbol: String
-
-    @State private var displayNumber: Double = 0
-
-    var fontSize: CGFloat {
-        switch dynamicTypeSize {
-        case .xSmall:
-            return 46
-        case .small:
-            return 47
-        case .medium:
-            return 48
-        case .large:
-            return 50
-        case .xLarge:
-            return 56
-        case .xxLarge:
-            return 58
-        case .xxxLarge:
-            return 62
-        default:
-            return 50
-        }
-    }
-
-    var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 2) {
-            Text(netTotal ? (positive ? "+\(currencySymbol)" : "-\(currencySymbol)") : currencySymbol)
-                .font(.system(.largeTitle, design: .rounded))
-                .foregroundStyle(Color.SubtitleText)
-            Text(displayNumber, format: .number.precision(.fractionLength(showCents ? 2 : 0)))
-                .font(.system(size: fontSize, weight: .regular, design: .rounded))
-                .foregroundStyle(Color.PrimaryText)
-                .contentTransition(.numericText(value: displayNumber))
-        }
-        .minimumScaleFactor(0.5)
-        .lineLimit(1)
-        .onAppear { displayNumber = number }
-        .onChange(of: number) { _, newValue in
-            withAnimation(.smooth(duration: 0.6)) {
-                displayNumber = newValue
-            }
-        }
-    }
-}
-

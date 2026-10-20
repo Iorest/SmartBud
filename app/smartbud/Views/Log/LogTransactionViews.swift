@@ -17,20 +17,24 @@ struct SingleTransactionView: View {
     @Environment(OverallTransactionManager.self) var transactionManager
 
     // delete mode
-//    @State private var toDelete: Transaction?
-//    @State var deleteMode = false
 //
 //    // edit mode
-//    @State private var toEdit: Transaction?
 
     @State private var offset: CGFloat = 0
     @State private var deleted: Bool = false
+    /// Row width, not the display width: on iPad/Mac a row is much narrower
+    /// than the window, so screen-based thresholds made a short swipe
+    /// trigger delete.
+    @State private var rowWidth: CGFloat = 0
+
+    private var gestureWidth: CGFloat { rowWidth > 0 ? rowWidth : 375 }
+
     var deletePopup: Bool {
-        return abs(offset) > ScreenSize.width * 0.2
+        return abs(offset) > gestureWidth * 0.2
     }
 
     var deleteConfirm: Bool {
-        return abs(offset) > ScreenSize.width * 0.42
+        return abs(offset) > gestureWidth * 0.42
     }
 
     @GestureState var isDragging = false
@@ -49,18 +53,7 @@ struct SingleTransactionView: View {
     }
 
     var transactionAmountString: String {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.locale = Locale.appLocale
-        numberFormatter.numberStyle = .currency
-        numberFormatter.currencyCode = currency
-
-        if showCents {
-            numberFormatter.maximumFractionDigits = 2
-        } else {
-            numberFormatter.maximumFractionDigits = 0
-        }
-
-        return numberFormatter.string(from: NSNumber(value: transaction.amount)) ?? "$0"
+        Money.format(transaction.amount, currencyCode: currency, showsCents: showCents)
     }
 
     var transactionAmountAccessibilityString: String {
@@ -70,12 +63,12 @@ struct SingleTransactionView: View {
     private var nameAndTime: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(transaction.wrappedNote)
-                .font(.system(.body, design: .rounded).weight(.medium))
+                .font(.body.weight(.medium))
                 .foregroundStyle(future ? Color.SubtitleText : Color.PrimaryText)
                 .lineLimit(2)
 
             Text(getSubtitle())
-                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(future ? Color.EvenLighterText : Color.SubtitleText)
                 .lineLimit(1)
         }
@@ -85,7 +78,7 @@ struct SingleTransactionView: View {
         Text(showExpenseOrIncomeSign
              ? "\(transaction.income ? "+" : "-")\(transactionAmountString)"
              : transactionAmountString)
-            .font(.system(.title3, design: .rounded).weight(.medium))
+            .font(.title3.weight(.medium).monospacedDigit())
             .foregroundStyle(transaction.income
                              ? (future ? Color.SubtitleText : Color.IncomeGreen)
                              : (future ? Color.SubtitleText : Color.PrimaryText))
@@ -97,13 +90,11 @@ struct SingleTransactionView: View {
     var body: some View {
         ZStack(alignment: .trailing) {
             Image(systemName: "xmark")
-//                .font(.system(size: 13, weight: .bold))
-                .font(.system(.caption, design: .rounded).weight(.bold))
+                .font(.caption.weight(.bold))
                 
                 .foregroundStyle(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
                 .padding(5)
                 .background(deleteConfirm ? Color.AlertRed.opacity(0.23) : Color.SecondaryBackground, in: Circle())
-//                .scaleEffect(imageScale)
                 .scaleEffect(deleteConfirm ? 1.1 : 1)
                 .contentShape(Circle())
                 .opacity(deleted ? 0 : 1)
@@ -121,7 +112,7 @@ struct SingleTransactionView: View {
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(Color.DarkIcon)
                                 .padding(3)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: GlassRadius.pill))
+                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: SBRadius.pill))
                                 .offset(x: 5, y: 5)
                         }
                     }
@@ -143,7 +134,7 @@ struct SingleTransactionView: View {
             .id(refreshID)
             .padding(.vertical, 8)
             .padding(.horizontal, 10)
-            .contentShape(RoundedRectangle(cornerRadius: GlassRadius.chip))
+            .contentShape(RoundedRectangle(cornerRadius: SBRadius.chip))
             .onTapGesture {
                 transactionManager.toEdit = transaction
             }
@@ -177,8 +168,16 @@ struct SingleTransactionView: View {
             }
             .offset(x: offset)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(localized: "\(transaction.wrappedNote), \(currencySymbol)\(transactionAmountAccessibilityString), Transaction Category: \(transaction.category?.wrappedName ?? String.appLocalized("Unknown")), Transaction made at \(timeConverterAccessibilityLabel(date: transaction.wrappedDate))"))
+            .accessibilityLabel(String.appFormatted(
+                "%@, %@%@, Category: %@, at %@",
+                transaction.wrappedNote,
+                currencySymbol,
+                transactionAmountAccessibilityString,
+                transaction.category?.wrappedName ?? String.appLocalized("Unknown"),
+                timeConverterAccessibilityLabel(date: transaction.wrappedDate)
+            ))
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
         .onChange(of: deletePopup) { _, _ in
             if deletePopup {
                 lightHaptic &+= 1
@@ -206,7 +205,7 @@ struct SingleTransactionView: View {
                     if deleteConfirm {
                         deleted = true
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            offset -= ScreenSize.width
+                            offset -= gestureWidth
                         }
 
                         if future, transaction.wrappedDate < Date.now, transaction.recurringType > 0 {
@@ -259,9 +258,7 @@ struct SingleTransactionView: View {
             if newValue == nil {
                 deleted = false
                 offset = 0
-//                withAnimation(.easeInOut(duration: 0.3)){
 //                   offset = 0
-//                }
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
@@ -293,7 +290,7 @@ func dateFormatter(date: Date) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale.appLocale
 
-    dateFormatter.dateFormat = "d MMM"
+    dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
     return dateFormatter.string(from: date).uppercased()
 }
 
@@ -306,17 +303,13 @@ struct EmojiLogView: View {
     var body: some View {
         ZStack {
             if future {
-                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                     .stroke(Color(hex: colour).opacity(0.73), lineWidth: 2)
                     .foregroundStyle(.clear)
             } else {
-                RoundedRectangle(cornerRadius: huge ? 20 : GlassRadius.chip, style: .continuous)
+                RoundedRectangle(cornerRadius: huge ? 20 : SBRadius.chip, style: .continuous)
                     .fill(blend(over: Color(hex: colour), withAlpha: 0.73))
-//                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-//                    .fill(Color.white)
 //
-//                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-//                    .fill(Color(hex: colour).opacity(0.73))
             }
 
             Text(emoji)
@@ -324,7 +317,6 @@ struct EmojiLogView: View {
                 // future ? .caption :
                 
                 .padding(8)
-//                .font(.system(size: huge ? 45 : future ? 16: 20))
         }
         .opacity(future ? 0.6 : 1)
     }
@@ -359,17 +351,15 @@ struct DeleteTransactionAlert: View {
     var body: some View {
         if let unwrappedToDelete = transactionManager.toDelete {
             VStack(alignment: .leading, spacing: 1.5) {
-                Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String(localized: "Delete '\(unwrappedToDelete.wrappedNote)'?"))
-                    .font(.system(.title2, design: .rounded).weight(.medium))
+                Text(stopRecurring ? String.appLocalized("Stop Recurring?") : String.appFormatted("Delete '%@'?", unwrappedToDelete.wrappedNote))
+                    .font(.title2.weight(.medium))
                     
-//                    .font(.system(size: 25, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.PrimaryText)
-                    .accessibilityLabel(String(localized: "Delete \(unwrappedToDelete.wrappedNote) transaction confirmation. You can undo right after deleting."))
+                    .accessibilityLabel(String.appFormatted("Delete %@ transaction confirmation. You can undo right after deleting.", unwrappedToDelete.wrappedNote))
 
                 Text(String.appLocalized(stopRecurring ? "The transaction will no longer be automatically logged." : "You can undo right after deleting."))
-                    .font(.system(.title3, design: .rounded).weight(.medium))
+                    .font(.title3.weight(.medium))
                     
-//                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)
                     .accessibilityHidden(true)
@@ -399,29 +389,16 @@ struct DeleteTransactionAlert: View {
                 }
             }
             .padding(13)
-            //            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
-//            .offset(y: offset)
-//            .gesture(
+            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
 //                DragGesture()
-//                    .onChanged { gesture in
-//                        if gesture.translation.height < 0 {
 //                            offset = gesture.translation.height / 3
 //                        } else {
 //                            offset = gesture.translation.height
-//                        }
-//                    }
-//                    .onEnded { value in
-//                        if value.translation.height > 20 {
 //                            dismiss()
 //                        } else {
-//                            withAnimation {
 //                                offset = 0
-//                            }
 //
-//                        }
-//                    }
 //            )
             .padding(.horizontal, 17)
             .padding(.bottom, bottomEdge == 0 ? 13 : bottomEdge)

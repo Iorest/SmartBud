@@ -17,15 +17,13 @@ struct CategoryStepperView: View {
         HStack(spacing: 8) {
             if income {
                 Image(systemName: "plus")
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
                     
-//                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.IncomeGreen)
                     .padding(7)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(1.0, contentMode: .fit)
-//                    .frame(width: 36, height: 36)
-                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                    .background(Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if expenseCategories.isEmpty {
@@ -37,15 +35,13 @@ struct CategoryStepperView: View {
                     }
             } else {
                 Image(systemName: "minus")
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
                     
-//                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.AlertRed)
                     .padding(7)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .aspectRatio(1.0, contentMode: .fit)
-//                    .frame(width: 36, height: 36)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if incomeCategories.isEmpty {
@@ -63,24 +59,21 @@ struct CategoryStepperView: View {
                         ForEach(categories, id: \.self) { item in
                             HStack(spacing: 5) {
                                 Text(item.wrappedEmoji)
-                                    .font(.system(.footnote, design: .rounded).weight(.medium))
+                                    .font(.footnote.weight(.medium))
                                     
-//                                    .font(.system(size: 13))
                                 Text(item.wrappedName)
-//                                    .font(.system(size: 17.5, weight: .medium, design: .rounded))
-                                    .font(.system(.body, design: .rounded).weight(.medium))
+                                    .font(.body.weight(.medium))
                                     
                             }
                             .id(item.id)
                             .padding(.horizontal, 11)
                             .padding(.vertical, 7)
                             .fixedSize(horizontal: false, vertical: true)
-//                            .frame(height: 36)
                             .foregroundStyle(categoryFilter == item ? Color(hex: item.wrappedColour) : Color.PrimaryText)
-                            .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                            .background(getBackground(category: item), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                             .overlay {
                                 if categoryFilter != item {
-                                    RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                                    RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                         .strokeBorder(Color.Outline,
                                                       style: StrokeStyle(lineWidth: 1.5))
                                 }
@@ -91,8 +84,6 @@ struct CategoryStepperView: View {
                                     value.scrollTo(item.id, anchor: .leading)
                                 }
                             }
-//                            .accessibilityElement(children: .ignore)
-//                            .accessibilityLabel("filter \(item.wrappedName) transactions button")
                         }
                     }
                 }
@@ -138,8 +129,7 @@ struct IncomeFilterToggleView: View {
     var body: some View {
         HStack(spacing: 0) {
             Text(String.appLocalized("Expense"))
-//                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 
                 .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
@@ -161,8 +151,7 @@ struct IncomeFilterToggleView: View {
                 }
 
             Text(String.appLocalized("filter-picker-income"))
-//                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 
                 .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
                 .padding(5.5)
@@ -206,7 +195,7 @@ struct DateStepperView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
 
-        dateFormatter.dateFormat = "d MMM yyyy"
+        dateFormatter.setLocalizedDateFormatFromTemplate("yMMMd")
 
         return dateFormatter.string(from: date)
     }
@@ -223,10 +212,9 @@ struct DateStepperView: View {
             Spacer()
 
             Text(dateString)
-                .font(.system(.title3, design: .rounded).weight(.bold))
+                .font(.headline)
                 
-//                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .accessibilityLabel(String(localized: "showing transactions on \(dateString)"))
+                .accessibilityLabel(String.appFormatted("showing transactions on %@", dateString))
 
             Spacer()
 
@@ -272,7 +260,7 @@ struct WeekStepperView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
 
-        dateFormatter.dateFormat = "d MMM"
+        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
 
         let endComponents = DateComponents(day: 7, second: -1)
         let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
@@ -284,12 +272,12 @@ struct WeekStepperView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
 
-        dateFormatter.dateFormat = "d MMM"
+        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
 
         let endComponents = DateComponents(day: 7, second: -1)
         let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
 
-        return String(localized: "showing transactions from \(dateFormatter.string(from: showingDate)) to \(dateFormatter.string(from: endWeekDate))")
+        return String.appFormatted("showing transactions from %@ to %@", dateFormatter.string(from: showingDate), dateFormatter.string(from: endWeekDate))
     }
 
     var body: some View {
@@ -304,7 +292,7 @@ struct WeekStepperView: View {
             Spacer()
 
             Text(dateString)
-                .font(.system(.title3, design: .rounded).weight(.bold))
+                .font(.headline)
                 .accessibilityLabel(accessibilityDateString)
 
             Spacer()
@@ -387,8 +375,8 @@ struct MonthStepperView: View {
             Spacer()
 
             Text(dateString)
-                .font(.system(.title3, design: .rounded).weight(.bold))
-                .accessibilityLabel(String(localized: "showing transactions in \(dateString)"))
+                .font(.headline)
+                .accessibilityLabel(String.appFormatted("showing transactions in %@", dateString))
 
             Spacer()
 
@@ -468,7 +456,7 @@ func dateConverterAccessibilityLabel(date: Date) -> String {
 
         dateFormatter.dateFormat = "EEE, d MMM yyyy"
 
-        return String(localized: "on \(dateFormatter.string(from: date))")
+        return String.appFormatted("on %@", dateFormatter.string(from: date))
     }
 }
 
