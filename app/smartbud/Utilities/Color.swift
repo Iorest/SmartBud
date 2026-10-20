@@ -14,6 +14,12 @@ extension Color {
     static var colorArray: [String] { Theme.Palette.swatches }
 
     init(hex: String) {
+        // Income categories persist the asset name rather than a hex value;
+        // without this every income swatch parsed as black.
+        if hex == "IncomeGreen" {
+            self = Color.IncomeGreen
+            return
+        }
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt64()
         Scanner(string: hex).scanHexInt64(&int)

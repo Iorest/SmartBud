@@ -77,13 +77,11 @@ enum Money {
         plus: Bool? = nil,
         locale: Locale
     ) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currencyCode
-        formatter.maximumFractionDigits = showsCents ? 2 : 0
-
-        let magnitude = formatter.string(from: NSDecimalNumber(decimal: abs(value))) ?? "0"
+        let magnitude = abs(value).formatted(
+            .currency(code: currencyCode)
+                .locale(locale)
+                .precision(.fractionLength(showsCents ? 2 : 0))
+        )
         guard let plus else { return magnitude }
         return (plus ? "+" : "-") + magnitude
     }
