@@ -9,187 +9,44 @@ import Foundation
 import SwiftUI
 
 struct SettingsWeekStartView: View {
-  @AppStorage("firstWeekday", store: .appGroup)
-  var firstWeekday: Int = 1
-  @AppStorage("firstDayOfMonth", store: .appGroup)
-  var firstDayOfMonth: Int = 1
+    @AppStorage("firstWeekday", store: .appGroup)
+    var firstWeekday: Int = 1
+    @AppStorage("firstDayOfMonth", store: .appGroup)
+    var firstDayOfMonth: Int = 1
 
-  @Environment(\.dismiss) var dismiss
-
-  let options = [String.appLocalized("Sunday"), String.appLocalized("Monday")]
-
-  @Environment(\.dynamicTypeSize) var dynamicTypeSize
-
-  var fontSize: CGFloat {
-    switch dynamicTypeSize {
-    case .xSmall:
-      return 14
-    case .small:
-      return 15
-    case .medium:
-      return 16
-    case .large:
-      return 17
-    case .xLarge:
-      return 19
-    case .xxLarge:
-      return 21
-    case .xxxLarge:
-      return 23
-    default:
-      return 23
+    private var weekdaySymbols: [String] {
+        var calendar = Calendar.current
+        calendar.locale = Locale.appLocale
+        return calendar.weekdaySymbols
     }
-  }
 
-  var scrollViewHeight: CGFloat {
-    return (("Start".heightOfRoundedString(size: fontSize, weight: .regular) + 18) * 6) - 1
-  }
+    var body: some View {
+        Form {
+            Section(String.appLocalized("Start of Week")) {
+                Picker(String.appLocalized("Start of Week"), selection: $firstWeekday) {
+                    ForEach(1...7, id: \.self) { index in
+                        Text(weekdaySymbols[index - 1]).tag(index)
+                    }
+                }
+            }
 
-  @Namespace var animation
-
-  var body: some View {
-    VStack(spacing: 10) {
-      Text(String.appLocalized("Time Frames"))
-        .font(.system(.title3, design: .rounded).weight(.semibold))
-        .foregroundStyle(Color.PrimaryText)
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .leading) {
-          Button {
-            dismiss()
-          } label: {
-            SettingsBackButton()
-          }
+            Section(String.appLocalized("Start of Month")) {
+                Picker(String.appLocalized("Start of Month"), selection: $firstDayOfMonth) {
+                    ForEach(1...28, id: \.self) { day in
+                        Text(day == 1
+                             ? String.appLocalized("Start of month")
+                             : String.appFormatted("%@ of month", "\(day)"))
+                            .tag(day)
+                    }
+                }
+            }
         }
-        .padding(.bottom, 20)
-
-      Text(String.appLocalized("Start of Week"))
-        .font(.system(.body, design: .rounded).weight(.medium))
-        .foregroundStyle(Color.SubtitleText)
-        .padding(.horizontal, 15)
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-      VStack(spacing: 0) {
-        ForEach(options.indices, id: \.self) { option in
-          Button {
-            withAnimation(.easeIn(duration: 0.15)) {
-              firstWeekday = (option + 1)
-            }
-            Task { @MainActor in
-              try? await Task.sleep(for: .milliseconds(400))
-              dismiss()
-            }
-          } label: {
-            HStack {
-              Text(options[option])
-                .font(.system(.body, design: .rounded))
-                .foregroundStyle(Color.PrimaryText)
-
-              Spacer()
-
-              if firstWeekday == (option + 1) {
-                Image(systemName: "checkmark")
-                  .font(.system(.subheadline, design: .rounded).weight(.medium))
-                  .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                  .matchedGeometryEffect(id: "tick", in: animation)
-                  .accessibilityHidden(true)
-              }
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .padding(.vertical, 9)
-          }
-          .buttonStyle(.plain)
-          .accessibilityAddTraits(firstWeekday == (option + 1) ? [.isButton, .isSelected] : .isButton)
-          .overlay(alignment: .bottom) {
-            if option < (options.count - 1) {
-              Divider()
-            }
-          }
-        }
-      }
-      .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
-      .padding(.bottom, 30)
-
-      Text(String.appLocalized("Start of Month"))
-        .font(.system(.body, design: .rounded).weight(.medium))
-        .foregroundStyle(Color.SubtitleText)
-        .padding(.horizontal, 15)
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-      ScrollView(showsIndicators: false) {
-        ScrollViewReader { value in
-          VStack(alignment: .leading, spacing: 0) {
-            ForEach(1..<29) { day in
-              Button {
-                withAnimation(.easeIn(duration: 0.15)) {
-                  firstDayOfMonth = day
-                }
-                Task { @MainActor in
-                  try? await Task.sleep(for: .milliseconds(400))
-                  dismiss()
-                }
-              } label: {
-                HStack {
-                  Text(
-                    String(localized: "\(getOrdinal(day)) of month")
-                  )
-                    .font(.system(.body, design: .rounded))
-                    .foregroundStyle(Color.PrimaryText)
-
-                  Spacer()
-
-                  if firstDayOfMonth == day {
-                    Image(systemName: "checkmark")
-                      .font(.system(.subheadline, design: .rounded).weight(.medium))
-                      .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                      .matchedGeometryEffect(id: "tick2", in: animation)
-                      .accessibilityHidden(true)
-                  }
-                }
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .padding(.vertical, 9)
-                .id(day)
-                .overlay(alignment: .bottom) {
-                  if day < 28 {
-                    Divider()
-                      .offset(y: 1)
-                  }
-                }
-              }
-              .buttonStyle(.plain)
-              .accessibilityAddTraits(firstDayOfMonth == day ? [.isButton, .isSelected] : .isButton)
-            }
-          }
-          .onAppear {
-            value.scrollTo(firstDayOfMonth)
-          }
-        }
-      }
-      .padding(.horizontal, 15)
-      .frame(height: scrollViewHeight)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
-
-      Text(String.appLocalized("Close and reload app for change to take effect."))
-        .font(.system(.caption, design: .rounded).weight(.medium))
-        .foregroundStyle(Color.SubtitleText)
-        .padding(.horizontal, 15)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 30)
+        #if os(macOS)
+        .formStyle(.grouped)
+        #endif
+        .navigationTitle(String.appLocalized("Time Frames"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
-    .modifier(SettingsSubviewModifier())
-  }
-
-  func getOrdinal(_ number: Int) -> String {
-    //        if number == 1 {
-    //            return String(localized: "Start")
-    //        }
-    //
-    let formatter = NumberFormatter()
-    formatter.locale = Locale.appLocale
-    formatter.numberStyle = .ordinal
-
-    return formatter.string(from: number as NSNumber)!.replacingOccurrences(of: ".", with: "")
-  }
 }

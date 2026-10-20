@@ -19,12 +19,11 @@ struct DetailedBudgetViewTopBarButton: View {
             self.action()
         }) {
             Image(systemName: imageName)
-                .font(.system(.callout, design: .rounded).weight(.semibold))
+                .font(.callout.weight(.semibold))
                 .foregroundStyle(color)
                 .padding(8)
-//                .frame(width: 30, height: 30)
                 .background(Circle().fill(.clear))
-                .tintedGlassChip(color.opacity(0.5), in: Circle())
+                .systemTintedChip(color.opacity(0.5), in: Circle())
                 .contentShape(Circle())
         }
         .accessibilityLabel(label)

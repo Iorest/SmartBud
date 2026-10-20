@@ -18,8 +18,15 @@
 //
 
 import StoreKit
+#if os(macOS)
+import AppKit
+#endif
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 @MainActor
 @Observable
@@ -338,6 +345,10 @@ final class SubscriptionManager {
     /// App Store's web subscription page if the sheet can't be presented
     /// (e.g. no active foreground scene).
     func showManageSubscriptions() async {
+        #if os(macOS)
+        // StoreKit 2 has no `showManageSubscriptions` scene overload on macOS.
+        NSWorkspace.shared.open(Self.manageSubscriptionsURL)
+        #else
         let scene = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first
@@ -350,6 +361,7 @@ final class SubscriptionManager {
         } catch {
             await UIApplication.shared.open(Self.manageSubscriptionsURL)
         }
+        #endif
     }
 
     func clearError() { lastError = nil }

@@ -18,7 +18,6 @@ struct AppIconBundle: Hashable {
 struct SettingsAppIconView: View {
   @AppStorage("activeIcon", store: .appGroup)
   var activeIcon: String = "AppIcon"
-  @Environment(\.dismiss) var dismiss
 
   // Holds the icon the user just tapped. While non-nil, an in-app
   // confirmation dialog is shown. Only when the user confirms do we
@@ -63,19 +62,6 @@ struct SettingsAppIconView: View {
 
   var body: some View {
     VStack(spacing: 10) {
-      Text(String.appLocalized("App Icon"))
-        .font(.system(.title3, design: .rounded).weight(.semibold))
-        .foregroundStyle(Color.PrimaryText)
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .leading) {
-          Button {
-            dismiss()
-          } label: {
-            SettingsBackButton()
-          }
-        }
-        .padding(.bottom, 20)
-
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { index in
           Button {
@@ -90,24 +76,24 @@ struct SettingsAppIconView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 70, height: 70)
-                .clipShape(RoundedRectangle(cornerRadius: GlassRadius.card))
+                .clipShape(RoundedRectangle(cornerRadius: SBRadius.card))
                 .shadow(color: .black.opacity(0.15), radius: 5, x: 5, y: 5)
                 .accessibilityHidden(true)
 
               VStack(alignment: .leading, spacing: 3) {
                 Text(options[index].displayName)
-                  .font(.system(.body, design: .rounded))
+                  .font(.body)
                   .foregroundStyle(Color.PrimaryText)
 
                 Text(options[index].displaySubtitle)
-                  .font(.system(.caption, design: .rounded))
+                  .font(.caption)
                   .foregroundStyle(Color.SubtitleText)
               }
 
               Spacer()
 
               Image(systemName: "checkmark")
-                .font(.system(.subheadline, design: .rounded))
+                .font(.subheadline)
                 .foregroundStyle(activeIcon == options[index].actualFileName
                     ? Color.DarkIcon.opacity(0.6)
                     : Color.SettingsBackground)
@@ -131,12 +117,19 @@ struct SettingsAppIconView: View {
         }
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
       .onChange(of: activeIcon) { _, newValue in
+        #if os(iOS)
         UIApplication.shared.setAlternateIconName(newValue == "AppIcon" ? nil : newValue)
+        #endif
       }
     }
-    .modifier(SettingsSubviewModifier())
+    .padding(.horizontal, SBSpace.m)
+    .padding(.top, SBSpace.xs)
+    .navigationTitle(String.appLocalized("App Icon"))
+    #if os(iOS)
+    .navigationBarTitleDisplayMode(.inline)
+    #endif
     .confirmationDialog(
       pendingIcon?.displayName ?? String.appLocalized("Change App Icon"),
       isPresented: Binding(

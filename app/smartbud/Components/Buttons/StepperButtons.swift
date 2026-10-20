@@ -18,11 +18,11 @@ struct StepperButtonView: View {
             self.action()
         }) {
             Image(systemName: left ? "chevron.left" : "chevron.right")
-                .font(.system(.subheadline, design: .rounded))
+                .font(.subheadline)
                 .foregroundStyle(Color.SubtitleText)
                 .padding(8)
                 .background(Circle().fill(.clear))
-                .glassChip(in: Circle(), interactive: !disabled)
+                .systemChip(in: Circle(), interactive: !disabled)
                 .opacity(disabled ? 0.3 : 1)
         }
         .accessibilityLabel(left ? String.appLocalized("Previous") : String.appLocalized("Next"))

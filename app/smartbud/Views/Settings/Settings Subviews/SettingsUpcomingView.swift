@@ -21,7 +21,7 @@ struct SettingsUpcomingView: View {
   var body: some View {
     VStack(spacing: 10) {
       Text(String.appLocalized("Upcoming Logs"))
-        .font(.system(.title3, design: .rounded).weight(.semibold))
+        .font(.title3.weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
@@ -39,7 +39,7 @@ struct SettingsUpcomingView: View {
         } label: {
           HStack {
             Text(String.appLocalized("Display on Log Page"))
-              .font(.system(.body, design: .rounded))
+              .font(.body)
               .foregroundStyle(Color.PrimaryText)
 
             Spacer()
@@ -75,7 +75,7 @@ struct SettingsUpcomingView: View {
         } label: {
           HStack {
             Text(String.appLocalized("Limit to 14-Day Outlook"))
-              .font(.system(.body, design: .rounded))
+              .font(.body)
               .foregroundStyle(Color.PrimaryText)
 
             Spacer()
@@ -100,12 +100,12 @@ struct SettingsUpcomingView: View {
         .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
       }
       .padding(.horizontal, 15)
-      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
+      .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
 
       Text(
         String.appLocalized("Don't worry, even if you do hide them there, you will aways be able to find all upcoming transactions right here.")
       )
-      .font(.system(.caption, design: .rounded).weight(.medium))
+      .font(.caption.weight(.medium))
       .multilineTextAlignment(.leading)
       .foregroundStyle(Color.SubtitleText)
       .padding(.horizontal, 15)

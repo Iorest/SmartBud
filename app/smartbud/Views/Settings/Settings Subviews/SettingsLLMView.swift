@@ -2,16 +2,18 @@
 //  SettingsLLMView.swift
 //  smartbud
 //
-//  Configures the optional OpenAI-compatible LLM used for ledger analysis.
-//  Base URL and model live in the app-group defaults; the API key goes to the
-//  Keychain (never UserDefaults, never logs).
+//  Configures the optional LLM used for ledger analysis. Provider presets
+//  fill sensible defaults; base URL and model live in the app-group defaults,
+//  the API key goes to the Keychain (never UserDefaults, never logs).
 //
 
 import SwiftUI
 
 struct SettingsLLMView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
+    @State private var provider: LLMProvider = .openAI
     @State private var baseURL = ""
     @State private var model = ""
     @State private var apiKey = ""
@@ -28,7 +30,7 @@ struct SettingsLLMView: View {
     var body: some View {
         VStack(spacing: 10) {
             Text(String.appLocalized("AI 服务"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
@@ -50,8 +52,9 @@ struct SettingsLLMView: View {
         .modifier(SettingsSubviewModifier())
         .onAppear {
             let config = LLMConfig.load()
-            baseURL = config.baseURL
-            model = config.model
+            provider = config.provider
+            baseURL = config.baseURL.isEmpty ? config.provider.defaultBaseURL : config.baseURL
+            model = config.model.isEmpty ? config.provider.defaultModel : config.model
             apiKey = config.apiKey
         }
     }
@@ -59,31 +62,100 @@ struct SettingsLLMView: View {
     private var fields: some View {
         VStack(spacing: 0) {
             fieldRow {
+                providerMenu
+            } label: {
+                Text(String.appLocalized("服务商"))
+            }
+            Divider().padding(.horizontal, 15)
+            fieldRow {
                 TextField("https://api.openai.com/v1", text: $baseURL)
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
                     .keyboardType(.URL)
+                    #endif
+                    .autocorrectionDisabled()
             } label: {
                 Text(String.appLocalized("服务地址"))
             }
             Divider().padding(.horizontal, 15)
             fieldRow {
                 TextField("gpt-4o-mini", text: $model)
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
+                    #endif
                     .autocorrectionDisabled()
             } label: {
                 Text(String.appLocalized("模型"))
             }
-            Divider().padding(.horizontal, 15)
-            fieldRow {
-                SecureField("sk-…", text: $apiKey)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-            } label: {
-                Text(String.appLocalized("API Key"))
+            if provider.showsAPIKeyField {
+                Divider().padding(.horizontal, 15)
+                fieldRow {
+                    SecureField("sk-…", text: $apiKey)
+                        #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        #endif
+                        .autocorrectionDisabled()
+                } label: {
+                    Text(String.appLocalized("API Key"))
+                }
             }
+            Divider().padding(.horizontal, 15)
+            Text(String.appLocalized(provider.hintKey))
+                .font(.caption)
+                .foregroundStyle(Color.SubtitleText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 10)
         }
-        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
+    }
+
+    private var providerMenu: some View {
+        Menu {
+            ForEach(LLMProvider.allCases) { option in
+                Button {
+                    apply(option)
+                } label: {
+                    if option == provider {
+                        Label(String.appLocalized(option.titleKey), systemImage: "checkmark")
+                    } else {
+                        Text(String.appLocalized(option.titleKey))
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(String.appLocalized(provider.titleKey))
+                    .font(.body)
+                    .foregroundStyle(Color.PrimaryText)
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption)
+                    .foregroundStyle(Color.SubtitleText)
+            }
+            .contentShape(Rectangle())
+        }
+        .accessibilityLabel(Text(String.appLocalized("服务商")))
+    }
+
+    /// Swaps in the new provider's defaults only when the field still holds
+    /// the previous provider's default (or nothing), so hand-edited values
+    /// are never overwritten.
+    private func apply(_ option: LLMProvider) {
+        guard option != provider else { return }
+        let previous = provider
+        provider = option
+        let currentBase = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let currentModel = model.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !option.defaultBaseURL.isEmpty,
+           currentBase.isEmpty || currentBase == previous.defaultBaseURL {
+            baseURL = option.defaultBaseURL
+        }
+        if !option.defaultModel.isEmpty,
+           currentModel.isEmpty || currentModel == previous.defaultModel {
+            model = option.defaultModel
+        }
+        status = .idle
     }
 
     private func fieldRow<Content: View, Label: View>(
@@ -92,10 +164,10 @@ struct SettingsLLMView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             label()
-                .font(.system(.caption, design: .rounded))
+                .font(.caption)
                 .foregroundStyle(Color.SubtitleText)
             content()
-                .font(.system(.body, design: .rounded))
+                .font(.body)
                 .foregroundStyle(Color.PrimaryText)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -103,30 +175,51 @@ struct SettingsLLMView: View {
         .padding(.vertical, 10)
     }
 
-    private var actions: some View {
-        HStack(spacing: 10) {
-            Button {
-                LLMConfig(baseURL: baseURL, model: model, apiKey: apiKey).save()
-                status = .saved
-            } label: {
-                Text(String.appLocalized("保存"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
-            }
-            .buttonStyle(.borderedProminent)
+    private var currentConfig: LLMConfig {
+        LLMConfig(provider: provider, baseURL: baseURL, model: model, apiKey: apiKey)
+    }
 
-            Button {
-                Task { await test() }
-            } label: {
-                Text(String.appLocalized("测试连接"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 11)
+    @ViewBuilder
+    private var actions: some View {
+        // Side by side the wrapped "测试连接" label makes the two pills
+        // different heights at accessibility sizes, so stack them there.
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 10) {
+                saveButton
+                testButton
             }
-            .buttonStyle(.bordered)
-            .disabled(status == .testing)
+        } else {
+            HStack(spacing: 10) {
+                saveButton
+                testButton
+            }
         }
+    }
+
+    private var saveButton: some View {
+        Button {
+            currentConfig.save()
+            status = .saved
+        } label: {
+            Text(String.appLocalized("保存"))
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+        }
+        .buttonStyle(.borderedProminent)
+    }
+
+    private var testButton: some View {
+        Button {
+            Task { await test() }
+        } label: {
+            Text(String.appLocalized("测试连接"))
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+        }
+        .buttonStyle(.bordered)
+        .disabled(status == .testing || !currentConfig.isConfigured)
     }
 
     @ViewBuilder
@@ -141,7 +234,7 @@ struct SettingsLLMView: View {
                 ProgressView()
                 Text(String.appLocalized("正在连接…")).foregroundStyle(Color.SubtitleText)
             }
-            .font(.system(.footnote, design: .rounded))
+            .font(.footnote)
         case .success(let message):
             label(message, color: Color.IncomeGreen)
         case .failure(let message):
@@ -151,19 +244,19 @@ struct SettingsLLMView: View {
 
     private func label(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(.footnote, design: .rounded))
+            .font(.footnote)
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var privacyNote: some View {
         Text(String.appLocalized("AI 分析只会发送汇总数据（总收支、分类占比），不会上传逐笔交易明细。密钥仅保存在本机钥匙串。"))
-            .font(.system(.caption, design: .rounded))
+            .font(.caption)
             .foregroundStyle(Color.SubtitleText)
     }
 
     private func test() async {
-        let config = LLMConfig(baseURL: baseURL, model: model, apiKey: apiKey)
+        let config = currentConfig
         guard config.isConfigured else {
             status = .failure(String.appLocalized("请先填写服务地址、模型和 API Key。"))
             return

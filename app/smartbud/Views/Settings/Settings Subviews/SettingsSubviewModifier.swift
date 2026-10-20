@@ -11,14 +11,13 @@ import SwiftUI
 struct SettingsSubviewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .navigationBarBackButtonHidden(true)
-            .toolbar(.hidden, for: .navigationBar)
+            .hiddenNavigationBackButton()
+            .hiddenNavigationBar()
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            // Settings is wrapped in `NavigationView`, which does not pass
-            // through the parent's `AppGlassBackground`. Each subview gets its
-            // own gradient here so the `glassCard` / `glassChip` surfaces
-            // have colour to refract.
-            .background(AppGlassBackground())
+            // Pushed subviews sit on the navigation stack's opaque default
+            // background, not the tab's `AppBackground`. Without this the
+            // page is pure white and every white card disappears.
+            .background(AppBackground())
     }
 }

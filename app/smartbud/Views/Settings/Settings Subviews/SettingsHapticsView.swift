@@ -11,119 +11,41 @@ import SwiftUI
 struct SettingsHapticsView: View {
     @AppStorage("haptics", store: .appGroup)
     var hapticType: Int = 1
-    @Environment(\.dismiss) var dismiss
-    let options = [String.appLocalized("None"), String.appLocalized("Subtle"), String.appLocalized("Excessive")]
 
-    @Namespace var animation
+    @State private var hapticTrigger = 0
 
-    @State var shake: Bool = false
-    @State var alternateShake: Bool = false
-
-    @State var wordShake: Bool = false
-
-    // sensory feedback triggers
-    @State private var hapticTrigger: Int = 0
+    private let options = [
+        String.appLocalized("None"),
+        String.appLocalized("Subtle"),
+        String.appLocalized("Excessive")
+    ]
 
     var body: some View {
-        VStack(spacing: 10) {
-            Text(String.appLocalized("Haptic Feedback"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
-                .foregroundStyle(Color.PrimaryText)
-                .frame(maxWidth: .infinity)
-                .overlay(alignment: .leading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        SettingsBackButton()
+        Form {
+            Section {
+                Picker(String.appLocalized("Haptic Feedback"), selection: $hapticType) {
+                    ForEach(options.indices, id: \.self) { index in
+                        Text(options[index]).tag(index)
                     }
                 }
-                .padding(.bottom, 20)
-
-            VStack(spacing: 0) {
-                ForEach(options.indices, id: \.self) { option in
-                    Button {
-                        withAnimation(.easeIn(duration: 0.15)) {
-                            hapticType = option
-                        }
-                    } label: {
-                        HStack {
-                            Text(options[option])
-                                .font(.system(.body, design: .rounded))
-                                .foregroundStyle(Color.PrimaryText)
-
-                            Spacer()
-
-                            if hapticType == option {
-                                Image(systemName: "checkmark")
-                                    .font(.system(.subheadline, design: .rounded))
-                                    .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                                    .matchedGeometryEffect(id: "tick", in: animation)
-                                    .accessibilityHidden(true)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .contentShape(Rectangle())
-                        .offset(x: wordShake && option == 1 ? -5 : 0)
-                        .padding(.vertical, 9)
-                        .overlay(alignment: .bottom) {
-                            if option < (options.count - 1) {
-                                Divider()
-                            }
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityAddTraits(hapticType == option ? [.isButton, .isSelected] : .isButton)
-                }
+                #if os(iOS)
+                .pickerStyle(.inline)
+                .labelsHidden()
+                #endif
+            } footer: {
+                Text(String.appLocalized("Haptics fire on keypad taps, submits and deletes."))
             }
-            .padding(.horizontal, 15)
-            .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
-            .offset(x: shake ? -5 : 5)
-            .offset(x: alternateShake ? 0 : -5)
-
-            Text(String.appLocalized("The 'Excessive' mode makes the entire numpad haptic."))
-                .font(.system(.caption, design: .rounded).weight(.medium))
-                .foregroundStyle(Color.SubtitleText)
-                .padding(.horizontal, 15)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .modifier(SettingsSubviewModifier())
+        #if os(macOS)
+        .formStyle(.grouped)
+        #endif
+        .navigationTitle(String.appLocalized("Haptic Feedback"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .onChange(of: hapticType) { _, newValue in
-            if newValue == 2 {
-                hapticTrigger &+= 1
-
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    alternateShake = true
-                }
-                withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
-                    shake = true
-                }
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(500))
-                    withAnimation(.easeInOut(duration: 0.1)) {
-                        shake = false
-                        alternateShake = false
-                    }
-                }
-            } else if newValue == 1 {
-                hapticTrigger &+= 1
-
-                withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
-                    wordShake = true
-                }
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(500))
-                    withAnimation(.easeInOut(duration: 0.1)) {
-                        wordShake = false
-                    }
-                }
-            }
+            if newValue > 0 { hapticTrigger += 1 }
         }
-        .sensoryFeedback(trigger: hapticTrigger) { oldValue, newValue in
-            // The haptic type depends on the current selection
-            // (heavy for "Excessive", light for "Subtle").
-            hapticType == 2
-                ? .impact(weight: .heavy)
-                : .impact(weight: .light)
-        }
+        .sensoryFeedback(.impact(weight: .light), trigger: hapticTrigger)
     }
 }

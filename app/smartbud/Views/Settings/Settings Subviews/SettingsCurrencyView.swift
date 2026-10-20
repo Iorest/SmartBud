@@ -9,94 +9,75 @@ import Foundation
 import SwiftUI
 
 struct SettingsCurrencyView: View {
-  @AppStorage("currency", store: .appGroup)
-  var currencyCode: String = Locale.current.currency?.identifier ?? "USD"
-  @Environment(\.dismiss) var dismiss
-  @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @AppStorage("currency", store: .appGroup)
+    var currencyCode: String = Locale.current.currency?.identifier ?? "USD"
 
-  let currencies = Currency.allCurrencies
+    @Environment(\.dismiss) var dismiss
+    @State private var search = ""
 
-  @Namespace var animation
+    private let currencies = Currency.allCurrencies
 
-  var body: some View {
-    VStack(spacing: 10) {
-      Text(String.appLocalized("Currencies"))
-        .font(.system(.title3, design: .rounded).weight(.semibold))
-        .foregroundStyle(Color.PrimaryText)
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .leading) {
-          Button {
-            dismiss()
-          } label: {
-            SettingsBackButton()
-          }
+    private var filtered: [Currency] {
+        let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return currencies }
+        return currencies.filter {
+            $0.code.localizedStandardContains(query) || $0.name.localizedStandardContains(query)
         }
-        .padding(.bottom, 10)
-
-      ScrollView {
-        ScrollViewReader { value in
-          VStack(spacing: 0) {
-            ForEach(currencies, id: \.self) { currency in
-              Button {
-                withAnimation(.easeIn(duration: 0.15)) {
-                  currencyCode = currency.code
-                }
-
-                NSUbiquitousKeyValueStore.default.set(currency.code, forKey: "currency")
-
-                Task { @MainActor in
-                  try? await Task.sleep(for: .milliseconds(400))
-                  dismiss()
-                }
-              } label: {
-                HStack(spacing: 10) {
-                  Text(currency.code)
-                    .font(.system(.body, design: .rounded).weight(.semibold))
-                    .foregroundStyle(Color.SubtitleText)
-                    .lineLimit(1)
-                    //                                    .layoutPriority(1)
-                    .frame(width: dynamicTypeSize > .xLarge ? 55 : 45, alignment: .leading)
-                  Text(currency.name)
-                    .font(.system(.body, design: .rounded))
-                    .foregroundStyle(Color.PrimaryText)
-                    .lineLimit(1)
-
-                  Spacer()
-
-                  if currency.code == currencyCode {
-                    Image(systemName: "checkmark")
-                      .font(.system(.subheadline, design: .rounded))
-                      .foregroundStyle(Color.DarkIcon.opacity(0.6))
-                      .matchedGeometryEffect(id: "tick", in: animation)
-                      .accessibilityHidden(true)
-                  }
-                }
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .padding(.vertical, 9)
-              }
-              .buttonStyle(.plain)
-              .accessibilityLabel("\(currency.name) (\(currency.code))")
-              .accessibilityAddTraits(currency.code == currencyCode ? [.isButton, .isSelected] : .isButton)
-              .overlay(alignment: .bottom) {
-                if currency != currencies.last {
-                  Divider()
-                }
-              }
-              .padding(.horizontal, 15)
-              .id(currency.code)
-            }
-          }
-          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
-          .padding(.bottom, 60)
-          .onAppear {
-            value.scrollTo(currencyCode, anchor: .center)
-          }
-        }
-      }
-      .scrollIndicators(.hidden)
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .modifier(SettingsSubviewModifier())
-  }
+
+    var body: some View {
+        List(filtered, id: \.self) { currency in
+            Button {
+                select(currency)
+            } label: {
+                HStack(spacing: SBSpace.s) {
+                    Text(currency.code)
+                        .font(.subheadline.monospaced())
+                        .foregroundStyle(Color.SubtitleText)
+                        .frame(width: 48, alignment: .leading)
+
+                    Text(currency.name)
+                        .font(.body)
+                        .foregroundStyle(Color.PrimaryText)
+                        .lineLimit(1)
+
+                    Spacer(minLength: SBSpace.xs)
+
+                    if currency.code == currencyCode {
+                        Image(systemName: "checkmark")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(currency.name) (\(currency.code))")
+            .accessibilityAddTraits(currency.code == currencyCode ? [.isButton, .isSelected] : .isButton)
+        }
+        #if os(macOS)
+        .listStyle(.inset)
+        #else
+        .listStyle(.plain)
+        #endif
+        #if os(iOS)
+        .searchable(
+            text: $search,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: Text(String.appLocalized("Search currencies"))
+        )
+        #else
+        .searchable(text: $search, prompt: Text(String.appLocalized("Search currencies")))
+        #endif
+        .navigationTitle(String.appLocalized("Currencies"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+    }
+
+    private func select(_ currency: Currency) {
+        currencyCode = currency.code
+        NSUbiquitousKeyValueStore.default.set(currency.code, forKey: "currency")
+        dismiss()
+    }
 }

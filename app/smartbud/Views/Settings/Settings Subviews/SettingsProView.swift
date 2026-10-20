@@ -15,11 +15,14 @@
 
 import StoreKit
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct SettingsProView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     @State private var subscription = SubscriptionManager.shared
     @State private var settingsVM = SettingsViewModel.shared
@@ -106,7 +109,7 @@ struct SettingsProView: View {
         }
         .overlay(alignment: .center) {
             Text(String.appLocalized(SettingsKey.proTitle))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
         }
         .padding(.bottom, 20)
@@ -129,7 +132,7 @@ struct SettingsProView: View {
             .padding(.top, 8)
 
             Text(settingsVM.proCardSubtitle)
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.title2.weight(.bold))
                 .foregroundStyle(Color.PrimaryText)
                 .multilineTextAlignment(.center)
         }
@@ -184,10 +187,10 @@ struct SettingsProView: View {
                 .font(.system(size: 56))
                 .foregroundStyle(Color.IncomeGreen)
             Text(String.appLocalized("Pro Active"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
             Text(String.appLocalized("Thank you for supporting SmartBud development."))
-                .font(.system(.subheadline, design: .rounded))
+                .font(.subheadline)
                 .foregroundStyle(Color.SubtitleText)
                 .multilineTextAlignment(.center)
         }
@@ -205,14 +208,14 @@ struct SettingsProView: View {
     private var limitedTimeFreeBanner: some View {
         HStack(alignment: .center, spacing: 10) {
             Image(systemName: "gift.fill")
-                .font(.system(.body, design: .rounded))
+                .font(.body)
                 .foregroundStyle(Color.IncomeGreen)
             VStack(alignment: .leading, spacing: 2) {
                 Text(String.appLocalized(SettingsKey.proLimitedFreeTitle))
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
                 Text(String.appLocalized(SettingsKey.proLimitedFreeSubtitle))
-                    .font(.system(.caption, design: .rounded))
+                    .font(.caption)
                     .foregroundStyle(Color.SubtitleText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -221,7 +224,7 @@ struct SettingsProView: View {
         .padding(14)
         .background(
             Color.SettingsBackground,
-            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+            in: RoundedRectangle(cornerRadius: SBRadius.card)
         )
     }
 
@@ -230,19 +233,19 @@ struct SettingsProView: View {
             ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
                 HStack(spacing: 14) {
                     Image(systemName: feature.icon)
-                        .font(.system(.body, design: .rounded))
+                        .font(.body)
                         .foregroundStyle(.white)
                         .frame(width: 36, height: 36)
                         .background(
                             Color(feature.color),
-                            in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                            in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                         )
                     VStack(alignment: .leading, spacing: 2) {
                         Text(LocalizedStringKey(feature.titleKey))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             .foregroundStyle(Color.PrimaryText)
                         Text(LocalizedStringKey(feature.subtitleKey))
-                            .font(.system(.footnote, design: .rounded))
+                            .font(.footnote)
                             .foregroundStyle(Color.SubtitleText)
                     }
                     Spacer()
@@ -256,7 +259,7 @@ struct SettingsProView: View {
         }
         .background(
             Color.SettingsBackground,
-            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+            in: RoundedRectangle(cornerRadius: SBRadius.card)
         )
     }
 
@@ -265,10 +268,10 @@ struct SettingsProView: View {
         if subscription.loadedProducts.isEmpty {
             VStack(spacing: 8) {
                 Text(String.appLocalized("Coming Soon"))
-                    .font(.system(.body, design: .rounded).weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
                 Text(String.appLocalized("Subscription products will be available in a future update."))
-                    .font(.system(.footnote, design: .rounded))
+                    .font(.footnote)
                     .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
             }
@@ -276,7 +279,7 @@ struct SettingsProView: View {
             .frame(maxWidth: .infinity)
             .background(
                 Color.SettingsBackground,
-                in: RoundedRectangle(cornerRadius: GlassRadius.card)
+                in: RoundedRectangle(cornerRadius: SBRadius.card)
             )
         } else {
             VStack(spacing: 20) {
@@ -342,7 +345,7 @@ struct SettingsProView: View {
                             }
                         }
                     Text(String.appLocalized(SettingsKey.proLifetimeOneTime))
-                        .font(.system(.caption2, design: .rounded))
+                        .font(.caption2)
                         .foregroundStyle(Color.SubtitleText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -355,7 +358,7 @@ struct SettingsProView: View {
     /// consistent if the grouping expands in the future.
     private func sectionHeader(_ key: String) -> some View {
         Text(String.appLocalized(key).uppercased())
-            .font(.system(.caption2, design: .rounded).weight(.semibold))
+            .font(.caption2.weight(.semibold))
             .foregroundStyle(Color.SubtitleText)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 4)
@@ -377,7 +380,7 @@ struct SettingsProView: View {
                     ? SettingsKey.proLifetimeLegalBody
                     : SettingsKey.proLegalBody
             ))
-            .font(.system(.caption, design: .rounded))
+            .font(.caption)
             .foregroundStyle(Color.SubtitleText)
             .fixedSize(horizontal: false, vertical: true)
 
@@ -387,7 +390,7 @@ struct SettingsProView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             Color.SettingsBackground.opacity(0.6),
-            in: RoundedRectangle(cornerRadius: GlassRadius.card)
+            in: RoundedRectangle(cornerRadius: SBRadius.card)
         )
     }
 
@@ -412,7 +415,7 @@ struct SettingsProView: View {
             )
             Text(".")
         }
-        .font(.system(.caption, design: .rounded))
+        .font(.caption)
         .foregroundStyle(Color.SubtitleText)
     }
 
@@ -438,7 +441,7 @@ struct SettingsProView: View {
             Task { await subscription.restorePurchases() }
         } label: {
             Text(String.appLocalized("Restore Purchases"))
-                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(Color.SubtitleText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)

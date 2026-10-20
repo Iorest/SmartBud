@@ -13,6 +13,7 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
 struct SettingsEraseView: View {
@@ -23,7 +24,7 @@ struct SettingsEraseView: View {
   var body: some View {
     VStack(spacing: 10) {
       Text(String.appLocalized("Erase Data"))
-        .font(.system(.title3, design: .rounded).weight(.semibold))
+        .font(.title3.weight(.semibold))
         .foregroundStyle(Color.PrimaryText)
         .frame(maxWidth: .infinity)
         .overlay(alignment: .leading) {
@@ -38,19 +39,28 @@ struct SettingsEraseView: View {
       Button {
         showAlert = true
       } label: {
-            Text(String.appLocalized("Permanently Delete Everythin'"))
-              .font(.system(.body, design: .rounded))
-          .foregroundStyle(Color.PrimaryText)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.vertical, 12)
-          .padding(.horizontal, 15)
-          .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: GlassRadius.chip))
+        HStack(spacing: SBSpace.xs) {
+          Image(systemName: "trash.fill")
+          Text(String.appLocalized("Permanently Delete Everything"))
+          Spacer(minLength: 0)
+          Image(systemName: "chevron.right")
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(Color.SubtitleText)
+        }
+        .font(.body.weight(.medium))
+        .foregroundStyle(Color.AlertRed)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 15)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.chip))
       }
+      .buttonStyle(.plain)
+      .accessibilityHint(Text(String.appLocalized("This action genuinely cannot be undone.")))
 
       Text(
         String.appLocalized("This action would delete all existing transactions, categories, and budgets, and cannot be undone.")
       )
-      .font(.system(.caption, design: .rounded).weight(.medium))
+      .font(.caption.weight(.medium))
       .multilineTextAlignment(.leading)
       .foregroundStyle(Color.SubtitleText)
       .padding(.horizontal, 15)
@@ -60,7 +70,7 @@ struct SettingsEraseView: View {
       Text(
         String.appLocalized("Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers.")
       )
-      .font(.system(.caption, design: .rounded).weight(.regular))
+      .font(.caption.weight(.regular))
       .multilineTextAlignment(.leading)
       .foregroundStyle(Color.SubtitleText.opacity(0.85))
       .padding(.horizontal, 15)
@@ -68,14 +78,13 @@ struct SettingsEraseView: View {
       .padding(.top, 4)
     }
     .modifier(SettingsSubviewModifier())
-    .fullScreenCover(isPresented: $showAlert) {
+    .fullScreenPresentation(isPresented: $showAlert) {
       DeleteAllAlert()
     }
   }
 }
 
 struct DeleteAllAlert: View {
-  @Environment(\.modelContext) var modelContext
   @Environment(\.dismiss) var dismiss
   @Environment(\.colorScheme) var systemColorScheme
   @State var settingsVM = SettingsViewModel.shared
@@ -85,22 +94,21 @@ struct DeleteAllAlert: View {
 
   @State private var offset: CGFloat = 0
 
-  @GestureState var isDetectingLongPress = false
-  @State var completedLongPress = false
+  @State private var showEraseConfirmation = false
   @State private var heavyHaptic = 0
   @State private var isWiping = false
   @State private var wipeResult: DataRepository.WipeOutcome?
 
-  var longPress: some Gesture {
-    LongPressGesture(minimumDuration: 2)
-      .updating($isDetectingLongPress) {
-        currentState, gestureState,
-        _ in
-        gestureState = currentState
-      }
-      .onEnded { finished in
-        self.completedLongPress = finished
-      }
+  private func performWipe() {
+    guard !isWiping else { return }
+    heavyHaptic &+= 1
+    isWiping = true
+    Task { @MainActor in
+      let outcome = await settingsVM.wipeAllData()
+      wipeResult = outcome
+      isWiping = false
+      dismiss()
+    }
   }
 
   var body: some View {
@@ -115,73 +123,45 @@ struct DeleteAllAlert: View {
       VStack(alignment: .leading, spacing: 1.5) {
         HStack(spacing: 7) {
           Image(systemName: "exclamationmark.triangle.fill")
-            .font(.system(.callout, design: .rounded).weight(.medium))
+            .font(.callout.weight(.medium))
 
           Text(String.appLocalized("Danger Zone"))
-            .font(.system(.title2, design: .rounded).weight(.medium))
+            .font(.title2.weight(.medium))
         }
         .foregroundStyle(Color.PrimaryText)
 
-        Text(String.appLocalized("This action genuinely cannot be undone. Long press to confirm."))
-          .font(.system(.title3, design: .rounded).weight(.medium))
+        Text(String.appLocalized("This action genuinely cannot be undone."))
+          .font(.subheadline)
           .foregroundStyle(Color.SubtitleText)
-          .padding(.bottom, 15)
+          .padding(.bottom, SBSpace.m)
 
-        GeometryReader { proxy in
-          ZStack(alignment: .leading) {
-            Rectangle()
-              .fill(Color.AlertRed.opacity(0.23))
-              .frame(width: proxy.size.width)
-
-            Rectangle()
-              .fill(Color.AlertRed)
-              .frame(width: proxy.size.width, height: 100)
-              .offset(x: completedLongPress ? 0 : (isDetectingLongPress ? 0 : -(proxy.size.width)))
-              .animation(.easeInOut(duration: 2), value: isDetectingLongPress)
-
+        Button(role: .destructive) {
+          showEraseConfirmation = true
+        } label: {
+          HStack(spacing: SBSpace.xs) {
             if isWiping {
-              ProgressView()
-                .progressViewStyle(.circular)
-                .tint(.white)
-                .frame(width: proxy.size.width, alignment: .center)
+              ProgressView().tint(.white)
             } else {
+              Image(systemName: "trash.fill")
               Text(String.appLocalized("Delete Literally Everything"))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: proxy.size.width, alignment: .center)
             }
           }
-          .frame(height: proxy.size.height)
-          .clipShape(RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+          .font(.body.weight(.semibold))
+          .frame(maxWidth: .infinity, minHeight: 48)
         }
-        .frame(height: 45)
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, 8)
-        .gesture(
-          LongPressGesture(minimumDuration: 2)
-            .updating(
-              $isDetectingLongPress,
-              body: { currentState, state, _ in
-                state = currentState
-              }
-            )
-            .onEnded { _ in
-              self.completedLongPress.toggle()
-            }
-        )
-        .onChange(of: completedLongPress) { _, _ in
-          if completedLongPress && !isWiping {
-            heavyHaptic &+= 1
-            isWiping = true
-            Task { @MainActor in
-              let outcome = await settingsVM.wipeAllData()
-              wipeResult = outcome
-              isWiping = false
-              dismiss()
-            }
-          }
+        .buttonStyle(.borderedProminent)
+        .tint(Color.AlertRed)
+        .disabled(isWiping)
+        .confirmationDialog(
+          String.appLocalized("This action genuinely cannot be undone."),
+          isPresented: $showEraseConfirmation,
+          titleVisibility: .visible
+        ) {
+          Button(String.appLocalized("Delete"), role: .destructive) { performWipe() }
+          Button(String.appLocalized("Cancel"), role: .cancel) {}
         }
         .sensoryFeedback(.impact(weight: .heavy), trigger: heavyHaptic)
+        .padding(.bottom, 8)
 
         Button {
           if !isWiping {
@@ -196,11 +176,11 @@ struct DeleteAllAlert: View {
       }
       .padding(13)
       .background(
-        RoundedRectangle(cornerRadius: GlassRadius.card).fill(Color.PrimaryBackground).shadow(
+        RoundedRectangle(cornerRadius: SBRadius.card).fill(Color.PrimaryBackground).shadow(
           color: systemColorScheme == .dark ? Color.clear : Color.gray.opacity(0.25), radius: 6)
       )
       .overlay(
-        RoundedRectangle(cornerRadius: GlassRadius.card).stroke(
+        RoundedRectangle(cornerRadius: SBRadius.card).stroke(
           systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3)
       )
       .offset(y: offset)

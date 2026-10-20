@@ -8,7 +8,11 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct SettingsExportView: View {
     @Environment(\.dismiss) private var dismiss
@@ -26,7 +30,7 @@ struct SettingsExportView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(String.appLocalized(SettingsKey.exportSubtitle))
-                        .font(.system(.body, design: .rounded))
+                        .font(.body)
                         .foregroundStyle(Color.SubtitleText)
                         .fixedSize(horizontal: false, vertical: true)
 
@@ -38,7 +42,7 @@ struct SettingsExportView: View {
                                 .progressViewStyle(.circular)
                                 .controlSize(.small)
                             Text(String.appLocalized(SettingsKey.exportProgress))
-                                .font(.system(.subheadline, design: .rounded))
+                                .font(.subheadline)
                                 .foregroundStyle(Color.SubtitleText)
                         }
                     }
@@ -50,7 +54,16 @@ struct SettingsExportView: View {
         .modifier(SettingsSubviewModifier())
         .sheet(isPresented: $isPresentingShareSheet) {
             if let url = exportedFileURL {
+                #if os(macOS)
+                VStack(spacing: 16) {
+                    Text(url.lastPathComponent)
+                        .font(.body.weight(.semibold))
+                    ShareLink(item: url)
+                }
+                .padding(24)
+                #else
                 ShareSheet(activityItems: [url])
+                #endif
             }
         }
         .alert(
@@ -70,7 +83,7 @@ struct SettingsExportView: View {
         }
         .overlay(alignment: .center) {
             Text(String.appLocalized(SettingsKey.exportTitle))
-                .font(.system(.title3, design: .rounded).weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
         }
         .padding(.bottom, 20)
@@ -126,6 +139,7 @@ struct SettingsExportView: View {
 
 // MARK: - ShareSheet (UIActivityViewController bridge)
 
+#if !os(macOS)
 private struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
 
@@ -135,3 +149,4 @@ private struct ShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#endif
