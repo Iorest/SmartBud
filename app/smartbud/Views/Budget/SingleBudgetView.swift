@@ -16,14 +16,6 @@ struct SingleBudgetView: View {
 
     var budgetRows: Bool
 
-    var width: CGFloat {
-        ((ScreenSize.width - 75) / 2) - 30
-    }
-
-    var rowWidth: CGFloat {
-        (ScreenSize.width - 80) / 2
-    }
-
     var budgetAmount: Double {
         return budget.amount
     }
@@ -50,11 +42,11 @@ struct SingleBudgetView: View {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(localized: "\(24 - components.hour!)h left")
+                return String.appFormatted("%lldh left", 24 - (components.hour ?? 0))
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(localized: "\(7 - (components.day ?? 0))d left")
+                return String.appFormatted("%lldd left", 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
@@ -63,17 +55,17 @@ struct SingleBudgetView: View {
                 let numberOfDaysPast = components2.day ?? 0
 
                 let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                return String(localized: "\(daysLeftNumber)d left")
+                return String.appFormatted("%lldd left", daysLeftNumber)
             }
         } else {
             if budget.type == 1 {
                 let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
 
-                return String(localized: "^[\(24 - (components.hour ?? 0)) hours left](inflect: true)")
+                return String.appFormatted("^[%lld hours left](inflect: true)", 24 - (components.hour ?? 0))
             } else if budget.type == 2 {
                 let components = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
 
-                return String(localized: "^[\(7 - (components.day ?? 0)) days left](inflect: true)")
+                return String.appFormatted("^[%lld days left](inflect: true)", 7 - (components.day ?? 0))
             } else {
                 let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
                 let numberOfDays = components1.day ?? 0
@@ -82,7 +74,7 @@ struct SingleBudgetView: View {
                 let numberOfDaysPast = components2.day ?? 0
 
                 let daysLeftNumber = Int(numberOfDays - numberOfDaysPast)
-                return String(localized: "\(daysLeftNumber) days left")
+                return String.appFormatted("%lld days left", daysLeftNumber)
             }
         }
     }
@@ -116,18 +108,23 @@ struct SingleBudgetView: View {
         return Double(numberOfDays - numberOfDaysPast) / Double(numberOfDays)
     }
 
-    @Environment(\.colorScheme) var colorScheme
 
     // swipe to delete
     @State private var offset: CGFloat = 0
     @State private var deleted: Bool = false
 
+    /// Measured card width; the swipe thresholds are relative to the card, so
+    /// a two-column iPad layout and a phone row behave the same.
+    @State private var cardWidth: CGFloat = 0
+
+    private var swipeWidth: CGFloat { max(cardWidth, 120) }
+
     var deletePopup: Bool {
-        return abs(offset) > ScreenSize.width * 0.15
+        return abs(offset) > swipeWidth * 0.15
     }
 
     var deleteConfirm: Bool {
-        return abs(offset) > ScreenSize.width * 0.50
+        return abs(offset) > swipeWidth * 0.50
     }
 
     @GestureState var isDragging = false
@@ -140,11 +137,10 @@ struct SingleBudgetView: View {
             if budgetRows {
                 ZStack(alignment: .trailing) {
                     Image(systemName: "xmark")
-                        .font(.system(.footnote, design: .rounded).weight(.bold))
-//                        .font(.system(size: 13, weight: .bold))
+                        .font(.footnote.weight(.bold))
                         .foregroundStyle(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
                         .padding(5)
-                        .tintedGlassChip(deleteConfirm ? Color.AlertRed : Color.SubtitleText, in: Circle())
+                        .systemTintedChip(deleteConfirm ? Color.AlertRed : Color.SubtitleText, in: Circle())
                         .scaleEffect(deleteConfirm ? 1.1 : 1)
                         .contentShape(Circle())
                         .opacity(deleted ? 0 : 1)
@@ -155,10 +151,10 @@ struct SingleBudgetView: View {
                     HStack {
                         HStack(spacing: 10) {
                             ZStack {
-                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                                RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                     .fill(.white)
 
-                                RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+                                RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                                     .fill(Color(hex: budget.wrappedColour).opacity(0.3))
                             }
                             .frame(width: 40, height: 40)
@@ -169,14 +165,12 @@ struct SingleBudgetView: View {
 
                             VStack(alignment: .leading, spacing: -0.5) {
                                 Text(budget.wrappedName)
-                                    .font(.system(.body, design: .rounded).weight(.semibold))
-//                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                    .font(.body.weight(.semibold))
                                     .lineLimit(1)
                                     .foregroundStyle(Color.PrimaryText)
 
-                                Text(String(localized: "\(timeLeft) • \(percentString1) spent"))
-                                    .font(.system(.footnote, design: .rounded).weight(.medium))
-//                                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                                Text(String.appFormatted("%@ • %@ spent", timeLeft, percentString1))
+                                    .font(.footnote.weight(.medium))
                                     .lineLimit(1)
                                     .foregroundStyle(Color.SubtitleText)
                             }
@@ -185,16 +179,16 @@ struct SingleBudgetView: View {
                         Spacer()
 
                         VStack(alignment: .trailing, spacing: -4) {
-                            BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 1, size: 80)
+                            BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 1)
 
                             Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
-                                .font(.system(.caption2, design: .rounded).weight(.medium))
+                                .font(.caption2.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
                     }
                     .padding(10)
-                    .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-                    .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
+                    .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                    .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))
                     .contextMenu {
                         Button {
                             toEdit = budget
@@ -211,6 +205,11 @@ struct SingleBudgetView: View {
                     .offset(x: offset)
                 }
                 .padding(.horizontal, 30)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.width
+                } action: { width in
+                    cardWidth = width
+                }
                 .onChange(of: deletePopup) { _, _ in
                     if deletePopup {
                         lightHaptic &+= 1
@@ -233,18 +232,12 @@ struct SingleBudgetView: View {
                             }
                         }.onEnded { _ in
                             if deleteConfirm {
-                                deleted = true
+                                // A full swipe never deletes directly; it
+                                // reuses the same confirmation as a short one.
                                 withAnimation(.easeInOut(duration: 0.3)) {
-                                    offset -= ScreenSize.width
+                                    offset = 0
                                 }
-
-                                Task { @MainActor in
-                                    try? await Task.sleep(for: .milliseconds(400))
-                                    withAnimation {
-                                        budgetVM.delete(budget)
-                                    }
-                                }
-
+                                toDelete = budget
                             } else if deletePopup {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     offset = 0
@@ -271,19 +264,16 @@ struct SingleBudgetView: View {
                         VStack(alignment: .leading, spacing: 0.5) {
                             HStack(spacing: 4) {
                                 Text(budget.wrappedEmoji)
-                                    .font(.system(.caption, design: .rounded))
-//                                    .font(.system(size: 11.5))
+                                    .font(.caption)
 
                                 Text(budget.wrappedName)
-                                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .font(.subheadline.weight(.semibold))
                                     .lineLimit(1)
                                     .foregroundStyle(Color.PrimaryText)
                             }
 
                             Text(timeLeft)
-                                .font(.system(.footnote, design: .rounded).weight(.semibold))
-//                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .font(.footnote.weight(.semibold))
                                 .foregroundStyle(Color.SubtitleText)
                                 .multilineTextAlignment(.leading)
                         }
@@ -297,18 +287,17 @@ struct SingleBudgetView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: -2) {
                             if totalSpent < budgetAmount {
-                                Text(String(localized: "\(percentString1) SPENT"))
-                                    .font(.system(.caption2, design: .rounded).weight(.semibold))
-//                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                Text(String.appFormatted("%@ SPENT", percentString1))
+                                    .font(.caption2.weight(.semibold))
                                     .lineLimit(1)
                                     .foregroundStyle(totalSpent / budgetAmount > 1 ? Color.AlertRed : Color.IncomeGreen)
                                     .padding(.bottom, 5)
                             }
 
-                            BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2, size: width - 40)
+                            BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2)
 
                             Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
-                                .font(.system(.footnote, design: .rounded).weight(.medium))
+                                .font(.footnote.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                                 .minimumScaleFactor(0.7)
                                 .lineLimit(1)
@@ -319,19 +308,11 @@ struct SingleBudgetView: View {
                     .frame(maxWidth: .infinity)
 
                     GeometryReader { proxy in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
-                                .fill(Color.SecondaryBackground)
-                                .frame(width: proxy.size.width)
-
-                            if totalSpent / budgetAmount < 0.98 {
-                                if let category = budget.category {
-                                    AnimatedHorizontalBarGraphBudget(category: category)
-                                        .frame(width: proxy.size.width * (1 - totalSpent / budgetAmount))
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
+                        ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
+                            .tint(totalSpent >= budgetAmount
+                                  ? Color.AlertRed
+                                  : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
+                            .frame(maxWidth: .infinity)
                         .overlay(alignment: .topLeading) {
                             if budget.type != 1 && totalSpent < budgetAmount && targetPercent > 0 && targetPercent < 0.95 {
                                 RoundedTriangle(cornerRadius: 1.3)
@@ -344,9 +325,9 @@ struct SingleBudgetView: View {
                     .frame(height: 17.5)
                 }
                 .padding(15)
-                .frame(width: width + 30)
-                .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-                .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
+                .frame(maxWidth: .infinity)
+                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))
                 .contextMenu {
                     Button {
                         toEdit = budget

@@ -44,7 +44,7 @@ struct BudgetStepperView: View {
             dateFormatter.dateFormat = "d MMM yy"
             return dateFormatter.string(from: date) + " - " + dateFormatter.string(from: endDate)
         } else {
-            dateFormatter.dateFormat = "d MMM"
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
             return dateFormatter.string(from: date) + " - " + dateFormatter.string(from: endDate)
         }
     }
@@ -68,7 +68,7 @@ struct BudgetStepperView: View {
             Spacer()
 
             Text(dateString)
-                .font(.system(.title3, design: .rounded).weight(.bold))
+                .font(.title3.weight(.bold))
 
             Spacer()
 
@@ -107,33 +107,3 @@ struct BudgetStepperView: View {
 }
 
 // MARK: - Arced Text (replaces CrookedText)
-struct ArcedText: View {
-    let text: String
-    let radius: CGFloat
-
-    @Environment(\.font) private var font
-
-    var body: some View {
-        Canvas { context, size in
-            let resolvedFont = font ?? .footnote
-            let resolvedColor: Color = .primary
-            let midX = size.width / 2
-            let midY = size.height
-            let center = CGPoint(x: midX, y: midY)
-            let charCount = text.count
-            let totalAngle: CGFloat = .pi / 2.5
-            let startAngle: CGFloat = .pi + totalAngle / 2
-            let spacing: CGFloat = charCount > 1 ? totalAngle / CGFloat(charCount - 1) : 0
-
-            for (index, character) in text.enumerated() {
-                let angle = startAngle + CGFloat(index) * spacing
-                let x = center.x + radius * cos(angle)
-                let y = center.y + radius * sin(angle)
-                let charText = Text(String(character)).font(resolvedFont).foregroundStyle(resolvedColor)
-                let resolved = context.resolve(charText)
-                let charSize = resolved.measure(in: .zero)
-                context.draw(resolved, at: CGPoint(x: x - charSize.width / 2, y: y - charSize.height / 2))
-            }
-        }
-    }
-}

@@ -49,16 +49,17 @@ struct FilteredCategoryDayBudgetView: View {
                 totalSpent = holding
             }
         }
-//        .fullScreenCover(item: $toDelete, onDismiss: {
+        // The ledger can change while this view stays alive (add from the
+        // detail screen); recompute instead of showing a stale header.
+        .onChange(of: transactions.map(\.amount)) { _, _ in
+            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedAmount }
+        }
 //            toDelete = nil
 //        }) { transaction in
 //            DeleteTransactionAlert(toDelete: transaction, stopRecurring: false)
-//        }
-//        .fullScreenCover(item: $toEdit, onDismiss: {
 //            toEdit = nil
 //        }) { transaction in
 //            TransactionView(toEdit: transaction)
-//        }
         .frame(maxHeight: .infinity)
     }
 
@@ -112,17 +113,7 @@ struct FilteredBudgetView: View {
     }
 
     private func dayTotalString(_ total: Double) -> String {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.locale = Locale.appLocale
-        numberFormatter.numberStyle = .currency
-        numberFormatter.currencyCode = currency
-        numberFormatter.maximumFractionDigits = showCents ? 2 : 0
-
-        if total >= 0 {
-            return "+" + (numberFormatter.string(from: NSNumber(value: total)) ?? "$0")
-        } else {
-            return numberFormatter.string(from: NSNumber(value: total)) ?? "$0"
-        }
+        Money.format(total, currencyCode: currency, showsCents: showCents, plus: total >= 0)
     }
 
     var body: some View {
@@ -146,11 +137,11 @@ struct FilteredBudgetView: View {
                                 Text(dayTotalString(total))
                                     .layoutPriority(1)
                             }
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
                             
                             .foregroundStyle(Color.SubtitleText)
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(String(localized: "\(currencySymbol)\(totalString) was spent \(dateConverterAccessibilityLabel(date: entry.day))"))
+                            .accessibilityLabel(String.appFormatted("%@%@ was spent %@", currencySymbol, totalString, dateConverterAccessibilityLabel(date: entry.day)))
 
                             Line()
                                 .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
@@ -171,6 +162,9 @@ struct FilteredBudgetView: View {
             totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
         }
         .onChange(of: date) { _, _ in
+            totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
+        }
+        .onChange(of: transactions.map(\.amount)) { _, _ in
             totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
         }
     }

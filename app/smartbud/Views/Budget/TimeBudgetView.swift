@@ -24,12 +24,12 @@ struct TimeBudgetView: View {
             return dateFormatter.string(from: startDate)
         } else if budgetType == 2 {
             let endDate = Calendar.current.date(byAdding: .day, value: 6, to: startDate) ?? Date.now
-            dateFormatter.dateFormat = "d MMM"
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
             return dateFormatter.string(from: startDate) + " - " + dateFormatter.string(from: endDate)
         } else if budgetType == 3 {
             var endDate = Calendar.current.date(byAdding: .month, value: 1, to: startDate)!
             endDate = Calendar.current.date(byAdding: .day, value: -1, to: endDate)!
-            dateFormatter.dateFormat = "d MMM"
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
             return dateFormatter.string(from: startDate) + " - " + dateFormatter.string(from: endDate)
         } else if budgetType == 4 {
             var endDate = Calendar.current.date(byAdding: .year, value: 1, to: startDate)!
@@ -48,9 +48,9 @@ struct TimeBudgetView: View {
 
         if budgetType == 1 {
             let components = calendar.dateComponents([.hour], from: budget.wrappedDate, to: Date.now)
-            return String(localized: "\(24 - (components.hour ?? 0)) hours left")
+            return String.appFormatted("%lld hours left", 24 - (components.hour ?? 0))
         } else {
-            return String(localized: "\(daysLeftNumber) days left")
+            return String.appFormatted("%lld days left", daysLeftNumber)
         }
     }
 
@@ -89,20 +89,20 @@ struct TimeBudgetView: View {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
-                    dateFormatter.dateFormat = "d MMM"
-                    return String(localized: "left on \(dateFormatter.string(from: startDate))")
+                    dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
+                    return String.appFormatted("left on %@", dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(localized: "\((components.day ?? 0) / 7) weeks ago")
-                    return String(localized: "left \(weekString)")
+                    let weekString = String.appFormatted("%lld weeks ago", (components.day ?? 0) / 7)
+                    return String.appFormatted("left %@", weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(localized: "\(components.month!) months ago")
-                    return String(localized: "left \(monthString)")
+                    let monthString = String.appFormatted("%lld months ago", components.month ?? 0)
+                    return String.appFormatted("left %@", monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(localized: "\(components.year!) years ago")
-                    return String(localized: "left \(yearString)")
+                    let yearString = String.appFormatted("%lld years ago", components.year ?? 0)
+                    return String.appFormatted("left %@", yearString)
                 } else {
                     return ""
                 }
@@ -124,20 +124,20 @@ struct TimeBudgetView: View {
                 if budgetType == 1 {
                     let dateFormatter = DateFormatter()
                     dateFormatter.locale = Locale.appLocale
-                    dateFormatter.dateFormat = "d MMM"
-                    return String(localized: "over on \(dateFormatter.string(from: startDate))")
+                    dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
+                    return String.appFormatted("over on %@", dateFormatter.string(from: startDate))
                 } else if budgetType == 2 {
                     let components = Calendar.current.dateComponents([.day], from: startDate, to: budget.wrappedDate)
-                    let weekString = String(localized: "\((components.day ?? 0) / 7) weeks ago")
-                    return String(localized: "over \(weekString)")
+                    let weekString = String.appFormatted("%lld weeks ago", (components.day ?? 0) / 7)
+                    return String.appFormatted("over %@", weekString)
                 } else if budgetType == 3 {
                     let components = Calendar.current.dateComponents([.month], from: startDate, to: budget.wrappedDate)
-                    let monthString = String(localized: "\(components.month!) months ago")
-                    return String(localized: "over \(monthString)")
+                    let monthString = String.appFormatted("%lld months ago", components.month ?? 0)
+                    return String.appFormatted("over %@", monthString)
                 } else if budgetType == 4 {
                     let components = Calendar.current.dateComponents([.year], from: startDate, to: budget.wrappedDate)
-                    let yearString = String(localized: "\(components.year!) years ago")
-                    return String(localized: "over \(yearString)")
+                    let yearString = String.appFormatted("%lld years ago", components.year ?? 0)
+                    return String.appFormatted("over %@", yearString)
                 } else {
                     return ""
                 }
@@ -195,15 +195,15 @@ struct TimeBudgetView: View {
             VStack(spacing: 10) {
                 HStack(spacing: 7.5) {
                     Text(budget.wrappedEmoji)
-                        .font(.system(.subheadline, design: .rounded))
+                        .font(.subheadline)
                     Text(budget.wrappedName)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
+                        .font(.title3.weight(.medium))
                         .lineLimit(1)
                 }
                 .foregroundStyle(Color.PrimaryText)
 
                 Text(subtitleText)
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(4)
                     .padding(.horizontal, 7)
@@ -219,7 +219,7 @@ struct TimeBudgetView: View {
                         DetailedBudgetDifferenceDollarView(amount: difference, red: totalSpent >= budgetAmount)
 
                         Text(differenceSubtitle)
-                            .font(.system(.subheadline, design: .rounded).weight(.medium))
+                            .font(.subheadline.weight(.medium))
                             .foregroundStyle(Color.SubtitleText)
                     }
                     .frame(maxWidth: .infinity, alignment: showExtraDetails ? .leading : .center)
@@ -229,8 +229,7 @@ struct TimeBudgetView: View {
                             DetailedBudgetDollarView(amount: leftPerDay)
 
                             Text("left each day")
-                                .font(.system(.subheadline, design: .rounded).weight(.medium))
-//                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .font(.subheadline.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -243,8 +242,7 @@ struct TimeBudgetView: View {
                     DetailedBudgetDifferenceDollarView(amount: difference, red: totalSpent >= budgetAmount)
 
                     Text(differenceSubtitle)
-                        .font(.system(.subheadline, design: .rounded).weight(.medium))
-//                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(Color.SubtitleText)
                 }
                 .padding(.horizontal, 25)
@@ -252,23 +250,13 @@ struct TimeBudgetView: View {
 
             // bar graph
 
-            VStack(spacing: 5) {
-                GeometryReader { proxy in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: GlassRadius.input, style: .continuous)
-                            .fill(Color.SecondaryBackground)
-                            .frame(width: proxy.size.width)
-
-                        if totalSpent / budgetAmount < 0.98 {
-                            if let category = budget.category {
-                                AnimatedHorizontalBarGraphBudget(category: category)
-                                    .frame(width: proxy.size.width * (1 - totalSpent / budgetAmount))
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .frame(height: 28)
+            VStack(spacing: SBSpace.xs) {
+                ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
+                    .tint(totalSpent >= budgetAmount
+                          ? Color.AlertRed
+                          : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
+                    .accessibilityLabel(String.appLocalized("Spent"))
+                    .accessibilityValue("\(Int(round((totalSpent / max(budgetAmount, 1)) * 100)))%")
 
                 HStack {
                     Text("\(currencySymbol)\(totalSpent.formatted(.number.precision(.fractionLength(2))))")
@@ -276,7 +264,7 @@ struct TimeBudgetView: View {
                     Text("\(currencySymbol)\(budgetAmount.formatted(.number.precision(.fractionLength(2))))")
                 }
                 .frame(maxWidth: .infinity)
-                .font(.system(.caption, design: .rounded))
+                .font(.caption)
                 .foregroundStyle(Color.SubtitleText)
             }
             .padding(.bottom, budgetType >= 2 ? 20 : 0)

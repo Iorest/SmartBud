@@ -14,29 +14,20 @@ struct BudgetView: View {
     @Query private var budgets: [BudgetModel]
     @Query private var mainBudget: [MainBudgetModel]
 
+    @State private var showNewBudget = false
+
     var body: some View {
         if categories.isEmpty && budgets.isEmpty && mainBudget.isEmpty {
-            VStack(spacing: 5) {
-                Image("category-3")
-                    .resizable()
-                    .frame(width: 75, height: 75)
-                    .padding(.bottom, 20)
-
-                Text("Budget Your Finances")
-                    .font(.system(.title2, design: .rounded).weight(.medium))
-//                    .font(.system(size: 23.5, weight: .medium, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.PrimaryText.opacity(0.8))
-
-                Text("Link budgets to categories and set appropriate expenditure goals")
-                    .font(.system(.body, design: .rounded).weight(.medium))
-//                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.SubtitleText.opacity(0.7))
+            SBEmptyState(
+                systemImage: "chart.pie",
+                title: String.appLocalized("Budget Your Finances"),
+                message: String.appLocalized("Link budgets to categories and set appropriate expenditure goals"),
+                actionTitle: String.appLocalized("新建预算"),
+                action: { showNewBudget = true }
+            )
+            .sheet(isPresented: $showNewBudget) {
+                BrandNewBudgetView(overallBudgetCreated: false)
             }
-            .padding(.horizontal, 30)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
         } else {
             ActualBudgetView()
         }
@@ -44,17 +35,13 @@ struct BudgetView: View {
 }
 
 struct ActualBudgetView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @State private var showInfo = false
 
     @Query(sort: [SortDescriptor(\BudgetModel.dateCreated)]) private var budgets: [BudgetModel]
     @Query private var mainBudget: [MainBudgetModel]
     @Environment(BudgetViewModel.self) var budgetVM
-    @Environment(TabBarManager.self) var tabBarManager
 
     @State var newBudget = false
 
-    @State private var showMenu = false
 
     @State private var toDelete: BudgetModel?
     @State private var toEdit: BudgetModel?
@@ -66,32 +53,25 @@ struct ActualBudgetView: View {
 
     @AppStorage("budgetViewStyle", store: .appGroup) var budgetRows: Bool = false
 
-    @Namespace var animation
 
-    @State var date = Date.now
 
     var body: some View {
         NavigationStack {
             ZStack {
-                AppGlassBackground()
-                    .ignoresSafeArea(.all)
-
                 VStack(spacing: 0) {
                     HStack {
                         Text("Budgets")
-                            .font(.system(.title, design: .rounded).weight(.semibold))
-//                            .font(.system(size: 25, weight: .semibold, design: .rounded))
+                            .font(.title.weight(.semibold))
                             .accessibility(addTraits: .isHeader)
 
                         Button {
                             newBudget = true
                         } label: {
                             Image(systemName: "plus")
-                                .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                                .font(.system(size: 14, weight: .semibold))
+                                .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(Color.SubtitleText)
                                 .padding(4)
-                                .glassChip(in: Circle())
+                                .systemChip(in: Circle())
                                 .contentShape(Circle())
                         }
 
@@ -144,72 +124,25 @@ struct ActualBudgetView: View {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        VStack(spacing: 5) {
-                            Spacer()
-                            Text("🙈")
-                                .font(.system(.largeTitle, design: .rounded))
-//                                .font(.system(size: 45))
-                                .padding(.bottom, 9)
-
-                            Text("No Budgets Found")
-                                .font(.system(.title2, design: .rounded).weight(.medium))
-//                                .font(.system(size: 23.5, weight: .medium, design: .rounded))
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(Color.PrimaryText.opacity(0.8))
-
-                            Text("Add your first budget today!")
-                                .font(.system(.body, design: .rounded).weight(.medium))
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(Color.SubtitleText)
-
-                            Button {
-                                newBudget = true
-                            } label: {
-                                Text(String.appLocalized("New Budget"))
-                                    .font(.system(.body, design: .rounded).weight(.semibold))
-                                    .padding(.horizontal, 24)
-                                    .padding(.vertical, 12)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .padding(.top, 6)
-
-                            Spacer()
-                            Spacer()
-                        }
-                        .padding(20)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        SBEmptyState(
+                            systemImage: "chart.pie",
+                            title: String.appLocalized("No Budgets Found"),
+                            message: String.appLocalized("Add your first budget today!"),
+                            actionTitle: String.appLocalized("New Budget"),
+                            action: { newBudget = true }
+                        )
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 
             }
-            .navigationBarTitle("")
-            .toolbar(.hidden, for: .navigationBar)
+            .navigationTitle("")
+            .hiddenNavigationBar()
             .navigationDestination(for: MainBudgetModel.self) { budget in
                 DetailedMainBudgetView(budget: budget)
-                    .onAppear {
-                        withAnimation(.easeOut.speed(2)) {
-                            tabBarManager.navigationHideTab()
-                        }
-                    }
-                    .onDisappear {
-                        withAnimation(.easeOut.speed(2)) {
-                            tabBarManager.navigationShowTab()
-                        }
-                    }
             }
             .navigationDestination(for: BudgetModel.self) { budget in
                 DetailedBudgetView(budget: budget)
-                    .onAppear {
-                        withAnimation(.easeOut.speed(2)) {
-                            tabBarManager.navigationHideTab()
-                        }
-                    }
-                    .onDisappear {
-                        withAnimation(.easeOut.speed(2)) {
-                            tabBarManager.navigationShowTab()
-                        }
-                    }
             }
             .sheet(item: $toEdit, onDismiss: {
                 toEdit = nil
@@ -223,7 +156,7 @@ struct ActualBudgetView: View {
             .sheet(isPresented: $newBudget) {
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty)
             }
-            .fullScreenCover(item: $toDelete, onDismiss: {
+            .fullScreenPresentation(item: $toDelete, onDismiss: {
                 toDelete = nil
             }) { budget in
                 DeleteBudgetAlert(toDelete: budget)
@@ -270,63 +203,6 @@ struct MainBudgetView: View {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
     }
 
-    var percentageOfDays: Double {
-        let calendar = Calendar.current
-
-        if budget.type == 1 {
-            let components = calendar.dateComponents([.minute], from: budget.wrappedDate, to: Date.now)
-            return Double(components.minute ?? 0) / 1440
-        }
-
-        let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
-        let numberOfDays = components1.day ?? 0
-
-        let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
-        let numberOfDaysPast = components2.day ?? 0
-
-        return Double(numberOfDaysPast) / Double(numberOfDays)
-    }
-
-    var targetPercent: Double {
-        let calendar = Calendar.current
-
-        let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
-        let numberOfDays = components1.day ?? 0
-
-        let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
-        let numberOfDaysPast = (components2.day ?? 0) + 1
-
-        return Double(numberOfDays - numberOfDaysPast) / Double(numberOfDays)
-    }
-
-    var triangleOffset: (x: Double, y: Double) {
-        var x = 0.0
-        var y = -5.0
-
-        let radius = (width / 2) - 5
-
-        if targetPercent > 0.5 {
-            let angle = (CGFloat.pi) * (1 - targetPercent)
-            y += (radius - (radius * sin(angle)))
-            x += (radius * cos(angle))
-        } else if targetPercent < 0.5 {
-            let angle = (CGFloat.pi) * targetPercent
-            y += (radius - (radius * sin(angle)))
-            x -= (radius * cos(angle))
-        }
-
-        return (x, y)
-    }
-
-    var triangleRotation: Double {
-        if targetPercent > 0.5 {
-            return ((targetPercent - 0.5) / 0.5) * 90
-        } else if targetPercent < 0.5 {
-            return -((0.5 - targetPercent) / 0.5) * 90
-        } else {
-            return 0
-        }
-    }
 
     var difference: Double {
         return abs(budgetAmount - totalSpent)
@@ -340,91 +216,63 @@ struct MainBudgetView: View {
         return "\(Int(round((totalSpent / budgetAmount) * 100)))%"
     }
 
-    var width: CGFloat {
-        if soloBudget {
-            return ScreenSize.width - 90
-        } else {
-            return 250
-        }
-    }
 
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack(spacing: 5) {
-            ZStack(alignment: .bottom) {
-                ZStack {
-                    DonutSemicircle(percent: 1, cornerRadius: 6.5, width: soloBudget ? 35 : 25)
-                        .fill(Color.SecondaryBackground)
-                        .frame(width: width, height: width / 2)
+        VStack(alignment: .leading, spacing: SBSpace.s) {
+            HStack(alignment: .firstTextBaseline, spacing: SBSpace.xs) {
+                Label(String.appLocalized("Total Budget"), systemImage: "chart.pie.fill")
+                    .font(.headline)
+                    .foregroundStyle(Color.PrimaryText)
 
-                    if totalSpent / budgetAmount < 0.97 {
-                        AnimatedCurvedBarGraphMainBudget(totalSpent: totalSpent, budgetTotal: budgetAmount, cornerRadius: 6.5, width: soloBudget ? 35 : 25)
-                            .frame(width: width, height: width / 2)
-                    }
-                }
-                .overlay(alignment: .top) {
-                    if budget.type != 1 && totalSpent < budgetAmount && targetPercent > 0 {
-                        RoundedTriangle(cornerRadius: 2)
+                Spacer(minLength: SBSpace.xs)
 
-                            .fill((targetPercent * budgetAmount) < (budgetAmount - totalSpent) ? Color.SubtitleText : Color.AlertRed)
-                            .frame(width: 20, height: 10)
-                            .rotationEffect(Angle(degrees: triangleRotation), anchor: .bottom)
-                            .offset(x: triangleOffset.x, y: triangleOffset.y)
-                    }
-                }
-
-                ArcedText(text: String(localized: "OVERALL SPENT: \(percentString1)"), radius: width / 2 + 8)
-                    .font(.system(.footnote, design: .rounded).weight(.medium))
-                    .foregroundStyle(Color.SubtitleText)
-                    .frame(width: width, height: 10)
-
-                VStack(spacing: -4) {
-                    let internalWidth = soloBudget ? width - 90 : width - 60
-                    BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 3, size: internalWidth)
-                        .frame(width: internalWidth)
-
-                    Text("\(budgetAmount >= totalSpent ? String.appLocalized("left") : String.appLocalized("over")) \(budgetType)")
-                        .font(.system(.subheadline, design: .rounded).weight(.medium))
-//                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color.SubtitleText)
-                }
+                Text(percentString1)
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(totalSpent >= budgetAmount ? Color.AlertRed : Color.SubtitleText)
             }
+
+            HStack(alignment: .firstTextBaseline, spacing: SBSpace.xxs) {
+                Text(String.appLocalized(budgetAmount >= totalSpent ? "Left" : "Over"))
+                    .font(.subheadline)
+                    .foregroundStyle(Color.SubtitleText)
+
+                Text(difference, format: .currency(code: currency))
+                    .font(.largeTitle.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(totalSpent >= budgetAmount ? Color.AlertRed : Color.PrimaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+
+            ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
+                .tint(totalSpent >= budgetAmount ? Color.AlertRed : Color.accentColor)
+                .accessibilityLabel(String.appLocalized("Spent"))
+                .accessibilityValue(percentString1)
 
             HStack {
-                if totalSpent < 1000 && budgetAmount < 1000 {
-                    Text(totalSpent, format: .number.precision(.fractionLength(2)))
-                        .frame(width: 60, alignment: .leading)
-                    Spacer()
-                    Text(budgetAmount, format: .number.precision(.fractionLength(2)))
-                        .frame(width: 60, alignment: .trailing)
-                } else {
-                    Text("\(Int(round(totalSpent)))")
-                        .frame(width: 60, alignment: .leading)
-                    Spacer()
-                    Text("\(Int(round(budgetAmount)))")
-                        .frame(width: 60, alignment: .trailing)
-                }
+                Text(totalSpent, format: .currency(code: currency))
+                Spacer(minLength: SBSpace.xs)
+                Text(budgetAmount, format: .currency(code: currency))
             }
-            .font(.system(.caption2, design: .rounded).weight(.medium))
-//            .font(.system(size: 10, weight: .medium, design: .rounded))
-            .frame(width: width)
+            .font(.caption.monospacedDigit())
             .foregroundStyle(Color.SubtitleText)
+
+            Text(budgetType)
+                .font(.caption)
+                .foregroundStyle(Color.SubtitleText)
         }
-        .padding(.bottom)
-        .frame(width: width + 30, height: soloBudget ? 230 : 200, alignment: .bottom)
-        .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: GlassRadius.card))
+        .padding(SBSpace.m)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))
         .contextMenu {
             Button {
                 toEdit = budget
-
             } label: {
                 Label(String.appLocalized("Edit"), systemImage: "pencil")
             }
             Button {
                 toDelete = budget
-
             } label: {
                 Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
             }
@@ -434,7 +282,7 @@ struct MainBudgetView: View {
         }) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenCover(item: $toDelete, onDismiss: {
+        .fullScreenPresentation(item: $toDelete, onDismiss: {
             toDelete = nil
         }) { budget in
             DeleteMainBudgetAlert(toDelete: budget)

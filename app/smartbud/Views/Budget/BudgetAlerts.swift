@@ -6,6 +6,7 @@ struct DeleteBudgetAlert: View {
     @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: BudgetModel
+    var onDeleted: (() -> Void)? = nil
     @Environment(\.colorScheme) var systemColorScheme
 
     @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
@@ -27,11 +28,11 @@ struct DeleteBudgetAlert: View {
                         format: String.appLocalized("Delete the '%@' budget?"),
                         toDelete.category?.wrappedName ?? "")
                 )
-                    .font(.system(.title2, design: .rounded).weight(.medium))
+                    .font(.title2.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
 
                 Text("This action cannot be undone.")
-                    .font(.system(.title3, design: .rounded).weight(.medium))
+                    .font(.title3.weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)
 
@@ -41,6 +42,7 @@ struct DeleteBudgetAlert: View {
                     withAnimation {
                         budgetVM.delete(toDelete)
                     }
+                    onDeleted?()
 
                 } label: {
                     DeleteButton(text: String.appLocalized("Delete"), red: true)
@@ -57,8 +59,8 @@ struct DeleteBudgetAlert: View {
                 }
             }
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()
@@ -91,6 +93,7 @@ struct DeleteMainBudgetAlert: View {
     @Environment(BudgetViewModel.self) var budgetVM
     @Environment(\.dismiss) var dismiss
     let toDelete: MainBudgetModel
+    var onDeleted: (() -> Void)? = nil
     @Environment(\.colorScheme) var systemColorScheme
 
     @AppStorage("bottomEdge", store: .appGroup) var bottomEdge: Double = 15
@@ -108,11 +111,11 @@ struct DeleteMainBudgetAlert: View {
 
             VStack(alignment: .leading, spacing: 1.5) {
                 Text("Delete your overall budget?")
-                    .font(.system(.title2, design: .rounded).weight(.medium))
+                    .font(.title2.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
 
                 Text("This action cannot be undone.")
-                    .font(.system(.title3, design: .rounded).weight(.medium))
+                    .font(.title3.weight(.medium))
                     .foregroundStyle(Color.SubtitleText)
                     .padding(.bottom, 25)
 
@@ -122,6 +125,7 @@ struct DeleteMainBudgetAlert: View {
                     withAnimation {
                         budgetVM.deleteMain(toDelete)
                     }
+                    onDeleted?()
 
                 } label: {
                     DeleteButton(text: String.appLocalized("Delete"), red: true)
@@ -140,8 +144,8 @@ struct DeleteMainBudgetAlert: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(13)
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: GlassRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+            .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: SBRadius.card).stroke(systemColorScheme == .dark ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
             .offset(y: offset)
             .gesture(
                 DragGesture()

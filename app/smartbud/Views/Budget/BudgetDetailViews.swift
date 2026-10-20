@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftData
 
 struct DetailedBudgetView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     let budget: BudgetModel
 
     @State private var toDelete: BudgetModel?
@@ -20,11 +20,11 @@ struct DetailedBudgetView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
                         Text(String.appLocalized("Back"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
                     .padding(.vertical, 6)
@@ -39,7 +39,7 @@ struct DetailedBudgetView: View {
                     newTransaction = true
                 }
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String.appLocalized("Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String.appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
@@ -53,27 +53,29 @@ struct DetailedBudgetView: View {
         }
         .padding(.vertical, 15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .hiddenNavigationBackButton()
+        .hiddenNavigationBar()
         .appBackground()
         .sheet(item: $toEdit, onDismiss: {
             toEdit = nil
         }) { budget in
             BrandNewBudgetView(overallBudgetCreated: false, toEditBudget: budget)
         }
-        .fullScreenCover(isPresented: $newTransaction) {
+        .fullScreenPresentation(isPresented: $newTransaction) {
             TransactionView(category: budget.category)
         }
-        .fullScreenCover(item: $toDelete, onDismiss: {
+        .fullScreenPresentation(item: $toDelete, onDismiss: {
             toDelete = nil
         }) { budget in
-            DeleteBudgetAlert(toDelete: budget)
+            DeleteBudgetAlert(toDelete: budget) {
+                dismiss()
+            }
         }
     }
 }
 
 struct DetailedMainBudgetView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     let budget: MainBudgetModel
 
     @State private var toDelete: MainBudgetModel?
@@ -88,23 +90,22 @@ struct DetailedMainBudgetView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
 
                         Text(String.appLocalized("Back"))
-                            .font(.system(.body, design: .rounded).weight(.semibold))
+                            .font(.body.weight(.semibold))
                             .foregroundStyle(Color.SubtitleText)
                     }
                     .padding(.vertical, 6)
                     .padding(.horizontal, 8)
                     .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-//                    .frame(height: 30, alignment: .center)
                     .background(Color.SecondaryBackground, in: Capsule())
                 }
 
                 Spacer()
 
-                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Color("6"), label: String.appLocalized("Edit budget")) {
+                DetailedBudgetViewTopBarButton(imageName: "pencil", color: Theme.Brand.edit, label: String.appLocalized("Edit budget")) {
                     toEdit = budget
                 }
 
@@ -118,18 +119,20 @@ struct DetailedMainBudgetView: View {
         }
         .padding(.vertical, 15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .hiddenNavigationBackButton()
+        .hiddenNavigationBar()
         .appBackground()
-        .fullScreenCover(item: $toEdit, onDismiss: {
+        .fullScreenPresentation(item: $toEdit, onDismiss: {
             toEdit = nil
         }) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenCover(item: $toDelete, onDismiss: {
+        .fullScreenPresentation(item: $toDelete, onDismiss: {
             toDelete = nil
         }) { budget in
-            DeleteMainBudgetAlert(toDelete: budget)
+            DeleteMainBudgetAlert(toDelete: budget) {
+                dismiss()
+            }
         }
     }
 }

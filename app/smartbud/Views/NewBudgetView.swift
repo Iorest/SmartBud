@@ -8,20 +8,6 @@
 import SwiftUI
 import SwiftData
 
-struct PickerStyle: ViewModifier {
-    var colorScheme: ColorScheme
-
-    func body(content: Content) -> some View {
-        content
-            .padding(5)
-            .background(RoundedRectangle(cornerRadius: GlassRadius.chip).fill(.clear))
-            .overlay(RoundedRectangle(cornerRadius: GlassRadius.chip).stroke(colorScheme == .light ? Color.clear : Color.Outline.opacity(0.4), lineWidth: 1.3))
-            .glassCard(in: RoundedRectangle(cornerRadius: GlassRadius.chip))
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 30)
-    }
-}
-
 struct InstructionHeadings {
     let title: String
     let subtitle: String
@@ -37,10 +23,8 @@ struct BrandNewBudgetView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @Environment(\.colorScheme) var colorScheme
 
     @State var progress = 1
-    var initialProgress: Double
 
     @State var showToast: Bool = false
     @State var toastMessage: String = String.appLocalized("Missing Category")
@@ -65,8 +49,6 @@ struct BrandNewBudgetView: View {
     @State var chosenDayMonth = 1
     @State var chosenDayYear = Date.now
 
-    let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
     var timeFrameString: String {
         switch budgetTimeFrame {
         case .day:
@@ -85,9 +67,6 @@ struct BrandNewBudgetView: View {
     }
 
     // stage 5
-//    var budgetAmount: Double {
-//        return (amount as NSString).doubleValue
-//    }
 
     @AppStorage("numberEntryType", store: .appGroup) var numberEntryType: Int = 1
 
@@ -119,12 +98,6 @@ struct BrandNewBudgetView: View {
         return "~\(numberFormatter.string(from: NSNumber(value: average)) ?? "$0") \(String.appLocalized("/day"))"
     }
 
-    // height of pickers
-
-    var heightOfPicker: CGFloat {
-        return (("Sunday".heightOfRoundedString(size: UIFont.textStyleSize(.title3), weight: .medium) + 16) * 5) + 10
-    }
-
     // editMode
     let toEditBudget: BudgetModel?
     let toEditMainBudget: MainBudgetModel?
@@ -135,33 +108,151 @@ struct BrandNewBudgetView: View {
     @Namespace var animation
 
     var labelHeight: CGFloat {
-        progress == 5 ? 130 : 170
+        progress == 1 ? 120 : 130
     }
 
     var showBackButton: Bool {
-        progress > 1 && !(progress == 2 && overallBudgetCreated) && !(progress == 3 && editMode)
+        progress > 1
     }
 
     var instructions: [InstructionHeadings] {
         [
             InstructionHeadings(
                 title: String.appLocalized("Indicate budget type"),
-                subtitle: String.appLocalized("The overall budget tracks expenses across the board, while categorical budgets are tied to expenses of a particular type only.")),
-            InstructionHeadings(
-                title: String.appLocalized("Select a category"),
-                subtitle: String.appLocalized("Begin by linking this budget to an existing category.")),
-            InstructionHeadings(
-                title: String.appLocalized("Choose a time frame"),
-                subtitle: String.appLocalized("The budget will periodically refresh according to your preference.")),
-            InstructionHeadings(
-                title: String.appLocalized("Pick a start date"),
-                subtitle: String(
-                    format: String.appLocalized("Which day of the %@ do you want your budget to start from?"),
-                    timeFrameString)),
+                subtitle: String.appLocalized("Pick the scope, period and start day. You can change all of this later.")),
             InstructionHeadings(
                 title: String.appLocalized("Set budget amount"),
                 subtitle: String.appLocalized("Try your best to stay under this limit! Also, feel free to change this in the future."))
         ]
+    }
+
+    // MARK: - Page 1: details
+
+    private var weekdaySymbols: [String] {
+        var calendar = Calendar.current
+        calendar.locale = Locale.appLocale
+        return calendar.weekdaySymbols
+    }
+
+    @ViewBuilder
+    private var budgetDetails: some View {
+        Form {
+            Section {
+                Picker(String.appLocalized("Budget type"), selection: $categoryBudget) {
+                    Text(String.appLocalized("Overall Budget")).tag(false)
+                    Text(String.appLocalized("Category Budget")).tag(true)
+                }
+                .pickerStyle(.segmented)
+                .disabled(editMode)
+            }
+
+            if categoryBudget {
+                Section(String.appLocalized("Category")) {
+                    if categories.isEmpty {
+                        Button {
+                            showingCategoryView = true
+                        } label: {
+                            Label(String.appLocalized("Add a category"), systemImage: "plus")
+                        }
+                    } else {
+                        Picker(String.appLocalized("Select a category"), selection: $selectedCategory) {
+                            Text(String.appLocalized("Select")).tag(CategoryModel?.none)
+                            ForEach(categories) { category in
+                                Text("\(category.wrappedEmoji) \(category.wrappedName)")
+                                    .tag(Optional(category))
+                            }
+                        }
+                        .labelsHidden()
+                    }
+                }
+            }
+
+            Section {
+                Picker(String.appLocalized("Time frame"), selection: $budgetTimeFrame) {
+                    ForEach(BudgetTimeFrame.allCases, id: \.self) { time in
+                        Text(LocalizedStringKey(time.rawValue)).tag(time)
+                    }
+                }
+            }
+
+            startDaySection
+        }
+        .scrollContentBackground(.hidden)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    @ViewBuilder
+    private var startDaySection: some View {
+        switch budgetTimeFrame {
+        case .day:
+            EmptyView()
+        case .week:
+            Section {
+                Picker(String.appLocalized("Start day"), selection: $chosenDayWeek) {
+                    ForEach(1...7, id: \.self) { index in
+                        Text(weekdaySymbols[index - 1]).tag(index)
+                    }
+                }
+            }
+        case .month:
+            Section {
+                Picker(String.appLocalized("Start day"), selection: $chosenDayMonth) {
+                    ForEach(1..<29, id: \.self) { day in
+                        Text(day == 1
+                             ? String.appLocalized("Start of month")
+                             : String(format: String.appLocalized("%@ of month"), "\(day)"))
+                            .tag(day)
+                    }
+                }
+            }
+        case .year:
+            Section {
+                DatePicker(
+                    String.appLocalized("Start date"),
+                    selection: $chosenDayYear,
+                    in: oneYearAgo ... Date.now,
+                    displayedComponents: .date
+                )
+            }
+        }
+    }
+
+    private func continueToAmount() {
+        if categoryBudget && selectedCategory == nil {
+            showToast = true
+            toastMessage = String.appLocalized("Missing Category")
+            errorHaptic &+= 1
+            return
+        }
+
+        lightHaptic &+= 1
+        withAnimation(.easeInOut(duration: 0.2)) {
+            progress = 5
+        }
+    }
+
+    // MARK: - Page 2: amount
+
+    private var amountPage: some View {
+        VStack(spacing: 10) {
+            NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
+
+            if budgetTimeFrame != .day && padVM.price > 0 {
+                Text(amountPerDayString)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.SubtitleText)
+                    .padding(4)
+                    .padding(.horizontal, 7)
+                    .background(Color.SecondaryBackground, in: Capsule())
+            }
+
+            Spacer()
+
+            NumberPad(vm: padVM) {
+                submit()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     var body: some View {
@@ -170,12 +261,8 @@ struct BrandNewBudgetView: View {
                     Button {
                         if showBackButton {
                             withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
-                                if progress == 3 && !categoryBudget && !editMode {
-                                    progress -= 2
-                                } else if progress == 5 && budgetTimeFrame == .day {
-                                    progress -= 2
-                                } else if progress > 1 {
-                                    progress -= 1
+                                if progress > 1 {
+                                    progress = 1
                                 }
                             }
                         } else {
@@ -183,7 +270,7 @@ struct BrandNewBudgetView: View {
                         }
                     } label: {
                         Image(systemName: showBackButton ? "chevron.left" : "xmark")
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
 
                             .foregroundStyle(Color.SubtitleText)
                             .padding(8)
@@ -193,8 +280,8 @@ struct BrandNewBudgetView: View {
 
                 Spacer()
 
-                CustomCapsuleProgress(percent: (Double(progress) - initialProgress + 1) / (6 - initialProgress), width: 4, topStroke: Color.DarkBackground, bottomStroke: Color.SecondaryBackground)
-                    .frame(width: 60)
+                ProgressView(value: progress == 1 ? 0.5 : 1)
+                    .frame(width: 72)
             }
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -202,15 +289,15 @@ struct BrandNewBudgetView: View {
                 if showToast {
                     HStack(spacing: 6.5) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                            .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Color.AlertRed)
 
                         Text(toastMessage)
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
+                            .font(.callout.weight(.semibold))
                             .foregroundStyle(Color.AlertRed)
                     }
                     .padding(8)
-                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
+                    .background(Color.AlertRed.opacity(0.23), in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .frame(width: 250)
                 }
@@ -220,332 +307,37 @@ struct BrandNewBudgetView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
-                    Text(instructions[progress - 1].title)
+                    Text(instructions[progress == 1 ? 0 : 1].title)
                         .foregroundStyle(Color.PrimaryText)
-                        .font(.system(.title2, design: .rounded).weight(.semibold))
-
-                    if progress == 2 {
-                        Button {
-                            showingCategoryView = true
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.system(.footnote, design: .rounded).weight(.semibold))
-                                .foregroundStyle(Color.SubtitleText)
-                                .padding(4)
-                                .background(Color.SecondaryBackground, in: Circle())
-                                .contentShape(Circle())
-                        }
-                    }
+                        .font(.title2.weight(.semibold))
 
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
 
-                Text(instructions[progress - 1].subtitle)
+                Text(instructions[progress == 1 ? 0 : 1].subtitle)
                     .foregroundStyle(Color.SubtitleText)
-                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .font(.body.weight(.medium))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(height: labelHeight, alignment: .top)
 
             if progress == 1 {
-                VStack {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Button {
-                            withAnimation(.easeIn(duration: 0.15)) {
-                                categoryBudget = false
-                            }
-                        } label: {
-                            HStack {
-                                Text("Overall Budget")
-                                Spacer()
-
-                                if !categoryBudget {
-                                    Checkmark()
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundStyle(Color.PrimaryText)
-                            .font(.system(.title3, design: .rounded).weight(.medium))
-                            .padding(8)
-                            .background {
-                                if !categoryBudget {
-                                    RoundedRectangle(cornerRadius: GlassRadius.pill)
-                                        .fill(Color.SecondaryBackground)
-                                        .matchedGeometryEffect(id: "TAB1", in: animation)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            withAnimation(.easeIn(duration: 0.15)) {
-                                categoryBudget = true
-                            }
-                        } label: {
-                            HStack {
-                                Text("Category Budget")
-                                Spacer()
-
-                                if categoryBudget {
-                                    Checkmark()
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundStyle(Color.PrimaryText)
-                            .font(.system(.title3, design: .rounded).weight(.medium))
-                            .padding(8)
-                            .background {
-                                if categoryBudget {
-                                    RoundedRectangle(cornerRadius: GlassRadius.pill)
-                                        .fill(Color.SecondaryBackground)
-                                        .matchedGeometryEffect(id: "TAB1", in: animation)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .modifier(PickerStyle(colorScheme: colorScheme))
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if progress == 2 {
-                VStack {
-                    if categories.isEmpty {
-                        VStack(spacing: 12) {
-                            Image(systemName: "tray.full.fill")
-                                .font(.system(.largeTitle, design: .rounded))
-//                                .font(.system(size: 38, weight: .regular, design: .rounded))
-                                .foregroundStyle(Color.SubtitleText.opacity(0.7))
-                                .padding(.top, 20)
-
-                            Text(String.appLocalized("No remaining\ncategories."))
-                                .font(.system(.title3, design: .rounded).weight(.medium))
-//                                .font(.system(size: 21, weight: .medium, design: .rounded))
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(Color.SubtitleText.opacity(0.7))
-                                .padding(.bottom, 20)
-
-                            Spacer()
-                        }
-                        .frame(maxHeight: .infinity)
-
-                    } else {
-                        ScrollView {
-                            VStack(spacing: 10) {
-                                ForEach(getRows(), id: \.self) { rows in
-
-                                    HStack(spacing: 10) {
-                                        ForEach(rows) { row in
-
-                                            // Row View....
-                                            RowView(category: row)
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(15)
-                        }
-                        .scrollIndicators(.hidden)
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom, 15)
-                    }
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if progress == 3 {
-                VStack {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(BudgetTimeFrame.allCases, id: \.self) { time in
-                            Button {
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    budgetTimeFrame = time
-                                }
-                            } label: {
-                                HStack {
-                                    Text(LocalizedStringKey(time.rawValue))
-                                    Spacer()
-
-                                    if time == budgetTimeFrame {
-                                        Checkmark()
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundStyle(Color.PrimaryText)
-                                .font(.system(.title3, design: .rounded).weight(.medium))
-                                .padding(8)
-                                .background {
-                                    if time == budgetTimeFrame {
-                                        RoundedRectangle(cornerRadius: GlassRadius.pill)
-                                            .fill(Color.SecondaryBackground)
-                                            .matchedGeometryEffect(id: "TAB2", in: animation)
-                                    }
-                                }
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .modifier(PickerStyle(colorScheme: colorScheme))
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if progress == 4 {
-                VStack {
-                    switch budgetTimeFrame {
-                    case .day:
-                        EmptyView()
-                    case .week:
-                        ScrollView {
-                            ScrollViewReader { value in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    ForEach(Array(weekdays.enumerated()), id: \.element) { index, day in
-                                        WeekdayPickerRow(
-                                            day: day,
-                                            weekdayIndex: index + 1,
-                                            chosenDayWeek: $chosenDayWeek
-                                        )
-                                    }
-                                }
-                                .onAppear {
-                                    value.scrollTo(chosenDayWeek)
-                                }
-                            }
-                        }
-                        .scrollIndicators(.hidden)
-                        .modifier(PickerStyle(colorScheme: colorScheme))
-                        .frame(height: min(heightOfPicker, 250))
-                    case .month:
-                        ScrollView {
-                            ScrollViewReader { value in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    ForEach(1 ..< 29) { day in
-                                        Button {
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                chosenDayMonth = day
-                                            }
-                                        } label: {
-                                            HStack {
-                                                if Int(day) == 1 {
-                                                    Text("Start of month")
-                                                } else {
-                                                    Text(
-                                                        String(
-                                                            format: String.appLocalized("%@ of month"),
-                                                            getOrdinal(day))
-                                                    )
-                                                }
-
-                                                Spacer()
-
-                                                if chosenDayMonth == day {
-                                                    Checkmark()
-                                                }
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundStyle(Color.PrimaryText)
-                                            .font(.system(.title3, design: .rounded).weight(.medium))
-                                            .padding(8)
-                                            .background(dayRowBackground(isSelected: chosenDayMonth == day))
-                                            .contentShape(Rectangle())
-                                        }
-                                        .buttonStyle(.plain)
-                                        .id(day)
-                                    }
-                                }
-                                .onAppear {
-                                    value.scrollTo(chosenDayMonth)
-                                }
-                            }
-                        }
-                        .scrollIndicators(.hidden)
-                        .modifier(PickerStyle(colorScheme: colorScheme))
-                        .frame(height: min(heightOfPicker, 250))
-                    case .year:
-                        // in: oneYearAgo...Date.now,
-                        DatePicker("Date", selection: $chosenDayYear, in: oneYearAgo ... Date.now, displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                            .tint(Color.AlertRed)
-                            .padding(.horizontal, 5)
-                            .modifier(PickerStyle(colorScheme: colorScheme))
-                    }
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if progress == 5 {
-                VStack(spacing: 10) {
-                    NumberPadTextView(vm: padVM, currencySymbol: currencySymbol)
-
-                    if budgetTimeFrame != .day && padVM.price > 0 {
-                        Text(amountPerDayString)
-                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color.SubtitleText)
-                            .padding(4)
-                            .padding(.horizontal, 7)
-                            .background(Color.SecondaryBackground, in: Capsule())
-                    }
-
-                    Spacer()
-
-                    NumberPad(vm: padVM) {
-                      submit()
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                budgetDetails
+            } else {
+                amountPage
             }
 
-            if progress < 5 {
+            if progress == 1 {
                 Button {
-                    if progress == 2 && selectedCategory == nil {
-                        showToast = true
-                        toastMessage = String.appLocalized("Missing Category")
-                        errorHaptic &+= 1
-                        return
-                    }
-
-                    lightHaptic &+= 1
-
-                    withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
-                        if progress < 5 {
-                            if progress == 1 {
-                                if categoryBudget {
-                                    progress += 1
-                                } else {
-                                    progress += 2
-                                }
-                            } else if progress == 3 {
-                                if budgetTimeFrame == .day {
-                                    progress += 2
-                                } else {
-                                    progress += 1
-                                }
-                            } else {
-                                progress += 1
-                            }
-                        }
-                    }
+                    continueToAmount()
                 } label: {
                     Text(String.appLocalized("Continue"))
-                        .font(.system(.title3, design: .rounded).weight(.semibold))
-//                        .font(.system(size: 19, weight: .semibold, design: .rounded))
-
-                        .padding(.vertical, 12)
+                        .font(.body.weight(.semibold))
+                        .padding(.vertical, 13)
                         .frame(maxWidth: .infinity)
-                        .foregroundStyle((selectedCategory == nil && progress == 2) ? Color.SubtitleText : Color.LightIcon)
-                        .background((selectedCategory == nil && progress == 2) ? Color.clear : Color.DarkBackground, in: RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous))
-                        .overlay {
-                            if selectedCategory == nil && progress == 2 {
-                                RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous)
-                                    .stroke(Color.Outline, lineWidth: 1.3)
-                            }
-                        }
+                        .foregroundStyle(Color.LightIcon)
+                        .background(Color.DarkBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                 }
                 .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
             }
@@ -581,21 +373,6 @@ struct BrandNewBudgetView: View {
                 if unwrappedEditedBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
                     padVM.isEditingDecimal = true
                 }
-//                    let string = String(format: "%.2f", unwrappedEditedBudget.amount)
-//
-//                    var stringArray = string.compactMap { String($0) }
-//
-//                    
-//                    numbers = stringArray.compactMap { Int($0) }
-//
-//                    if round(unwrappedEditedBudget.amount) == unwrappedEditedBudget.amount {
-//                        stringArray.removeLast()
-//                        stringArray.removeLast()
-//                        stringArray.removeLast()
-//                        numbers1 = stringArray
-//                    } else {
-//                        numbers1 = stringArray
-//                    }
             } else {
                 chosenDayWeek = firstWeekday
                 chosenDayMonth = firstDayOfMonth
@@ -623,21 +400,7 @@ struct BrandNewBudgetView: View {
                 if unwrappedEditedMainBudget.amount.truncatingRemainder(dividingBy: 1) > 0 && numberEntryType == 2 {
                     padVM.isEditingDecimal = true
                 }
-//                    let string = String(format: "%.2f", unwrappedEditedMainBudget.amount)
-//
-//                    var stringArray = string.compactMap { String($0) }
-//
-//                    numbers = stringArray.compactMap { Int($0) }
-//
-//                    if round(unwrappedEditedMainBudget.amount) == unwrappedEditedMainBudget.amount {
-//                        stringArray.removeLast()
-//                        stringArray.removeLast()
-//                        stringArray.removeLast()
-//                        numbers1 = stringArray
-//                    } else {
-//                        numbers1 = stringArray
-//                    }
-            } else {
+            } else if toEditBudget == nil {
                 chosenDayWeek = firstWeekday
                 chosenDayMonth = firstDayOfMonth
             }
@@ -663,12 +426,6 @@ struct BrandNewBudgetView: View {
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }
 
-    @ViewBuilder
-    func Checkmark() -> some View {
-        Image(systemName: "checkmark")
-            .font(.system(.callout, design: .rounded).weight(.medium))
-    }
-
     func submit() {
         let amount = padVM.price
         if amount == 0 {
@@ -689,11 +446,19 @@ struct BrandNewBudgetView: View {
             case .year: return 3
             }
         }()
-        let startDate = budgetVM.computeStartDate(
+        let computedStart = budgetVM.computeStartDate(
             timeFrameRaw: timeFrameInt,
             chosenDayWeek: chosenDayWeek,
             chosenDayMonth: chosenDayMonth,
             chosenDayYear: chosenDayYear
+        )
+        let originalStart = toEditBudget?.startDate ?? toEditMainBudget?.startDate
+        let originalType = toEditBudget?.type ?? toEditMainBudget?.type ?? budgetType
+        let startDate = BudgetAnchor.startDate(
+            original: originalStart,
+            oldType: originalType,
+            newType: budgetType,
+            computed: computedStart
         )
 
         if let unwrappedEditedBudget = toEditBudget {
@@ -740,93 +505,6 @@ struct BrandNewBudgetView: View {
         dismiss()
     }
 
-    func getRows() -> [[CategoryModel]] {
-        var rows: [[CategoryModel]] = []
-        var currentRow: [CategoryModel] = []
-
-        var totalWidth: CGFloat = 0
-
-        let screenWidth: CGFloat = ScreenSize.width - 50
-
-        categories.forEach { category in
-
-//            let roundedFont = UIFont.rounded(ofSize: UIFont.textStyleSize(.title3), weight: .semibold)
-//
-//            let attributes = [NSAttributedString.Key.font: roundedFont]
-//
-//            let size = (category.fullName as NSString).size(withAttributes: attributes)
-
-            let categoryWidth = category.fullName.widthOfRoundedString(size: UIFont.textStyleSize(.title3), weight: .semibold) + 12 + 12 + 10
-
-            totalWidth += categoryWidth
-
-            if totalWidth > screenWidth {
-                totalWidth = (!currentRow.isEmpty || rows.isEmpty ? categoryWidth : 0)
-
-                rows.append(currentRow)
-                currentRow.removeAll()
-                currentRow.append(category)
-
-            } else {
-                currentRow.append(category)
-            }
-        }
-
-        // Safe check...
-        // if having any value storing it in rows...
-        if !currentRow.isEmpty {
-            rows.append(currentRow)
-            currentRow.removeAll()
-        }
-
-        return rows
-    }
-
-    @ViewBuilder
-    func RowView(category: CategoryModel) -> some View {
-        Button {
-            if selectedCategory == category {
-                selectedCategory = nil
-            } else {
-                selectedCategory = category
-            }
-        } label: {
-            HStack(spacing: 5) {
-                Text(category.wrappedEmoji)
-                    .font(.system(.subheadline, design: .rounded))
-                    .font(.system(size: 15))
-                Text(category.wrappedName)
-                    .font(.system(.title3, design: .rounded).weight(.semibold))
-//                    .font(.system(size: 19, weight: .semibold, design: .rounded))
-            }
-            .padding(.horizontal, 11)
-            .padding(.vertical, 7)
-            .foregroundStyle(selectedCategory == category ? Color(hex: category.wrappedColour) : Color.PrimaryText)
-            .background(selectedCategory == category ? Color(hex: category.wrappedColour).opacity(0.35) : Color.clear, in: RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous))
-            .overlay {
-                if selectedCategory != category {
-                    RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
-                        .strokeBorder(Color.Outline,
-                                      style: StrokeStyle(lineWidth: 1.5))
-                }
-            }
-            .opacity(selectedCategory == nil ? 1 : (selectedCategory == category ? 1 : 0.4))
-        }
-        .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
-    }
-
-    func getOrdinal(_ number: Int) -> String {
-        if number == 1 {
-            return String.appLocalized("Start")
-        }
-
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.appLocale
-        formatter.numberStyle = .ordinal
-
-        return formatter.string(from: number as NSNumber)!.replacing(".", with: "")
-    }
-
     func getBudgetTypeInteger(_ budget: BudgetTimeFrame) -> Int {
         switch budget {
         case .day:
@@ -843,24 +521,20 @@ struct BrandNewBudgetView: View {
     init(overallBudgetCreated: Bool, toEditBudget: BudgetModel? = nil, toEditMainBudget: MainBudgetModel? = nil) {
         if toEditBudget != nil {
             self.overallBudgetCreated = overallBudgetCreated
-            _progress = State(initialValue: 3)
+            _progress = State(initialValue: 1)
             _categoryBudget = State(initialValue: true)
-            initialProgress = 3
         } else if toEditMainBudget != nil {
             self.overallBudgetCreated = overallBudgetCreated
-            _progress = State(initialValue: 3)
+            _progress = State(initialValue: 1)
             _categoryBudget = State(initialValue: false)
-            initialProgress = 3
         } else {
             if overallBudgetCreated {
                 self.overallBudgetCreated = true
-                _progress = State(initialValue: 2)
+                _progress = State(initialValue: 1)
                 _categoryBudget = State(initialValue: true)
-                initialProgress = 2
-            } else {
+                } else {
                 self.overallBudgetCreated = false
-                initialProgress = 1
-            }
+                }
         }
 
         self.toEditBudget = toEditBudget
@@ -869,115 +543,5 @@ struct BrandNewBudgetView: View {
         _categories = Query(filter: #Predicate<CategoryModel> { $0.budget == nil && $0.income == false }, sort: [SortDescriptor(\.order)])
     }
 
-    @ViewBuilder
-    private func dayRowBackground(isSelected: Bool) -> some View {
-        if isSelected {
-            RoundedRectangle(cornerRadius: GlassRadius.pill)
-                .fill(Color.SecondaryBackground)
-        }
-    }
 }
 
-struct CheckmarkView: View {
-    var body: some View {
-        Image(systemName: "checkmark")
-            .font(.system(.callout, design: .rounded).weight(.medium))
-    }
-}
-
-struct RowProgressIndicator: View {
-    let count: Double
-    @Binding var progress: Int
-    let initialProgess: Double
-
-    var body: some View {
-//        ZStack(alignment: .leading) {
-//            Rectangle()
-//                .foregroundStyle(Color.SecondaryBackground)
-//                .frame(maxWidth: .infinity)
-//
-//            GeometryReader { proxy in
-//                Rectangle()
-//                    .foregroundStyle(Color.DarkBackground)
-//                    .frame(width: proxy.size.width * CGFloat((Double(progress) - initialProgess + 1)/count), height: 5)
-//            }
-//            .frame(maxWidth: .infinity)
-//        }
-//        .frame(height: 5)
-//        .frame(maxWidth: .infinity)
-//        .mask {
-//            HStack(spacing: 5) {
-//                ForEach(0..<Int(count), id: \.self) { num in
-//                    Capsule()
-//                        .frame(height: 5)
-//                        .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-//                        .onTapGesture {
-//                            print("tapped")
-//                        }
-//
-//                }
-//            }
-//        }
-//
-
-        HStack(spacing: 6) {
-            ForEach(0 ..< Int(count), id: \.self) { num in
-                Capsule()
-                    .frame(width: 15, height: 5)
-                    .foregroundStyle(num == progress - Int(initialProgess) ? Color.DarkBackground : Color.SecondaryBackground)
-
-//                    .transaction { transaction in
-//                        transaction.animation = .easeIn.delay(0.2)
-//                    }
-//                    .onTapGesture {
-//                        print("tapped")
-//                    }
-            }
-        }
-        .padding(.bottom, 20)
-//        .overlay(alignment: .leading) {
-//            Capsule()
-//                .frame(width: 30, height: 5)
-//                .offset(x: CGFloat((progress - Int(initialProgess)) * 11))
-//                .foregroundStyle(Color.DarkBackground)
-//        }
-    }
-}
-
-private struct WeekdayPickerRow: View {
-    let day: String
-    let weekdayIndex: Int
-    @Binding var chosenDayWeek: Int
-
-    private var isSelected: Bool { chosenDayWeek == weekdayIndex }
-
-    var body: some View {
-        Button {
-            withAnimation(.easeIn(duration: 0.15)) {
-                chosenDayWeek = weekdayIndex
-            }
-        } label: {
-            HStack {
-                Text(LocalizedStringKey(day))
-                Spacer()
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(.callout, design: .rounded).weight(.medium))
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(Color.PrimaryText)
-            .font(.system(.title3, design: .rounded).weight(.medium))
-            .padding(8)
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: GlassRadius.pill)
-                        .fill(Color.SecondaryBackground)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .id(weekdayIndex)
-    }
-}
