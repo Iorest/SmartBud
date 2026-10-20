@@ -345,6 +345,8 @@
 		E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000281 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
+		E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
+		E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
 		E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
@@ -563,6 +565,7 @@
 		E1A2B3C40000000000000250 /* AmountFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountFormatting.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000280 /* SBToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBToast.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDeleteConfirmation.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002B0 /* TransactionDateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDateRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A0 /* TransactionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidationTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
@@ -711,6 +714,7 @@
 				E1A2B3C40000000000000218 /* CSVTable.swift */,
 				E1A2B3C40000000000000300 /* TransactionCategoryGrid.swift */,
 				E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */,
+				E1A2B3C400000000000002B0 /* TransactionDateRow.swift */,
 				E1A2B3C40000000000000400 /* LogTransactionList.swift */,
 				E1A2B3C40000000000000500 /* TemplatesView.swift */,
 				5327D284287C697400F76ADF /* Products */,
@@ -1301,6 +1305,7 @@
 				E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000281 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */,
+				E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000301 /* TransactionCategoryGrid.swift in Sources */,
@@ -1504,6 +1509,7 @@
 				E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000282 /* SBToast.swift in Sources */,
 				E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */,
+				E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */,
 				E1A2B3C40000000000000272 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000302 /* TransactionCategoryGrid.swift in Sources */,

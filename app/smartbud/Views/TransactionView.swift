@@ -172,18 +172,6 @@ struct TransactionView: View {
     }
 
     @ViewBuilder
-    var dateDisplayText: some View {
-        let dateStr = getDateString(date: date)
-        if isDateToday(date: date) {
-            Text(String.appLocalized("Today") + " · " + dateStr)
-                .lineLimit(1)
-        } else {
-            Text(dateStr)
-                .lineLimit(1)
-        }
-    }
-
-    @ViewBuilder
     var deleteButtonIcon: some View {
         Image(systemName: "trash.fill")
             .font(.subheadline.weight(.semibold))
@@ -481,58 +469,10 @@ struct TransactionView: View {
         }
     }
 
-    @ViewBuilder
     var dateButton: some View {
-        // Two candidate layouts: date + time, or date alone when the row is
-        // too narrow. `ViewThatFits` measures the real container, which is
-        // what the old screen-width arithmetic was approximating.
-        ViewThatFits(in: .horizontal) {
-            dateRow(withTime: true)
-            dateRow(withTime: false)
-        }
-        .foregroundStyle(Color.PrimaryText)
-        .padding(.vertical, 8.5)
-        .padding(.horizontal, 10)
-        .animation(.default, value: isDateToday(date: date))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(
-            RoundedRectangle(cornerRadius: SBRadius.input, style: .continuous)
-                .strokeBorder(Color.Outline, lineWidth: 1.5)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
+        TransactionDateRow(date: date, animateIcon: animateIcon) {
             hideKeyboard()
             showingDatePicker = true
-        }
-    }
-
-    @ViewBuilder
-    private func dateRow(withTime: Bool) -> some View {
-        HStack(spacing: 7) {
-            Group {
-                if date < Date.now {
-                    Image(systemName: "calendar")
-                } else {
-                        Image(systemName: "rays")
-                            .symbolEffect(
-                                .variableColor.iterative.dimInactiveLayers.nonReversing,
-                                options: .repeating, value: animateIcon)
-                }
-            }
-            .foregroundStyle(Color.SubtitleText)
-            .font(.subheadline.weight(.semibold))
-
-            Group {
-                dateDisplayText
-            }
-            .font(.body.weight(.semibold))
-
-            if withTime {
-                Spacer(minLength: 8)
-
-                Text(getTimeString(date: date))
-                    .font(.body.weight(.semibold))
-            }
         }
     }
 
@@ -983,29 +923,6 @@ struct TransactionView: View {
         .sensoryFeedback(.success, trigger: successHaptic)
     }
 
-    func isDateToday(date: Date) -> Bool {
-        let calendar = Calendar.current
-
-        return calendar.isDateInToday(date)
-    }
-
-    func getDateString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.appLocale
-        // Localized template: zh gives "10月19日", en gives "Oct 19".
-        // A fixed "d MMM" pattern rendered as "19 10月" in Chinese.
-        formatter.setLocalizedDateFormatFromTemplate(isDateToday(date: date) ? "MMMd" : "MMMdEEE")
-        return formatter.string(from: date)
-    }
-
-    func getTimeString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.appLocale
-
-        formatter.dateFormat = "HH:mm"
-
-        return formatter.string(from: date)
-    }
 
     func toggleFieldColors() {
         if categoryButtonTextColor == Color.AlertRed
