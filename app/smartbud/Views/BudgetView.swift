@@ -93,7 +93,7 @@ struct ActualBudgetView: View {
 
                                 if budgetRows {
                                     VStack(spacing: 10) {
-                                        ForEach(budgets, id: \.self) { budget in
+                                        ForEach(budgets, id: \.id) { budget in
                                             NavigationLink(value: budget) {
                                                 SingleBudgetView(
                                                     budget: budget,
@@ -107,7 +107,7 @@ struct ActualBudgetView: View {
 
                                 } else {
                                     LazyVGrid(columns: layout, spacing: 15) {
-                                        ForEach(budgets, id: \.self) { budget in
+                                        ForEach(budgets, id: \.id) { budget in
                                             NavigationLink(value: budget) {
                                                 SingleBudgetView(
                                                     budget: budget,

@@ -76,7 +76,7 @@ final class InsightsViewModel {
         let defaults = UserDefaults.appGroup
         showCents = defaults.bool(forKey: "showCents")
         currency = defaults.string(forKey: "currency") ?? Locale.current.currency?.identifier ?? "USD"
-        currencySymbol = currencySymbolFor(code: currency)
+        currencySymbol = Locale.appCurrencySymbol(forCurrencyCode: currency)
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)
         let all = repo.fetch(TransactionModel.self)
@@ -248,13 +248,5 @@ final class InsightsViewModel {
             let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
             return "\(formatRange(start)) - \(formatRange(endInclusive))"
         }
-    }
-
-    private func currencySymbolFor(code: String) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = code
-        formatter.locale = Locale.appLocale
-        return formatter.currencySymbol ?? code
     }
 }

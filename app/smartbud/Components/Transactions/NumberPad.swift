@@ -63,7 +63,7 @@ struct NumberPad: View {
             bottomRow
         }
         .padding(.bottom, 15)
-        .keyboardAwareHeight(showToolbar: showingNotePicker)
+        .keyboardAwareHeight()
         .modifier(DigitHapticModifier(
             haptic: .impact(weight: .light, intensity: viewModel.digitHapticIntensity),
             trigger: viewModel.price,

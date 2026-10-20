@@ -29,19 +29,6 @@ extension Notification {
     }
 }
 
-extension View {
-    func placeholder<Content: View>(
-        when shouldShow: Bool,
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content
-    ) -> some View {
-        ZStack(alignment: alignment) {
-            placeholder().opacity(shouldShow ? 1 : 0)
-            self
-        }
-    }
-}
-
 #if !os(macOS)
 extension UIApplication {
 }
@@ -49,7 +36,6 @@ extension UIApplication {
 
 struct KeyboardAwareModifier: ViewModifier {
     @AppStorage("keyboard", store: .appGroup) var savedKeyboardHeight: Double = 291
-    var showToolbar: Bool
     @State private var isKeyboardVisible = false
 
     func body(content: Content) -> some View {
@@ -96,7 +82,7 @@ struct KeyboardAwareModifier: ViewModifier {
 }
 
 extension View {
-    func keyboardAwareHeight(showToolbar: Bool) -> some View {
-        ModifiedContent(content: self, modifier: KeyboardAwareModifier(showToolbar: showToolbar))
+    func keyboardAwareHeight() -> some View {
+        ModifiedContent(content: self, modifier: KeyboardAwareModifier())
     }
 }
