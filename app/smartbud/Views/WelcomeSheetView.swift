@@ -5,9 +5,10 @@
 //  Created by Iorest on 22/8/22.
 //
 
+import Combine
 import Foundation
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct WelcomeSheetFeatureRow: Hashable {
     let icon: String
@@ -16,7 +17,6 @@ struct WelcomeSheetFeatureRow: Hashable {
 }
 
 struct WelcomeSheetView: View {
-    @Environment(\.dismiss) var dismiss
 
     @Query(sort: [SortDescriptor(\CategoryModel.dateCreated)])
     private var categories: [CategoryModel]
@@ -33,53 +33,49 @@ struct WelcomeSheetView: View {
     ]
 
     var body: some View {
-        GeometryReader { proxy in
-            VStack {
-                if firstPage {
-                    VStack(spacing: 50) {
-                        VStack(spacing: 2) {
-                            Text(String.appLocalized("app_name"))
-                                .font(.system(size: 30, weight: .medium, design: .rounded))
-                                .foregroundStyle(Color.PrimaryText)
+        Group {
+            if firstPage {
+                VStack(spacing: SBSpace.xl) {
+                    VStack(spacing: SBSpace.xxs) {
+                        Text(String.appLocalized("app_name"))
+                            .font(.largeTitle.bold())
+                            .foregroundStyle(Color.PrimaryText)
 
-                            Text(String(localized: "Version \(UIApplication.appVersion) (\(UIApplication.buildNumber))"))
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
-                                .foregroundStyle(Color.SubtitleText)
-                                .padding(.bottom, 15)
-                        }
-                        .frame(height: proxy.size.height / 3.4, alignment: .bottom)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        Text("Version \(Bundle.main.appVersion) (\(Bundle.main.appBuild))")
+                            .font(.footnote)
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 48)
 
-                    VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: SBSpace.l) {
                         ForEach(welcomeFeatures.indices, id: \.self) { rowIndex in
                             if rowIndex < visibleLines {
-                                HStack(alignment: .top, spacing: 15) {
+                                HStack(alignment: .top, spacing: SBSpace.s) {
                                     Image(systemName: welcomeFeatures[rowIndex].icon)
-                                        .font(.system(size: 25, weight: .regular))
+                                        .font(.title2)
                                         .foregroundStyle(Color.SubtitleText)
-                                        .frame(width: 40, alignment: .leading)
-                                        .offset(y: 2)
+                                        .frame(width: 36, alignment: .leading)
 
-                                    VStack(alignment: .leading, spacing: 5) {
+                                    VStack(alignment: .leading, spacing: SBSpace.xxs) {
                                         Text(LocalizedStringKey(welcomeFeatures[rowIndex].header))
-                                            .font(.system(size: 18, weight: .medium, design: .rounded))
+                                            .font(.headline)
                                             .foregroundStyle(Color.PrimaryText)
 
                                         Text(LocalizedStringKey(welcomeFeatures[rowIndex].subtitle))
-                                            .font(.system(size: 16, weight: .regular, design: .rounded))
+                                            .font(.subheadline)
                                             .fixedSize(horizontal: false, vertical: true)
                                             .foregroundStyle(Color.SubtitleText)
                                     }
                                 }
-                                .transition(AnyTransition.opacity.combined(with: .move(edge: .leading)))
+                                .transition(.opacity.combined(with: .move(edge: .leading)))
                             }
                         }
                     }
-                    .padding(.horizontal, 5)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     .onReceive(timer) { _ in
                         withAnimation(.easeInOut(duration: 0.4)) {
-                            if visibleLines < 3 {
+                            if visibleLines < welcomeFeatures.count {
                                 visibleLines += 1
                             } else {
                                 timer.upstream.connect().cancel()
@@ -93,14 +89,13 @@ struct WelcomeSheetView: View {
                         }
                     } label: {
                         Text("Get Started")
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color.LightIcon)
-                            .padding(.vertical, 12)
+                            .font(.body.weight(.semibold))
                             .frame(maxWidth: .infinity)
-                            .background(RoundedRectangle(cornerRadius: GlassRadius.card, style: .continuous).fill(Color.DarkBackground))
                     }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                 }
-                .padding(30)
+                .padding(SBSpace.l)
             } else {
                 CategoryView(mode: .welcome)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -108,6 +103,5 @@ struct WelcomeSheetView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .appBackground()
-        }
     }
 }

@@ -42,30 +42,29 @@ struct ContentView: View {
             let bottomEdge = proxy.safeAreaInsets.bottom == 0 ? 15 : proxy.safeAreaInsets.bottom
 
             ZStack(alignment: .top) {
-                HomeView(topEdge: topEdge, bottomEdge: bottomEdge)
+                HomeView(topEdge: topEdge,
+                         isInFallbackMode: dataRepo.isInFallbackMode)
                     .ignoresSafeArea(.all, edges: .bottom)
                     .preferredColorScheme(colourScheme == 1 ? .light : colourScheme == 2 ? .dark : nil)
                     .environment(\.locale, appLanguage.isEmpty ? Locale.current : Locale(identifier: appLanguage))
                     .onChange(of: appLanguage) { _, _ in
                         WidgetCenter.shared.reloadAllTimelines()
                     }
-                    .fullScreenCover(isPresented: $contentVM.showIntro) {
+                    .fullScreenPresentation(isPresented: $contentVM.showIntro) {
                         WelcomeSheetView()
                     }
-                    .fullScreenCover(isPresented: $contentVM.showUpdate) {
-                        UpdateAlert()
-                    }
-                    .onAppear {
-                        contentVM.updateInsets(top: topEdge, bottom: bottomEdge)
-                    }
 
-                if dataRepo.isInFallbackMode {
-                    fallbackBanner
-                        .padding(.horizontal, 14)
-                        .padding(.top, topEdge + 6)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                if let saveError = dataRepo.lastSaveError {
+                    SBSaveErrorBanner(message: saveError) {
+                        dataRepo.clearSaveError()
+                    }
+                    .padding(.horizontal, SBSpace.m)
+                    .padding(.bottom, bottomEdge + 68)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
+            .animation(.easeOut(duration: 0.2), value: dataRepo.lastSaveError != nil)
         }
         .ignoresSafeArea(.keyboard)
         .task {
@@ -98,21 +97,23 @@ struct ContentView: View {
         }
     }
 
-    /// Non-blocking banner shown when the SwiftData container booted in
-    /// a degraded mode (no App Group, no CloudKit, or a corrupted
-    /// on-disk store). The user can keep using the app locally; the
-    /// banner just makes it clear that nothing is syncing to iCloud.
-    private var fallbackBanner: some View {
+}
+
+/// Shown when the SwiftData container booted degraded (no App Group, no
+/// iCloud, or a corrupted store). Lives outside `ContentView` so the Mac
+/// layout can place it inside the detail column instead of over the sidebar.
+struct FallbackSyncBanner: View {
+    var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "icloud.slash.fill")
-                .font(.system(.body, design: .rounded).weight(.semibold))
+                .font(.body.weight(.semibold))
                 .foregroundStyle(.white)
             VStack(alignment: .leading, spacing: 2) {
                 Text(String.appLocalized(SettingsKey.bannerFallbackTitle))
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
                 Text(String.appLocalized(SettingsKey.bannerFallbackBody))
-                    .font(.system(.caption, design: .rounded))
+                    .font(.caption)
                     .foregroundStyle(.white.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -120,8 +121,9 @@ struct ContentView: View {
         }
         .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: GlassRadius.chip, style: .continuous)
+            RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                 .fill(Theme.Brand.warning.opacity(0.92))
         )
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 }

@@ -12,17 +12,6 @@ import SwiftUI
 
 @MainActor
 @Observable
-class OverallToastPresenter {
-    var showToast: Bool = false
-}
-
-enum DeletionType {
-    case instant
-    case prompt
-}
-
-@MainActor
-@Observable
 class OverallTransactionManager {
     var toEdit: TransactionModel?
     var toDelete: TransactionModel?
@@ -34,13 +23,11 @@ class OverallTransactionManager {
 struct HomeView: View {
     @Environment(AppLockViewModel.self) var appLockVM
 
-    @State var toastPresenter = OverallToastPresenter()
     @State var transactionManager = OverallTransactionManager()
     @Environment(TransactionViewModel.self) var transactionVM
 
     @State var currentTab = "Log"
     var topEdge: CGFloat
-    var bottomEdge: CGFloat
 
     @State var fromURL1: Bool = false
     @State var fromURL2: Bool = false
@@ -52,22 +39,21 @@ struct HomeView: View {
 
     @State var counter = 0
     @State private var showConfetti = false
+    var isInFallbackMode: Bool = false
 
-    @Environment(TabBarManager.self) var tabBarManager
 
     @State var showPopup = false
 
     // Floating add button (replaces the custom tab bar's centre button).
     @State private var addTransaction = false
     @State private var transactionCountBeforeAdd = 0
-    @State private var lightHaptic = 0
     @Query private var transactions: [TransactionModel]
     @AppStorage("confetti", store: .appGroup) private var confetti: Bool = false
     @AppStorage("firstTransactionViewLaunch", store: .appGroup) private var firstLaunch: Bool = true
 
-    init(topEdge: CGFloat, bottomEdge: CGFloat) {
+    init(topEdge: CGFloat, isInFallbackMode: Bool = false) {
         self.topEdge = topEdge
-        self.bottomEdge = bottomEdge
+        self.isInFallbackMode = isInFallbackMode
         #if DEBUG
         // QA hook: `SIMCTL_CHILD_START_TAB=Insights` opens straight on a tab
         // for screenshot/UI verification. Debug builds only.
@@ -78,18 +64,70 @@ struct HomeView: View {
         #endif
     }
 
+    #if os(macOS)
+    /// Mac uses a real sidebar instead of the compact tab strip. The detail
+    /// column keeps the same 860pt reading width as the iPad layout.
+    private var macShell: some View {
+        NavigationSplitView {
+            List(selection: $currentTab) {
+                Label(String.appLocalized("Log"), systemImage: "list.bullet")
+                    .tag("Log")
+                Label(String.appLocalized("Insights"), systemImage: "chart.bar.fill")
+                    .tag("Insights")
+                Label(String.appLocalized("Budget"), systemImage: "chart.pie.fill")
+                    .tag("Budget")
+                Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
+                    .tag("Settings")
+            }
+            .listStyle(.sidebar)
+            .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
+        } detail: {
+            macDetail
+        }
+        .allowsHitTesting(showPopup ? false : true)
+        .environment(transactionManager)
+    }
+
+    @ViewBuilder
+    private var macDetail: some View {
+        Group {
+            switch currentTab {
+            case "Insights":
+                InsightsView()
+            case "Budget":
+                BudgetView()
+            case "Settings":
+                SettingsView()
+            default:
+                LogView(launchSearch: launchSearch,
+                        onAdd: { addTransaction = true })
+            }
+        }
+        .frame(maxWidth: 860)
+        .frame(maxWidth: .infinity)
+        .background(AppBackground())
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if isInFallbackMode {
+                FallbackSyncBanner()
+                    .padding(.horizontal, 14)
+                    .padding(.top, 8)
+            }
+        }
+    }
+    #endif
+
     var body: some View {
         ZStack(alignment: .bottom) {
-            AppGlassBackground()
+            AppBackground()
 
-            // Native TabView: one navigation shell that adapts to iPhone,
-            // iPad and Mac (Designed for iPad) without a custom tab bar.
+            #if os(macOS)
+            macShell
+            #else
             TabView(selection: $currentTab) {
-                LogView(topEdge: topEdge, bottomEdge: bottomEdge, launchSearch: launchSearch,
+                LogView(launchSearch: launchSearch,
                         onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
-                    .background(AppGlassBackground())
                     .tag("Log")
                     .tabItem {
                         Label(String.appLocalized("Log"), systemImage: "list.bullet")
@@ -98,7 +136,6 @@ struct HomeView: View {
                 InsightsView()
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
-                    .background(AppGlassBackground())
                     .tag("Insights")
                     .tabItem {
                         Label(String.appLocalized("Insights"), systemImage: "chart.bar.fill")
@@ -107,7 +144,6 @@ struct HomeView: View {
                 BudgetView()
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
-                    .background(AppGlassBackground())
                     .tag("Budget")
                     .tabItem {
                         Label(String.appLocalized("Budget"), systemImage: "chart.pie.fill")
@@ -116,48 +152,33 @@ struct HomeView: View {
                 SettingsView()
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
-                    .background(AppGlassBackground())
                     .tag("Settings")
                     .tabItem {
                         Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
                     }
             }
             .allowsHitTesting(showPopup ? false : true)
-            .environment(toastPresenter)
             .environment(transactionManager)
             // Light selection feedback when switching tabs (HIG: every
             // interaction gets feedback).
             .sensoryFeedback(.selection, trigger: currentTab)
-
-            // The add button is only meaningful on data screens; on Settings
-            // it used to overlap the last rows and steal their taps.
-            if currentTab != "Settings" {
-                Button {
-                    lightHaptic &+= 1
-                    transactionCountBeforeAdd = transactions.count
-                    addTransaction = true
-                } label: {
-                    Image(systemName: "plus")
+            .overlay(alignment: .top) {
+                if isInFallbackMode {
+                    FallbackSyncBanner()
+                        .padding(.horizontal, 14)
+                        .padding(.top, topEdge + 6)
                 }
-                .buttonStyle(MyButtonStyle())
-                .padding(.trailing, 22)
-                .padding(.bottom, bottomEdge + 46)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                .accessibilityLabel(String.appLocalized("Add New Transaction"))
             }
+            #endif
 
-            if transactionManager.showToast, let deleted = transactionManager.toDelete {
-                undoBanner(deleted)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    .padding(.top, 58)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .task(id: deleted.id) {
-                        try? await Task.sleep(for: .seconds(4))
-                        guard transactionManager.showToast else { return }
-                        transactionVM.commitPendingChanges()
-                        transactionManager.toDelete = nil
-                        withAnimation { transactionManager.showToast = false }
-                    }
+            if transactionVM.pendingDelete != nil {
+                // Bottom snackbar, above the tab bar: the top of the screen
+                // is owned by the navigation bar and search field.
+                undoBanner
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.bottom, 100)
+                    .padding(.horizontal, SBSpace.m)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
             if showPopup {
@@ -191,20 +212,17 @@ struct HomeView: View {
                     }
             }
         }
-        .toast(isPresenting: $toastPresenter.showToast, duration: 4, tapToDismiss: true, offsetY: 64, alert: {
-            AlertToast(displayMode: .hud, type: .systemImage("checkmark.circle.fill", Color.IncomeGreen), title: String.appLocalized("Image Saved"), subTitle: String.appLocalized("Check it out in Photos"))
-        })
         .onChange(of: transactionManager.showPopup) { _, newValue in
             withAnimation {
                 showPopup = newValue
             }
         }
-        .fullScreenCover(item: $transactionManager.toEdit, onDismiss: {
+        .fullScreenPresentation(item: $transactionManager.toEdit, onDismiss: {
             transactionManager.toEdit = nil
         }) { transaction in
             TransactionView(toEdit: transaction)
         }
-        .fullScreenCover(isPresented: $addTransaction, onDismiss: {
+        .fullScreenPresentation(isPresented: $addTransaction, onDismiss: {
             if confetti && transactionCountBeforeAdd != transactions.count {
                 counter += 1
             }
@@ -217,12 +235,16 @@ struct HomeView: View {
         .onChange(of: launchAdd) { _, _ in
             addTransaction = true
         }
+        .onChange(of: addTransaction) { _, isAdding in
+            // Snapshot the count when the entry sheet opens so the confetti
+            // check on dismiss compares against the right baseline.
+            if isAdding { transactionCountBeforeAdd = transactions.count }
+        }
         .onOpenURL { url in
             if url.host == "newExpense" {
                 addTransaction = true
             }
         }
-        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }
         .onAppear {
@@ -273,26 +295,26 @@ struct HomeView: View {
     /// AlertToast, whose tap handler was swallowed on iOS 26 so "undo" only
     /// dismissed the toast and the deletion stuck.
     @ViewBuilder
-    private func undoBanner(_ deleted: TransactionModel) -> some View {
+    private var undoBanner: some View {
         HStack(spacing: 12) {
             Image(systemName: "trash.fill")
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.AlertRed)
 
             Text(String.appLocalized("Log Deleted"))
-                .font(.system(.subheadline, design: .rounded).weight(.medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(Color.PrimaryText)
                 .lineLimit(1)
 
             Spacer(minLength: 12)
 
             Button {
-                transactionVM.undoDelete(deleted)
+                transactionVM.undoPendingDelete()
                 transactionManager.toDelete = nil
                 withAnimation { transactionManager.showToast = false }
             } label: {
                 Text(String.appLocalized("Undo"))
-                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.PrimaryText)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
@@ -320,7 +342,7 @@ struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
                 .foregroundStyle(Color.DarkIcon.opacity(0.7))
 
             Text("App Locked")
-                .font(.system(size: 28, weight: .semibold, design: .rounded))
+                .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(Color.PrimaryText)
                 .padding(.bottom, 30)
 
@@ -332,19 +354,19 @@ struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
 
                     Text("Unlock App")
                 }
-                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(Color.PrimaryText)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 15)
                 .overlay {
-                    RoundedRectangle(cornerRadius: GlassRadius.card)
+                    RoundedRectangle(cornerRadius: SBRadius.card)
                         .stroke(Color.Outline)
                 }
             }
 
             if appLockVM.enrollmentError {
                 Text("Please re-enable Face ID access in the Settings app to unlock application.")
-                    .font(.system(size: 15, weight: .regular, design: .rounded))
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundStyle(Color.SubtitleText)
                     .multilineTextAlignment(.center)
             }

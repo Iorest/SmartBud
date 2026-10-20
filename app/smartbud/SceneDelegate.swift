@@ -14,10 +14,14 @@
 //
 //  In both cases we forward the shortcut's `type` to `UIApplication.open`
 //  so the existing `.onOpenURL` handlers in the SwiftUI view tree can
-//  react (see CustomTabBar.swift, HomeView.swift, LogView.swift).
+//  react (see HomeView.swift, LogView.swift).
 //
 
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 final class SceneDelegate: NSObject, UIWindowSceneDelegate {
 

@@ -14,7 +14,11 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(

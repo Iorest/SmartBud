@@ -7,13 +7,16 @@
 
 import SwiftUI
 import SwiftData
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 @main
 struct SmartBudApp: App {
     @State private var dataRepository = DataRepository.shared
     @State private var appLockVM = AppLockViewModel()
-    @State private var tabBarManager = TabBarManager()
     @State private var homeVM = HomeViewModel.shared
     @State private var transactionVM = TransactionViewModel.shared
     @State private var categoryVM = CategoryViewModel.shared
@@ -34,7 +37,6 @@ struct SmartBudApp: App {
             ContentView()
                 .modelContainer(dataRepository.modelContainer)
                 .environment(appLockVM)
-                .environment(tabBarManager)
                 .environment(homeVM)
                 .environment(transactionVM)
                 .environment(categoryVM)

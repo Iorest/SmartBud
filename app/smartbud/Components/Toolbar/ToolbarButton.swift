@@ -14,12 +14,12 @@ struct ToolbarButton: View {
                 .frame(width: 33, height: 33)
                 .overlay {
                     Image(systemName: systemName)
-                        .font(.system(.callout, design: .rounded).weight(.semibold))
+                        .font(.callout.weight(.semibold))
                         
                         .foregroundStyle(Color.SubtitleText)
                         .offset(y: 0.8)
                 }
-                .glassChip(in: Circle())
+                .systemChip(in: Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel.isEmpty ? systemName : accessibilityLabel)
