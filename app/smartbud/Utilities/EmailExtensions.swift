@@ -17,8 +17,13 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
+#if !os(macOS)
 extension UIDevice {
     struct DeviceModel: Decodable {
         let identifier: String
@@ -41,6 +46,36 @@ extension UIDevice {
             }
         #endif
         return DeviceModel.all.first { $0.identifier == identifier }?.model ?? identifier
+    }
+}
+#endif
+
+/// Cross-platform replacement for the two `UIDevice` facts the support email
+/// needs. macOS has no `UIDevice`; the hardware model comes from `hw.model`.
+/// `UIDevice.current` is main-actor isolated, and every caller
+/// (`SupportEmail`) already runs there.
+@MainActor
+enum DeviceInfo {
+    static var systemVersion: String {
+        #if os(macOS)
+        ProcessInfo.processInfo.operatingSystemVersionString
+        #else
+        UIDevice.current.systemVersion
+        #endif
+    }
+
+    static var modelName: String {
+        #if os(macOS)
+        var size = 0
+        sysctlbyname("hw.model", nil, &size, nil, 0)
+        guard size > 0 else { return "Mac" }
+        var model = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.model", &model, &size, nil, 0)
+        let bytes = model.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        return String(decoding: bytes, as: UTF8.self)
+        #else
+        UIDevice.current.modelName
+        #endif
     }
 }
 

@@ -5,7 +5,6 @@
 //  Pure (SwiftData-free) arithmetic for budget period rollover and recurring
 //  transactions, extracted so the advance loops are unit-testable. The
 //  previous inline `while endDate <= now` loops hung the main thread forever
-//  for budgets/transactions whose type had no period (e.g. the default 0),
 //  because the loop condition never became false.
 //
 
@@ -34,6 +33,17 @@ enum BudgetRollover {
             start = end
         }
         return start
+    }
+}
+
+/// Start date for a budget being created or edited. Editing only the amount
+/// must keep the existing anchor; a new period type has to be re-anchored
+/// from the freshly picked day, otherwise the period would still start on
+/// the old type's boundary.
+enum BudgetAnchor {
+    static func startDate(original: Date?, oldType: Int, newType: Int, computed: Date) -> Date {
+        guard let original, oldType == newType else { return computed }
+        return original
     }
 }
 

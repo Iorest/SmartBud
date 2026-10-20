@@ -9,6 +9,9 @@ import Foundation
 import LocalAuthentication
 import SwiftUI
 import Observation
+#if os(macOS)
+import AppKit
+#endif
 // All App Lock related methods will be handled here
 
 @MainActor
@@ -103,10 +106,22 @@ class AppLockViewModel{
                 }
             }
         } else {
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
-            }
+            openBiometricSettings()
         }
+    }
+
+    /// Sends the user to the OS screen where biometrics can be enrolled when
+    /// the device has none available.
+    private func openBiometricSettings() {
+        #if os(macOS)
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy") {
+            NSWorkspace.shared.open(url)
+        }
+        #else
+        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsURL)
+        }
+        #endif
     }
 
     // This method will call on every launch of the app if user has enabled AppLock
@@ -128,9 +143,7 @@ class AppLockViewModel{
                 }
             }
         } else {
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
-            }
+            openBiometricSettings()
         }
     }
 }

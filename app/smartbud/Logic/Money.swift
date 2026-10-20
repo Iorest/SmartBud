@@ -37,4 +37,35 @@ enum Money {
     static func double(_ value: Decimal) -> Double {
         NSDecimalNumber(decimal: value).doubleValue
     }
+
+    /// Currency string for display. Amounts render as a magnitude; pass
+    /// `plus` to force a leading `+`/`-` (nil keeps the natural rendering).
+    static func format(
+        _ value: Double,
+        currencyCode: String,
+        showsCents: Bool = true,
+        plus: Bool? = nil,
+        locale: Locale
+    ) -> String {
+        format(cents(value), currencyCode: currencyCode,
+               showsCents: showsCents, plus: plus, locale: locale)
+    }
+
+    static func format(
+        _ value: Decimal,
+        currencyCode: String,
+        showsCents: Bool = true,
+        plus: Bool? = nil,
+        locale: Locale
+    ) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = locale
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        formatter.maximumFractionDigits = showsCents ? 2 : 0
+
+        let magnitude = formatter.string(from: NSDecimalNumber(decimal: abs(value))) ?? "0"
+        guard let plus else { return magnitude }
+        return (plus ? "+" : "-") + magnitude
+    }
 }

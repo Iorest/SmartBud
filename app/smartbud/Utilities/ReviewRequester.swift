@@ -13,7 +13,11 @@
 //
 
 import StoreKit
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 @MainActor
 enum ReviewRequester {
@@ -71,6 +75,11 @@ enum ReviewRequester {
             return // already asked for this version
         }
 
+        #if os(macOS)
+        // The macOS review prompt has no scene anchor and the App Store
+        // handles its own throttling; skip the in-app nudge there.
+        return
+        #else
         // The system sheet needs a foreground scene to anchor to.
         // Prefer the active one; fall back to the first connected
         // scene (covers the "cold launch" case where the scene
@@ -84,11 +93,11 @@ enum ReviewRequester {
         else { return }
 
         // `AppStore.requestReview(in:)` is the iOS 18+ replacement
-        // for `SKStoreReviewController.requestReview(in:)`. Since
         // the deployment target is iOS 26, this is the right entry
         // point and matches the AppStore.* calls already used in
         // `SubscriptionManager`.
         AppStore.requestReview(in: scene)
         store.set(currentVersion, forKey: lastAskedVersionKey)
+        #endif
     }
 }

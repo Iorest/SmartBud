@@ -16,7 +16,11 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 // MARK: - Bundle (non-Optional, with "Could not determine …" fallback)
 
@@ -43,14 +47,3 @@ extension Bundle {
     }
 }
 
-// MARK: - UIApplication (computed delegates, kept for call-site ergonomics)
-
-extension UIApplication {
-    /// Same as `Bundle.main.appVersion`. Kept for existing call sites
-    /// that already read it through `UIApplication.appVersion`; the
-    /// single source of truth lives on `Bundle`.
-    static var appVersion: String { Bundle.main.appVersion }
-
-    /// Same as `Bundle.main.appBuild`. See `appVersion` above.
-    static var buildNumber: String { Bundle.main.appBuild }
-}

@@ -7,25 +7,21 @@
 
 import Foundation
 import SwiftUI
-
-#if canImport(UIKit)
-    extension View {
-        func hideKeyboard() {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        }
-    }
+#if os(macOS)
+import AppKit
 #endif
 
 extension View {
-    @ViewBuilder func scrollEnabled(_ enabled: Bool) -> some View {
-        if enabled {
-            self
-        } else {
-            simultaneousGesture(DragGesture(minimumDistance: 0),
-                                including: .all)
-        }
+    func hideKeyboard() {
+        #if os(macOS)
+        NSApp.keyWindow?.makeFirstResponder(nil)
+        #else
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
     }
+}
 
+extension View {
     func confettiOverlay(isActive: Binding<Bool>, particleCount: Int = 50) -> some View {
         modifier(ConfettiModifier(isActive: isActive, particleCount: particleCount))
     }
@@ -93,4 +89,54 @@ extension HorizontalAlignment {
     }
 
     static let moneySubtitle = HorizontalAlignment(MoneySubtitle.self)
+}
+
+extension View {
+    /// `fullScreenCover` is iOS-only; macOS presents the same content as a
+    /// sheet so dialogs stay inside the window.
+    @ViewBuilder
+    func fullScreenPresentation<Content: View>(
+        isPresented: Binding<Bool>,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        #if os(macOS)
+        sheet(isPresented: isPresented, onDismiss: onDismiss, content: content)
+        #else
+        fullScreenCover(isPresented: isPresented, onDismiss: onDismiss, content: content)
+        #endif
+    }
+
+    @ViewBuilder
+    func fullScreenPresentation<Item: Identifiable, Content: View>(
+        item: Binding<Item?>,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping (Item) -> Content
+    ) -> some View {
+        #if os(macOS)
+        sheet(item: item, onDismiss: onDismiss, content: content)
+        #else
+        fullScreenCover(item: item, onDismiss: onDismiss, content: content)
+        #endif
+    }
+
+    /// The app draws its own back buttons; hide the platform chrome where it
+    /// exists (iOS navigation bars; macOS has none in this hierarchy).
+    @ViewBuilder
+    func hiddenNavigationBar() -> some View {
+        #if os(iOS)
+        toolbar(.hidden, for: .navigationBar)
+        #else
+        self
+        #endif
+    }
+
+    @ViewBuilder
+    func hiddenNavigationBackButton() -> some View {
+        #if os(iOS)
+        navigationBarBackButtonHidden(true)
+        #else
+        self
+        #endif
+    }
 }

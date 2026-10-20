@@ -6,12 +6,11 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
-
-extension StringProtocol {
-    var firstUppercased: String { prefix(1).uppercased() + dropFirst() }
-    var firstCapitalized: String { prefix(1).capitalized + dropFirst() }
-}
+#else
+import AppKit
+#endif
 
 extension String {
     var containsDigits: Bool {
@@ -26,7 +25,8 @@ extension String {
         let systemFont = UIFont.systemFont(ofSize: size, weight: weight)
         let roundedFont: UIFont
         if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
-            roundedFont = UIFont(descriptor: descriptor, size: size)
+            let rounded: UIFont? = UIFont(descriptor: descriptor, size: size)
+            roundedFont = rounded ?? systemFont
         } else {
             roundedFont = systemFont
         }
@@ -36,19 +36,6 @@ extension String {
         return size.width
     }
 
-    func heightOfRoundedString(size: CGFloat, weight: UIFont.Weight) -> CGFloat {
-        let systemFont = UIFont.systemFont(ofSize: size, weight: weight)
-        let roundedFont: UIFont
-        if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
-            roundedFont = UIFont(descriptor: descriptor, size: size)
-        } else {
-            roundedFont = systemFont
-        }
-
-        let fontAttributes = [NSAttributedString.Key.font: roundedFont]
-        let size = self.size(withAttributes: fontAttributes)
-        return size.height
-    }
 }
 
 extension Character {

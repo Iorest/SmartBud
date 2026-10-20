@@ -160,6 +160,14 @@ extension String {
         return target.localizedString(forKey: key, value: key, table: table, localizations: languages)
     }
 
+    /// Localizes a format template and substitutes arguments. Use this for
+    /// interpolated strings: `String(localized:)` follows the device locale,
+    /// not the in-app language pick, and `String.appLocalized` cannot carry
+    /// format arguments.
+    static func appFormatted(_ key: String, _ arguments: CVarArg...) -> String {
+        String(format: appLocalized(key), arguments: arguments)
+    }
+
     /// Overload for `String(appLocalized: "...\(var)...")`-style call sites
     /// that wrap a String in `String.LocalizationValue`. Kept for parity
     /// with the original Foundation-style API; current call sites all
@@ -174,8 +182,11 @@ extension String {
         bundle: Bundle? = nil,
         comment: StaticString? = nil
     ) -> String {
+        // Swift 6 stores the literal in a `key` child (older builds used
+        // `value`/`_value`); missing every label returned "" and the UI
+        // silently dropped the whole Text.
         let keyString = Mirror(reflecting: key).children
-            .first(where: { $0.label == "value" || $0.label == "_value" })
+            .first(where: { $0.label == "value" || $0.label == "_value" || $0.label == "key" })
             .map { "\($0.value)" } ?? ""
         let code = resolvedAppLanguageCode()
         let target = bundle ?? .main

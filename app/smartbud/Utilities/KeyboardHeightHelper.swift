@@ -13,11 +13,19 @@
 
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 extension Notification {
     var keyboardHeight: CGFloat {
-        (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+        #if os(macOS)
+        return 0
+        #else
+        return (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+        #endif
     }
 }
 
@@ -34,11 +42,10 @@ extension View {
     }
 }
 
+#if !os(macOS)
 extension UIApplication {
-    func endEditing() {
-        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
 }
+#endif
 
 struct KeyboardAwareModifier: ViewModifier {
     @AppStorage("keyboard", store: .appGroup) var savedKeyboardHeight: Double = 291
@@ -46,6 +53,9 @@ struct KeyboardAwareModifier: ViewModifier {
     @State private var isKeyboardVisible = false
 
     func body(content: Content) -> some View {
+        #if os(macOS)
+        content
+        #else
         content
             .padding(.bottom, isKeyboardVisible ? max(0, savedKeyboardHeight) : 0)
             .animation(.easeOut(duration: 0.25), value: isKeyboardVisible)
@@ -77,6 +87,7 @@ struct KeyboardAwareModifier: ViewModifier {
                     }
                 }
             }
+        #endif
     }
 }
 

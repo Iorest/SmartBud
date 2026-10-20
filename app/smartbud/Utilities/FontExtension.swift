@@ -5,7 +5,11 @@
 //  Created by Iorest on 29/7/22.
 //
 
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 import SwiftUI
 
 extension UIFont {
@@ -36,7 +40,8 @@ extension UIFont {
         let font: UIFont
 
         if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
-            font = UIFont(descriptor: descriptor, size: size)
+            let rounded: UIFont? = UIFont(descriptor: descriptor, size: size)
+            font = rounded ?? systemFont
         } else {
             font = systemFont
         }
@@ -48,15 +53,18 @@ extension UIFont {
         let font: UIFont
 
         if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
-            font = UIFont(descriptor: descriptor, size: size)
+            let rounded: UIFont? = UIFont(descriptor: descriptor, size: size)
+            font = rounded ?? systemFont
         } else {
             font = systemFont
         }
+        #if os(macOS)
+        // macOS has no UIFontMetrics; the view's dynamicTypeSize already
+        // drives the size passed in.
+        return font
+        #else
         return UIFontMetrics(forTextStyle: style).scaledFont(for: font)
-    }
-
-    static func textStyleSize(_ style: UIFont.TextStyle) -> CGFloat {
-        UIFont.preferredFont(forTextStyle: style).pointSize
+        #endif
     }
 
 }

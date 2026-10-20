@@ -32,6 +32,14 @@ final class DataRepository {
     /// letting the user know their data isn't syncing to iCloud.
     var isInFallbackMode: Bool { fallbackReason != nil }
 
+    /// Last write failure, surfaced by the UI. Writes used to fail silently,
+    /// which made every "saved" state a lie when the store was unhealthy.
+    private(set) var lastSaveError: String?
+
+    func clearSaveError() {
+        lastSaveError = nil
+    }
+
     /// Ordered list of storage paths the init tries, best-effort first.
     /// Mirrors `WidgetModelContainer`'s strategy on the widget side.
     enum FallbackReason: String {
@@ -65,15 +73,23 @@ final class DataRepository {
         if FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: Self.appGroupID
         ) != nil {
-            let cloudConfig = ModelConfiguration(
+            #if os(macOS)
+            // The macOS target has no iCloud entitlements yet. Configuring
+            // CloudKit without them traps inside PFCloudKitContainerProvider
+            // (SIGTRAP) on a background queue. Use the App Group store
+            // locally until the mac build is team-signed with
+            // com.apple.developer.icloud-container-identifiers.
+            let cloudConfig: ModelConfiguration? = nil
+            #else
+            let cloudConfig: ModelConfiguration? = ModelConfiguration(
                 Self.storeName,
                 groupContainer: .identifier(Self.appGroupID),
                 cloudKitDatabase: .private(Self.cloudContainerID)
             )
-            if let c = try? ModelContainer(
-                for: Self.schema,
-                configurations: cloudConfig
-            ) {
+            #endif
+
+            if let cloudConfig,
+               let c = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
                 container = c
             } else if let c = try? ModelContainer(
                 for: Self.schema,
@@ -82,11 +98,15 @@ final class DataRepository {
                     groupContainer: .identifier(Self.appGroupID)
                 )
             ) {
-                // App Group reachable but CloudKit isn't (e.g. no iCloud
-                // account, iCloud disabled, or signed into a different
-                // Apple ID than the one that owns the container).
+                // App Group reachable but CloudKit isn't (no iCloud
+                // account, iCloud disabled, different Apple ID, or macOS
+                // where CloudKit is not wired up yet).
                 container = c
+                #if os(macOS)
                 reason = .cloudKitUnavailable
+                #else
+                if cloudConfig != nil { reason = .cloudKitUnavailable }
+                #endif
             } else {
                 reason = .cloudKitUnavailable
             }
@@ -144,15 +164,21 @@ final class DataRepository {
 
     // MARK: Save
 
-    func save() {
-        guard context.hasChanges else { return }
+    /// Persists pending changes. Returns `false` (and records
+    /// `lastSaveError`) when the store rejects the write.
+    @discardableResult
+    func save() -> Bool {
+        guard context.hasChanges else { return true }
         do {
             try context.save()
+            lastSaveError = nil
+            WidgetCenter.shared.reloadAllTimelines()
+            return true
         } catch {
-            // Swallowing this used to hide failed writes entirely.
+            lastSaveError = String.appLocalized("无法保存更改，请稍后重试。")
             dataLogger.error("SwiftData save failed: \(error.localizedDescription, privacy: .public)")
+            return false
         }
-        WidgetCenter.shared.reloadAllTimelines()
     }
 
     /// Discards any uncommitted (unsaved) inserts/deletes/updates in the context.
@@ -193,17 +219,14 @@ final class DataRepository {
 
     // MARK: Bulk Delete
 
-    func deleteAll() {
+    @discardableResult
+    func deleteAll() -> Bool {
         for t in fetch(TransactionModel.self) { context.delete(t) }
         for c in fetch(CategoryModel.self) { context.delete(c) }
         for b in fetch(BudgetModel.self) { context.delete(b) }
         for m in fetch(MainBudgetModel.self) { context.delete(m) }
-        do {
-            try context.save()
-        } catch {
-            dataLogger.error("SwiftData deleteAll failed: \(error.localizedDescription, privacy: .public)")
-        }
-        WidgetCenter.shared.reloadAllTimelines()
+        for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
+        return save()
     }
 
     // MARK: - CloudKit wipe
@@ -234,14 +257,10 @@ final class DataRepository {
     /// own scheduler and the local deletes are confined to the
     /// main-actor `context` we already own.
     func wipeEverything() async -> WipeOutcome {
-        // 1. Local delete. If this throws, abort — wiping iCloud when
+        // 1. Local delete. If the save fails, abort — wiping iCloud when
         //    the local store is in an unknown state is worse than
         //    failing the whole flow.
-        do {
-            deleteAll()
-        } catch {
-            return .localFailed
-        }
+        guard deleteAll() else { return .localFailed }
 
         // 2. CloudKit zone delete. Best effort — if the device is
         //    signed out of iCloud, the zone doesn't exist on this

@@ -260,14 +260,14 @@ struct LineGraphDataPoint: Equatable, Identifiable {
     var dateString: String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
-        dateFormatter.dateFormat = "d MMM"
+        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
         return dateFormatter.string(from: date)
     }
 
     var monthString: String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.appLocale
-        dateFormatter.dateFormat = "MMM yy"
+        dateFormatter.setLocalizedDateFormatFromTemplate("yMMM")
         return dateFormatter.string(from: date)
     }
 
