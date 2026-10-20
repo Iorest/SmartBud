@@ -246,7 +246,9 @@ struct NumberPadTextView: View {
         // stays next to the number it edits instead of floating at the screen
         // edge (HIG: destructive/edit affordances belong with their target).
         HStack(spacing: 10) {
-            HStack(alignment: .lastTextBaseline, spacing: 1) {
+            // Alphabetic symbols ("SGD", "CHF") need breathing room that a
+            // single "$" does not.
+            HStack(alignment: .lastTextBaseline, spacing: currencySymbol.count > 1 ? 6 : 1) {
                 Text(currencySymbol)
                     .font(.largeTitle)
                     .foregroundStyle(Color.SubtitleText)
