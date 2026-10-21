@@ -53,11 +53,11 @@ struct InsightsWidgetDollarView: View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
             Text(currencySymbol)
                 .font(.system(.subheadline, design: .rounded).weight(.medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
 
             Text(dollarText)
                 .font(.system(.title3, design: .rounded).weight(.medium))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
@@ -99,12 +99,12 @@ struct InsightsWidgetCategoryBreakdownView: View {
                             Text(category.name)
                                 .lineLimit(1)
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                .foregroundColor(Color.PrimaryText)
+                                .foregroundStyle(Color.PrimaryText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
                             Text("\(Int(round(category.percent * 100)))%")
                                 .font(.system(size: 12, weight: .regular, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
                         }
                     }
                 }
@@ -114,7 +114,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                     .font(.system(size: 10,
                                   weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .frame(maxHeight: .infinity)
             }
 
@@ -125,7 +125,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
 
                     Text(String.appLocalized("New Expense"))
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundColor(Color.PrimaryText)
+                        .foregroundStyle(Color.PrimaryText)
                 }
                 .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)
@@ -145,7 +145,7 @@ extension InsightsWidgetEntryView {
                     VStack(alignment: .leading, spacing: -1) {
                         Text("\(verbText)\(subtitleText)")
                             .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
 
                         InsightsWidgetDollarView(currencySymbol: currencySymbol, dollarText: dollarText)
                     }
@@ -159,13 +159,13 @@ extension InsightsWidgetEntryView {
                                     Text(getMaxText())
                                         .lineLimit(1)
                                         .font(.system(size: 8, weight: .regular, design: .rounded))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
 
                                     Spacer()
 
                                     Text(String.appLocalized("0"))
                                         .font(.system(size: 8, weight: .regular, design: .rounded))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
                                 }
                                 .frame(height: proxy.size.height * 0.85)
 
@@ -184,7 +184,7 @@ extension InsightsWidgetEntryView {
 
                                                 Text(getWeekday(day: day).prefix(1))
                                                     .font(.system(size: 8, weight: .bold, design: .rounded))
-                                                    .foregroundColor(Color.SubtitleText)
+                                                    .foregroundStyle(Color.SubtitleText)
                                             }
                                             .opacity(day > Date.now ? 0.3 : 1)
                                             .frame(maxWidth: .infinity)
@@ -206,7 +206,7 @@ extension InsightsWidgetEntryView {
                                                             && firstDayOfMonth == 1 {
                                                             Text("\(dayNumber(for: day))")
                                                                 .font(.system(size: 8, weight: .bold, design: .rounded))
-                                                                .foregroundColor(Color.SubtitleText)
+                                                                .foregroundStyle(Color.SubtitleText)
                                                                 .frame(width: 20, alignment: .center)
                                                                 .offset(y: 15)
                                                         }
@@ -232,7 +232,7 @@ extension InsightsWidgetEntryView {
                                                         if monthNumberArray.contains(dayNumber(for: day)) {
                                                             Text(LocalizedStringKey(monthName(for: day)))
                                                                 .font(.system(size: 8, weight: .bold, design: .rounded))
-                                                                .foregroundColor(Color.SubtitleText)
+                                                                .foregroundStyle(Color.SubtitleText)
                                                                 .frame(width: 20, alignment: .center)
                                                                 .offset(y: 15)
                                                         }
@@ -253,7 +253,7 @@ extension InsightsWidgetEntryView {
                                 Text(getAverageText())
                                     .lineLimit(1)
                                     .font(.system(size: 8, weight: .regular, design: .rounded))
-                                    .foregroundColor(Color.PrimaryText)
+                                    .foregroundStyle(Color.PrimaryText)
                                     .opacity(averageLabelOpacity)
 
                                 Line()

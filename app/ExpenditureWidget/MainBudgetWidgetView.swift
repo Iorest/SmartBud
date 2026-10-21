@@ -135,7 +135,7 @@ struct MainBudgetWidgetEntryView: View {
                         let amount = amountText(difference, showCents: showCents)
                         Text("\(currencySymbol)\(amount) \(statusText) \(budgetType)")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
 
                         Gauge(value: min(max(percent, 0), 1), in: 0 ... 1) {
                             Text(String.appLocalized("Percent Spent"))
@@ -162,7 +162,7 @@ struct MainBudgetWidgetEntryView: View {
                 Text(String.appLocalized("Create your overall budget in the app"))
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.SubtitleText)
                     .padding(15)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .containerBackground(for: .widget) { WidgetGlassBackground() }
@@ -173,11 +173,11 @@ struct MainBudgetWidgetEntryView: View {
                             Text(headingText.uppercased())
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .lineLimit(1)
-                                .foregroundColor(Color.PrimaryText)
+                                .foregroundStyle(Color.PrimaryText)
 
                             Text("SPENT: \(percentString1)")
                                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
                         }
 
                         Spacer()
@@ -223,16 +223,16 @@ struct MainBudgetWidgetEntryView: View {
                                     if showTimeFrame(size: proxy.size.width - 50) {
                                         Text(systemSmallWidgetText)
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                     } else {
                                         if entry.budgetAmount >= entry.totalSpent {
                                             Text(String.appLocalized("left"))
                                                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                                                .foregroundColor(Color.SubtitleText)
+                                                .foregroundStyle(Color.SubtitleText)
                                         } else {
                                             Text(String.appLocalized("over"))
                                                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                                                .foregroundColor(Color.SubtitleText)
+                                                .foregroundStyle(Color.SubtitleText)
                                         }
                                     }
                                 }
@@ -255,7 +255,7 @@ struct MainBudgetWidgetEntryView: View {
                                 }
                             }
                             .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                         }
                         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .bottom)
                     }

@@ -248,7 +248,7 @@ struct LockBudgetWidgetEntryView: View {
                         let amount = amountText(difference, showCents: showCents)
                         Text("\(currencySymbol)\(amount) \(subtitle) \(budgetType)")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
 
                         Gauge(value: min(max(percent, 0), 1), in: 0 ... 1) {
                             Text(String.appLocalized("Percent Spent"))

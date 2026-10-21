@@ -131,11 +131,11 @@ struct RecentTransactionsDollarView: View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
             Text(net ? "\(amount < 0 ? "-" : (amount == 0 ? "" : "+"))\(currencySymbol)" : currencySymbol)
                 .font(.system(bigger ? .title3 : .subheadline, design: .rounded).weight(.medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
 
             Text("\(actualAmount, specifier: showCents && actualAmount < 100  ? "%.2f" : "%.0f")")
                 .font(.system(bigger ? .title : .title3, design: .rounded).weight(.medium))
-                .foregroundColor(Color.PrimaryText)
+                .foregroundStyle(Color.PrimaryText)
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
@@ -189,7 +189,7 @@ extension ExpenditureWidgetEntryView {
                     VStack(spacing: 0) {
                         Text("\(typeText) \(inlineSubtitleText)".uppercased())
                             .font(.system(size: 9, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
 
                         RecentTransactionsDollarView(
                             amount: entry.amount,
@@ -206,7 +206,7 @@ extension ExpenditureWidgetEntryView {
                         VStack(spacing: 5) {
                             Text(String.appLocalized("NO RECENT EXPENSES"))
                                 .font(.system(size: 9, weight: .medium, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
                                 .frame(maxHeight: .infinity)
 
                             HStack(spacing: 5) {
@@ -215,7 +215,7 @@ extension ExpenditureWidgetEntryView {
 
                                 Text(String.appLocalized("New Expense"))
                                     .font(.system(size: 12, weight: .medium, design: .rounded))
-                                    .foregroundColor(Color.PrimaryText)
+                                    .foregroundStyle(Color.PrimaryText)
                             }
                             .padding(.vertical, 5)
                             .frame(maxWidth: .infinity)
@@ -228,7 +228,7 @@ extension ExpenditureWidgetEntryView {
                         VStack(alignment: .leading, spacing: 5) {
                             Text(String.appLocalized("RECENT EXPENSES"))
                                 .font(.system(size: 9, weight: .medium, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
 
                             ForEach(entry.transactions.prefix(3), id: \.self) { transaction in
                                 HStack(spacing: 5) {
@@ -239,19 +239,19 @@ extension ExpenditureWidgetEntryView {
                                     Text(transaction.note)
                                         .lineLimit(1)
                                         .font(.system(size: 13, weight: .regular, design: .rounded))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundStyle(Color.PrimaryText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
                                     if transaction.income {
                                         Text(signedAmount(transaction.amount, income: true, showCents: showCents))
                                             .font(.system(size: 13, weight: .regular, design: .rounded))
-                                            .foregroundColor(Color.IncomeGreen)
+                                            .foregroundStyle(Color.IncomeGreen)
                                             .lineLimit(1)
                                             .layoutPriority(1)
                                     } else {
                                         Text(signedAmount(transaction.amount, income: false, showCents: showCents))
                                             .font(.system(size: 13, weight: .regular, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                             .lineLimit(1)
                                             .layoutPriority(1)
                                     }
@@ -265,7 +265,7 @@ extension ExpenditureWidgetEntryView {
 
                                     Text(String.appLocalized("New Expense"))
                                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundStyle(Color.PrimaryText)
                                 }
                                 .padding(.vertical, 5)
                                 .frame(maxWidth: .infinity)
@@ -293,7 +293,7 @@ extension ExpenditureWidgetEntryView {
                     VStack(spacing: 0) {
                         Text("\(typeText) \(inlineSubtitleText)".uppercased())
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
 
                         RecentTransactionsDollarView(
                             amount: entry.amount,
@@ -312,7 +312,7 @@ extension ExpenditureWidgetEntryView {
                         VStack(spacing: 20) {
                             Text(String.appLocalized("NO RECENT EXPENSES"))
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
 
                             Link(destination: URL(string: "smartbud://newExpense")!) {
                                 HStack(spacing: 4) {
@@ -321,7 +321,7 @@ extension ExpenditureWidgetEntryView {
 
                                     Text(String.appLocalized("New Expense"))
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundStyle(Color.PrimaryText)
                                 }
                                 .padding(.vertical, 6)
                                 .frame(width: 200)
@@ -335,7 +335,7 @@ extension ExpenditureWidgetEntryView {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(String.appLocalized("RECENT EXPENSES"))
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundStyle(Color.SubtitleText)
 
                             ForEach(entry.transactions, id: \.self) { transaction in
                                 HStack(spacing: 8) {
@@ -346,19 +346,19 @@ extension ExpenditureWidgetEntryView {
                                     Text(transaction.note)
                                         .lineLimit(1)
                                         .font(.system(size: 16, weight: .medium, design: .rounded))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundStyle(Color.PrimaryText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
                                     if transaction.income {
                                         Text(signedAmount(transaction.amount, income: true, showCents: showCents))
                                             .font(.system(size: 16, weight: .regular, design: .rounded))
-                                            .foregroundColor(Color.IncomeGreen)
+                                            .foregroundStyle(Color.IncomeGreen)
                                             .lineLimit(1)
                                             .layoutPriority(1)
                                     } else {
                                         Text(signedAmount(transaction.amount, income: false, showCents: showCents))
                                             .font(.system(size: 16, weight: .regular, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                             .lineLimit(1)
                                             .layoutPriority(1)
                                     }
@@ -373,7 +373,7 @@ extension ExpenditureWidgetEntryView {
 
                                         Text(String.appLocalized("New Expense"))
                                             .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                            .foregroundColor(Color.PrimaryText)
+                                            .foregroundStyle(Color.PrimaryText)
                                     }
                                     .padding(.vertical, 6)
                                     .frame(width: 200)

@@ -190,7 +190,7 @@ struct BudgetWidgetEntryView: View {
             Text(String.appLocalized("Select budget in widget options"))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .padding(15)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .containerBackground(for: .widget) {
@@ -201,7 +201,7 @@ struct BudgetWidgetEntryView: View {
             Text(String.appLocalized("Budget no longer exists - please select new budget from widget options."))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color.SubtitleText)
+                .foregroundStyle(Color.SubtitleText)
                 .padding(15)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .containerBackground(for: .widget) {
@@ -219,11 +219,11 @@ struct BudgetWidgetEntryView: View {
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                                 .lineLimit(1)
                         }
-                        .foregroundColor(Color.PrimaryText)
+                        .foregroundStyle(Color.PrimaryText)
 
                         Text("SPENT: \(percentString1)")
                             .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundStyle(Color.SubtitleText)
                     }
 
                     Spacer()
@@ -269,16 +269,16 @@ struct BudgetWidgetEntryView: View {
                                 if showTimeFrame(size: proxy.size.width - 50) {
                                     Text(systemSmallWidgetText)
                                         .font(.system(size: 10, weight: .medium, design: .rounded))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundStyle(Color.SubtitleText)
                                 } else {
                                     if entry.budget.budgetAmount >= entry.totalSpent {
                                         Text(String.appLocalized("left"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                     } else {
                                         Text(String.appLocalized("over"))
                                             .font(.system(size: 10, weight: .medium, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundStyle(Color.SubtitleText)
                                     }
                                 }
                             }
@@ -301,7 +301,7 @@ struct BudgetWidgetEntryView: View {
                             }
                         }
                         .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundStyle(Color.SubtitleText)
                     }
                     .frame(width: proxy.size.width, height: proxy.size.height, alignment: .bottom)
                 }
@@ -331,11 +331,11 @@ struct WidgetBudgetDollarView: View {
         HStack(alignment: .lastTextBaseline, spacing: 1.3) {
             Text(currencySymbol)
                 .font(.system(.subheadline, design: .rounded).weight(.medium))
-                .foregroundColor(red ? Color("BudgetRed") : Color.SubtitleText)
+                .foregroundStyle(red ? Color("BudgetRed") : Color.SubtitleText)
 
             Text("\(amount, specifier: showCents && amount < 100  ? "%.2f" : "%.0f")")
                 .font(.system(.title3, design: .rounded).weight(.medium))
-                .foregroundColor(red ? Color("BudgetRed") : Color.PrimaryText)
+                .foregroundStyle(red ? Color("BudgetRed") : Color.PrimaryText)
 
         }
         .minimumScaleFactor(0.5)
