@@ -142,6 +142,9 @@ struct LogInsightsView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(Color.SecondaryBackground, in: Capsule())
+            // Keep the pill compact but give the menu a 44pt tap target.
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
