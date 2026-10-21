@@ -81,9 +81,6 @@ struct TransactionView: View {
     @State var toDelete: TransactionModel?
     @State var deleteMode = false
 
-    @AppStorage("bottomEdge", store: .appGroup)
-    var bottomEdge: Double = 15
-
     @AppStorage("colourScheme", store: .appGroup)
     var colourScheme: Int = 0
 
@@ -138,9 +135,10 @@ struct TransactionView: View {
 
     @ViewBuilder
     var headerArea: some View {
-        if usesLargeTextLayout {
-            // At large sizes the Cancel/repeat buttons overlap the
+        if usesLargeTextLayout || toEdit != nil {
+            // At large sizes the Cancel/repeat/delete buttons overlap the
             // income/expense capsule on narrow phones, so give each its row.
+            // The delete button only exists while editing, hence the check.
             VStack(spacing: 8) {
                 topBarButtons
                 toastOrIncomeExpensePicker

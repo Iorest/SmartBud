@@ -4,6 +4,7 @@ import SwiftData
 
 struct DetailedBudgetView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(BudgetViewModel.self) private var budgetVM
     let budget: BudgetModel
 
     @State private var toDelete: BudgetModel?
@@ -73,16 +74,27 @@ struct DetailedBudgetView: View {
         .fullScreenPresentation(isPresented: $newTransaction) {
             TransactionView(category: budget.category)
         }
-        .fullScreenPresentation(item: $toDelete) { budget in
-            DeleteBudgetAlert(toDelete: budget) {
+        .alert(
+            String(format: String.appLocalized("Delete the '%@' budget?"),
+                   toDelete?.category?.wrappedName ?? ""),
+            isPresented: Binding(get: { toDelete != nil },
+                                 set: { if !$0 { toDelete = nil } }),
+            presenting: toDelete
+        ) { budget in
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation { budgetVM.delete(budget) }
                 dismiss()
             }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: { _ in
+            Text(String.appLocalized("This action cannot be undone."))
         }
     }
 }
 
 struct DetailedMainBudgetView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(BudgetViewModel.self) private var budgetVM
     let budget: MainBudgetModel
 
     @State private var toDelete: MainBudgetModel?
@@ -142,10 +154,19 @@ struct DetailedMainBudgetView: View {
         .fullScreenPresentation(item: $toEdit) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenPresentation(item: $toDelete) { budget in
-            DeleteMainBudgetAlert(toDelete: budget) {
+        .alert(
+            String.appLocalized("Delete your overall budget?"),
+            isPresented: Binding(get: { toDelete != nil },
+                                 set: { if !$0 { toDelete = nil } }),
+            presenting: toDelete
+        ) { budget in
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation { budgetVM.deleteMain(budget) }
                 dismiss()
             }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: { _ in
+            Text(String.appLocalized("This action cannot be undone."))
         }
     }
 }

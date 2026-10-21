@@ -341,26 +341,23 @@ extension CategoryListView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.clear)
         .animation(.easeOut(duration: 0.2), value: showToast)
-        .onChange(of: toDelete) { _, _ in
-            if toDelete != nil {
-                deleteMode = true
-            }
-        }
-        .fullScreenPresentation(isPresented: $deleteMode) {
-            SBDeleteSheet(
-                title: String.appFormatted("Delete '%@'?", toDelete?.wrappedName ?? ""),
-                message: String(
-                    format: String.appLocalized(
-                        "This action cannot be undone. %@ transactions are kept and become uncategorized."),
-                    toDelete?.wrappedName ?? ""
-                )
-            ) {
-                if let gonnaDelete = toDelete {
-                    withAnimation { categoryVM.delete(gonnaDelete) }
-                }
-                deleteMode = false
+        .alert(
+            String.appFormatted("Delete '%@'?", toDelete?.wrappedName ?? ""),
+            isPresented: Binding(get: { toDelete != nil },
+                                 set: { if !$0 { toDelete = nil } }),
+            presenting: toDelete
+        ) { category in
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation { categoryVM.delete(category) }
                 toDelete = nil
             }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: { category in
+            Text(String(
+                format: String.appLocalized(
+                    "This action cannot be undone. %@ transactions are kept and become uncategorized, "
+                        + "and this category's budget is deleted."),
+                category.wrappedName))
         }
         .sheet(item: $toEdit) { category in
                 EditCategoryAlert(

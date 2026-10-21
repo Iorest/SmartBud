@@ -156,8 +156,19 @@ struct ActualBudgetView: View {
             .sheet(isPresented: $newBudget) {
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty)
             }
-            .fullScreenPresentation(item: $toDelete) { budget in
-                DeleteBudgetAlert(toDelete: budget)
+            .alert(
+                String(format: String.appLocalized("Delete the '%@' budget?"),
+                       toDelete?.category?.wrappedName ?? ""),
+                isPresented: Binding(get: { toDelete != nil },
+                                     set: { if !$0 { toDelete = nil } }),
+                    presenting: toDelete
+            ) { budget in
+                Button(String.appLocalized("Delete"), role: .destructive) {
+                    withAnimation { budgetVM.delete(budget) }
+                }
+                Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+            } message: { _ in
+                Text(String.appLocalized("This action cannot be undone."))
             }
         }
     }
@@ -262,8 +273,18 @@ struct MainBudgetView: View {
         .sheet(item: $toEdit) { budget in
             BrandNewBudgetView(overallBudgetCreated: true, toEditMainBudget: budget)
         }
-        .fullScreenPresentation(item: $toDelete) { budget in
-            DeleteMainBudgetAlert(toDelete: budget)
+        .alert(
+            String.appLocalized("Delete your overall budget?"),
+            isPresented: Binding(get: { toDelete != nil },
+                                 set: { if !$0 { toDelete = nil } }),
+            presenting: toDelete
+        ) { budget in
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation { budgetVM.deleteMain(budget) }
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: { _ in
+            Text(String.appLocalized("This action cannot be undone."))
         }
     }
 

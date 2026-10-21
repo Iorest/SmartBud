@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
+		E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
 		E1A2B3C4000000000000062B /* CategoryEditor+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000629 /* CategoryEditor+Validation.swift */; };
 		E1A2B3C4000000000000062A /* CategoryEditor+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000629 /* CategoryEditor+Validation.swift */; };
 		E1A2B3C40000000000000625 /* SettingsProView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000623 /* SettingsProView+Sections.swift */; };
@@ -28,8 +30,6 @@
 		E1A2B3C4000000000000060D /* InsightsWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000060C /* InsightsWidgetViews.swift */; };
 		E1A2B3C4000000000000060B /* MainBudgetWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000609 /* MainBudgetWidgetView.swift */; };
 		E1A2B3C4000000000000060A /* MainBudgetWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000609 /* MainBudgetWidgetView.swift */; };
-		E1A2B3C40000000000000608 /* LogTransactionViews+Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000606 /* LogTransactionViews+Alerts.swift */; };
-		E1A2B3C40000000000000607 /* LogTransactionViews+Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000606 /* LogTransactionViews+Alerts.swift */; };
 		E1A2B3C40000000000000605 /* LogSteppers+Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000603 /* LogSteppers+Month.swift */; };
 		E1A2B3C40000000000000604 /* LogSteppers+Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000603 /* LogSteppers+Month.swift */; };
 		E1A2B3C40000000000000602 /* InsightsView+Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000600 /* InsightsView+Rows.swift */; };
@@ -173,7 +173,6 @@
 		B0A0F00000000000000000E3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
 		B0A0F0000000000000000102 /* SingleBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000101 /* SingleBudgetView.swift */; };
 		B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000103 /* BudgetGraphs.swift */; };
-		B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000105 /* BudgetAlerts.swift */; };
 		B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000107 /* BudgetDetailViews.swift */; };
 		B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010B /* FilteredBudgetViews.swift */; };
 		B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010F /* BudgetSteppers.swift */; };
@@ -198,7 +197,6 @@
 		B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000209 /* SmartEntrySheet.swift */; };
 		B0A0F0000000000000000301 /* CategoryListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000302 /* CategoryListViews.swift */; };
 		B0A0F0000000000000000303 /* CategoryEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000304 /* CategoryEditorViews.swift */; };
-		B0A0F0000000000000000305 /* CategoryDeleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000306 /* CategoryDeleteView.swift */; };
 		B0A0F0000000000000000307 /* CategorySuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000308 /* CategorySuggestions.swift */; };
 		B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030A /* CategoryInputViews.swift */; };
 		B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030C /* CategoryColourPicker.swift */; };
@@ -219,7 +217,6 @@
 		D0C0FFEE0000000000000111 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000E1 /* Theme.swift */; };
 		D0C0FFEE0000000000000112 /* SingleBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000101 /* SingleBudgetView.swift */; };
 		D0C0FFEE0000000000000113 /* BudgetGraphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000103 /* BudgetGraphs.swift */; };
-		D0C0FFEE0000000000000114 /* BudgetAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000105 /* BudgetAlerts.swift */; };
 		D0C0FFEE0000000000000115 /* BudgetDetailViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000107 /* BudgetDetailViews.swift */; };
 		D0C0FFEE0000000000000117 /* FilteredBudgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010B /* FilteredBudgetViews.swift */; };
 		D0C0FFEE0000000000000119 /* BudgetSteppers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000010F /* BudgetSteppers.swift */; };
@@ -240,7 +237,6 @@
 		D0C0FFEE0000000000000129 /* SmartEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000209 /* SmartEntrySheet.swift */; };
 		D0C0FFEE000000000000012A /* CategoryListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000302 /* CategoryListViews.swift */; };
 		D0C0FFEE000000000000012B /* CategoryEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000304 /* CategoryEditorViews.swift */; };
-		D0C0FFEE000000000000012C /* CategoryDeleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000306 /* CategoryDeleteView.swift */; };
 		D0C0FFEE000000000000012D /* CategorySuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000308 /* CategorySuggestions.swift */; };
 		D0C0FFEE000000000000012E /* CategoryInputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030A /* CategoryInputViews.swift */; };
 		D0C0FFEE000000000000012F /* CategoryColourPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030C /* CategoryColourPicker.swift */; };
@@ -343,9 +339,6 @@
 		E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000250 /* AmountFormatting.swift */; };
 		E1A2B3C40000000000000281 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
-		E1A2B3C40000000000000441 /* SBDeleteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000440 /* SBDeleteSheet.swift */; };
-		E1A2B3C40000000000000442 /* SBDeleteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000440 /* SBDeleteSheet.swift */; };
-		E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
 		E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
 		E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */; };
 		E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */; };
@@ -366,7 +359,6 @@
 		E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
-		E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */; };
 		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000254 /* MoneyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */; };
 		E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000270 /* TransactionSnapshot.swift */; };
@@ -441,6 +433,7 @@
 		E1A2B3C40000000000000503 /* TransactionView+Body.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionView+Body.swift"; sourceTree = "<group>"; };
 		5327D2CF287C6B5E00F76ADF /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5327D2D0287C6B5E00F76ADF /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeView+DeleteConfirmation.swift"; sourceTree = "<group>"; };
 		5327D2D2287C6B5E00F76ADF /* LogView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		5327D2D3287C6B5E00F76ADF /* BudgetView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
 		5327D2D4287C6B5E00F76ADF /* InsightsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; wrapsLines = 0; };
@@ -540,14 +533,12 @@
 		B0A0F00000000000000000E1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000101 /* SingleBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleBudgetView.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000103 /* BudgetGraphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetGraphs.swift; sourceTree = "<group>"; };
-		B0A0F0000000000000000105 /* BudgetAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetAlerts.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000107 /* BudgetDetailViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViews.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000010B /* FilteredBudgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredBudgetViews.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000010F /* BudgetSteppers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetSteppers.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000111 /* LogInsightsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInsightsViews.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000115 /* LogListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogListViews.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000117 /* LogTransactionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTransactionViews.swift; sourceTree = "<group>"; };
-		E1A2B3C40000000000000606 /* LogTransactionViews+Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogTransactionViews+Alerts.swift"; sourceTree = "<group>"; };
 		B0A0F0000000000000000119 /* LogFilterViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFilterViews.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000011B /* LogSteppers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSteppers.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000603 /* LogSteppers+Month.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogSteppers+Month.swift"; sourceTree = "<group>"; };
@@ -568,7 +559,6 @@
 		B0A0F0000000000000000304 /* CategoryEditorViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryEditorViews.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000611 /* CategoryEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CategoryEditor.swift"; sourceTree = "<group>"; };
 		E1A2B3C40000000000000629 /* CategoryEditor+Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CategoryEditor+Validation.swift"; sourceTree = "<group>"; };
-		B0A0F0000000000000000306 /* CategoryDeleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryDeleteView.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000308 /* CategorySuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySuggestions.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000030A /* CategoryInputViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryInputViews.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000030C /* CategoryColourPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColourPicker.swift; sourceTree = "<group>"; };
@@ -588,8 +578,6 @@
 		E1A2B3C4000000000000021B /* CSVTableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVTableTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000250 /* AmountFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmountFormatting.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000280 /* SBToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBToast.swift; sourceTree = "<group>"; };
-		E1A2B3C40000000000000440 /* SBDeleteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBDeleteSheet.swift; sourceTree = "<group>"; };
-		E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDeleteConfirmation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002B0 /* TransactionDateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionDateRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionCategoryRow.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionRepeatButton.swift; sourceTree = "<group>"; };
@@ -669,7 +657,6 @@
 			children = (
 				B0A0F0000000000000000101 /* SingleBudgetView.swift */,
 				B0A0F0000000000000000103 /* BudgetGraphs.swift */,
-				B0A0F0000000000000000105 /* BudgetAlerts.swift */,
 				B0A0F0000000000000000107 /* BudgetDetailViews.swift */,
 				E1A2B3C400000000000002E0 /* BudgetTimeView.swift */,
 				B0A0F000000000000000010B /* FilteredBudgetViews.swift */,
@@ -686,7 +673,6 @@
 				B0A0F0000000000000000304 /* CategoryEditorViews.swift */,
 				E1A2B3C40000000000000611 /* CategoryEditor.swift */,
 				E1A2B3C40000000000000629 /* CategoryEditor+Validation.swift */,
-				B0A0F0000000000000000306 /* CategoryDeleteView.swift */,
 				B0A0F0000000000000000308 /* CategorySuggestions.swift */,
 				B0A0F000000000000000030A /* CategoryInputViews.swift */,
 				B0A0F000000000000000030C /* CategoryColourPicker.swift */,
@@ -700,7 +686,6 @@
 				B0A0F0000000000000000111 /* LogInsightsViews.swift */,
 				B0A0F0000000000000000115 /* LogListViews.swift */,
 				B0A0F0000000000000000117 /* LogTransactionViews.swift */,
-				E1A2B3C40000000000000606 /* LogTransactionViews+Alerts.swift */,
 				B0A0F0000000000000000119 /* LogFilterViews.swift */,
 				B0A0F000000000000000011B /* LogSteppers.swift */,
 				E1A2B3C40000000000000603 /* LogSteppers+Month.swift */,
@@ -747,10 +732,8 @@
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
 				E1A2B3C40000000000000280 /* SBToast.swift */,
-				E1A2B3C40000000000000440 /* SBDeleteSheet.swift */,
 				E1A2B3C40000000000000218 /* CSVTable.swift */,
 				E1A2B3C40000000000000300 /* TransactionCategoryGrid.swift */,
-				E1A2B3C40000000000000290 /* TransactionDeleteConfirmation.swift */,
 				E1A2B3C400000000000002B0 /* TransactionDateRow.swift */,
 				E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */,
 				E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */,
@@ -872,6 +855,7 @@
 				E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */,
 				E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */,
 				5327D2D0287C6B5E00F76ADF /* HomeView.swift */,
+				E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */,
 				5327D2D2287C6B5E00F76ADF /* LogView.swift */,
 				536CC385293106180081E401 /* LineGraph.swift */,
 				5327D2D4287C6B5E00F76ADF /* InsightsView.swift */,
@@ -1240,14 +1224,12 @@
 				B0A0F00000000000000000E2 /* Theme.swift in Sources */,
 				B0A0F0000000000000000102 /* SingleBudgetView.swift in Sources */,
 				B0A0F0000000000000000104 /* BudgetGraphs.swift in Sources */,
-				B0A0F0000000000000000106 /* BudgetAlerts.swift in Sources */,
 				B0A0F0000000000000000108 /* BudgetDetailViews.swift in Sources */,
 				B0A0F000000000000000010C /* FilteredBudgetViews.swift in Sources */,
 				B0A0F0000000000000000110 /* BudgetSteppers.swift in Sources */,
 				B0A0F0000000000000000112 /* LogInsightsViews.swift in Sources */,
 				B0A0F0000000000000000116 /* LogListViews.swift in Sources */,
 				B0A0F0000000000000000118 /* LogTransactionViews.swift in Sources */,
-				E1A2B3C40000000000000607 /* LogTransactionViews+Alerts.swift in Sources */,
 				B0A0F000000000000000011A /* LogFilterViews.swift in Sources */,
 				B0A0F000000000000000011C /* LogSteppers.swift in Sources */,
 				E1A2B3C40000000000000604 /* LogSteppers+Month.swift in Sources */,
@@ -1267,7 +1249,6 @@
 				B0A0F0000000000000000303 /* CategoryEditorViews.swift in Sources */,
 				E1A2B3C40000000000000612 /* CategoryEditor.swift in Sources */,
 				E1A2B3C4000000000000062A /* CategoryEditor+Validation.swift in Sources */,
-				B0A0F0000000000000000305 /* CategoryDeleteView.swift in Sources */,
 				B0A0F0000000000000000307 /* CategorySuggestions.swift in Sources */,
 				B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */,
 				B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */,
@@ -1360,8 +1341,6 @@
 				E1A2B3C40000000000000219 /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000251 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000281 /* SBToast.swift in Sources */,
-				E1A2B3C40000000000000441 /* SBDeleteSheet.swift in Sources */,
-				E1A2B3C40000000000000291 /* TransactionDeleteConfirmation.swift in Sources */,
 				E1A2B3C400000000000002B1 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C1 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D1 /* TransactionRepeatButton.swift in Sources */,
@@ -1376,7 +1355,8 @@
 				E1A2B3C40000000000000401 /* LogTransactionList.swift in Sources */,
 				E1A2B3C40000000000000615 /* LogTransactionRow.swift in Sources */,
 				E1A2B3C40000000000000501 /* TemplatesView.swift in Sources */,
-			);
+							E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		53B1D186288ED7E400E28062 /* Sources */ = {
@@ -1467,14 +1447,12 @@
 				D0C0FFEE0000000000000111 /* Theme.swift in Sources */,
 				D0C0FFEE0000000000000112 /* SingleBudgetView.swift in Sources */,
 				D0C0FFEE0000000000000113 /* BudgetGraphs.swift in Sources */,
-				D0C0FFEE0000000000000114 /* BudgetAlerts.swift in Sources */,
 				D0C0FFEE0000000000000115 /* BudgetDetailViews.swift in Sources */,
 				D0C0FFEE0000000000000117 /* FilteredBudgetViews.swift in Sources */,
 				D0C0FFEE0000000000000119 /* BudgetSteppers.swift in Sources */,
 				D0C0FFEE000000000000011A /* LogInsightsViews.swift in Sources */,
 				D0C0FFEE000000000000011C /* LogListViews.swift in Sources */,
 				D0C0FFEE000000000000011D /* LogTransactionViews.swift in Sources */,
-				E1A2B3C40000000000000608 /* LogTransactionViews+Alerts.swift in Sources */,
 				D0C0FFEE000000000000011E /* LogFilterViews.swift in Sources */,
 				D0C0FFEE000000000000011F /* LogSteppers.swift in Sources */,
 				E1A2B3C40000000000000605 /* LogSteppers+Month.swift in Sources */,
@@ -1493,7 +1471,6 @@
 				D0C0FFEE000000000000012B /* CategoryEditorViews.swift in Sources */,
 				E1A2B3C40000000000000613 /* CategoryEditor.swift in Sources */,
 				E1A2B3C4000000000000062B /* CategoryEditor+Validation.swift in Sources */,
-				D0C0FFEE000000000000012C /* CategoryDeleteView.swift in Sources */,
 				D0C0FFEE000000000000012D /* CategorySuggestions.swift in Sources */,
 				D0C0FFEE000000000000012E /* CategoryInputViews.swift in Sources */,
 				D0C0FFEE000000000000012F /* CategoryColourPicker.swift in Sources */,
@@ -1580,8 +1557,6 @@
 				E1A2B3C4000000000000021A /* CSVTable.swift in Sources */,
 				E1A2B3C40000000000000252 /* AmountFormatting.swift in Sources */,
 				E1A2B3C40000000000000282 /* SBToast.swift in Sources */,
-				E1A2B3C40000000000000442 /* SBDeleteSheet.swift in Sources */,
-				E1A2B3C40000000000000292 /* TransactionDeleteConfirmation.swift in Sources */,
 				E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */,
 				E1A2B3C400000000000002C2 /* TransactionCategoryRow.swift in Sources */,
 				E1A2B3C400000000000002D2 /* TransactionRepeatButton.swift in Sources */,
@@ -1596,7 +1571,8 @@
 				E1A2B3C40000000000000402 /* LogTransactionList.swift in Sources */,
 				E1A2B3C40000000000000616 /* LogTransactionRow.swift in Sources */,
 				E1A2B3C40000000000000502 /* TemplatesView.swift in Sources */,
-			);
+							E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

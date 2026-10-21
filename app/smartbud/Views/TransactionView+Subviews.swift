@@ -46,31 +46,26 @@ extension TransactionView {
         .frame(maxHeight: .infinity)
         .ignoresSafeArea(.all)
         #endif
-        .overlay {
-            if deleteMode {
-                TransactionDeleteConfirmation(
-                    income: toDelete?.income ?? income,
-                    bottomEdge: bottomEdge,
-                    onDelete: {
-                        deleteMode = false
-                        withAnimation {
-                            if let itemToDelete = toDelete {
-                                transactionVM.delete(itemToDelete)
-                            }
-                        }
-                        dismiss()
-                    },
-                    onCancel: {
-                        withAnimation(.easeOut(duration: 0.7)) {
-                            deleteMode = false
-                            toDelete = nil
-                        }
+        // An alert rather than a confirmation dialog: this screen is a
+        // full-screen cover with a fixed, keyboard-avoiding frame, where an
+        // action sheet is clipped by the keypad.
+        .alert(
+            String.appLocalized((toDelete?.income ?? income) ? "Delete Income?" : "Delete Expense?"),
+            isPresented: $deleteMode
+        ) {
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation {
+                    if let itemToDelete = toDelete {
+                        transactionVM.delete(itemToDelete)
                     }
-                )
-                    .transition(.opacity)
+                }
+                toDelete = nil
+                dismiss()
             }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: {
+            Text(String.appLocalized("This action cannot be undone."))
         }
-        .animation(.easeOut(duration: 0.2), value: deleteMode)
         // Control-dense surface (keypad + fixed rows). Let text grow to the
         // first accessibility size, then stop: beyond that the keypad and the
         // date/category row cannot fit on a phone. Documented exception to

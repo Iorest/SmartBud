@@ -40,8 +40,6 @@ struct HomeView: View {
     @State private var showConfetti = false
     var isInFallbackMode: Bool = false
 
-    @State var showPopup = false
-
     // Floating add button (replaces the custom tab bar's centre button).
     @State private var addTransaction = false
     @State private var transactionCountBeforeAdd = 0
@@ -82,8 +80,7 @@ struct HomeView: View {
         } detail: {
             macDetail
         }
-        .allowsHitTesting(showPopup ? false : true)
-        .environment(transactionManager)
+                .environment(transactionManager)
     }
 
     @ViewBuilder
@@ -155,7 +152,8 @@ struct HomeView: View {
     }
 }
 
-struct AppLockView: View {    @Environment(AppLockViewModel.self) var appLockVM
+struct AppLockView: View {
+    @Environment(AppLockViewModel.self) var appLockVM
 
     var body: some View {
         VStack(spacing: 15) {
@@ -243,8 +241,7 @@ extension HomeView {
                         Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
                     }
             }
-            .allowsHitTesting(showPopup ? false : true)
-            .environment(transactionManager)
+                        .environment(transactionManager)
             // Light selection feedback when switching tabs (HIG: every
             // interaction gets feedback).
             .sensoryFeedback(.selection, trigger: currentTab)
@@ -267,20 +264,6 @@ extension HomeView {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            if showPopup {
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        transactionManager.showPopup = false
-                    }
-            }
-
-            DeleteTransactionAlert()
-                .offset(y: showPopup ? 0 : 300)
-                .environment(transactionManager)
-
             if appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked {
                 AppLockView()
                     .ignoresSafeArea(.all)
@@ -298,10 +281,30 @@ extension HomeView {
                     }
             }
         }
-        .onChange(of: transactionManager.showPopup) { _, newValue in
-            withAnimation {
-                showPopup = newValue
+        .alert(
+            deleteDialogTitle,
+            isPresented: deleteDialogPresented,
+            presenting: transactionManager.toDelete
+        ) { transaction in
+            Button(String.appLocalized(stopRecurringDelete ? "Confirm" : "Delete"),
+                   role: .destructive) {
+                transactionManager.showPopup = false
+                if stopRecurringDelete {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        transactionVM.stopRecurring(transaction)
+                    }
+                } else {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        transactionVM.stageDelete(transaction)
+                    }
+                }
             }
+            Button(String.appLocalized("Cancel"), role: .cancel) {
+                transactionManager.showPopup = false
+                transactionManager.toDelete = nil
+            }
+        } message: { _ in
+            Text(deleteDialogMessage)
         }
         .fullScreenPresentation(item: $transactionManager.toEdit) { transaction in
             TransactionView(toEdit: transaction)

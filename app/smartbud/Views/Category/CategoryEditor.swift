@@ -360,8 +360,23 @@ extension CategoryEditor {
             supportsAlpha: false,
             title: ""
         )
-        .fullScreenPresentation(item: $toDelete) { category in
-            DeleteCategoryAlert(toDelete: category, deleted: $deleted)
+        .alert(
+            String.appFormatted("Delete '%@'?", toDelete?.wrappedName ?? ""),
+            isPresented: Binding(get: { toDelete != nil },
+                                 set: { if !$0 { toDelete = nil } }),
+            presenting: toDelete
+        ) { category in
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                withAnimation { categoryVM.delete(category) }
+                deleted = true
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
+        } message: { category in
+            Text(String(
+                format: String.appLocalized(
+                    "This action cannot be undone. %@ transactions are kept and become uncategorized, "
+                        + "and this category's budget is deleted."),
+                category.wrappedName))
         }
         .onAppear(perform: seedState)
         .onChange(of: deleted) { _, _ in dismiss() }

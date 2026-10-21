@@ -31,7 +31,6 @@ struct CategoryListView: View {
     }
 
     // delete mode
-    @State var deleteMode = false
     @State var toDelete: CategoryModel?
     // edit mode
     @State var toEdit: CategoryModel?
