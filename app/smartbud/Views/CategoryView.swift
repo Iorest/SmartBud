@@ -26,7 +26,6 @@ struct CategoryView: View {
     var onSelect: ((CategoryModel) -> Void)?
     @Environment(\.dismiss) var dismiss
     @State var income = false
-    @Namespace var animation
 
     @State var newCategory = false
 
@@ -61,58 +60,14 @@ struct CategoryView: View {
 )
 
             HStack {
-                HStack(spacing: 0) {
-                    Button {
-                        DispatchQueue.main.async {
-                            withAnimation(.easeIn(duration: 0.15)) {
-                                income = false
-                            }
-                        }
-                    } label: {
-                        Text(String.appLocalized("Expense"))
-                            .font(.body.weight(.semibold))
-
-                            .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                            .padding(6)
-                            .padding(.horizontal, 8)
-                            .background {
-                                if income == false {
-                                    Capsule()
-                                        .fill(Color.SecondaryBackground)
-                                        .matchedGeometryEffect(id: "TAB1", in: animation)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        DispatchQueue.main.async {
-                            withAnimation(.easeIn(duration: 0.15)) {
-                                income = true
-                            }
-                        }
-                    } label: {
-                        Text(String.appLocalized("Income"))
-                            .font(.body.weight(.semibold))
-
-                            .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                            .padding(6)
-                            .padding(.horizontal, 8)
-                            .background {
-                                if income == true {
-                                    Capsule()
-                                        .fill(Color.SecondaryBackground)
-                                        .matchedGeometryEffect(id: "TAB1", in: animation)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
+                Picker("", selection: $income) {
+                    Text(String.appLocalized("Expense")).tag(false)
+                    Text(String.appLocalized("Income")).tag(true)
                 }
-                .padding(3)
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(maxWidth: 200)
                 .layoutPriority(1)
-                .overlay(Capsule().stroke(Color.Outline.opacity(0.4), lineWidth: 1.3))
 
                 Spacer()
 
