@@ -16,8 +16,6 @@ struct SettingsUpcomingView: View {
   @AppStorage("showUpcomingTransactionsWhenUpcoming", store: .appGroup)
   var showSoon: Bool = false
 
-  @Namespace var animation
-
   var body: some View {
     VStack(spacing: 10) {
       Text(String.appLocalized("Upcoming Logs"))
@@ -34,70 +32,22 @@ struct SettingsUpcomingView: View {
         .padding(.bottom, 20)
 
       VStack(spacing: 0) {
-        Button {
-          showFuture.toggle()
-        } label: {
-          HStack {
-            Text(String.appLocalized("Display on Log Page"))
-              .font(.body)
-              .foregroundStyle(Color.PrimaryText)
-
-            Spacer()
-
-            ZStack(alignment: showFuture ? .trailing : .leading) {
-              Capsule()
-                .frame(width: 42, height: 28)
-                .foregroundStyle(showFuture ? .green : .gray.opacity(0.8))
-
-              Circle()
-                .foregroundStyle(Color.white)
-                .padding(2)
-                .frame(width: 28, height: 28)
-                .matchedGeometryEffect(id: "toggle1", in: animation)
+        Toggle(String.appLocalized("Display on Log Page"), isOn: $showFuture)
+          .font(.body)
+          .foregroundStyle(Color.PrimaryText)
+          .padding(.vertical, 9)
+          .onChange(of: showFuture) { _, newValue in
+            // Cross-toggle: hiding all upcoming transactions also turns off
+            // the 14-day outlook filter.
+            if !newValue && showSoon {
+              showSoon = false
             }
           }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
+
+        Toggle(String.appLocalized("Limit to 14-Day Outlook"), isOn: $showSoon)
+          .font(.body)
+          .foregroundStyle(Color.PrimaryText)
           .padding(.vertical, 9)
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(showFuture ? [.isButton, .isSelected] : .isButton)
-        .onChange(of: showFuture) { _, newValue in
-          // Cross-toggle: hiding all upcoming transactions also turns off
-          // the 14-day outlook filter.
-          if !newValue && showSoon {
-            showSoon = false
-          }
-        }
-
-        Button {
-          showSoon.toggle()
-        } label: {
-          HStack {
-            Text(String.appLocalized("Limit to 14-Day Outlook"))
-              .font(.body)
-              .foregroundStyle(Color.PrimaryText)
-
-            Spacer()
-
-            ZStack(alignment: showSoon ? .trailing : .leading) {
-              Capsule()
-                .frame(width: 42, height: 28)
-                .foregroundStyle(showSoon ? .green : .gray.opacity(0.8))
-
-              Circle()
-                .foregroundStyle(Color.white)
-                .padding(2)
-                .frame(width: 28, height: 28)
-                .matchedGeometryEffect(id: "toggle2", in: animation)
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .contentShape(Rectangle())
-          .padding(.vertical, 9)
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(showSoon ? [.isButton, .isSelected] : .isButton)
       }
       .padding(.horizontal, 15)
       .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))

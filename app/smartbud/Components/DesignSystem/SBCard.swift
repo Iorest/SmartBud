@@ -20,7 +20,7 @@ struct SBCard<Content: View>: View {
         VStack(alignment: .leading, spacing: SBSpace.small) {
             if let title {
                 Text(title)
-                    .font(.sbSectionHeader)
+                    .font(.headline)
                     .foregroundStyle(Color.SubtitleText)
             }
             content

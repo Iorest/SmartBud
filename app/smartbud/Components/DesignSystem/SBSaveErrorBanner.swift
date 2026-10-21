@@ -18,7 +18,7 @@ struct SBSaveErrorBanner: View {
                 .foregroundStyle(Color.Alert)
 
             Text(message)
-                .font(.sbRowSubtitle)
+                .font(.subheadline)
                 .foregroundStyle(Color.PrimaryText)
                 .fixedSize(horizontal: false, vertical: true)
 

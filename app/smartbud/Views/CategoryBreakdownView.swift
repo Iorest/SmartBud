@@ -79,8 +79,8 @@ struct CategoryBreakdownView: View {
     }
 
     private func colorForCategory(_ category: PowerCategory, index: Int) -> Color {
-        // GitHub reference: income categories use the shared `colorArray` palette
-        // by index, expense categories use the category's custom colour.
+        // Income categories have no stored colour, so they follow the shared
+        // palette by index; expense categories use their own colour.
         if category.category.income {
             let hex = Color.colorArray[index % Color.colorArray.count]
             return Color(hex: hex)

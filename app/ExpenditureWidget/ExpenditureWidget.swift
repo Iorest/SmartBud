@@ -9,8 +9,8 @@
 //  `.environment(\.locale, Locale.appLocale)` so that SwiftUI `Text("…")`
 //  lookups honour the in-app language pick rather than the system
 //  locale. Date formatters also use `Locale.appLocale`. The historical
-//  `LanguageBundleInstaller.install()` Bundle swizzle is no longer called
-//  here — see `LanguageBundle.swift` for why.
+//  Bundle-swizzle approach is no longer used: String Catalog entries cannot
+//  be served through a swizzled `localizedString(forKey:value:table:)`.
 //
 
 import SwiftUI

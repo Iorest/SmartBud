@@ -217,7 +217,7 @@ extension TemplateTransactionModel {
 // MARK: - Shared date utilities
 //
 // Free functions used by the app (`InsightsViewModel`), widgets (`InsightsWidget`), and App Intents.
-// Originally lived in the legacy `DataController.swift`.
+// Originally lived in the single legacy data controller.
 
 /// Returns the start-of-day for the current month, offset by `startDay` (1–28).
 /// If `startDay` is 1, this is the 1st of the month at 00:00. If `startDay` is 15, it's the 15th at 00:00.

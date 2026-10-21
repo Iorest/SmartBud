@@ -14069,28 +14069,6 @@
         }
       }
     },
-    "Delete %@ transaction confirmation. You can undo right after deleting." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete %@ transaction confirmation. You can undo right after deleting."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除 %@ 交易的确认。删除后可撤销。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除 %@ 交易的確認。刪除後可復原。"
-          }
-        }
-      }
-    },
     "%@, %@%@, Category: %@, at %@" : {
       "localizations" : {
         "en" : {
