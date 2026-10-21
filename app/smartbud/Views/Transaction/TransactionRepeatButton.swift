@@ -14,13 +14,28 @@ struct TransactionRepeatButton: View {
     /// Drives the full recurrence editor sheet opened from the picker.
     @Binding var showPicker: Bool
 
-    @State private var showRecurring = false
-
     private let overlays = ["D", "W", "M"]
 
     var body: some View {
-        Button {
-            showRecurring = true
+        Menu {
+            Picker(String.appLocalized("Repeat"), selection: preset) {
+                Text(String.appLocalized("None")).tag(0)
+                Text(String.appLocalized("Daily")).tag(1)
+                Text(String.appLocalized("Weekly")).tag(2)
+                Text(String.appLocalized("Monthly")).tag(3)
+            }
+            .pickerStyle(.inline)
+
+            Divider()
+
+            Button {
+                // Hop to the next runloop so the menu finishes dismissing
+                // before the sheet presentation starts; otherwise the menu
+                // dismissal animation swallows it.
+                Task { @MainActor in showPicker = true }
+            } label: {
+                Label(customTitle, systemImage: "slider.horizontal.3")
+            }
         } label: {
             if repeatType > 0 {
                 iconWithBadge
@@ -36,14 +51,33 @@ struct TransactionRepeatButton: View {
         .frame(minWidth: 44, minHeight: 44)
         .contentShape(Rectangle())
         .accessibilityLabel(accessibilityLabel)
-        .popover(isPresented: $showRecurring) {
-            RecurringPickerView(
-                repeatType: $repeatType,
-                repeatCoefficient: $repeatCoefficient,
-                showMenu: $showRecurring,
-                showPicker: $showPicker
-            )
+    }
+
+    /// The custom row carries the active interval so the menu still shows the
+    /// current setting once a preset is no longer selected.
+    private var customTitle: String {
+        guard repeatCoefficient > 1 else {
+            return String.appLocalized("Custom Interval")
         }
+        let unit: String
+        switch repeatType {
+        case 3: unit = String.appLocalized("months")
+        case 2: unit = String.appLocalized("weeks")
+        default: unit = String.appLocalized("days")
+        }
+        return "\(String.appLocalized("Custom Interval")) · \(repeatCoefficient) \(unit)"
+    }
+
+    /// `-1` means "custom interval", which no preset row should tick.
+    private var preset: Binding<Int> {
+        Binding(
+            get: { repeatCoefficient == 1 ? repeatType : -1 },
+            set: { newValue in
+                guard newValue >= 0 else { return }
+                repeatType = newValue
+                repeatCoefficient = 1
+            }
+        )
     }
 
     private var badge: String {

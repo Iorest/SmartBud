@@ -6,13 +6,6 @@ struct CustomRecurringView: View {
     @Binding var repeatCoefficient: Int
     @Binding var showPicker: Bool
 
-    var stringArray: [String] {
-        return [
-            "", "\(holdingCoefficient) days", "\(holdingCoefficient) weeks",
-            "\(holdingCoefficient) months"
-        ]
-    }
-
     @Environment(\.dismiss) var dismiss
 
     @State private var lightHaptic = 0
@@ -186,8 +179,11 @@ struct CustomRecurringView: View {
         .padding(13)
         .frame(maxHeight: .infinity, alignment: .top)
         .onAppear {
-            holdingType = repeatType
-            holdingCoefficient = repeatCoefficient
+            // A preset ("weekly", coefficient 1) or "none" (0) has no custom
+            // interval yet; start from the smallest custom one instead of
+            // writing a half-formed recurrence into the transaction.
+            holdingType = (1 ... 3).contains(repeatType) ? repeatType : 2
+            holdingCoefficient = max(2, repeatCoefficient)
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
     }

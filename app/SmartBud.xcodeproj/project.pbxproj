@@ -200,7 +200,6 @@
 		B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030A /* CategoryInputViews.swift */; };
 		B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030C /* CategoryColourPicker.swift */; };
 		B0A0F000000000000000030D /* TransactionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030E /* TransactionComponents.swift */; };
-		B0A0F000000000000000030F /* TransactionRecurringViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000310 /* TransactionRecurringViews.swift */; };
 		B0A0F0000000000000000311 /* TransactionCustomRecurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */; };
 		D0C0FFEE0000000000000100 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D75185B3B6443E7ACD15C76 /* SettingsViewModel.swift */; };
 		D0C0FFEE0000000000000101 /* NumberPadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22CC33DD44EEFF55AA11BB /* NumberPadViewModel.swift */; };
@@ -240,7 +239,6 @@
 		D0C0FFEE000000000000012E /* CategoryInputViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030A /* CategoryInputViews.swift */; };
 		D0C0FFEE000000000000012F /* CategoryColourPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030C /* CategoryColourPicker.swift */; };
 		D0C0FFEE0000000000000130 /* TransactionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F000000000000000030E /* TransactionComponents.swift */; };
-		D0C0FFEE0000000000000131 /* TransactionRecurringViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000310 /* TransactionRecurringViews.swift */; };
 		D0C0FFEE0000000000000132 /* TransactionCustomRecurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */; };
 		D0C0FFEE0000000000000134 /* EmailExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B2287C6AFB00F76ADF /* EmailExtensions.swift */; };
 		D0C0FFEE0000000000000135 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2CA287C6B4700F76ADF /* ContentView.swift */; };
@@ -558,7 +556,6 @@
 		B0A0F000000000000000030A /* CategoryInputViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryInputViews.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000030C /* CategoryColourPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColourPicker.swift; sourceTree = "<group>"; };
 		B0A0F000000000000000030E /* TransactionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionComponents.swift; sourceTree = "<group>"; };
-		B0A0F0000000000000000310 /* TransactionRecurringViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionRecurringViews.swift; sourceTree = "<group>"; };
 		B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction/TransactionCustomRecurringView.swift; sourceTree = "<group>"; };
 		D0C0FFEE0000000000000001 /* SmartBud-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SmartBud-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0C0FFEE000000000000018E /* SmartBudMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudMacApp.swift; sourceTree = "<group>"; };
@@ -855,7 +852,6 @@
 				B0A0F0000000000000000137 /* InsightsAIAnalysisView.swift */,
 				B0A0F0000000000000000209 /* SmartEntrySheet.swift */,
 				B0A0F000000000000000030E /* TransactionComponents.swift */,
-				B0A0F0000000000000000310 /* TransactionRecurringViews.swift */,
 				B0A0F0000000000000000312 /* TransactionCustomRecurringView.swift */,
 				5327D2D3287C6B5E00F76ADF /* BudgetView.swift */,
 				532C58BB2A629C3900DA2C81 /* NewBudgetView.swift */,
@@ -1245,7 +1241,6 @@
 				B0A0F0000000000000000309 /* CategoryInputViews.swift in Sources */,
 				B0A0F000000000000000030B /* CategoryColourPicker.swift in Sources */,
 				B0A0F000000000000000030D /* TransactionComponents.swift in Sources */,
-				B0A0F000000000000000030F /* TransactionRecurringViews.swift in Sources */,
 				B0A0F0000000000000000311 /* TransactionCustomRecurringView.swift in Sources */,
 				5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */,
 				5327D2CB287C6B4700F76ADF /* ContentView.swift in Sources */,
@@ -1465,7 +1460,6 @@
 				D0C0FFEE000000000000012E /* CategoryInputViews.swift in Sources */,
 				D0C0FFEE000000000000012F /* CategoryColourPicker.swift in Sources */,
 				D0C0FFEE0000000000000130 /* TransactionComponents.swift in Sources */,
-				D0C0FFEE0000000000000131 /* TransactionRecurringViews.swift in Sources */,
 				D0C0FFEE0000000000000132 /* TransactionCustomRecurringView.swift in Sources */,
 				D0C0FFEE0000000000000134 /* EmailExtensions.swift in Sources */,
 				D0C0FFEE0000000000000135 /* ContentView.swift in Sources */,
