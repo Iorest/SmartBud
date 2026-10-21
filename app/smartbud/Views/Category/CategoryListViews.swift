@@ -15,7 +15,6 @@ struct CategoryListView: View {
     var onSelect: ((CategoryModel) -> Void)?
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var systemColorScheme
     @Environment(CategoryViewModel.self) var categoryVM
 
     @AppStorage("categorySuggestions", store: .appGroup) var showSuggestions: Bool = true

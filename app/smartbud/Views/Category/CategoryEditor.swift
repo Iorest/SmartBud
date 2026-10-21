@@ -15,10 +15,7 @@ struct CategoryEditor: View {
     var onSaved: ((String) -> Void)?
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var systemColorScheme
     @Environment(CategoryViewModel.self) var categoryVM
-
-    @Namespace var animation
 
     var expenseCategories: [CategoryModel] { categoryVM.expenseCategories }
     @State private var availableColours: [String] = Color.colorArray
@@ -146,65 +143,17 @@ extension CategoryEditor {
 
                                 .padding(.top, 4)
                         } else {
-                            HStack(spacing: 0) {
-                                Button {
-                                    DispatchQueue.main.async {
-                                        withAnimation(.easeIn(duration: 0.15)) {
-                                            income = false
-                                        }
-                                    }
-                                } label: {
-                                    Text(String.appLocalized("Expense"))
-                                        .font(.callout.weight(.semibold))
-
-                                        .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                                        .padding(5)
-                                        .padding(.horizontal, 7)
-                                        .background {
-                                            if income == false {
-                                                Capsule()
-                                                    .fill(Color.SecondaryBackground)
-                                                    .matchedGeometryEffect(id: "TAB1", in: animation)
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(.plain)
-
-                                Button {
-                                    DispatchQueue.main.async {
-                                        withAnimation(.easeIn(duration: 0.15)) {
-                                            income = true
-                                        }
-                                    }
-                                } label: {
-                                    Text(String.appLocalized("Income"))
-                                        .font(.callout.weight(.semibold))
-
-                                        .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                                        .padding(5)
-                                        .padding(.horizontal, 7)
-                                        .background {
-                                            if income == true {
-                                                Capsule()
-                                                    .fill(Color.SecondaryBackground)
-                                                    .matchedGeometryEffect(id: "TAB1", in: animation)
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(.plain)
+                            Picker("", selection: $income) {
+                                Text(String.appLocalized("Expense")).tag(false)
+                                Text(String.appLocalized("Income")).tag(true)
                             }
-                            .padding(3)
-                            .background(Capsule().fill(Color.PrimaryBackground)
-                                .shadow(color: systemColorScheme == .light ? Color.Outline : Color.clear, radius: 6))
-                            .overlay(Capsule()
-                                .stroke(systemColorScheme == .light ? Color.clear : Color.Outline.opacity(0.4),
-                                    lineWidth: 1.3))
+                            .pickerStyle(.segmented)
+                            .labelsHidden()
+                            .frame(maxWidth: 200)
                         }
                     }
                 }
-                .frame(height: 30)
+                .frame(minHeight: 30)
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .leading) {
                     Button {

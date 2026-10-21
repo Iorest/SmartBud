@@ -84,8 +84,6 @@ struct TransactionView: View {
     @AppStorage("colourScheme", store: .appGroup)
     var colourScheme: Int = 0
 
-    @Environment(\.colorScheme) var systemColorScheme
-
     @State var showPicker = false
     @State var animateIcon = false
 
