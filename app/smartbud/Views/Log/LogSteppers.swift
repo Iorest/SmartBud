@@ -137,56 +137,18 @@ struct CategoryStepperView: View {
 struct IncomeFilterToggleView: View {
     @Binding var income: Bool
 
-    @Namespace var animation
-
     var body: some View {
-        HStack(spacing: 0) {
-            Text(String.appLocalized("Expense"))
-                .font(.body.weight(.semibold))
+        HStack {
+            Picker("", selection: $income) {
+                Text(String.appLocalized("Expense")).tag(false)
+                Text(String.appLocalized("filter-picker-income")).tag(true)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(maxWidth: 220)
 
-                .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                .padding(5.5)
-                .padding(.horizontal, 8)
-                .background {
-                    if income == false {
-                        Capsule()
-                            .fill(Color.SecondaryBackground)
-                            .matchedGeometryEffect(id: "TAB1", in: animation)
-                    }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    DispatchQueue.main.async {
-                        withAnimation(.easeIn(duration: 0.15)) {
-                            income = false
-                        }
-                    }
-                }
-
-            Text(String.appLocalized("filter-picker-income"))
-                .font(.body.weight(.semibold))
-
-                .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                .padding(5.5)
-                .padding(.horizontal, 8)
-                .background {
-                    if income == true {
-                        Capsule()
-                            .fill(Color.SecondaryBackground)
-                            .matchedGeometryEffect(id: "TAB1", in: animation)
-                    }
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    DispatchQueue.main.async {
-                        withAnimation(.easeIn(duration: 0.15)) {
-                            income = true
-                        }
-                    }
-                }
+            Spacer(minLength: 0)
         }
-        .padding(3)
-        .overlay(Capsule().stroke(Color.Outline.opacity(0.4), lineWidth: 1.3))
     }
 }
 
