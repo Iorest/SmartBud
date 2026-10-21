@@ -89,6 +89,7 @@ struct InsightsView: View {
                     Spacer()
                     aiButton
                     periodSegmented
+                        .frame(maxWidth: SBControlWidth.segment)
                 }
             }
         }
@@ -117,14 +118,13 @@ struct InsightsView: View {
     }
 
     private var periodSegmented: some View {
-        Picker("Period", selection: $period) {
+        Picker(String.appLocalized("Period"), selection: $period) {
             Text(String.appLocalized("week")).tag(1)
             Text(String.appLocalized("month")).tag(2)
             Text(String.appLocalized("year")).tag(3)
         }
         .pickerStyle(.segmented)
         .labelsHidden()
-        .frame(maxWidth: 240)
     }
 
     // MARK: - Date range row

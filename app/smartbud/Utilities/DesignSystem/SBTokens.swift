@@ -18,6 +18,13 @@ enum SBSpace {
     static let extraLarge: CGFloat = 32
 }
 
+enum SBControlWidth {
+    /// Inline segmented controls (expense/income, insights period). Wide
+    /// enough for two or three short labels, narrow enough to leave room for
+    /// the buttons that share their row.
+    static let segment: CGFloat = 220
+}
+
 enum SBRadius {
     /// Smallest UI: segmented-control selection, swatches, day pills.
     static let pill: CGFloat = 6

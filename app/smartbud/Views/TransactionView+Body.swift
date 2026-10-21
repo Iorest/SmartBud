@@ -107,13 +107,13 @@ extension TransactionView {
                 SBToast(title: toastTitle, systemImage: toastImage)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
             } else {
-                Picker("", selection: $income) {
+                Picker(String.appLocalized("Type"), selection: $income) {
                     Text(String.appLocalized("Expense")).tag(false)
-                    Text(String.appLocalized("transaction-view-income-picker")).tag(true)
+                    Text(String.appLocalized("Income")).tag(true)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
-                .frame(maxWidth: 240)
+                .frame(maxWidth: SBControlWidth.segment)
             }
         }
     }

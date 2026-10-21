@@ -139,13 +139,13 @@ struct IncomeFilterToggleView: View {
 
     var body: some View {
         HStack {
-            Picker("", selection: $income) {
+            Picker(String.appLocalized("Type"), selection: $income) {
                 Text(String.appLocalized("Expense")).tag(false)
-                Text(String.appLocalized("filter-picker-income")).tag(true)
+                Text(String.appLocalized("Income")).tag(true)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
-            .frame(maxWidth: 220)
+            .frame(maxWidth: SBControlWidth.segment)
 
             Spacer(minLength: 0)
         }

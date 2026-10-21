@@ -143,13 +143,13 @@ extension CategoryEditor {
 
                                 .padding(.top, 4)
                         } else {
-                            Picker("", selection: $income) {
+                            Picker(String.appLocalized("Type"), selection: $income) {
                                 Text(String.appLocalized("Expense")).tag(false)
                                 Text(String.appLocalized("Income")).tag(true)
                             }
                             .pickerStyle(.segmented)
                             .labelsHidden()
-                            .frame(maxWidth: 200)
+                            .frame(maxWidth: SBControlWidth.segment)
                         }
                     }
                 }

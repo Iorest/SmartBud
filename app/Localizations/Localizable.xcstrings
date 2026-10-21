@@ -4230,29 +4230,6 @@
         }
       }
     },
-    "filter-picker-income" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Income"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        }
-      }
-    },
     "Food" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11127,28 +11104,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "交易按週重複，點擊編輯重複週期"
-          }
-        }
-      }
-    },
-    "transaction-view-income-picker" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Income"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "收入"
           }
         }
       }

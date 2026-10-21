@@ -243,7 +243,8 @@ extension ImportDataView {
 
                                 Spacer(minLength: SBSpace.extraSmall)
 
-                                Picker("", selection: $uniqueCategories[categoryIndex].income) {
+                                Picker(String.appLocalized("Type"),
+                                       selection: $uniqueCategories[categoryIndex].income) {
                                     Text(String.appLocalized("Expense")).tag(false)
                                     Text(String.appLocalized("Income")).tag(true)
                                 }
