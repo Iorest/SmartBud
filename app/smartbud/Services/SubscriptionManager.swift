@@ -367,11 +367,16 @@ enum SubscriptionError: Error, Identifiable, Equatable {
     }
 
     var errorDescription: String? {
+        // StoreKit surfaces its own `localizedDescription`, which follows the
+        // device language and reads like a developer message. These alerts
+        // use on-brand copy in the in-app language instead.
         switch self {
-        case .loadProductsFailed(let error),
-             .purchaseFailed(let error),
-             .restoreFailed(let error):
-            error.localizedDescription
+        case .loadProductsFailed:
+            String.appLocalized(SettingsKey.proErrorLoad)
+        case .purchaseFailed:
+            String.appLocalized(SettingsKey.proErrorPurchase)
+        case .restoreFailed:
+            String.appLocalized(SettingsKey.proErrorRestore)
         case .purchasePending:
             String.appLocalized("settings.pro.error.pending")
         }

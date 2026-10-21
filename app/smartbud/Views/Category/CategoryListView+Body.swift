@@ -353,10 +353,9 @@ extension CategoryListView {
             }
             Button(String.appLocalized("Cancel"), role: .cancel) { toDelete = nil }
         } message: { category in
-            Text(String(
-                format: String.appLocalized(
-                    "This action cannot be undone. %@ transactions are kept and become uncategorized, "
-                        + "and this category's budget is deleted."),
+            Text(String.appFormatted(
+                "This action cannot be undone. %@ transactions are kept and become uncategorized, "
+                    + "and this category's budget is deleted.",
                 category.wrappedName))
         }
         .sheet(item: $toEdit) { category in

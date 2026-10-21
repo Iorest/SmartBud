@@ -45,6 +45,8 @@ enum SettingsKey {
     static let proManageSubscription = "settings.pro.manage"
     static let proErrorTitle = "settings.pro.error.title"
     static let proErrorPurchase = "settings.pro.error.purchase"
+    static let proErrorLoad = "settings.pro.error.load"
+    static let proErrorRestore = "settings.pro.error.restore"
     static let proErrorDismiss = "settings.pro.error.dismiss"
     static let proLimitedFreeTitle = "settings.pro.limitedFreeTitle"
     static let proLimitedFreeSubtitle = "settings.pro.limitedFreeSubtitle"

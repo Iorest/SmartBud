@@ -39,7 +39,7 @@ enum DataExporter {
         var errorDescription: String? {
             switch self {
             case .noData: String.appLocalized(SettingsKey.exportEmpty)
-            case .writeFailed(let error): error.localizedDescription
+            case .writeFailed: String.appLocalized(SettingsKey.exportFailure)
             }
         }
     }

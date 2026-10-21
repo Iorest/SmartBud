@@ -157,7 +157,7 @@ struct ActualBudgetView: View {
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty)
             }
             .alert(
-                String(format: String.appLocalized("Delete the '%@' budget?"),
+                String.appFormatted("Delete the '%@' budget?",
                        toDelete?.category?.wrappedName ?? ""),
                 isPresented: Binding(get: { toDelete != nil },
                                      set: { if !$0 { toDelete = nil } }),
