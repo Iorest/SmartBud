@@ -4,18 +4,12 @@
 //
 //  Shared SwiftData ModelContainer for all widgets in the extension.
 //
-//  History: every widget previously declared its own
-//      static let container: ModelContainer = {
-//          let config = ModelConfiguration(...)
-//          return try! ModelContainer(for: schema, configurations: [config])
-//      }()
-//
-//  `try!` against an App-Group store can crash the entire widget
-//  extension on first launch (or after a schema migration) if the
-//  store is locked, the App Group entitlement is missing, or the
-//  container URL is unreachable (e.g. dev simulator with stripped
-//  signing). Because the extension runs in its own process, that
-//  crash takes every widget down.
+//  History: every widget used to declare its own container with `try!`,
+//  which can crash the entire widget extension on first launch (or after
+//  a schema migration) if the store is locked, the App Group entitlement
+//  is missing, or the container URL is unreachable (e.g. dev simulator
+//  with stripped signing). Because the extension runs in its own process,
+//  that crash takes every widget down.
 //
 //  This helper centralises the construction and:
 //    1. Tries the App-Group-backed configuration first (matches the

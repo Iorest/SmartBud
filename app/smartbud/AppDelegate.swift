@@ -27,13 +27,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         // Note: in-app language switching is handled by
         // `String.appLocalized(...)` in `AppLocale.swift`, which resolves
-        // through the user's `appLanguage` pick on every call. The
-        // historical `LanguageBundleInstaller.install()` Bundle swizzle
-        // was abandoned
-        // because (a) it crashed on iOS 26.5.1 (EXC_BAD_ACCESS at
-        // objc_retain(0x1)) and (b) String Catalog entries cannot be
-        // served through a swizzled
-        // `Bundle.localizedString(forKey:value:table:)`.
+        // through the user's `appLanguage` pick on every call. The earlier
+        // Bundle-swizzle approach was dropped: it crashed on iOS 26.5.1
+        // (EXC_BAD_ACCESS at objc_retain(0x1)), and String Catalog entries
+        // cannot be served through a swizzled
+        // `Bundle.localizedString(forKey:value:table:)` anyway.
 
         return true
     }
