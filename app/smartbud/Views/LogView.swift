@@ -128,11 +128,13 @@ struct LogView: View {
                         )
                     }
                 }
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    if showsStepper {
-                        stepperBar
-                    }
-                }
+            }
+        }
+        // The stepper stays put when a period has no entries: otherwise the
+        // empty state takes away the only way to step to another day/week.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if showsStepper {
+                stepperBar
             }
         }
     }
