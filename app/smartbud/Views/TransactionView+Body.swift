@@ -274,7 +274,8 @@ extension TransactionView {
             )
             .environment(categoryVM)
             .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
-        } else {
+        } else if !textFieldFocused {
+            // The system keyboard owns the bottom while the note is typed.
             NumberPad(
                 viewModel: padVM,
                 showingNotePicker: showingNotePicker,

@@ -42,9 +42,11 @@ extension TransactionView {
         // calculator-like surface, so give it one.
         .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
         #else
-        .ignoresSafeArea(.keyboard, edges: .all)
+        // Only bleed into the container edges. Leaving the keyboard safe
+        // area active is what makes SwiftUI move the form above the system
+        // keyboard on its own.
         .frame(maxHeight: .infinity)
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea(.container, edges: .all)
         #endif
         // An alert rather than a confirmation dialog: this screen is a
         // full-screen cover with a fixed, keyboard-avoiding frame, where an

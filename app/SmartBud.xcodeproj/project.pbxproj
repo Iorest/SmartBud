@@ -50,7 +50,6 @@
 		5327D28E287C697C00F76ADF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5327D28D287C697C00F76ADF /* Preview Assets.xcassets */; };
 		5327D295287C698900F76ADF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5327D294287C698900F76ADF /* Assets.xcassets */; };
 		5327D2B6287C6AFB00F76ADF /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2AF287C6AFB00F76ADF /* Authentication.swift */; };
-		5327D2B7287C6AFB00F76ADF /* KeyboardHeightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B0287C6AFB00F76ADF /* KeyboardHeightHelper.swift */; };
 		5327D2B9287C6AFB00F76ADF /* EmailExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B2287C6AFB00F76ADF /* EmailExtensions.swift */; };
 		5327D2BA287C6AFB00F76ADF /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B3287C6AFB00F76ADF /* ViewExtension.swift */; };
 		5327D2BB287C6AFB00F76ADF /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B4287C6AFB00F76ADF /* StringExtension.swift */; };
@@ -255,7 +254,6 @@
 		D0C0FFEE0000000000000143 /* PowerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2BF287C6B2500F76ADF /* PowerCategory.swift */; };
 		D0C0FFEE0000000000000146 /* SettingsSubviewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D6BDE02AF73FAB00F5728E /* SettingsSubviewModifier.swift */; };
 		D0C0FFEE0000000000000147 /* BudgetTimeFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2C0287C6B2500F76ADF /* BudgetTimeFrame.swift */; };
-		D0C0FFEE0000000000000148 /* KeyboardHeightHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2B0287C6AFB00F76ADF /* KeyboardHeightHelper.swift */; };
 		D0C0FFEE000000000000014A /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2CD287C6B5E00F76ADF /* CategoryView.swift */; };
 		D0C0FFEE000000000000014B /* RoundedTriangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B9079A2AE818710001F496 /* RoundedTriangle.swift */; };
 		53B907992AE817EA0001F496 /* DonutSemicircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B907982AE817EA0001F496 /* DonutSemicircle.swift */; };
@@ -415,7 +413,6 @@
 		5327D28D287C697C00F76ADF /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5327D294287C698900F76ADF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5327D2AF287C6AFB00F76ADF /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
-		5327D2B0287C6AFB00F76ADF /* KeyboardHeightHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardHeightHelper.swift; sourceTree = "<group>"; };
 		5327D2B2287C6AFB00F76ADF /* EmailExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailExtensions.swift; sourceTree = "<group>"; };
 		5327D2B3287C6AFB00F76ADF /* ViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		5327D2B4287C6AFB00F76ADF /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
@@ -807,7 +804,6 @@
 				E1A2B3C40000000000000250 /* AmountFormatting.swift */,
 				B0A0F00000000000000000E1 /* Theme.swift */,
 				5327D2AF287C6AFB00F76ADF /* Authentication.swift */,
-				5327D2B0287C6AFB00F76ADF /* KeyboardHeightHelper.swift */,
 				5327D2B5287C6AFB00F76ADF /* Color.swift */,
 				5327D2B2287C6AFB00F76ADF /* EmailExtensions.swift */,
 				5327D2B3287C6AFB00F76ADF /* ViewExtension.swift */,
@@ -1272,7 +1268,6 @@
 				530C9DFD28ACE14A0038535F /* BudgetWidget.swift in Sources */,
 				53D6BDE12AF73FAB00F5728E /* SettingsSubviewModifier.swift in Sources */,
 				5327D2C6287C6B2500F76ADF /* BudgetTimeFrame.swift in Sources */,
-				5327D2B7287C6AFB00F76ADF /* KeyboardHeightHelper.swift in Sources */,
 				5327D2D6287C6B5E00F76ADF /* CategoryView.swift in Sources */,
 				53B9079B2AE818710001F496 /* RoundedTriangle.swift in Sources */,
 				53B907992AE817EA0001F496 /* DonutSemicircle.swift in Sources */,
@@ -1485,7 +1480,6 @@
 				D0C0FFEE0000000000000143 /* PowerCategory.swift in Sources */,
 				D0C0FFEE0000000000000146 /* SettingsSubviewModifier.swift in Sources */,
 				D0C0FFEE0000000000000147 /* BudgetTimeFrame.swift in Sources */,
-				D0C0FFEE0000000000000148 /* KeyboardHeightHelper.swift in Sources */,
 				D0C0FFEE000000000000014A /* CategoryView.swift in Sources */,
 				D0C0FFEE000000000000014B /* RoundedTriangle.swift in Sources */,
 				D0C0FFEE000000000000014E /* DetailedBudgetViewTopBarButtons.swift in Sources */,

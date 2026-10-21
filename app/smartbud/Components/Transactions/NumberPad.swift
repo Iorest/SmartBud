@@ -10,7 +10,7 @@
 //  - `frame(maxHeight: .infinity)` on each row replaces the old
 //    `proxy.size.height * 0.22` button-height math and the lost
 //    `.frame(width:height:)` on the VStack. The pad now always fills its
-//    parent (set by `.keyboardAwareHeight`).
+//    parent.
 //  - `sensoryFeedback(_:trigger:)` replaces the old CHHapticEngine plumbing.
 //  - The keypad is a plain grid of system surfaces
 //    effects for cheaper rendering (iOS 26 performance API).
@@ -36,7 +36,7 @@ struct NumberPad: View {
 
     /// Fixed row height (was `frame(maxHeight: .infinity)` in the previous
     /// rewrite — that made each row greedy and the bottom row clipped off-screen
-    /// when the parent (`.keyboardAwareHeight`) gave it 800pt to fill). At
+    /// when the parent gave it 800pt to fill). At
     /// 4 × 72pt + 3 × 8pt = 312pt the whole pad fits a standard iPhone without
     /// spilling into the rest of the add-transaction layout.
     @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 72
@@ -63,7 +63,6 @@ struct NumberPad: View {
             bottomRow
         }
         .padding(.bottom, 15)
-        .keyboardAwareHeight()
         .modifier(DigitHapticModifier(
             haptic: .impact(weight: .light, intensity: viewModel.digitHapticIntensity),
             trigger: viewModel.price,
