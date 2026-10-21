@@ -86,26 +86,8 @@ extension TransactionView {
         .onChange(of: numberEntryType) { _, new in
             padVM.numberEntryType = new
         }
-        .onChange(of: isDragging) { _, _ in
-            if !isDragging {
-                if income {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        swipingOffset = capsuleWidth
-                    }
-                } else {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        swipingOffset = 0
-                    }
-                }
-            }
-        }
         .onAppear {
             categoryVM.load()
-            // The init can't read `capsuleWidth`, so re-align the income
-            // capsule once the environment (and its type size) is known.
-            if income {
-                swipingOffset = capsuleWidth
-            }
             // Sync the pad's numberEntryType with the AppStorage flag at the
             // moment the view first appears. Subsequent changes are picked up
             // by the `.onChange(of: numberEntryType)` modifier above.
@@ -153,11 +135,6 @@ extension TransactionView {
                     repeatType: $repeatType, repeatCoefficient: $repeatCoefficient, showPicker: $showPicker
                 )
                 .presentationDetents([.medium, .large])
-        }
-        .onChange(of: dynamicTypeSize) { _, _ in
-            if income {
-                swipingOffset = capsuleWidth
-            }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
         .sensoryFeedback(.error, trigger: errorHaptic)

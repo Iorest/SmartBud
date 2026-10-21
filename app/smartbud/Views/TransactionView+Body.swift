@@ -100,55 +100,6 @@ extension TransactionView {
         .frame(maxWidth: .infinity)
     }
 
-    var incomeExpenseSwipeGesture: some Gesture {
-        DragGesture()
-            .updating($isDragging) { _, state, _ in
-                state = true
-            }
-            .onChanged { gesture in
-                let swipe: CGFloat = gesture.translation.width
-
-                if income {
-                    if swipe < 0 {
-                        swipingOffset = max(-capsuleWidth, -pow(abs(swipe), 0.8)) + capsuleWidth
-                    }
-                } else {
-                    if swipe > 0 {
-                        swipingOffset = min(capsuleWidth, pow(swipe, 0.8))
-                    }
-                }
-            }
-            .onEnded { _ in
-                handleSwipeEnded()
-            }
-    }
-
-    func handleSwipeEnded() {
-        if income {
-            if swipingOffset < (capsuleWidth / 2) {
-                withAnimation {
-                    swipingOffset = 0
-                    income = false
-                }
-            } else {
-                withAnimation {
-                    swipingOffset = capsuleWidth
-                }
-            }
-        } else {
-            if swipingOffset > (capsuleWidth / 2) {
-                withAnimation {
-                    swipingOffset = capsuleWidth
-                    income = true
-                }
-            } else {
-                withAnimation {
-                    swipingOffset = 0
-                }
-            }
-        }
-    }
-
     @ViewBuilder
     var toastOrIncomeExpensePicker: some View {
         VStack {
@@ -156,21 +107,13 @@ extension TransactionView {
                 SBToast(title: toastTitle, systemImage: toastImage)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
             } else {
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.SecondaryBackground)
-                        .frame(width: capsuleWidth)
-                        .offset(x: swipingOffset)
-
-                    HStack(spacing: 0) {
-                        expenseToggleButton
-
-                        incomeToggleButton
-                    }
+                Picker("", selection: $income) {
+                    Text(String.appLocalized("Expense")).tag(false)
+                    Text(String.appLocalized("transaction-view-income-picker")).tag(true)
                 }
-                .padding(3)
-                .fixedSize(horizontal: true, vertical: true)
-                .overlay(Capsule().stroke(Color.Outline.opacity(0.4), lineWidth: 1.3))
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(maxWidth: 240)
             }
         }
     }
@@ -217,7 +160,6 @@ extension TransactionView {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
-        .simultaneousGesture(incomeExpenseSwipeGesture)
     }
 
     @ViewBuilder
@@ -348,46 +290,6 @@ extension TransactionView {
             outlineColor: categoryButtonOutlineColor,
             shake: shake
         )
-    }
-
-    @ViewBuilder
-    var expenseToggleButton: some View {
-        Button {
-            withAnimation(.easeIn(duration: 0.15)) {
-                income = false
-                swipingOffset = 0
-            }
-        } label: {
-            Text(String.appLocalized("Expense"))
-                .font(.body.weight(.semibold))
-                .lineLimit(1)
-                .foregroundStyle(income == false ? Color.PrimaryText : Color.SubtitleText)
-                .padding(6)
-                .frame(width: capsuleWidth)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(income == false ? .isSelected : [])
-    }
-
-    @ViewBuilder
-    var incomeToggleButton: some View {
-        Button {
-            withAnimation(.easeIn(duration: 0.15)) {
-                income = true
-                swipingOffset = capsuleWidth
-            }
-        } label: {
-            Text(String.appLocalized("transaction-view-income-picker"))
-                .font(.body.weight(.semibold))
-                .lineLimit(1)
-                .foregroundStyle(income == true ? Color.PrimaryText : Color.SubtitleText)
-                .padding(6)
-                .frame(width: capsuleWidth)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(income == true ? .isSelected : [])
     }
 
     var dateString: String {

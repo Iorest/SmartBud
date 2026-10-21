@@ -89,11 +89,6 @@ struct TransactionView: View {
     @State var showPicker = false
     @State var animateIcon = false
 
-    @Namespace var animation
-
-    @State var swipingOffset: CGFloat = 0
-    @GestureState var isDragging = false
-
     // show recommendations
 
     @State var textFieldFocused: Bool = false
@@ -117,12 +112,6 @@ struct TransactionView: View {
     /// up, so switch to the stacked layout there (not just at AX sizes).
     var usesLargeTextLayout: Bool {
         dynamicTypeSize >= .xxLarge
-    }
-
-    var capsuleWidth: CGFloat {
-        // Stacked header at large sizes, so each half can be wide enough for
-        // the localized "Expense"/"Income" labels.
-        usesLargeTextLayout ? 140 : 100
     }
 
     @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
@@ -276,10 +265,6 @@ struct TransactionView: View {
             }
 
             _income = State(initialValue: transaction.income)
-
-            if transaction.income {
-                _swipingOffset = State(initialValue: 100)
-            }
 
             _date = State(initialValue: transaction.date ?? Date.now)
         }
