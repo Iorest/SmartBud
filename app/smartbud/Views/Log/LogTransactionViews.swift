@@ -16,31 +16,6 @@ struct SingleTransactionView: View {
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(OverallTransactionManager.self) var transactionManager
 
-    // delete mode
-//
-//    // edit mode
-
-    @State private var offset: CGFloat = 0
-    @State private var deleted: Bool = false
-    /// Row width, not the display width: on iPad/Mac a row is much narrower
-    /// than the window, so screen-based thresholds made a short swipe
-    /// trigger delete.
-    @State private var rowWidth: CGFloat = 0
-
-    private var gestureWidth: CGFloat { rowWidth > 0 ? rowWidth : 375 }
-
-    var deletePopup: Bool {
-        return abs(offset) > gestureWidth * 0.2
-    }
-
-    var deleteConfirm: Bool {
-        return abs(offset) > gestureWidth * 0.42
-    }
-
-    @GestureState var isDragging = false
-
-    @State private var lightHaptic = 0
-    @State private var mediumHaptic = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var transactionAmountString: String {
@@ -79,177 +54,80 @@ struct SingleTransactionView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .trailing) {
-            Image(systemName: "xmark")
-                .font(.caption.weight(.bold))
-
-                .foregroundStyle(deleteConfirm ? Color.AlertRed : Color.SubtitleText)
-                .padding(5)
-                .background(deleteConfirm ? Color.AlertRed.opacity(0.23) : Color.SecondaryBackground, in: Circle())
-                .scaleEffect(deleteConfirm ? 1.1 : 1)
-                .contentShape(Circle())
-                .opacity(deleted ? 0 : 1)
-                .padding(.horizontal, 10)
-                .offset(x: 80)
-                .offset(x: max(-80, offset))
-
-            HStack(spacing: 12) {
-                EmojiLogView(emoji: (transaction.category?.wrappedEmoji ?? ""),
-                             colour: (transaction.category?.wrappedColour ?? "#FFFFFF"), future: future)
-                    .fixedSize(horizontal: true, vertical: true)
-                    .overlay(alignment: .bottomTrailing) {
-                        if transaction.recurringType > 0 {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(Color.DarkIcon)
-                                .padding(3)
-                                .background(
-                                    Color.SecondaryBackground,
-                                    in: RoundedRectangle(cornerRadius: SBRadius.pill)
-                                )
-                                .offset(x: 5, y: 5)
-                        }
+        HStack(spacing: 12) {
+            EmojiLogView(emoji: (transaction.category?.wrappedEmoji ?? ""),
+                         colour: (transaction.category?.wrappedColour ?? "#FFFFFF"), future: future)
+                .fixedSize(horizontal: true, vertical: true)
+                .overlay(alignment: .bottomTrailing) {
+                    if transaction.recurringType > 0 {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(Color.DarkIcon)
+                            .padding(3)
+                            .background(
+                                Color.SecondaryBackground,
+                                in: RoundedRectangle(cornerRadius: SBRadius.pill)
+                            )
+                            .offset(x: 5, y: 5)
                     }
+                }
 
-                if dynamicTypeSize.isAccessibilitySize {
-                    // Large text: amount gets its own row under the note so
-                    // neither the note nor the time truncates.
-                    VStack(alignment: .leading, spacing: 4) {
-                        nameAndTime
-                        amountLabel
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    }
-                } else {
+            if dynamicTypeSize.isAccessibilitySize {
+                // Large text: amount gets its own row under the note so
+                // neither the note nor the time truncates.
+                VStack(alignment: .leading, spacing: 4) {
                     nameAndTime
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     amountLabel
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
+            } else {
+                nameAndTime
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                amountLabel
             }
-            .id(refreshID)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 10)
-            .contentShape(RoundedRectangle(cornerRadius: SBRadius.chip))
-            .onTapGesture {
-                transactionManager.toEdit = transaction
-            }
-            .contextMenu {
-                if transaction.recurringType > 0 {
-                    Button {
-                        transactionVM.stopRecurring(transaction)
-                    } label: {
-                        Label(String.appLocalized("Stop Recurring"), systemImage: "xmark")
-                    }
-                }
-
+        }
+        .id(refreshID)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+        .contentShape(RoundedRectangle(cornerRadius: SBRadius.chip))
+        .onTapGesture {
+            transactionManager.toEdit = transaction
+        }
+        .contextMenu {
+            if transaction.recurringType > 0 {
                 Button {
-                    transactionManager.toEdit = transaction
+                    transactionVM.stopRecurring(transaction)
                 } label: {
-                    Label(String.appLocalized("Edit"), systemImage: "pencil")
-                }
-
-                if !(future && transaction.wrappedDate < Date.now && transaction.recurringType > 0) {
-                    Button {
-                        transactionManager.toDelete = transaction
-                        transactionManager.future = future
-                        transactionManager.showPopup = true
-
-                    } label: {
-                        Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
-                    }
+                    Label(String.appLocalized("Stop Recurring"), systemImage: "xmark")
                 }
             }
-            .offset(x: offset)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String.appFormatted(
-                "%@, %@%@, Category: %@, at %@",
-                transaction.wrappedNote,
-                currencySymbol,
-                transactionAmountAccessibilityString,
-                transaction.category?.wrappedName ?? String.appLocalized("Unknown"),
-                timeConverterAccessibilityLabel(date: transaction.wrappedDate)
-            ))
-        }
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
-        .onChange(of: deletePopup) { _, _ in
-            if deletePopup {
-                lightHaptic &+= 1
+
+            Button {
+                transactionManager.toEdit = transaction
+            } label: {
+                Label(String.appLocalized("Edit"), systemImage: "pencil")
             }
-        }
-        .onChange(of: deleteConfirm) { _, _ in
-            if deleteConfirm {
-                mediumHaptic &+= 1
-            }
-        }
-        .animation(.easeInOut, value: deletePopup)
-        .simultaneousGesture(
-            DragGesture()
-                .updating($isDragging, body: { _, state, _ in
-                    state = true
-                })
-                .onChanged { value in
-                    if value.translation.width < 0 {
-                        withAnimation {
-                            offset = value.translation.width
-                        }
-                    }
-                }
-                .onEnded { _ in
-                    if deleteConfirm {
-                        deleted = true
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            offset -= gestureWidth
-                        }
 
-                        if future, transaction.wrappedDate < Date.now, transaction.recurringType > 0 {
-                            Task { @MainActor in
-                                try? await Task.sleep(for: .milliseconds(400))
-                                withAnimation(.easeInOut(duration: 0.5)) {
-                                    transactionVM.stopRecurring(transaction)
-                                }
-                            }
-                        } else {
-                            Task { @MainActor in
-                                try? await Task.sleep(for: .milliseconds(400))
-                                withAnimation {
-                                    transactionVM.stageDelete(transaction)
-                                    transactionManager.toDelete = transaction
-//                                    transactionManager.future = future
-//                                    transactionManager.toDelete = transaction
-//                                    transactionManager.deletionType = .instant
-                                }
-                            }
-                        }
+            if !(future && transaction.wrappedDate < Date.now && transaction.recurringType > 0) {
+                Button {
+                    transactionManager.toDelete = transaction
+                    transactionManager.future = future
+                    transactionManager.showPopup = true
 
-                    } else if deletePopup {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            offset = 0
-                        }
-
-                        transactionManager.future = future
-                        transactionManager.toDelete = transaction
-                        transactionManager.showPopup = true
-                    } else {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            offset = 0
-                        }
-                    }
-                }
-        )
-        .onChange(of: isDragging) { _, _ in
-            if !isDragging && !deleted {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    offset = 0
+                } label: {
+                    Label(String.appLocalized("Delete"), systemImage: "xmark.bin")
                 }
             }
         }
-        .onChange(of: transactionManager.toDelete) { _, newValue in
-            if newValue == nil {
-                deleted = false
-                offset = 0
-            }
-        }
-        .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)
-        .sensoryFeedback(.impact(weight: .medium), trigger: mediumHaptic)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String.appFormatted(
+            "%@, %@%@, Category: %@, at %@",
+            transaction.wrappedNote,
+            currencySymbol,
+            transactionAmountAccessibilityString,
+            transaction.category?.wrappedName ?? String.appLocalized("Unknown"),
+            timeConverterAccessibilityLabel(date: transaction.wrappedDate)
+        ))
     }
 
     func getSubtitle() -> String {

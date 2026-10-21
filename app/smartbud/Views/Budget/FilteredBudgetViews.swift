@@ -4,6 +4,7 @@ import SwiftData
 
 struct FilteredCategoryDayBudgetView: View {
     @Query private var transactions: [TransactionModel]
+    @Environment(OverallTransactionManager.self) private var transactionManager
     @Binding var totalSpent: Double
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
@@ -18,9 +19,11 @@ struct FilteredCategoryDayBudgetView: View {
     var showExpenseOrIncomeSign: Bool = true
 
     var body: some View {
-        VStack(spacing: 0) {
+        List {
             if transactions.count == 0 {
                 NoResultsView(fullscreen: false)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
             } else {
                 ForEach(transactions, id: \.id) { transaction in
                     SingleTransactionView(
@@ -32,9 +35,12 @@ struct FilteredCategoryDayBudgetView: View {
                         future: false,
                         showExpenseOrIncomeSign: showExpenseOrIncomeSign
                     )
+                    .swipeToDelete(manager: transactionManager)
                 }
             }
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .onAppear {
             DispatchQueue.main.async {
                 var holding = 0.0
@@ -118,58 +124,64 @@ struct FilteredBudgetView: View {
         Money.format(total, currencyCode: currency, showsCents: showCents, plus: total >= 0)
     }
 
+    private func dayHeader(_ entry: (day: Date, transactions: [TransactionModel])) -> some View {
+        let total = dayTotal(entry.transactions)
+        let dateText = dateConverter(date: entry.day).uppercased()
+        let totalString = abs(total).formatted(.number.precision(.fractionLength(2)))
+
+        return VStack(spacing: 4) {
+            HStack {
+                Text(dateText)
+                Spacer()
+                Text(dayTotalString(total))
+                    .layoutPriority(1)
+            }
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(Color.SubtitleText)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String
+                .appFormatted("%@%@ was spent %@", currencySymbol, totalString,
+                    dateConverterAccessibilityLabel(date: entry.day)))
+
+            Line()
+                .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 10)
+        .textCase(nil)
+    }
+
+    @Environment(OverallTransactionManager.self) private var transactionManager
+
     var body: some View {
-        VStack(spacing: 30) {
+        List {
             if transactions.count == 0 {
                 NoResultsView(fullscreen: false)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
             }
 
-            LazyVStack(spacing: 0) {
-                ForEach(groupedByDay, id: \.day) { entry in
-                    let total = dayTotal(entry.transactions)
-                    let dateText = dateConverter(date: entry.day).uppercased()
-                    let totalString = abs(total).formatted(.number.precision(.fractionLength(2)))
-
-                    VStack(spacing: 0) {
-                        VStack(spacing: 4) {
-                            HStack {
-                                Text(dateText)
-                                Spacer()
-
-                                Text(dayTotalString(total))
-                                    .layoutPriority(1)
-                            }
-                            .font(.callout.weight(.semibold))
-
-                            .foregroundStyle(Color.SubtitleText)
-                            .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(String
-                                .appFormatted("%@%@ was spent %@", currencySymbol, totalString,
-                                    dateConverterAccessibilityLabel(date: entry.day)))
-
-                            Line()
-                                .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.top, 10)
-
-                        ForEach(entry.transactions, id: \.id) { transaction in
-                            SingleTransactionView(
-                        transaction: transaction,
-                        showCents: showCents,
-                        currencySymbol: currencySymbol,
-                        currency: currency,
-                        swapTimeLabel: swapTimeLabel,
-                        future: false,
-                        showExpenseOrIncomeSign: showExpenseOrIncomeSign
-                    )
-                        }
+            ForEach(groupedByDay, id: \.day) { entry in
+                Section {
+                    ForEach(entry.transactions, id: \.id) { transaction in
+                        SingleTransactionView(
+                            transaction: transaction,
+                            showCents: showCents,
+                            currencySymbol: currencySymbol,
+                            currency: currency,
+                            swapTimeLabel: swapTimeLabel,
+                            future: false,
+                            showExpenseOrIncomeSign: showExpenseOrIncomeSign
+                        )
+                        .swipeToDelete(manager: transactionManager)
                     }
-                    .padding(.bottom, 18)
+                } header: {
+                    dayHeader(entry)
                 }
             }
         }
-        .frame(maxHeight: .infinity)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .onAppear {
             totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
         }
@@ -229,5 +241,22 @@ struct FilteredBudgetView: View {
         }
 
         _totalSpent = totalSpent
+    }
+}
+
+/// Native swipe-to-delete for a ledger row inside a `List`.
+private extension SingleTransactionView {
+    func swipeToDelete(manager: OverallTransactionManager) -> some View {
+        self
+            .listRowInsets(EdgeInsets())
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(String.appLocalized("Delete"), role: .destructive) {
+                    manager.toDelete = transaction
+                    manager.future = false
+                    manager.showPopup = true
+                }
+            }
     }
 }

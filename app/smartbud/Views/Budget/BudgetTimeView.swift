@@ -294,10 +294,11 @@ extension BudgetTimeView {
                     .padding(.horizontal, 25)
             }
 
-            ScrollView(showsIndicators: false) {
+            // A List owns its own scrolling; wrapping it in a ScrollView would
+            // give it unbounded height and disable the native swipe actions.
+            Group {
                 if budgetType == 1 {
                     FilteredCategoryDayBudgetView(category: category, day: startDate, totalSpent: $totalSpent)
-                        .padding(.horizontal, 15)
                 } else {
                     FilteredBudgetView(
                         category: category,
@@ -305,9 +306,9 @@ extension BudgetTimeView {
                         totalSpent: $totalSpent,
                         type: budgetType - 1
                     )
-                        .padding(.horizontal, 15)
                 }
             }
+            .padding(.horizontal, 15)
             .frame(maxHeight: .infinity)
 
             BudgetStepperView(category: category, date: $startDate, startDate: budgetStart, budgetType: budgetType)
