@@ -88,6 +88,7 @@ enum SettingsKey {
     static let importSuccess = "settings.import.success"
     static let importSkipped = "settings.import.skipped"
     static let importEmpty = "settings.import.empty"
+    static let importAllSkipped = "settings.import.allSkipped"
     static let importDone = "settings.import.done"
     static let importSettingsApplied = "settings.import.settingsApplied"
     static let importConfirmTitle = "settings.import.confirm.title"

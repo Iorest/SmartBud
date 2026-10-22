@@ -127,12 +127,8 @@ struct SettingsImportView: View {
 
     private func resultCard(_ summary: DataImporter.Summary) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Label(
-                summary.isEmpty
-                    ? String.appLocalized(SettingsKey.importEmpty)
-                    : String.appFormatted(SettingsKey.importSuccess, summary.imported),
-                systemImage: summary.isEmpty ? "info.circle" : "checkmark.circle.fill"
-            )
+            Label(resultTitle(summary),
+                  systemImage: summary.isEmpty ? "info.circle" : "checkmark.circle.fill")
             .font(.body.weight(.medium))
             .foregroundStyle(summary.isEmpty ? Color.SubtitleText : Color.PrimaryText)
 
@@ -190,6 +186,17 @@ struct SettingsImportView: View {
         guard let payload = pendingPayload else { return "" }
         return payload.exportDate.formatted(
             Date.FormatStyle(locale: .appLocale).year().month().day())
+    }
+
+    /// "Nothing to import" means the file itself is empty; "nothing new" means
+    /// every record was already here. Different situations, different copy.
+    private func resultTitle(_ summary: DataImporter.Summary) -> String {
+        if !summary.isEmpty {
+            return String.appFormatted(SettingsKey.importSuccess, summary.imported)
+        }
+        return summary.skipped > 0
+            ? String.appLocalized(SettingsKey.importAllSkipped)
+            : String.appLocalized(SettingsKey.importEmpty)
     }
 
     private func applyPendingImport() {
