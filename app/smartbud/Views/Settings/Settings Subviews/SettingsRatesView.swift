@@ -16,6 +16,14 @@ struct SettingsRatesView: View {
     @AppStorage("currency", store: .appGroup) private var baseCurrency: String =
         Locale.current.currency?.identifier ?? "USD"
 
+    /// Auto-refresh runs when the page opens (and on launch), at most once per
+    /// `refreshInterval`. There is no background job: iOS would need
+    /// BGTaskScheduler for that, which is overkill for a daily rate.
+    @AppStorage("autoRefreshRates", store: .appGroup) private var autoRefreshRates = false
+    @AppStorage("lastRateRefresh", store: .appGroup) private var lastRateRefresh: Double = 0
+
+    private let refreshInterval: TimeInterval = 6 * 60 * 60
+
     @State private var drafts: [String: String] = [:]
     @State private var isRefreshing = false
     @State private var refreshError: String?
@@ -30,6 +38,9 @@ struct SettingsRatesView: View {
     var body: some View {
         Form {
             Section {
+                Toggle(String.appLocalized("Update automatically"), isOn: $autoRefreshRates)
+                    .disabled(foreignCodes.isEmpty)
+
                 Button {
                     Task { await refresh() }
                 } label: {
@@ -59,7 +70,8 @@ struct SettingsRatesView: View {
             } footer: {
                 Text(String.appLocalized(
                     "Uses European Central Bank reference rates. Currencies it does not publish "
-                        + "keep the rate you type below."))
+                        + "keep the rate you type below. Automatic updates run when you open this "
+                        + "screen, at most once every 6 hours."))
             }
 
             Section {
@@ -94,6 +106,7 @@ struct SettingsRatesView: View {
             for code in foreignCodes where drafts[code] == nil {
                 drafts[code] = rateStore.rates[code].map { String(format: "%.4f", $0) } ?? ""
             }
+            autoRefreshIfNeeded()
         }
     }
 
@@ -140,6 +153,13 @@ struct SettingsRatesView: View {
         .accessibilityElement(children: .contain)
     }
 
+    private func autoRefreshIfNeeded() {
+        guard autoRefreshRates, !foreignCodes.isEmpty else { return }
+        let last = Date(timeIntervalSince1970: lastRateRefresh)
+        guard Date.now.timeIntervalSince(last) >= refreshInterval else { return }
+        Task { await refresh() }
+    }
+
     private func refresh() async {
         isRefreshing = true
         refreshError = nil
@@ -147,6 +167,7 @@ struct SettingsRatesView: View {
         do {
             refreshedCount = try await rateStore.refreshRates(
                 for: foreignCodes + [baseCurrency])
+            lastRateRefresh = Date.now.timeIntervalSince1970
             syncDrafts()
         } catch {
             refreshError = error.localizedDescription

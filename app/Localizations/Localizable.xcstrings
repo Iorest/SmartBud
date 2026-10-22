@@ -15404,6 +15404,50 @@
           }
         }
       }
+    },
+    "Update automatically" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update automatically"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动更新"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動更新"
+          }
+        }
+      }
+    },
+    "Uses European Central Bank reference rates. Currencies it does not publish keep the rate you type below. Automatic updates run when you open this screen, at most once every 6 hours." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses European Central Bank reference rates. Currencies it does not publish keep the rate you type below. Automatic updates run when you open this screen, at most once every 6 hours."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用欧洲央行参考汇率；未收录的货币会保留你手动填写的汇率。开启自动更新后，每次打开本页会尝试刷新，最短间隔 6 小时。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用歐洲央行參考匯率；未收錄的貨幣會保留你手動填寫的匯率。開啟自動更新後，每次開啟本頁會嘗試重新整理，最短間隔 6 小時。"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"
