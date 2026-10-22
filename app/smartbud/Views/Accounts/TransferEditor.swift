@@ -15,6 +15,7 @@ struct TransferEditor: View {
     @State private var destination: AccountModel?
     @State private var amount = ""
     @State private var destinationAmount = ""
+    @State private var fee = ""
     @State private var date = Date.now
     @State private var note = ""
 
@@ -33,6 +34,10 @@ struct TransferEditor: View {
         Double(destinationAmount.replacingOccurrences(of: ",", with: ".")) ?? 0
     }
 
+    private var parsedFee: Double {
+        fee.isEmpty ? 0 : (Double(fee.replacingOccurrences(of: ",", with: ".")) ?? 0)
+    }
+
     private var isCrossCurrency: Bool {
         guard let source, let destination else { return false }
         return source.resolvedCurrencyCode != destination.resolvedCurrencyCode
@@ -44,6 +49,7 @@ struct TransferEditor: View {
     private var canSave: Bool {
         guard let source, let destination else { return false }
         guard source.id != destination.id, parsedAmount > 0, parsedAmount.isFinite else { return false }
+        guard parsedFee >= 0, parsedFee.isFinite else { return false }
         guard isCrossCurrency else { return true }
         return parsedDestinationAmount > 0 && parsedDestinationAmount.isFinite
     }
@@ -67,6 +73,8 @@ struct TransferEditor: View {
                 Section {
                     amountRow(titleKey: "Amount", text: $amount, code: sourceCurrency)
 
+                    amountRow(titleKey: "Fee", text: $fee, code: sourceCurrency)
+
                     if isCrossCurrency {
                         amountRow(titleKey: "Amount Received",
                                   text: $destinationAmount, code: destinationCurrency)
@@ -83,6 +91,10 @@ struct TransferEditor: View {
                         Text(String.appLocalized(
                             "Enter what actually arrived. The rate is stored with the transfer, "
                                 + "so later rate changes never rewrite it."))
+                    } else {
+                        Text(String.appLocalized(
+                            "The fee is charged on top of the amount, so the sending account "
+                                + "pays both."))
                     }
                 }
 
@@ -163,6 +175,7 @@ struct TransferEditor: View {
             destination: destination,
             amount: parsedAmount,
             destinationAmount: isCrossCurrency ? parsedDestinationAmount : 0,
+            fee: parsedFee,
             date: date,
             note: note
         )

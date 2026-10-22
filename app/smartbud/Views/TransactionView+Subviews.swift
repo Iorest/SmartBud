@@ -82,6 +82,8 @@ extension TransactionView {
             if let category, category.income != newValue {
                 self.category = nil
             }
+            // Income cannot be claimed back.
+            if newValue { reimbursable = false }
         }
         .onChange(of: numberEntryType) { _, new in
             padVM.numberEntryType = new
@@ -133,6 +135,17 @@ extension TransactionView {
         .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
             Button(String.appLocalized("Keep Editing"), role: .cancel) {}
             Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
+        }
+        .alert(String.appLocalized("Discount"), isPresented: $showDiscountEditor) {
+            TextField("0", text: $discountInput)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+            Button(String.appLocalized("Cancel"), role: .cancel) {}
+            Button(String.appLocalized("Done")) { applyDiscount() }
+        } message: {
+            Text(String.appLocalized(
+                "How much came off the listed price. The number pad already shows what you paid."))
         }
         .sheet(isPresented: $showAccountPicker) {
             AccountPickerSheet(selection: $account)

@@ -8,10 +8,16 @@ struct TransactionEdit {
     let category: CategoryModel?
     let account: AccountModel?
     let income: Bool
+    /// Net amount: what actually left (or entered) the account.
     let amount: Double
     let date: Date
     let repeatType: Int
     let repeatCoefficient: Int
+    /// How much was knocked off the listed price. Display-only; `amount`
+    /// already excludes it.
+    var discount: Double = 0
+    /// Expense the user will claim back.
+    var reimbursable: Bool = false
 }
 
 /// Values written when saving a quick-add template.
@@ -41,7 +47,9 @@ final class TransactionViewModel {
                                        edit.amount, from: edit.account?.currencyCode ?? ""),
                                    income: edit.income, amount: edit.amount, date: edit.date,
                                    repeatType: edit.repeatType,
-                                   repeatCoefficient: edit.repeatCoefficient)
+                                   repeatCoefficient: edit.repeatCoefficient,
+                                   discount: edit.discount,
+                                   reimbursable: edit.reimbursable)
         repo.insert(txn)
         if edit.repeatType > 0 { processRecurring(txn) }
         repo.save()
@@ -65,6 +73,10 @@ final class TransactionViewModel {
             edit.amount, from: edit.account?.currencyCode ?? "")
         txn.date = edit.date
         txn.income = edit.income
+        txn.discount = edit.discount
+        // Only expenses can be claimed back; switching to income drops the flag.
+        txn.reimbursable = edit.reimbursable && !edit.income
+        if !txn.reimbursable { txn.reimbursedAt = nil }
 
         let calendar = Calendar(identifier: .gregorian)
         txn.day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: edit.date) ?? Date.now
@@ -88,6 +100,27 @@ final class TransactionViewModel {
     func stopRecurring(_ txn: TransactionModel) {
         txn.recurringType = 0
         txn.onceRecurring = false
+        repo.save()
+    }
+
+    // MARK: Reimbursement
+
+    /// Turns the claim flag on/off. Only expenses can be claimed back, and
+    /// clearing the flag also clears the "paid back" date.
+    func setReimbursable(_ reimbursable: Bool, for txn: TransactionModel) {
+        let allowed = reimbursable && !txn.income && !txn.adjustment
+        guard txn.reimbursable != allowed else { return }
+        txn.reimbursable = allowed
+        if !allowed { txn.reimbursedAt = nil }
+        repo.save()
+    }
+
+    /// Records (or clears) the moment the money came back.
+    func setReimbursed(_ reimbursed: Bool, for txn: TransactionModel) {
+        guard txn.reimbursable else { return }
+        let newValue: Date? = reimbursed ? .now : nil
+        guard txn.reimbursedAt != newValue else { return }
+        txn.reimbursedAt = newValue
         repo.save()
     }
 
@@ -115,7 +148,8 @@ final class TransactionViewModel {
                       coefficient: txn.recurringCoefficient) {
                 let new = TransactionModel(note: txn.note ?? "", category: txn.category,
                                            account: txn.account, baseAmount: txn.wrappedBaseAmount,
-                                           income: txn.income, amount: txn.amount, date: cursor)
+                                           income: txn.income, amount: txn.amount, date: cursor,
+                                           discount: txn.discount, reimbursable: txn.reimbursable)
                 repo.insert(new)
                 new.onceRecurring = true
                 cursor = next
@@ -126,7 +160,8 @@ final class TransactionViewModel {
             let new = TransactionModel(note: txn.note ?? "", category: txn.category,
                                        account: txn.account, baseAmount: txn.wrappedBaseAmount,
                                        income: txn.income, amount: txn.amount,
-                                       date: txn.nextTransactionDate)
+                                       date: txn.nextTransactionDate,
+                                       discount: txn.discount, reimbursable: txn.reimbursable)
             repo.insert(new)
             new.onceRecurring = true
             txn.recurringType = 0

@@ -66,7 +66,13 @@ final class AccountViewModel {
     }
 
     var visibleAccounts: [AccountModel] {
-        accounts.filter { !$0.hidden }
+        accounts.filter { !$0.hidden && !$0.archived }
+    }
+
+    /// Archived accounts are out of the daily list and the total, but their
+    /// history stays intact.
+    var archivedAccounts: [AccountModel] {
+        accounts.filter(\.archived)
     }
 
     /// Sum of every visible account, the number a "net worth" header shows.
@@ -84,7 +90,7 @@ final class AccountViewModel {
             opening: account.openingBalance,
             transactions: (account.transactions ?? []).map { ($0.amount, $0.income) },
             transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.receivedAmount },
-            transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.amount }
+            transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.outgoingTotal }
         )
     }
 
@@ -99,10 +105,12 @@ final class AccountViewModel {
         destination: AccountModel,
         amount: Double,
         destinationAmount: Double = 0,
+        fee: Double = 0,
         date: Date,
         note: String
     ) -> TransferModel? {
         guard source.id != destination.id, amount > 0, amount.isFinite else { return nil }
+        guard fee >= 0, fee.isFinite else { return nil }
 
         // Same currency keeps the legacy shape (destinationAmount left at 0);
         // crossing currencies records what actually landed in the target.
@@ -114,6 +122,7 @@ final class AccountViewModel {
         let transfer = TransferModel(
             amount: amount,
             destinationAmount: received,
+            fee: fee,
             date: date,
             note: note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note,
             source: source,
@@ -179,6 +188,36 @@ final class AccountViewModel {
         account.hidden = hidden
         repo.save()
         load()
+    }
+
+    func setArchived(_ archived: Bool, for account: AccountModel) {
+        account.archived = archived
+        repo.save()
+        load()
+    }
+
+    /// Corrects the account to `target` with a dedicated adjustment row, so
+    /// the opening balance (and the history behind it) is never rewritten.
+    @discardableResult
+    func adjustBalance(_ account: AccountModel, to target: Double, date: Date = .now) -> TransactionModel? {
+        guard target.isFinite else { return nil }
+        let delta = Money.double(Money.cents(target) - Money.cents(balance(for: account)))
+        guard delta != 0 else { return nil }
+
+        let transaction = TransactionModel(
+            note: String.appLocalized("Balance Adjustment"),
+            account: account,
+            baseAmount: CurrencyRateStore.shared.convertToBase(
+                abs(delta), from: account.resolvedCurrencyCode),
+            income: delta > 0,
+            amount: abs(delta),
+            date: date,
+            adjustment: true
+        )
+        repo.insert(transaction)
+        repo.save()
+        load()
+        return transaction
     }
 
     /// Default for a new transaction: the account used last, otherwise the

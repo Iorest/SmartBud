@@ -187,14 +187,21 @@ extension TransactionView {
             }
             .padding(.bottom, 5)
         } else {
-            if !accountVM.accounts.isEmpty {
-                TransactionAccountChip(account: account) {
-                    hideKeyboard()
-                    showAccountPicker = true
+            // The extras row is always there; the account chip joins it once
+            // the user has an account (discount and claims work without one).
+            HStack(spacing: 6) {
+                if !accountVM.accounts.isEmpty {
+                    TransactionAccountChip(account: account) {
+                        hideKeyboard()
+                        showAccountPicker = true
+                    }
+                    Spacer(minLength: 4)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 6)
+
+                entryOptionChips
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 6)
 
             if usesLargeTextLayout {
                 // Large text: two chips side by side would truncate the date.
@@ -310,6 +317,40 @@ extension TransactionView {
         dateFormatter.locale = Locale.appLocale
         dateFormatter.dateFormat = "d MMM yyyy"
         return dateFormatter.string(from: date)
+    }
+
+    // MARK: - Discount and reimbursement chips
+
+    /// Two compact chips that sit opposite the account chip. Both are
+    /// optional extras, so they stay out of the way until used.
+    @ViewBuilder
+    var entryOptionChips: some View {
+        HStack(spacing: 6) {
+            TransactionOptionChip(
+                systemImage: "tag",
+                title: discount > 0
+                    ? Money.format(discount,
+                                   currencyCode: account?.resolvedCurrencyCode ?? currency,
+                                   showsCents: false, locale: .appLocale)
+                    : String.appLocalized("Discount"),
+                isOn: discount > 0
+            ) {
+                hideKeyboard()
+                discountInput = discount > 0 ? String(format: "%.2f", discount) : ""
+                showDiscountEditor = true
+            }
+
+            if !income {
+                TransactionOptionChip(
+                    systemImage: reimbursable ? "checkmark.circle.fill" : "arrow.uturn.backward.circle",
+                    title: String.appLocalized("Claim"),
+                    isOn: reimbursable
+                ) {
+                    withAnimation(.easeOut(duration: 0.15)) { reimbursable.toggle() }
+                    lightHaptic &+= 1
+                }
+            }
+        }
     }
 
 }

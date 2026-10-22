@@ -27,6 +27,9 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - Insightful expenditure breakdowns over various time periods.
 - Create budgets based on expense categories and stick to them.
 - Create recurring expenses with custom time frames.
+- Track accounts and transfers, including cross-currency moves with a per-transfer rate and fee.
+- Mark an expense as reimbursable: it stays in the ledger but out of your spending totals until it is paid back.
+- Restore everything from the JSON backup, or export a CSV for a spreadsheet.
 - Sync your expenses, categories and budgets with other devices via iCloud.
 - Custom reminders to input your expenses.
 - Biometric authentication to protect your data.
@@ -57,6 +60,11 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - Please let all dependecies update automatically but we would recommend to run
   `File > Packages > Resolve Package Versions` to ensure, everything is updated.
 
+
+## Documentation
+
+- [Data export and restore](docs/data-portability.md) — JSON backup format, import rules, CSV columns.
+- [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
 
 ## Licence
 

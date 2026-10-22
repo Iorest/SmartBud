@@ -35,7 +35,9 @@ enum LogEntry: Identifiable {
 
     var netAmount: Double {
         switch self {
-        case .transaction(let txn): return txn.income ? txn.wrappedBaseAmount : -txn.wrappedBaseAmount
+        // Same policy as the statistics totals: claims and balance
+        // adjustments move the account but not the day's income/spend.
+        case .transaction(let txn): return txn.signedBaseAmount
         case .transfer: return 0
         }
     }
@@ -121,13 +123,13 @@ struct LogTransactionList<Header: View>: View {
     @Binding var selection: Set<UUID>
     var header: Header
 
-    @State private var selectionHaptic = 0
+    @State var selectionHaptic = 0
 
-    @Environment(TransactionViewModel.self) private var transactionVM
-    @Environment(OverallTransactionManager.self) private var transactionManager
-    @Environment(AccountViewModel.self) private var accountVM
+    @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(OverallTransactionManager.self) var transactionManager
+    @Environment(AccountViewModel.self) var accountVM
 
-    @State private var transferToDelete: TransferModel?
+    @State var transferToDelete: TransferModel?
 
     init(
         entries: [LogEntry],
@@ -151,7 +153,7 @@ struct LogTransactionList<Header: View>: View {
 
     /// A repeating transaction whose next occurrence is in the past can only
     /// be stopped, not deleted, so it must not be full-swipe deletable.
-    private func stopsRecurring(_ transaction: TransactionModel, future: Bool? = nil) -> Bool {
+    func stopsRecurring(_ transaction: TransactionModel, future: Bool? = nil) -> Bool {
         let isFuture = future ?? self.future
         return isFuture && transaction.wrappedDate < .now && transaction.recurringType > 0
     }
@@ -278,123 +280,6 @@ struct LogTransactionList<Header: View>: View {
             row(transaction)
         case .transfer(let transfer):
             transferRow(transfer)
-        }
-    }
-
-    /// Transfers sit in the ledger but are never selectable in batch mode:
-    /// they are not transactions and have no category to reassign.
-    private func transferRow(_ transfer: TransferModel) -> some View {
-        LogTransferRow(transfer: transfer)
-            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button(role: .destructive) {
-                    transferToDelete = transfer
-                } label: {
-                    Label(String.appLocalized("Delete"), systemImage: "trash")
-                }
-            }
-            .contextMenu {
-                Button(role: .destructive) {
-                    transferToDelete = transfer
-                } label: {
-                    Label(String.appLocalized("Delete"), systemImage: "trash")
-                }
-            }
-    }
-
-    @ViewBuilder
-    private func row(_ transaction: TransactionModel, isFuture: Bool? = nil) -> some View {
-        let futureRow = isFuture ?? future
-
-        if isSelecting {
-            selectableRow(transaction, isFuture: futureRow)
-        } else {
-            editableRow(transaction, isFuture: futureRow)
-        }
-    }
-
-    /// Selection mode: the row toggles a checkmark instead of opening.
-    private func selectableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
-        let isSelected = selection.contains(transaction.id)
-
-        return HStack(spacing: SBSpace.small) {
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.title3)
-                .foregroundStyle(isSelected ? Color.accentColor : Color.SubtitleText)
-                .accessibilityHidden(true)
-
-            LogTransactionRow(transaction: transaction, future: isFuture)
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if isSelected {
-                selection.remove(transaction.id)
-            } else {
-                selection.insert(transaction.id)
-            }
-            selectionHaptic &+= 1
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
-    }
-
-    private func editableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
-        let futureRow = isFuture
-        return Button {
-            transactionManager.toEdit = transaction
-        } label: {
-            LogTransactionRow(transaction: transaction, future: futureRow)
-        }
-        .buttonStyle(.plain)
-        .swipeActions(edge: .trailing, allowsFullSwipe: !stopsRecurring(transaction, future: futureRow)) {
-            Button(role: .destructive) {
-                remove(transaction, future: futureRow)
-            } label: {
-                Label(String.appLocalized("Delete"), systemImage: "trash")
-            }
-
-            Button {
-                transactionManager.toEdit = transaction
-            } label: {
-                Label(String.appLocalized("Edit"), systemImage: "pencil")
-            }
-            .tint(.accentColor)
-        }
-        .contextMenu {
-            if transaction.recurringType > 0 {
-                Button {
-                    transactionVM.stopRecurring(transaction)
-                } label: {
-                    Label(String.appLocalized("Stop Recurring"), systemImage: "xmark")
-                }
-            }
-
-            Button {
-                transactionManager.toEdit = transaction
-            } label: {
-                Label(String.appLocalized("Edit"), systemImage: "pencil")
-            }
-
-            if !stopsRecurring(transaction, future: futureRow) {
-                Button(role: .destructive) {
-                    remove(transaction, future: futureRow)
-                } label: {
-                    Label(String.appLocalized("Delete"), systemImage: "trash")
-                }
-            }
-        }
-    }
-
-    private func remove(_ transaction: TransactionModel, future: Bool? = nil) {
-        if stopsRecurring(transaction, future: future) {
-            withAnimation {
-                transactionVM.stopRecurring(transaction)
-            }
-        } else {
-            // Staged so the undo banner can restore it; the view model owns
-            // the commit timer.
-            withAnimation {
-                transactionVM.stageDelete(transaction)
-            }
         }
     }
 }

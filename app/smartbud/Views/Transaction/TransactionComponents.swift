@@ -10,6 +10,37 @@ struct NumPadButton: ButtonStyle {
     }
 }
 
+/// Small on/off chip used by the entry form for the optional extras
+/// (discount, reimbursement). Matches the account chip's capsule styling.
+struct TransactionOptionChip: View {
+    let systemImage: String
+    let title: String
+    let isOn: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: systemImage)
+                    .font(.caption.weight(.semibold))
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(isOn ? Color.accentColor : Color.SubtitleText)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .background(
+                isOn ? Color.accentColor.opacity(0.15) : Color.SecondaryBackground,
+                in: Capsule()
+            )
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn ? .isSelected : [])
+    }
+}
+
 struct NoteView: View {
     @Binding var note: String
     @Binding var focused: Bool

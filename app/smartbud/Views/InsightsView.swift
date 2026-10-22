@@ -26,14 +26,15 @@ struct InsightsView: View {
     @Environment(InsightsViewModel.self) var insightsVM
 
     @AppStorage("currency", store: .appGroup)
-    private var currency: String = Locale.current.currency?.identifier ?? "USD"
+    var currency: String = Locale.current.currency?.identifier ?? "USD"
 
     @AppStorage("showCents", store: .appGroup)
-    private var showCents: Bool = true
+    var showCents: Bool = true
 
     @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)
     @State private var showAIAnalysis = false
-    @Environment(\.dynamicTypeSize) private var typeSize
+    @State var showPendingReimbursements = false
+    @Environment(\.dynamicTypeSize) var typeSize
 
     var body: some View {
         NavigationStack {
@@ -57,6 +58,10 @@ struct InsightsView: View {
                     } else {
                         summaryCards
                             .padding(.bottom, 13)
+                        if insightsVM.pendingReimbursementTotal > 0 {
+                            pendingReimbursementCard
+                                .padding(.bottom, 13)
+                        }
                         barChartSection
                             .padding(.bottom, 18)
                         categoryBreakdownSection
@@ -93,6 +98,10 @@ struct InsightsView: View {
         }
         .sheet(isPresented: $showAIAnalysis) {
             InsightsAIAnalysisView()
+                .environment(insightsVM)
+        }
+        .sheet(isPresented: $showPendingReimbursements) {
+            PendingReimbursementSheet()
                 .environment(insightsVM)
         }
     }

@@ -34,12 +34,24 @@ struct TransactionView: View {
                 || category?.id != toEdit.category?.id
                 || income != toEdit.income
                 || date != toEdit.wrappedDate
+                || discount != toEdit.discount
+                || reimbursable != toEdit.reimbursable
         }
         return padVM.price > 0 || !note.isEmpty || category != nil
+            || discount > 0 || reimbursable
     }
     @State var repeatType = 0
     @State var repeatCoefficient = 1
     @State var income = false
+
+    /// How much was knocked off the listed price. `amount` already holds the
+    /// net total, so this only feeds the "原价" line and the export.
+    @State var discount: Double = 0
+    @State var showDiscountEditor = false
+    @State var discountInput = ""
+
+    /// Claims the expense back; claims are excluded from spend statistics.
+    @State var reimbursable = false
 
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
@@ -238,7 +250,9 @@ struct TransactionView: View {
             amount: amount,
             date: date,
             repeatType: repeatType,
-            repeatCoefficient: repeatCoefficient
+            repeatCoefficient: repeatCoefficient,
+            discount: discount,
+            reimbursable: reimbursable && !income
         ))
 
         // Reset pad state (price / decimal / haptic trigger) for the next
@@ -268,10 +282,22 @@ struct TransactionView: View {
             amount: amount,
             date: date,
             repeatType: repeatType,
-            repeatCoefficient: repeatCoefficient
+            repeatCoefficient: repeatCoefficient,
+            discount: discount,
+            reimbursable: reimbursable && !income
         ))
 
         dismiss()
+    }
+
+    /// Parses the discount alert's text into a non-negative amount.
+    func applyDiscount() {
+        let cleaned = discountInput
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: ",", with: ".")
+        let value = Double(cleaned) ?? 0
+        discount = value.isFinite ? max(0, min(value, Money.maxAmount)) : 0
+        discountInput = ""
     }
 
     /// Closes the form, or keeps it open in continuous-entry mode.
@@ -291,6 +317,8 @@ struct TransactionView: View {
         // Keep category, date, income and recurrence so the next transaction
         // is a one-tap repeat, but clear what's per-entry.
         note = ""
+        discount = 0
+        reimbursable = false
         toastImage = "checkmark.circle.fill"
         toastTitle = String.appLocalized("Saved")
         showToast = true
@@ -311,6 +339,8 @@ struct TransactionView: View {
 
             _date = State(initialValue: transaction.date ?? Date.now)
             _account = State(initialValue: transaction.account)
+            _discount = State(initialValue: transaction.discount)
+            _reimbursable = State(initialValue: transaction.reimbursable)
         }
         self.toEdit = toEdit
     }

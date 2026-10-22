@@ -1,0 +1,160 @@
+//
+//  AccountListView+Sections.swift
+//  smartbud
+//
+//  Row builders, the archived section and the balance-adjustment flow.
+//  Split from AccountListView.swift to keep the type body readable.
+//
+
+import SwiftData
+import SwiftUI
+
+extension AccountListView {
+
+    var totalRow: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(String.appLocalized("Total Balance"))
+                .font(.subheadline)
+                .foregroundStyle(Color.SubtitleText)
+            Spacer()
+            Text(Money.format(accountVM.totalBalance, currencyCode: currency,
+                              showsCents: showCents, locale: .appLocale))
+                .font(.title3.weight(.semibold).monospacedDigit())
+        }
+        .padding(.vertical, SBSpace.xxs)
+        .listRowSeparator(.hidden)
+    }
+
+    func transferAmountText(_ transfer: TransferModel) -> String {
+        let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
+        let sent = Money.format(transfer.amount, currencyCode: outgoing,
+                                showsCents: showCents, locale: .appLocale)
+        let feeText = transfer.fee > 0
+            ? Money.format(transfer.fee, currencyCode: outgoing,
+                           showsCents: showCents, locale: .appLocale)
+            : nil
+        let sentWithFee = feeText.map { "\(sent) + \($0)" } ?? sent
+        guard transfer.destinationAmount > 0 else { return sentWithFee }
+
+        let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
+        let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
+                                  showsCents: showCents, locale: .appLocale)
+        return "\(sentWithFee) → \(landed)"
+    }
+
+    func kindLabel(_ account: AccountModel) -> String {
+        let kind = String.appLocalized(
+            AccountKind(rawValue: account.kind)?.titleKey ?? AccountKind.cash.titleKey)
+        let code = account.resolvedCurrencyCode
+        return code == currency ? kind : "\(kind) · \(code)"
+    }
+
+    func transferRow(_ transfer: TransferModel) -> some View {
+        HStack(spacing: SBSpace.small) {
+            Image(systemName: "arrow.left.arrow.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color.SubtitleText)
+                .frame(width: 36, height: 36)
+                .background(Color.SecondaryBackground,
+                            in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(transfer.source?.wrappedName ?? "—") → \(transfer.destination?.wrappedName ?? "—")")
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.PrimaryText)
+                Text(transfer.wrappedDate.formatted(
+                    Date.FormatStyle(locale: Locale.appLocale).month(.abbreviated).day().hour().minute()))
+                    .font(.caption)
+                    .foregroundStyle(Color.SubtitleText)
+            }
+
+            Spacer(minLength: SBSpace.extraSmall)
+
+            Text(transferAmountText(transfer))
+                .font(.callout.weight(.medium).monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 2)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                transferToDelete = transfer
+            } label: {
+                Label(String.appLocalized("Delete"), systemImage: "trash")
+            }
+        }
+    }
+
+    func row(_ account: AccountModel) -> some View {
+        HStack(spacing: SBSpace.small) {
+            Text(account.wrappedEmoji.isEmpty ? "💳" : account.wrappedEmoji)
+                .font(.title3)
+                .frame(width: 36, height: 36)
+                .background(Color(hex: account.wrappedColour).opacity(0.25),
+                            in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(account.wrappedName)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.PrimaryText)
+                Text(kindLabel(account))
+                    .font(.caption)
+                    .foregroundStyle(Color.SubtitleText)
+            }
+
+            Spacer(minLength: SBSpace.extraSmall)
+
+            Text(Money.format(accountVM.balance(for: account),
+                              currencyCode: account.resolvedCurrencyCode,
+                              showsCents: showCents, locale: .appLocale))
+                .font(.callout.weight(.medium).monospacedDigit())
+                .foregroundStyle(accountVM.balance(for: account) < 0
+                                 ? Color.AlertRed : Color.PrimaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 2)
+        .contentShape(Rectangle())
+        .onTapGesture { editing = account }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            rowSwipeActions(for: account)
+        }
+        .contextMenu {
+            Button {
+                startAdjustment(account)
+            } label: {
+                Label(String.appLocalized("Adjust Balance"), systemImage: "equal.circle")
+            }
+            Button {
+                accountVM.setArchived(!account.archived, for: account)
+            } label: {
+                Label(String.appLocalized(account.archived ? "Unarchive" : "Archive"),
+                      systemImage: "archivebox")
+            }
+        }
+        .opacity(account.hidden ? 0.45 : 1)
+    }
+
+    @ViewBuilder
+    private func rowSwipeActions(for account: AccountModel) -> some View {
+        Button(role: .destructive) {
+            toDelete = account
+        } label: {
+            Label(String.appLocalized("Delete"), systemImage: "trash")
+        }
+        Button {
+            accountVM.setArchived(!account.archived, for: account)
+        } label: {
+            Label(String.appLocalized(account.archived ? "Unarchive" : "Archive"),
+                  systemImage: account.archived ? "tray.and.arrow.up" : "archivebox")
+        }
+        .tint(.orange)
+        Button {
+            accountVM.setHidden(!account.hidden, for: account)
+        } label: {
+            Label(String.appLocalized(account.hidden ? "Show" : "Hide"),
+                  systemImage: account.hidden ? "eye" : "eye.slash")
+        }
+        .tint(.gray)
+    }
+}

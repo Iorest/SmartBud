@@ -207,6 +207,14 @@
 		C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
 		C10200000000000000000002 /* DataExporter+CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10200000000000000000001 /* DataExporter+CSV.swift */; };
 		C10200000000000000000004 /* DataExporter+CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10200000000000000000001 /* DataExporter+CSV.swift */; };
+		C10400000000000000000002 /* AccountListView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10400000000000000000001 /* AccountListView+Sections.swift */; };
+		C10400000000000000000004 /* AccountListView+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10400000000000000000001 /* AccountListView+Sections.swift */; };
+		C10500000000000000000002 /* LogTransactionList+Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10500000000000000000001 /* LogTransactionList+Rows.swift */; };
+		C10500000000000000000004 /* LogTransactionList+Rows.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10500000000000000000001 /* LogTransactionList+Rows.swift */; };
+		C10600000000000000000002 /* InsightsView+Pending.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10600000000000000000001 /* InsightsView+Pending.swift */; };
+		C10600000000000000000004 /* InsightsView+Pending.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10600000000000000000001 /* InsightsView+Pending.swift */; };
+		C10700000000000000000002 /* PendingReimbursementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10700000000000000000001 /* PendingReimbursementSheet.swift */; };
+		C10700000000000000000004 /* PendingReimbursementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10700000000000000000001 /* PendingReimbursementSheet.swift */; };
 		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
 		B0A0F00000000000000000A2 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
@@ -578,6 +586,10 @@
 		C10000000000000000000001 /* SharedSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/SharedSupport.swift; sourceTree = SOURCE_ROOT; };
 		C10100000000000000000001 /* TemplateTransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/TemplateTransactionModel.swift; sourceTree = SOURCE_ROOT; };
 		C10200000000000000000001 /* DataExporter+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Services/DataExporter+CSV.swift"; sourceTree = SOURCE_ROOT; };
+		C10400000000000000000001 /* AccountListView+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Accounts/AccountListView+Sections.swift"; sourceTree = SOURCE_ROOT; };
+		C10500000000000000000001 /* LogTransactionList+Rows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogTransactionList+Rows.swift"; sourceTree = SOURCE_ROOT; };
+		C10600000000000000000001 /* InsightsView+Pending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/InsightsView+Pending.swift"; sourceTree = SOURCE_ROOT; };
+		C10700000000000000000001 /* PendingReimbursementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Insights/PendingReimbursementSheet.swift; sourceTree = SOURCE_ROOT; };
 		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortabilityTests.swift; sourceTree = "<group>"; };
@@ -1068,6 +1080,10 @@
 				C10000000000000000000001 /* SharedSupport.swift */,
 				C10100000000000000000001 /* TemplateTransactionModel.swift */,
 				C10200000000000000000001 /* DataExporter+CSV.swift */,
+				C10400000000000000000001 /* AccountListView+Sections.swift */,
+				C10500000000000000000001 /* LogTransactionList+Rows.swift */,
+				C10600000000000000000001 /* InsightsView+Pending.swift */,
+				C10700000000000000000001 /* PendingReimbursementSheet.swift */,
 			);
 			path = "Settings Subviews";
 			sourceTree = "<group>";
@@ -1307,6 +1323,10 @@
 		C10000000000000000000002 /* SharedSupport.swift in Sources */,
 		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */,
 		C10200000000000000000002 /* DataExporter+CSV.swift in Sources */,
+		C10400000000000000000002 /* AccountListView+Sections.swift in Sources */,
+		C10500000000000000000002 /* LogTransactionList+Rows.swift in Sources */,
+		C10600000000000000000002 /* InsightsView+Pending.swift in Sources */,
+		C10700000000000000000002 /* PendingReimbursementSheet.swift in Sources */,
 		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */,
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */,
 				53D6BDCA2AF73B7A00F5728E /* SettingsAppIconView.swift in Sources */,
@@ -1665,6 +1685,10 @@
 				C10000000000000000000004 /* SharedSupport.swift in Sources */,
 				C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */,
 				C10200000000000000000004 /* DataExporter+CSV.swift in Sources */,
+				C10400000000000000000004 /* AccountListView+Sections.swift in Sources */,
+				C10500000000000000000004 /* LogTransactionList+Rows.swift in Sources */,
+				C10600000000000000000004 /* InsightsView+Pending.swift in Sources */,
+				C10700000000000000000004 /* PendingReimbursementSheet.swift in Sources */,
 				D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */,
 				E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */,
 				E1A2B3C40000000000000202 /* SBTokens.swift in Sources */,

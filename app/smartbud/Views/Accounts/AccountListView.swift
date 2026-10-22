@@ -11,17 +11,20 @@ import SwiftData
 import SwiftUI
 
 struct AccountListView: View {
-    @Environment(AccountViewModel.self) private var accountVM
+    @Environment(AccountViewModel.self) var accountVM
 
-    @AppStorage("currency", store: .appGroup) private var currency: String =
+    @AppStorage("currency", store: .appGroup) var currency: String =
         Locale.current.currency?.identifier ?? "USD"
-    @AppStorage("showCents", store: .appGroup) private var showCents: Bool = true
+    @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
 
-    @State private var showEditor = false
-    @State private var showTransfer = false
-    @State private var editing: AccountModel?
-    @State private var toDelete: AccountModel?
-    @State private var transferToDelete: TransferModel?
+    @State var showEditor = false
+    @State var showTransfer = false
+    @State var editing: AccountModel?
+    @State var toDelete: AccountModel?
+    @State var transferToDelete: TransferModel?
+    @State var showArchived = false
+    @State var adjusting: AccountModel?
+    @State var adjustmentInput = ""
 
     var body: some View {
         List {
@@ -43,9 +46,13 @@ struct AccountListView: View {
                 }
             } else {
                 Section {
-                    ForEach(accountVM.accounts) { account in
+                    ForEach(accountVM.visibleAccounts) { account in
                         row(account)
                     }
+                }
+
+                if !accountVM.archivedAccounts.isEmpty {
+                    archivedSection
                 }
 
                 if !accountVM.transfers.isEmpty {
@@ -127,122 +134,79 @@ struct AccountListView: View {
         } message: { _ in
             Text(String.appLocalized("Transactions in this account are kept and become unassigned."))
         }
-    }
-
-    private var totalRow: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(String.appLocalized("Total Balance"))
-                .font(.subheadline)
-                .foregroundStyle(Color.SubtitleText)
-            Spacer()
-            Text(Money.format(accountVM.totalBalance, currencyCode: currency,
-                              showsCents: showCents, locale: .appLocale))
-                .font(.title3.weight(.semibold).monospacedDigit())
-        }
-        .padding(.vertical, SBSpace.xxs)
-        .listRowSeparator(.hidden)
-    }
-
-    private func transferAmountText(_ transfer: TransferModel) -> String {
-        let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
-        let sent = Money.format(transfer.amount, currencyCode: outgoing,
-                                showsCents: showCents, locale: .appLocale)
-        guard transfer.destinationAmount > 0 else { return sent }
-
-        let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
-        let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
-                                  showsCents: showCents, locale: .appLocale)
-        return "\(sent) → \(landed)"
-    }
-
-    private func kindLabel(_ account: AccountModel) -> String {
-        let kind = String.appLocalized(
-            AccountKind(rawValue: account.kind)?.titleKey ?? AccountKind.cash.titleKey)
-        let code = account.resolvedCurrencyCode
-        return code == currency ? kind : "\(kind) · \(code)"
-    }
-
-    private func transferRow(_ transfer: TransferModel) -> some View {
-        HStack(spacing: SBSpace.small) {
-            Image(systemName: "arrow.left.arrow.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Color.SubtitleText)
-                .frame(width: 36, height: 36)
-                .background(Color.SecondaryBackground,
-                            in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(transfer.source?.wrappedName ?? "—") → \(transfer.destination?.wrappedName ?? "—")")
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.PrimaryText)
-                Text(transfer.wrappedDate.formatted(
-                    Date.FormatStyle(locale: Locale.appLocale).month(.abbreviated).day().hour().minute()))
-                    .font(.caption)
-                    .foregroundStyle(Color.SubtitleText)
+        .alert(
+            String.appLocalized("Adjust Balance"),
+            isPresented: Binding(
+                get: { adjusting != nil },
+                set: { if !$0 { adjusting = nil } }
+            )
+        ) {
+            TextField("0", text: $adjustmentInput)
+                #if os(iOS)
+                .keyboardType(.decimalPad)
+                #endif
+            Button(String.appLocalized("Cancel"), role: .cancel) {
+                adjusting = nil
+                adjustmentInput = ""
             }
-
-            Spacer(minLength: SBSpace.extraSmall)
-
-            Text(transferAmountText(transfer))
-                .font(.callout.weight(.medium).monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .padding(.vertical, 2)
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
-                transferToDelete = transfer
-            } label: {
-                Label(String.appLocalized("Delete"), systemImage: "trash")
-            }
+            Button(String.appLocalized("Done")) { applyAdjustment() }
+        } message: {
+            Text(adjustmentMessage)
         }
     }
 
-    private func row(_ account: AccountModel) -> some View {
-        HStack(spacing: SBSpace.small) {
-            Text(account.wrappedEmoji.isEmpty ? "💳" : account.wrappedEmoji)
-                .font(.title3)
-                .frame(width: 36, height: 36)
-                .background(Color(hex: account.wrappedColour).opacity(0.25),
-                            in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(account.wrappedName)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.PrimaryText)
-                Text(kindLabel(account))
-                    .font(.caption)
-                    .foregroundStyle(Color.SubtitleText)
+    /// Archived accounts drop out of the daily list and the total but keep
+    /// every transaction, transfer and report that references them.
+    var archivedSection: some View {
+        Section {
+            if showArchived {
+                ForEach(accountVM.archivedAccounts) { account in
+                    row(account)
+                }
             }
 
-            Spacer(minLength: SBSpace.extraSmall)
-
-            Text(Money.format(accountVM.balance(for: account),
-                              currencyCode: account.resolvedCurrencyCode,
-                              showsCents: showCents, locale: .appLocale))
-                .font(.callout.weight(.medium).monospacedDigit())
-                .foregroundStyle(accountVM.balance(for: account) < 0
-                                 ? Color.AlertRed : Color.PrimaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .padding(.vertical, 2)
-        .contentShape(Rectangle())
-        .onTapGesture { editing = account }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
-                toDelete = account
-            } label: {
-                Label(String.appLocalized("Delete"), systemImage: "trash")
-            }
             Button {
-                accountVM.setHidden(!account.hidden, for: account)
+                withAnimation(.easeInOut(duration: 0.2)) { showArchived.toggle() }
             } label: {
-                Label(String.appLocalized(account.hidden ? "Show" : "Hide"),
-                      systemImage: account.hidden ? "eye" : "eye.slash")
+                Text(showArchived
+                     ? String.appLocalized("Hide Archived Accounts")
+                     : String.appFormatted("Show Archived Accounts (%lld)",
+                                           accountVM.archivedAccounts.count))
             }
-            .tint(.gray)
+        } header: {
+            Text(String.appLocalized("Archived"))
+        } footer: {
+            Text(String.appLocalized(
+                "Archived accounts keep their history but are left out of the total balance."))
         }
-        .opacity(account.hidden ? 0.45 : 1)
+    }
+
+    var adjustmentMessage: String {
+        guard let account = adjusting else { return "" }
+        let current = Money.format(accountVM.balance(for: account),
+                                   currencyCode: account.resolvedCurrencyCode,
+                                   showsCents: showCents, locale: .appLocale)
+        return String.appFormatted(
+            "Records a balance correction for “%@” (now %@). The opening balance stays as it is.",
+            account.wrappedName, current)
+    }
+
+    func startAdjustment(_ account: AccountModel) {
+        adjusting = account
+        let current = Money.double(Money.cents(accountVM.balance(for: account)))
+        adjustmentInput = String(format: "%.2f", current)
+    }
+
+    func applyAdjustment() {
+        guard let account = adjusting else { return }
+        defer {
+            adjusting = nil
+            adjustmentInput = ""
+        }
+        let cleaned = adjustmentInput
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: ",", with: ".")
+        guard let target = Double(cleaned), target.isFinite else { return }
+        accountVM.adjustBalance(account, to: target)
     }
 }
