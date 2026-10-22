@@ -41,7 +41,11 @@
 		E1A2B3C40000000000000901 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000902 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000801 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
+		E1A2B3C4000000000000A022 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A021 /* DeepLink.swift */; };
+		E1A2B3C4000000000000A024 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A021 /* DeepLink.swift */; };
+		E1A2B3C4000000000000B112 /* DeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000B111 /* DeepLinkTests.swift */; };
 		E1A2B3C40000000000000802 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
+		E1A2B3C4000000000000A023 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A021 /* DeepLink.swift */; };
 		E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
 		E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
 		E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
@@ -198,6 +202,7 @@
 		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
+		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
 		C10000000000000000000002 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
 		C10000000000000000000003 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
 		C10000000000000000000004 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
@@ -378,6 +383,7 @@
 		E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
 		E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
+		C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
 		D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
 		E1A2B3C40000000000000201 /* SBTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000200 /* SBTokens.swift */; };
 		E1A2B3C40000000000000202 /* SBTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000200 /* SBTokens.swift */; };
@@ -583,6 +589,7 @@
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A011 /* SettingsImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsImportView.swift; sourceTree = "<group>"; };
+		C10300000000000000000001 /* HomeView+DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/HomeView+DeepLink.swift"; sourceTree = SOURCE_ROOT; };
 		C10000000000000000000001 /* SharedSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/SharedSupport.swift; sourceTree = SOURCE_ROOT; };
 		C10100000000000000000001 /* TemplateTransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/TemplateTransactionModel.swift; sourceTree = SOURCE_ROOT; };
 		C10200000000000000000001 /* DataExporter+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Services/DataExporter+CSV.swift"; sourceTree = SOURCE_ROOT; };
@@ -636,6 +643,8 @@
 		D0C0FFEE0000000000000190 /* SmartBud-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "SmartBud-macOS.entitlements"; sourceTree = "<group>"; };
 		E1A2B3C40000000000000200 /* SBTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/DesignSystem/SBTokens.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000800 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppCommands.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000A021 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/DeepLink.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000B111 /* DeepLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000900 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/AppLockView.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000A03 /* AccountListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/AccountListView.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000E03 /* TransferEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/TransferEditor.swift; sourceTree = SOURCE_ROOT; };
@@ -719,6 +728,7 @@
 			isa = PBXGroup;
 			children = (
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
+				E1A2B3C4000000000000B111 /* DeepLinkTests.swift */,
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
 				B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */,
 				B1C2D3E4F5A60718293A4B04 /* LLMProviderTests.swift */,
@@ -807,6 +817,7 @@
 				D0C0FFEE0000000000000009 /* SmartBudMac */,
 				E1A2B3C40000000000000200 /* SBTokens.swift */,
 				E1A2B3C40000000000000800 /* AppCommands.swift */,
+				E1A2B3C4000000000000A021 /* DeepLink.swift */,
 				E1A2B3C40000000000000900 /* AppLockView.swift */,
 				E1A2B3C40000000000000A03 /* AccountListView.swift */,
 				E1A2B3C40000000000000E03 /* TransferEditor.swift */,
@@ -1077,6 +1088,7 @@
 				E1A2B3C40000000000000623 /* SettingsProView+Sections.swift */,
 				AAAA00000000000000000040 /* SettingsExportView.swift */,
 				E1A2B3C4000000000000A011 /* SettingsImportView.swift */,
+				C10300000000000000000001 /* HomeView+DeepLink.swift */,
 				C10000000000000000000001 /* SharedSupport.swift */,
 				C10100000000000000000001 /* TemplateTransactionModel.swift */,
 				C10200000000000000000001 /* DataExporter+CSV.swift */,
@@ -1320,6 +1332,7 @@
 		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
+		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */,
 		C10000000000000000000002 /* SharedSupport.swift in Sources */,
 		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */,
 		C10200000000000000000002 /* DataExporter+CSV.swift in Sources */,
@@ -1466,6 +1479,7 @@
 				E1A2B3C40000000000000501 /* TemplatesView.swift in Sources */,
 							E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000801 /* AppCommands.swift in Sources */,
+		E1A2B3C4000000000000A022 /* DeepLink.swift in Sources */,
 				E1A2B3C40000000000000901 /* AppLockView.swift in Sources */,
 				E1A2B3C40000000000000A01 /* AccountViewModel.swift in Sources */,
 				E1A2B3C40000000000000A04 /* AccountListView.swift in Sources */,
@@ -1533,6 +1547,8 @@
 			files = (
 				B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */,
 				B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */,
+				E1A2B3C4000000000000B112 /* DeepLinkTests.swift in Sources */,
+				E1A2B3C4000000000000A024 /* DeepLink.swift in Sources */,
 				E1A2B3C4000000000000B102 /* DataPortabilityTests.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,
 				B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */,
@@ -1682,6 +1698,7 @@
 				E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
+				C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */,
 				C10000000000000000000004 /* SharedSupport.swift in Sources */,
 				C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */,
 				C10200000000000000000004 /* DataExporter+CSV.swift in Sources */,
@@ -1714,6 +1731,7 @@
 				E1A2B3C40000000000000502 /* TemplatesView.swift in Sources */,
 							E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000802 /* AppCommands.swift in Sources */,
+				E1A2B3C4000000000000A023 /* DeepLink.swift in Sources */,
 				E1A2B3C40000000000000902 /* AppLockView.swift in Sources */,
 				E1A2B3C40000000000000A02 /* AccountViewModel.swift in Sources */,
 				E1A2B3C40000000000000A05 /* AccountListView.swift in Sources */,

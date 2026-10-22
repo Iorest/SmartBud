@@ -30,6 +30,7 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - Track accounts and transfers, including cross-currency moves with a per-transfer rate and fee.
 - Mark an expense as reimbursable: it stays in the ledger but out of your spending totals until it is paid back.
 - Restore everything from the JSON backup, or export a CSV for a spreadsheet.
+- Automate entries with `smartbud://` URLs and x-callback-url from Shortcuts or any launcher.
 - Sync your expenses, categories and budgets with other devices via iCloud.
 - Custom reminders to input your expenses.
 - Biometric authentication to protect your data.
@@ -64,6 +65,7 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 ## Documentation
 
 - [Data export and restore](docs/data-portability.md) — JSON backup format, import rules, CSV columns.
+- [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
 
 ## Licence

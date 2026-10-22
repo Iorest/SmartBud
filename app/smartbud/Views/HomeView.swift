@@ -27,6 +27,9 @@ struct HomeView: View {
 
     @State var transactionManager = OverallTransactionManager()
     @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(CategoryViewModel.self) var categoryVM
+    @Environment(AccountViewModel.self) var accountVM
+    @Environment(\.openURL) var openURL
 
     @State var currentTab = "Log"
     var topEdge: CGFloat
@@ -368,6 +371,8 @@ extension HomeView {
             }
         }
         .onOpenURL { url in
+            if handleDeepLink(url) { return }
+
             if url.host == "search" {
                 currentTab = "Log"
             } else if url.host == "insights" {
