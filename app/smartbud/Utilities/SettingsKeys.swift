@@ -103,6 +103,7 @@ enum SettingsKey {
     // MARK: - Row titles (Data)
 
     static let rowCategories = "settings.row.categories"
+    static let rowAccounts = "settings.row.accounts"
     static let rowTemplates = "settings.row.templates"
     static let rowImportData = "settings.row.importData"
     static let rowExportData = "settings.row.exportData"

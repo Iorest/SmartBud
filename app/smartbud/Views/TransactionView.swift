@@ -44,6 +44,13 @@ struct TransactionView: View {
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
 
+    @State var account: AccountModel?
+    @State var showAccountPicker = false
+    @Environment(AccountViewModel.self) var accountVM
+
+    /// Remembers the account used most recently so repeat entries are one tap.
+    @AppStorage("lastAccountID", store: .appGroup) var lastAccountID: String = ""
+
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)
@@ -198,7 +205,6 @@ struct TransactionView: View {
         isSubmitting = true
 
         let amount = padVM.price
-
         if let validationError = TransactionValidation.error(
             amount: amount, hasCategory: category != nil
         ) {
@@ -217,26 +223,7 @@ struct TransactionView: View {
         successHaptic &+= 1
 
         if let editedTransaction = toEdit {
-            let trimmedNote = note.trimmingCharacters(in: .whitespaces)
-            let finalNote: String
-            if let category {
-                finalNote = trimmedNote.isEmpty ? category.wrappedName : trimmedNote
-            } else {
-                finalNote = trimmedNote
-            }
-
-            transactionVM.update(editedTransaction, with: TransactionEdit(
-                note: finalNote,
-                category: category,
-                income: income,
-                amount: amount,
-                date: date,
-                repeatType: repeatType,
-                repeatCoefficient: repeatCoefficient
-            ))
-
-            dismiss()
-
+            applyEdit(editedTransaction, amount: amount)
             return
         }
 
@@ -244,6 +231,7 @@ struct TransactionView: View {
             note: note.trimmingCharacters(in: .whitespacesAndNewlines) == ""
                 ? (category?.wrappedName ?? "") : note.trimmingCharacters(in: .whitespaces),
             category: category,
+            account: account,
             income: income,
             amount: amount,
             date: date,
@@ -259,8 +247,37 @@ struct TransactionView: View {
         finishEntry()
     }
 
+    /// Writes an edited transaction, keeping the note in sync with the
+    /// category when the user never typed one.
+    private func applyEdit(_ transaction: TransactionModel, amount: Double) {
+        let trimmedNote = note.trimmingCharacters(in: .whitespaces)
+        let finalNote: String
+        if let category {
+            finalNote = trimmedNote.isEmpty ? category.wrappedName : trimmedNote
+        } else {
+            finalNote = trimmedNote
+        }
+
+        transactionVM.update(transaction, with: TransactionEdit(
+            note: finalNote,
+            category: category,
+            account: account,
+            income: income,
+            amount: amount,
+            date: date,
+            repeatType: repeatType,
+            repeatCoefficient: repeatCoefficient
+        ))
+
+        dismiss()
+    }
+
     /// Closes the form, or keeps it open in continuous-entry mode.
     private func finishEntry() {
+        if let account {
+            lastAccountID = account.id.uuidString
+        }
+
         let stayOpen = continuousEntry || keepEntering
         keepEntering = false
 
@@ -291,6 +308,7 @@ struct TransactionView: View {
             _income = State(initialValue: transaction.income)
 
             _date = State(initialValue: transaction.date ?? Date.now)
+            _account = State(initialValue: transaction.account)
         }
         self.toEdit = toEdit
     }

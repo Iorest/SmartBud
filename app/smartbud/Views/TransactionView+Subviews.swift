@@ -88,6 +88,10 @@ extension TransactionView {
         }
         .onAppear {
             categoryVM.load()
+            accountVM.load()
+            if account == nil {
+                account = accountVM.defaultAccount(lastUsedID: lastAccountID)
+            }
             // Sync the pad's numberEntryType with the AppStorage flag at the
             // moment the view first appears. Subsequent changes are picked up
             // by the `.onChange(of: numberEntryType)` modifier above.
@@ -129,6 +133,10 @@ extension TransactionView {
         .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
             Button(String.appLocalized("Keep Editing"), role: .cancel) {}
             Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
+        }
+        .sheet(isPresented: $showAccountPicker) {
+            AccountPickerSheet(selection: $account)
+                .environment(accountVM)
         }
         .sheet(isPresented: $showPicker) {
                 CustomRecurringView(

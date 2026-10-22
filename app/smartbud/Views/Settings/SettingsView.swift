@@ -36,6 +36,7 @@ enum SettingsRoute: Hashable {
     case haptics
     case numberEntry
     case categories
+    case accounts
     case templates
     case llm
 }
@@ -224,6 +225,7 @@ struct SettingsView: View {
 
           Section(String.appLocalized(SettingsKey.sectionData)) {
             settingsLink(.categories, "rectangle.grid.2x2.fill", 110, SettingsKey.rowCategories, nil)
+            settingsLink(.accounts, "creditcard.fill", 108, SettingsKey.rowAccounts, nil)
             settingsLink(.templates, "square.on.square", 122, SettingsKey.rowTemplates, nil)
 
             Button {
@@ -303,6 +305,7 @@ struct SettingsView: View {
           case .llm: SettingsLLMView()
           case .numberEntry: SettingsNumberEntryView()
           case .categories: SettingsCategoryView()
+          case .accounts: AccountListView()
           case .templates: TemplatesView()
           }
         }
@@ -315,26 +318,6 @@ struct SettingsView: View {
       }
     }
 
-    @ViewBuilder
-    private func settingsLink(
-        _ route: SettingsRoute,
-        _ icon: String,
-        _ colour: Int,
-        _ title: String,
-        _ value: String?
-    ) -> some View {
-      NavigationLink(value: route) {
-        HStack(spacing: 0) {
-          SettingsRowView(icon: icon, colour: colour, title: title, value: value)
-          #if os(macOS)
-          Image(systemName: "chevron.right")
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(Color.SubtitleText)
-            .padding(.leading, 8)
-          #endif
-        }
-      }
-    }
 }
 
 struct SettingsRowView: View {

@@ -120,3 +120,25 @@ struct RecurrenceTests {
         #expect(next == date(2026, 2, 28))
     }
 }
+
+@Suite("Account balances")
+struct AccountBalanceTests {
+    @Test("Opening balance with no transactions stays put")
+    func openingOnly() {
+        #expect(AccountBalance.current(opening: 120, transactions: []) == 120)
+    }
+
+    @Test("Expenses subtract and income adds")
+    func mixedTransactions() {
+        let balance = AccountBalance.current(opening: 100, transactions: [
+            (amount: 30, income: false),
+            (amount: 50, income: true)
+        ])
+        #expect(balance == 120)
+    }
+
+    @Test("Overdraft is negative, not clamped")
+    func negativeBalance() {
+        #expect(AccountBalance.current(opening: 10, transactions: [(amount: 35, income: false)]) == -25)
+    }
+}

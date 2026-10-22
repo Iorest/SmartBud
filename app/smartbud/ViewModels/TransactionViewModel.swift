@@ -6,6 +6,7 @@ import Observation
 struct TransactionEdit {
     let note: String
     let category: CategoryModel?
+    let account: AccountModel?
     let income: Bool
     let amount: Double
     let date: Date
@@ -35,6 +36,7 @@ final class TransactionViewModel {
     @discardableResult
     func create(_ edit: TransactionEdit) -> TransactionModel {
         let txn = TransactionModel(note: edit.note, category: edit.category,
+                                   account: edit.account,
                                    income: edit.income, amount: edit.amount, date: edit.date,
                                    repeatType: edit.repeatType,
                                    repeatCoefficient: edit.repeatCoefficient)
@@ -135,6 +137,7 @@ final class TransactionViewModel {
         create(TransactionEdit(
             note: tmpl.wrappedNote,
             category: cat,
+            account: nil,
             income: tmpl.income,
             amount: tmpl.wrappedAmount,
             date: .now,

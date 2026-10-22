@@ -187,6 +187,15 @@ extension TransactionView {
             }
             .padding(.bottom, 5)
         } else {
+            if !accountVM.accounts.isEmpty {
+                TransactionAccountChip(account: account) {
+                    hideKeyboard()
+                    showAccountPicker = true
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 6)
+            }
+
             if usesLargeTextLayout {
                 // Large text: two chips side by side would truncate the date.
                 VStack(alignment: .leading, spacing: 8) {

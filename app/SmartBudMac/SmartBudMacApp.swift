@@ -16,6 +16,7 @@ struct SmartBudMacApp: App {
     @State private var appLockVM = AppLockViewModel()
     @State private var transactionVM = TransactionViewModel.shared
     @State private var categoryVM = CategoryViewModel.shared
+    @State private var accountVM = AccountViewModel.shared
     @State private var budgetVM = BudgetViewModel.shared
     @State private var insightsVM = InsightsViewModel.shared
     @State private var settingsVM = SettingsViewModel.shared
@@ -31,6 +32,7 @@ struct SmartBudMacApp: App {
                 .environment(appLockVM)
                 .environment(transactionVM)
                 .environment(categoryVM)
+                .environment(accountVM)
                 .environment(budgetVM)
                 .environment(insightsVM)
                 .environment(settingsVM)

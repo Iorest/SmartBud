@@ -92,6 +92,7 @@ struct NewTransactionIntent: AppIntent {
         let transaction = TransactionViewModel.shared.create(TransactionEdit(
             note: note ?? "",
             category: category,
+            account: nil,
             income: !isExpense,
             amount: amount,
             date: Date.now,

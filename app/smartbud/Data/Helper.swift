@@ -26,10 +26,13 @@ final class TransactionModel {
     var recurringCoefficient: Int = 0
     var recurringType: Int = 0
     var category: CategoryModel?
+    /// Optional so existing rows keep working; new entries set it.
+    var account: AccountModel?
 
     init(
         note: String = "",
         category: CategoryModel? = nil,
+        account: AccountModel? = nil,
         income: Bool = false,
         amount: Double = 0,
         date: Date = Date.now,
@@ -39,6 +42,7 @@ final class TransactionModel {
         self.id = UUID()
         self.note = note
         self.category = category
+        self.account = account
         self.income = income
         self.amount = amount
         self.date = date
@@ -113,6 +117,52 @@ extension CategoryModel {
         (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
     }
     @Transient var transactionCount: Int { transactions?.count ?? 0 }
+}
+
+// MARK: - Account
+
+@Model
+final class AccountModel {
+    var id: UUID = UUID()
+    var name: String = ""
+    var emoji: String = ""
+    var colour: String = ""
+    /// 0 = cash, 1 = debit card, 2 = credit card.
+    var kind: Int = 0
+    /// Balance before any recorded transaction.
+    var openingBalance: Double = 0
+    var hidden: Bool = false
+    var order: Int = 0
+    var dateCreated: Date = Date.now
+    /// CloudKit requires all to-many relationships to be optional.
+    var transactions: [TransactionModel]?
+
+    init(
+        name: String = "",
+        emoji: String = "",
+        colour: String = "",
+        kind: Int = 0,
+        openingBalance: Double = 0,
+        order: Int = 0
+    ) {
+        self.id = UUID()
+        self.name = name
+        self.emoji = emoji
+        self.colour = colour
+        self.kind = kind
+        self.openingBalance = openingBalance
+        self.order = order
+        self.dateCreated = .now
+    }
+}
+
+extension AccountModel {
+    @Transient var wrappedName: String { name }
+    @Transient var wrappedEmoji: String { emoji }
+    @Transient var wrappedColour: String { colour }
+    @Transient var allTransactions: [TransactionModel] {
+        (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
+    }
 }
 
 // MARK: - Category Budget

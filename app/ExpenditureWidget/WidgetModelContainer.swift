@@ -39,6 +39,7 @@ enum WidgetModelContainer {
         let schema = Schema([
             TransactionModel.self,
             CategoryModel.self,
+            AccountModel.self,
             BudgetModel.self,
             MainBudgetModel.self
         ])

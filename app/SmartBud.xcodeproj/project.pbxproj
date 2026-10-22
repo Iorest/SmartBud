@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C40000000000000C00 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A00 /* AccountViewModel.swift */; };
+		E1A2B3C40000000000000B01 /* SettingsRowLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000B00 /* SettingsRowLink.swift */; };
+		E1A2B3C40000000000000B02 /* SettingsRowLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000B00 /* SettingsRowLink.swift */; };
+		E1A2B3C40000000000000A04 /* AccountListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A03 /* AccountListView.swift */; };
+		E1A2B3C40000000000000A05 /* AccountListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A03 /* AccountListView.swift */; };
+		E1A2B3C40000000000000A01 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A00 /* AccountViewModel.swift */; };
+		E1A2B3C40000000000000A02 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A00 /* AccountViewModel.swift */; };
 		E1A2B3C40000000000000901 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000902 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000801 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
@@ -568,6 +578,10 @@
 		E1A2B3C40000000000000200 /* SBTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/DesignSystem/SBTokens.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000800 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppCommands.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000900 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/AppLockView.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000A03 /* AccountListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/AccountListView.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000B00 /* SettingsRowLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Settings/SettingsRowLink.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000A00 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/ViewModels/AccountViewModel.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000D00 /* AccountBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AccountBalance.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000206 /* SBCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBCard.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000020F /* SBEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBEmptyState.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBSaveErrorBanner.swift; sourceTree = "<group>"; };
@@ -726,6 +740,10 @@
 				E1A2B3C40000000000000200 /* SBTokens.swift */,
 				E1A2B3C40000000000000800 /* AppCommands.swift */,
 				E1A2B3C40000000000000900 /* AppLockView.swift */,
+				E1A2B3C40000000000000A03 /* AccountListView.swift */,
+				E1A2B3C40000000000000B00 /* SettingsRowLink.swift */,
+				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
+				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
 				E1A2B3C40000000000000206 /* SBCard.swift */,
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
@@ -1351,6 +1369,10 @@
 							E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000801 /* AppCommands.swift in Sources */,
 				E1A2B3C40000000000000901 /* AppLockView.swift in Sources */,
+				E1A2B3C40000000000000A01 /* AccountViewModel.swift in Sources */,
+				E1A2B3C40000000000000A04 /* AccountListView.swift in Sources */,
+				E1A2B3C40000000000000B01 /* SettingsRowLink.swift in Sources */,
+				E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1420,7 +1442,8 @@
 				E1A2B3C40000000000000278 /* AppLanguage.swift in Sources */,
 				E1A2B3C40000000000000279 /* Currency.swift in Sources */,
 				E1A2B3C40000000000000261 /* BudgetEditPreservesAnchorTests.swift in Sources */,
-			);
+							E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D0C0FFEE0000000000000006 /* Sources */ = {
@@ -1566,6 +1589,10 @@
 							E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000802 /* AppCommands.swift in Sources */,
 				E1A2B3C40000000000000902 /* AppLockView.swift in Sources */,
+				E1A2B3C40000000000000A02 /* AccountViewModel.swift in Sources */,
+				E1A2B3C40000000000000A05 /* AccountListView.swift in Sources */,
+				E1A2B3C40000000000000B02 /* SettingsRowLink.swift in Sources */,
+				E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
