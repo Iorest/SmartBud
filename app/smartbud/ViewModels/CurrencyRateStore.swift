@@ -10,6 +10,7 @@
 import Foundation
 import Observation
 import SwiftData
+import WidgetKit
 
 @MainActor
 @Observable
@@ -101,6 +102,72 @@ final class CurrencyRateStore {
     func convertToBase(_ amount: Double, from code: String) -> Double {
         CurrencyConversion.convertRounded(
             amount, from: code, to: baseCurrency, rates: rates)
+    }
+
+    // MARK: - Base currency switch
+
+    typealias RebaseError = CurrencyRebaseService.Failure
+
+    struct RebasePreview: Equatable {
+        let oldBase: String
+        let newBase: String
+        /// 1 old-base unit expressed in the new base.
+        let factor: Double
+        /// Rows whose stored amount will be converted.
+        let recordCount: Int
+    }
+
+    /// Everything a base-currency switch would do, without touching the store.
+    func rebasePreview(to newBase: String) -> Result<RebasePreview, RebaseError> {
+        load()
+        switch CurrencyRebase.plan(from: baseCurrency, to: newBase, rates: rates) {
+        case .failure(.sameCurrency):
+            return .failure(.sameCurrency)
+        case .failure(.missingRate(let code)):
+            return .failure(.missingRate(code))
+        case .success(let plan):
+            let transactions = repo.fetch(TransactionModel.self).count
+            let budgets = repo.fetch(BudgetModel.self).count
+            let mainBudgets = repo.fetch(MainBudgetModel.self).count
+            let templates = repo.fetch(TemplateTransactionModel.self).count
+            return .success(RebasePreview(oldBase: plan.oldBase, newBase: plan.newBase,
+                                          factor: plan.factor,
+                                          recordCount: transactions + budgets + mainBudgets + templates))
+        }
+    }
+
+    /// Converts every frozen base-currency amount and the whole rate table, then
+    /// switches the setting — in one save, so a failure leaves the store as it
+    /// was. See `CurrencyRebase` for the maths and `CurrencyRebaseService` for
+    /// the row-by-row part.
+    @discardableResult
+    func rebase(to newBase: String) throws -> RebasePreview {
+        load()
+        let plan: CurrencyRebase.Plan
+        switch CurrencyRebase.plan(from: baseCurrency, to: newBase, rates: rates) {
+        case .failure(.sameCurrency): throw RebaseError.sameCurrency
+        case .failure(.missingRate(let code)): throw RebaseError.missingRate(code)
+        case .success(let value): plan = value
+        }
+
+        let result = try CurrencyRebaseService.apply(plan, context: repo.context)
+
+        UserDefaults.appGroup.set(plan.newBase, forKey: "currency")
+        NSUbiquitousKeyValueStore.default.set(plan.newBase, forKey: "currency")
+        applyRebaseRefresh()
+
+        return RebasePreview(oldBase: plan.oldBase, newBase: plan.newBase,
+                             factor: plan.factor,
+                             recordCount: result.records)
+    }
+
+    /// Everything that cached converted numbers has to start over.
+    private func applyRebaseRefresh() {
+        load()
+        AccountViewModel.shared.load()
+        BudgetViewModel.shared.load()
+        InsightsViewModel.shared.refreshAll()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 

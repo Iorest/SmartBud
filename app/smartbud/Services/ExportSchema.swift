@@ -27,6 +27,9 @@ enum ExportSchema {
         var accounts: [AccountDTO]
         var transfers: [TransferDTO]
         var rates: [RateDTO]
+        /// App settings that decide how the numbers are read. Optional so
+        /// files written before this field still decode.
+        var settings: SettingsDTO?
 
         init(
             exportDate: Date,
@@ -39,7 +42,8 @@ enum ExportSchema {
             templates: [TemplateTransactionDTO],
             accounts: [AccountDTO],
             transfers: [TransferDTO],
-            rates: [RateDTO]
+            rates: [RateDTO],
+            settings: SettingsDTO? = nil
         ) {
             self.exportDate = exportDate
             self.appVersion = appVersion
@@ -52,6 +56,7 @@ enum ExportSchema {
             self.accounts = accounts
             self.transfers = transfers
             self.rates = rates
+            self.settings = settings
         }
 
         /// Lenient on purpose: a file written by an older build can be missing
@@ -70,12 +75,22 @@ enum ExportSchema {
             accounts = try container.decodeIfPresent([AccountDTO].self, forKey: .accounts) ?? []
             transfers = try container.decodeIfPresent([TransferDTO].self, forKey: .transfers) ?? []
             rates = try container.decodeIfPresent([RateDTO].self, forKey: .rates) ?? []
+            settings = try container.decodeIfPresent(SettingsDTO.self, forKey: .settings)
         }
 
         /// `true` when the file carries the marker every SmartBud export has.
         /// Decoding alone cannot tell a backup from any other JSON object
         /// because every field has a default.
         var exportedBySmartBud: Bool { schemaVersion > 0 }
+    }
+
+    /// Everything the importer needs to read the amounts the way they were
+    /// written. Without `baseCurrency` a backup restored on a device using
+    /// another base would be reinterpreted, not converted.
+    struct SettingsDTO: Codable, Equatable {
+        var baseCurrency: String?
+        var firstDayOfMonth: Int?
+        var firstWeekday: Int?
     }
 
     struct TransactionDTO: Codable {

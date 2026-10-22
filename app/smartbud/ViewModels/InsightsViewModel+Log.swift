@@ -87,7 +87,7 @@ extension InsightsViewModel {
             return calendar.date(from: comps)
         case 3:
             let startDay = defaults.integer(forKey: "firstDayOfMonth")
-            return getStartOfMonth(startDay: startDay)
+            return AppPeriod.monthStart(containing: .now, startDay: startDay, calendar: calendar)
         case 4:
             let comps = calendar.dateComponents([.year], from: .now)
             return calendar.date(from: comps)
@@ -277,8 +277,9 @@ extension InsightsViewModel {
         calendar.minimumDaysInFirstWeek = 4
         switch timeframe {
         case 3:
-            let comps = calendar.dateComponents([.month, .year], from: .now)
-            let monthStart = calendar.date(from: comps) ?? .now
+            let startDay = defaults.integer(forKey: "firstDayOfMonth")
+            let monthStart = AppPeriod.monthStart(containing: .now, startDay: startDay,
+                                                  calendar: calendar)
             return (calendar.dateComponents([.day], from: monthStart, to: .now).day ?? 0) + 1
         case 4:
             let comps = calendar.dateComponents([.year], from: .now)

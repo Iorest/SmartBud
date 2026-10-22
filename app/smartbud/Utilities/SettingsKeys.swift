@@ -89,6 +89,10 @@ enum SettingsKey {
     static let importSkipped = "settings.import.skipped"
     static let importEmpty = "settings.import.empty"
     static let importDone = "settings.import.done"
+    static let importSettingsApplied = "settings.import.settingsApplied"
+    static let importConfirmTitle = "settings.import.confirm.title"
+    static let importConfirmMessage = "settings.import.confirm.message"
+    static let importConfirmAction = "settings.import.confirm.action"
 
     // MARK: - Banner (offline / fallback mode)
 

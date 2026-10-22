@@ -49,28 +49,27 @@ final class InsightsViewModel {
         return cal
     }
 
-    /// Returns (start, end-exclusive) for the given period. For week this is the user's
-    /// first-weekday to the following 6th day. For month, the 1st of the month to the 1st
-    /// of next month. For year, Jan 1 to Jan 1 of next year.
+    /// Month-start offset from Settings → Time Frames (1…28).
+    private var configuredStartDay: Int {
+        UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
+    }
+
+    /// Returns (start, end-exclusive) for the given period. Week follows the
+    /// user's first weekday, month follows their month-start day, year is the
+    /// calendar year. All three come from `AppPeriod` so Log, Insights and the
+    /// widgets cannot drift apart.
     func getPeriodDateRange(for period: Int) -> (start: Date, end: Date) {
         let cal = configuredCalendar
         let now = Date.now
         switch period {
         case 1:
-            let comps = cal.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)
-            let start = cal.date(from: comps) ?? cal.startOfDay(for: now)
-            let end = cal.date(byAdding: .day, value: 7, to: start) ?? start
-            return (start, end)
+            return AppPeriod.weekRange(containing: now, calendar: cal)
         case 3:
-            let comps = cal.dateComponents([.year], from: now)
-            let start = cal.date(from: comps) ?? cal.startOfDay(for: now)
-            let end = cal.date(byAdding: .year, value: 1, to: start) ?? start
-            return (start, end)
+            return AppPeriod.yearRange(containing: now, calendar: cal)
         default:
-            let comps = cal.dateComponents([.year, .month], from: now)
-            let start = cal.date(from: comps) ?? cal.startOfDay(for: now)
-            let end = cal.date(byAdding: .month, value: 1, to: start) ?? start
-            return (start, end)
+            return AppPeriod.monthRange(containing: now,
+                                        startDay: configuredStartDay,
+                                        calendar: cal)
         }
     }
 
@@ -101,7 +100,8 @@ final class InsightsViewModel {
         case 1: divisor = 7
         case 3: divisor = 12
         default:
-            divisor = configuredCalendar.range(of: .day, in: .month, for: periodStart)?.count ?? 30
+            divisor = AppPeriod.dayCount(in: (periodStart, periodEnd),
+                                         calendar: configuredCalendar)
         }
         periodAverage = Money.double(abs(net) / Decimal(max(1, divisor)))
 
@@ -151,8 +151,9 @@ final class InsightsViewModel {
         case 1: count = 7; step = .day
         case 3: count = 12; step = .month
         default:
-            // Match the period's actual day count (28/29/30/31), not a hardcoded 30.
-            count = cal.range(of: .day, in: .month, for: start)?.count ?? 30
+            // Match the period's actual day count (28/29/30/31, and 30/31 for a
+            // shifted month start), not a hardcoded 30.
+            count = AppPeriod.dayCount(in: getPeriodDateRange(for: period), calendar: cal)
             step = .day
         }
 

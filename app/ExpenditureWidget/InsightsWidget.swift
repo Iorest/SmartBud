@@ -145,10 +145,10 @@ struct InsightsProvider: AppIntentTimelineProvider {
                               count: 7, elapsedUnit: .day)
         case .month:
             let startDay = UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
-            let start = getStartOfMonth(startDay: startDay)
-            guard let range = calendar.range(of: .day, in: .month, for: start) else { return nil }
-            return PeriodSpec(startDate: start, step: .day, value: 1,
-                              count: range.count, elapsedUnit: .day)
+            let range = AppPeriod.monthRange(containing: now, startDay: startDay, calendar: calendar)
+            return PeriodSpec(startDate: range.start, step: .day, value: 1,
+                              count: AppPeriod.dayCount(in: range, calendar: calendar),
+                              elapsedUnit: .day)
         case .year:
             let comps = calendar.dateComponents([.year], from: now)
             guard let start = calendar.date(from: comps) else { return nil }

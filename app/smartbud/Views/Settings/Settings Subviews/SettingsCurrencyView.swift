@@ -13,7 +13,12 @@ struct SettingsCurrencyView: View {
     var currencyCode: String = Locale.current.currency?.identifier ?? "USD"
 
     @Environment(\.dismiss) var dismiss
+    @Environment(CurrencyRateStore.self) private var rateStore
     @State private var search = ""
+    @State private var pendingRebase: CurrencyRateStore.RebasePreview?
+    @State private var rebaseError: String?
+    @State private var showRebaseConfirmation = false
+    @State private var showRebaseError = false
 
     private let currencies = Currency.allCurrencies
 
@@ -57,6 +62,20 @@ struct SettingsCurrencyView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .alert(String.appLocalized("Switch base currency?"),
+               isPresented: $showRebaseConfirmation,
+               presenting: pendingRebase) { preview in
+            Button(String.appLocalized("Switch")) { applySwitch(preview) }
+            Button(String.appLocalized("Cancel"), role: .cancel) { pendingRebase = nil }
+        } message: { preview in
+            Text(rebaseMessage(preview))
+        }
+        .alert(String.appLocalized("Could not switch base currency"),
+               isPresented: $showRebaseError) {
+            Button(String.appLocalized("Done"), role: .cancel) {}
+        } message: {
+            Text(rebaseError ?? "")
+        }
     }
 
     private func currencyRow(_ currency: Currency) -> some View {
@@ -91,9 +110,66 @@ struct SettingsCurrencyView: View {
         }
     }
 
+    /// Switching the base currency rewrites every frozen base amount, so it is
+    /// never a silent setting change: without stored amounts there is nothing
+    /// to convert, otherwise we need an anchor rate and an explicit confirmation.
     private func select(_ currency: Currency) {
-        currencyCode = currency.code
-        NSUbiquitousKeyValueStore.default.set(currency.code, forKey: "currency")
+        guard currency.code != currencyCode else {
+            dismiss()
+            return
+        }
+
+        guard ConversionScope.needsConversion else {
+            commitSwitch(to: currency.code)
+            return
+        }
+
+        switch rateStore.rebasePreview(to: currency.code) {
+        case .success(let preview):
+            pendingRebase = preview
+            showRebaseConfirmation = true
+        case .failure(let error):
+            rebaseError = error.errorDescription
+            showRebaseError = true
+        }
+    }
+
+    private func applySwitch(_ preview: CurrencyRateStore.RebasePreview) {
+        pendingRebase = nil
+        do {
+            try rateStore.rebase(to: preview.newBase)
+            dismiss()
+        } catch {
+            rebaseError = error.localizedDescription
+            showRebaseError = true
+        }
+    }
+
+    private func commitSwitch(to code: String) {
+        currencyCode = code
+        NSUbiquitousKeyValueStore.default.set(code, forKey: "currency")
+        rateStore.load()
         dismiss()
+    }
+
+    private func rebaseMessage(_ preview: CurrencyRateStore.RebasePreview) -> String {
+        let factor = preview.factor.formatted(
+            .number.precision(.fractionLength(4)).locale(.appLocale))
+        return String.appFormatted(
+            "Every stored amount will be converted at 1 %@ = %@ %@ (%lld records) and then stay fixed.",
+            preview.oldBase, factor, preview.newBase, preview.recordCount)
+    }
+}
+
+/// Whether switching the base currency has anything to convert.
+private enum ConversionScope {
+    @MainActor
+    static var needsConversion: Bool {
+        let repo = DataRepository.shared
+        return !repo.fetch(TransactionModel.self).isEmpty
+            || !repo.fetch(BudgetModel.self).isEmpty
+            || !repo.fetch(MainBudgetModel.self).isEmpty
+            || !repo.fetch(TemplateTransactionModel.self).isEmpty
+            || !repo.fetch(CurrencyRate.self).isEmpty
     }
 }

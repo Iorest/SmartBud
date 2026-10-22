@@ -10,26 +10,6 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Shared date utilities
-//
-// Free functions used by the app (`InsightsViewModel`), widgets (`InsightsWidget`), and App Intents.
-// Originally lived in the single legacy data controller.
-
-/// Returns the start-of-day for the current month, offset by `startDay` (1–28).
-/// If `startDay` is 1, this is the 1st of the month at 00:00. If `startDay` is 15, it's the 15th at 00:00.
-/// Months where the configured `startDay` doesn't exist (e.g. Feb 30) fall back to the last day of the month.
-func getStartOfMonth(startDay: Int) -> Date {
-    let calendar = Calendar.current
-    let now = Date.now
-    let comps = calendar.dateComponents([.year, .month], from: now)
-    var startComps = comps
-    startComps.day = max(1, min(startDay, 28))
-    startComps.hour = 0
-    startComps.minute = 0
-    startComps.second = 0
-    return calendar.date(from: startComps) ?? now
-}
-
 // MARK: - Line graph
 //
 // A single sampled data point on the `LineGraph` view, used by the Insights screen and the

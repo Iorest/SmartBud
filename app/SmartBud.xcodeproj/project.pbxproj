@@ -26,8 +26,12 @@
 		E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
 		E1A2B3C40000000000000E02 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
 		E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C4000000000000F002 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
+		E1A2B3C4000000000000F022 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C4000000000000F003 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
+		E1A2B3C4000000000000F023 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
 		E1A2B3C4000000000000A044 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
@@ -200,11 +204,15 @@
 		AAAA00000000000000000031 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
 		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
+		E1A2B3C4000000000000F052 /* DataRefreshCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */; };
+		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
+		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
 		E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
 		C10000000000000000000002 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
 		C10000000000000000000003 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
+		E1A2B3C4000000000000F004 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		C10000000000000000000004 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
 		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
 		C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
@@ -225,6 +233,14 @@
 		B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000B1 /* BudgetLogicTests.swift */; };
 		E1A2B3C4000000000000B102 /* DataPortabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */; };
+		E1A2B3C4000000000000F012 /* AppPeriodTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F011 /* AppPeriodTests.swift */; };
+		E1A2B3C4000000000000F032 /* CurrencyRebaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */; };
+		E1A2B3C4000000000000F042 /* LocalizationCoverageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F041 /* LocalizationCoverageTests.swift */; };
+		E1A2B3C4000000000000F072 /* DataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F071 /* DataImporterTests.swift */; };
+		E1A2B3C4000000000000F064 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
+		E1A2B3C4000000000000F084 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
+		E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
+		E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000D2 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
 		B0A0F00000000000000000D3 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
@@ -382,6 +398,9 @@
 		D0C0FFEED0C0FFEE0000000000000194 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
 		E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
 		E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
+		E1A2B3C4000000000000F053 /* DataRefreshCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */; };
+		E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
+		E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
 		E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
 		D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
@@ -585,8 +604,13 @@
 		AAAA00000000000000000020 /* ReviewRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequester.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000030 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataExporter.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A001 /* DataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataImporter.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataRefreshCenter.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/DataImporter+Merger.swift"; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CurrencyRebaseService.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F001 /* AppPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AppPeriod.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F021 /* CurrencyRebase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CurrencyRebase.swift; sourceTree = SOURCE_ROOT; };
 		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A011 /* SettingsImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsImportView.swift; sourceTree = "<group>"; };
 		C10300000000000000000001 /* HomeView+DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/HomeView+DeepLink.swift"; sourceTree = SOURCE_ROOT; };
@@ -600,6 +624,10 @@
 		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortabilityTests.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F011 /* AppPeriodTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPeriodTests.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyRebaseTests.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F041 /* LocalizationCoverageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationCoverageTests.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F071 /* DataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImporterTests.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000C5 /* SmartBudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0A0F00000000000000000D1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModelTests.swift; sourceTree = "<group>"; };
@@ -730,6 +758,10 @@
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
 				E1A2B3C4000000000000B111 /* DeepLinkTests.swift */,
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
+				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
+				E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */,
+				E1A2B3C4000000000000F041 /* LocalizationCoverageTests.swift */,
+				E1A2B3C4000000000000F071 /* DataImporterTests.swift */,
 				B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */,
 				B1C2D3E4F5A60718293A4B04 /* LLMProviderTests.swift */,
 				E1A2B3C4000000000000021B /* CSVTableTests.swift */,
@@ -826,6 +858,8 @@
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
+				E1A2B3C4000000000000F001 /* AppPeriod.swift */,
+				E1A2B3C4000000000000F021 /* CurrencyRebase.swift */,
 				E1A2B3C40000000000001007 /* SettingsRatesView.swift */,
 				E1A2B3C40000000000001004 /* CurrencyRateStore.swift */,
 				E1A2B3C40000000000001000 /* CurrencyConversion.swift */,
@@ -890,6 +924,9 @@
 				E1A2B3C40000000000000626 /* SubscriptionLinks.swift */,
 				AAAA00000000000000000030 /* DataExporter.swift */,
 				E1A2B3C4000000000000A001 /* DataImporter.swift */,
+				E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */,
+				E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */,
+				E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */,
 				E1A2B3C4000000000000A031 /* ExportSchema.swift */,
 				B0A0F0000000000000000133 /* LLMClient.swift */,
 				B1C2D3E4F5A60718293A4B01 /* LLMProvider.swift */,
@@ -1330,8 +1367,13 @@
 		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */,
 		AAAA00000000000000000031 /* DataExporter.swift in Sources */,
 		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */,
+		E1A2B3C4000000000000F052 /* DataRefreshCenter.swift in Sources */,
+		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */,
+		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
+		E1A2B3C4000000000000F002 /* AppPeriod.swift in Sources */,
+		E1A2B3C4000000000000F022 /* CurrencyRebase.swift in Sources */,
 		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */,
 		C10000000000000000000002 /* SharedSupport.swift in Sources */,
 		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */,
@@ -1523,6 +1565,7 @@
 				5321E1DE291FE2CE00D5A931 /* CategoryCreationErrors.swift in Sources */,
 				53980E5D28A77B62009CC4E2 /* Helper.swift in Sources */,
 				C10000000000000000000003 /* SharedSupport.swift in Sources */,
+				E1A2B3C4000000000000F004 /* AppPeriod.swift in Sources */,
 				C10100000000000000000003 /* TemplateTransactionModel.swift in Sources */,
 				53D0298128C62BF600443F2B /* Currency.swift in Sources */,
 				53A32B3928AB6C8700628905 /* Line.swift in Sources */,
@@ -1550,6 +1593,14 @@
 				E1A2B3C4000000000000B112 /* DeepLinkTests.swift in Sources */,
 				E1A2B3C4000000000000A024 /* DeepLink.swift in Sources */,
 				E1A2B3C4000000000000B102 /* DataPortabilityTests.swift in Sources */,
+				E1A2B3C4000000000000F012 /* AppPeriodTests.swift in Sources */,
+				E1A2B3C4000000000000F032 /* CurrencyRebaseTests.swift in Sources */,
+				E1A2B3C4000000000000F042 /* LocalizationCoverageTests.swift in Sources */,
+				E1A2B3C4000000000000F072 /* DataImporterTests.swift in Sources */,
+				E1A2B3C4000000000000F064 /* DataImporter+Merger.swift in Sources */,
+				E1A2B3C4000000000000F084 /* CurrencyRebaseService.swift in Sources */,
+				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
+				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,
 				B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */,
 				B0A0F00000000000000000D6 /* NumberPadViewModelTests.swift in Sources */,
@@ -1696,8 +1747,13 @@
 				D0C0FFEED0C0FFEE0000000000000193 /* ReviewRequester.swift in Sources */,
 				D0C0FFEED0C0FFEE0000000000000194 /* DataExporter.swift in Sources */,
 				E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */,
+				E1A2B3C4000000000000F053 /* DataRefreshCenter.swift in Sources */,
+				E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */,
+				E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
+				E1A2B3C4000000000000F003 /* AppPeriod.swift in Sources */,
+				E1A2B3C4000000000000F023 /* CurrencyRebase.swift in Sources */,
 				C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */,
 				C10000000000000000000004 /* SharedSupport.swift in Sources */,
 				C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */,

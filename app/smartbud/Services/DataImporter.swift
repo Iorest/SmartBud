@@ -39,6 +39,9 @@ enum DataImporter {
         var rates = 0
         /// Rows already on this device (same id) that were left alone.
         var skipped = 0
+        /// Settings from the backup that still have to be written to the app
+        /// (only when this device had no data to protect).
+        var settingsToApply: ExportSchema.SettingsDTO?
 
         /// Records the user thinks of as "data". Rates are configuration and
         /// stay out of the count.
@@ -53,6 +56,7 @@ enum DataImporter {
         case unreadable
         case notABackup
         case newerVersion
+        case baseCurrencyMismatch(backup: String, local: String)
         case writeFailed
 
         var errorDescription: String? {
@@ -62,6 +66,11 @@ enum DataImporter {
             case .newerVersion:
                 String.appLocalized("This backup comes from a newer version of SmartBud. "
                                     + "Update the app before restoring it.")
+            case .baseCurrencyMismatch(let backup, let local):
+                String.appFormatted(
+                    "This backup was recorded in %@ but this device uses %@. "
+                        + "Switch the base currency first, or erase the data and import again.",
+                    backup, local)
             case .writeFailed: String.appLocalized("The backup could not be saved. Try again.")
             }
         }
@@ -72,11 +81,32 @@ enum DataImporter {
     /// Reads and applies the backup at `url`. The URL comes from a file
     /// importer, so it is security-scoped and must be unlocked explicitly.
     static func importFile(at url: URL, context: ModelContext) throws -> Summary {
+        try apply(decodeFile(at: url), context: context)
+    }
+
+    /// Reads and validates the file without writing anything, so the UI can
+    /// show "N records" before the user commits.
+    static func decodeFile(at url: URL) throws -> ExportSchema.Payload {
         let accessed = url.startAccessingSecurityScopedResource()
         defer { if accessed { url.stopAccessingSecurityScopedResource() } }
 
         guard let data = try? Data(contentsOf: url) else { throw ImportError.unreadable }
-        return try apply(decode(data), context: context)
+        return try decode(data)
+    }
+
+    /// What the file contains, counted without touching the store. Skips are
+    /// not predicted — that depends on what is already here.
+    static func preview(_ payload: ExportSchema.Payload) -> Summary {
+        var summary = Summary()
+        summary.categories = payload.categories.count
+        summary.accounts = payload.accounts.count
+        summary.transactions = payload.transactions.count
+        summary.transfers = payload.transfers.count
+        summary.budgets = payload.budgets.count
+        summary.mainBudgets = payload.mainBudgets.count
+        summary.templates = payload.templates.count
+        summary.rates = payload.rates.count
+        return summary
     }
 
     static func decode(_ data: Data) throws -> ExportSchema.Payload {
@@ -107,6 +137,7 @@ enum DataImporter {
         _ payload: ExportSchema.Payload,
         context: ModelContext
     ) throws -> Summary {
+        let settingsToApply = try resolveSettings(payload, context: context)
         var merger = BackupMerger(context: context)
 
         merger.importCategories(payload.categories)
@@ -124,262 +155,44 @@ enum DataImporter {
             context.rollback()
             throw ImportError.writeFailed
         }
-        return merger.summary
-    }
-}
 
-// MARK: - Merger
-
-/// Holds the id lookups while one file is applied. A single instance per
-/// import keeps the relationship resolution consistent: a transaction can
-/// only point at a category this same run created or found.
-private struct BackupMerger {
-    let context: ModelContext
-    var summary = DataImporter.Summary()
-
-    var categoriesByID: [UUID: CategoryModel] = [:]
-    var categoriesByName: [String: CategoryModel] = [:]
-    var accountsByID: [UUID: AccountModel] = [:]
-    var accountsByName: [String: AccountModel] = [:]
-
-    init(context: ModelContext) {
-        self.context = context
-        for category in fetch(CategoryModel.self) {
-            categoriesByID[category.id] = category
-            categoriesByName[category.name] = category
-        }
-        for account in fetch(AccountModel.self) {
-            accountsByID[account.id] = account
-            accountsByName[account.name] = account
-        }
+        var summary = merger.summary
+        summary.settingsToApply = settingsToApply
+        return summary
     }
 
-    // MARK: Categories and accounts
+    /// A backup carries the base currency its amounts were frozen in. Restoring
+    /// it onto a device that already has data in another currency would
+    /// reinterpret every total, so that combination is refused; an empty device
+    /// simply adopts the backup's settings.
+    private static func resolveSettings(
+        _ payload: ExportSchema.Payload,
+        context: ModelContext
+    ) throws -> ExportSchema.SettingsDTO? {
+        guard let settings = payload.settings,
+              let backupBase = settings.baseCurrency?.uppercased(),
+              !backupBase.isEmpty else { return nil }
 
-    mutating func importCategories(_ dtos: [ExportSchema.CategoryDTO]) {
-        for dto in dtos {
-            guard categoriesByID[dto.id] == nil else {
-                summary.skipped += 1
-                continue
-            }
-            let category = CategoryModel(
-                name: dto.name, emoji: dto.emoji, colour: dto.colour,
-                income: dto.income, order: dto.order
-            )
-            category.id = dto.id
-            category.dateCreated = dto.dateCreated
-            context.insert(category)
-            categoriesByID[dto.id] = category
-            categoriesByName[dto.name] = category
-            summary.categories += 1
+        let storeIsEmpty = isEmpty(context)
+        let localBase = (UserDefaults.appGroup.string(forKey: "currency") ?? "").uppercased()
+
+        if storeIsEmpty { return settings }
+        if !localBase.isEmpty, localBase != backupBase {
+            throw ImportError.baseCurrencyMismatch(backup: backupBase, local: localBase)
         }
-    }
-
-    mutating func importAccounts(_ dtos: [ExportSchema.AccountDTO]) {
-        for dto in dtos {
-            guard accountsByID[dto.id] == nil else {
-                summary.skipped += 1
-                continue
-            }
-            let account = AccountModel(
-                name: dto.name, emoji: dto.emoji, colour: dto.colour,
-                kind: dto.kind, currencyCode: dto.currencyCode,
-                openingBalance: signedAmount(dto.openingBalance), order: dto.order
-            )
-            account.id = dto.id
-            account.hidden = dto.hidden
-            account.archived = dto.archived ?? false
-            account.dateCreated = dto.dateCreated
-            context.insert(account)
-            accountsByID[dto.id] = account
-            accountsByName[dto.name] = account
-            summary.accounts += 1
-        }
-    }
-
-    mutating func importRates(_ dtos: [ExportSchema.RateDTO]) {
-        var byCode: [String: CurrencyRate] = [:]
-        for rate in fetch(CurrencyRate.self) { byCode[rate.code] = rate }
-
-        for dto in dtos where !dto.code.isEmpty {
-            guard dto.rate.isFinite, dto.rate > 0 else {
-                summary.skipped += 1
-                continue
-            }
-            if let rate = byCode[dto.code] {
-                rate.rate = min(dto.rate, 1_000_000)
-                rate.updatedAt = dto.updatedAt
-            } else {
-                let rate = CurrencyRate(code: dto.code, rate: min(dto.rate, 1_000_000))
-                rate.updatedAt = dto.updatedAt
-                context.insert(rate)
-                byCode[dto.code] = rate
-            }
-            summary.rates += 1
-        }
-    }
-
-    // MARK: Ledger
-
-    mutating func importTransactions(_ dtos: [ExportSchema.TransactionDTO]) {
-        var existing = Set(fetch(TransactionModel.self).map(\.id))
-
-        for dto in dtos {
-            guard existing.insert(dto.id).inserted else {
-                summary.skipped += 1
-                continue
-            }
-            let transaction = TransactionModel(
-                note: dto.note ?? "",
-                category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
-                account: resolveAccount(id: dto.accountId, name: dto.accountName),
-                baseAmount: dto.baseAmount.map(amount),
-                income: dto.income,
-                amount: amount(dto.amount),
-                date: dto.date ?? .now,
-                repeatType: dto.recurringType,
-                repeatCoefficient: dto.recurringCoefficient,
-                discount: amount(dto.discount ?? 0),
-                reimbursable: dto.reimbursable ?? false,
-                adjustment: dto.adjustment ?? false
-            )
-            transaction.id = dto.id
-            transaction.onceRecurring = dto.onceRecurring
-            transaction.reimbursedAt = dto.reimbursedAt
-            if let day = dto.day { transaction.day = day }
-            if let month = dto.month { transaction.month = month }
-            context.insert(transaction)
-            summary.transactions += 1
-        }
-    }
-
-    mutating func importTransfers(_ dtos: [ExportSchema.TransferDTO]) {
-        var existing = Set(fetch(TransferModel.self).map(\.id))
-
-        for dto in dtos {
-            guard existing.insert(dto.id).inserted else {
-                summary.skipped += 1
-                continue
-            }
-            // A transfer needs both ends to stay meaningful; an orphan
-            // would show an empty row in the ledger.
-            guard let source = resolveAccount(id: dto.sourceId, name: dto.sourceName),
-                  let destination = resolveAccount(id: dto.destinationId, name: dto.destinationName)
-            else {
-                summary.skipped += 1
-                continue
-            }
-
-            let transfer = TransferModel(
-                amount: amount(dto.amount),
-                destinationAmount: amount(dto.destinationAmount ?? 0),
-                fee: amount(dto.fee ?? 0),
-                date: dto.date,
-                note: dto.note,
-                source: source,
-                destination: destination
-            )
-            transfer.id = dto.id
-            context.insert(transfer)
-            summary.transfers += 1
-        }
-    }
-
-    // MARK: Budgets and templates
-
-    mutating func importBudgets(_ dtos: [ExportSchema.BudgetDTO]) {
-        var existing = Set(fetch(BudgetModel.self).map(\.id))
-
-        for dto in dtos {
-            guard existing.insert(dto.id).inserted else {
-                summary.skipped += 1
-                continue
-            }
-            let budget = BudgetModel(amount: amount(dto.amount),
-                                     startDate: dto.startDate, type: dto.type)
-            budget.id = dto.id
-            budget.dateCreated = dto.dateCreated
-            budget.green = dto.green
-            budget.category = resolveCategory(id: dto.categoryId, name: dto.categoryName)
-            context.insert(budget)
-            summary.budgets += 1
-        }
-    }
-
-    /// Main budgets carry no id, so dedupe on the values that identify one.
-    mutating func importMainBudgets(_ dtos: [ExportSchema.MainBudgetDTO]) {
-        var keys = Set(fetch(MainBudgetModel.self).map {
-            key(amount: $0.amount, start: $0.startDate, type: $0.type)
-        })
-
-        for dto in dtos {
-            guard keys.insert(key(amount: dto.amount, start: dto.startDate, type: dto.type)).inserted else {
-                summary.skipped += 1
-                continue
-            }
-            let mainBudget = MainBudgetModel(
-                amount: amount(dto.amount), startDate: dto.startDate, type: dto.type)
-            mainBudget.dateCreated = dto.dateCreated
-            mainBudget.green = dto.green
-            context.insert(mainBudget)
-            summary.mainBudgets += 1
-        }
-    }
-
-    mutating func importTemplates(_ dtos: [ExportSchema.TemplateTransactionDTO]) {
-        var existing = Set(fetch(TemplateTransactionModel.self).map(\.id))
-
-        for dto in dtos {
-            guard existing.insert(dto.id).inserted else {
-                summary.skipped += 1
-                continue
-            }
-            let template = TemplateTransactionModel(
-                note: dto.note ?? "", category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
-                income: dto.income, amount: amount(dto.amount), order: dto.order,
-                repeatType: dto.recurringType, repeatCoefficient: dto.recurringCoefficient
-            )
-            template.id = dto.id
-            context.insert(template)
-            summary.templates += 1
-        }
-    }
-
-    // MARK: Lookups
-
-    private func resolveCategory(id: UUID?, name: String?) -> CategoryModel? {
-        if let id, let match = categoriesByID[id] { return match }
-        if let name, let match = categoriesByName[name] { return match }
+        // Same currency: keep the user's own period settings.
         return nil
     }
 
-    private func resolveAccount(id: UUID?, name: String?) -> AccountModel? {
-        if let id, let match = accountsByID[id] { return match }
-        if let name, let match = accountsByName[name] { return match }
-        return nil
-    }
-
-    private func fetch<T: PersistentModel>(_ type: T.Type) -> [T] {
-        (try? context.fetch(FetchDescriptor<T>())) ?? []
-    }
-
-    private func key(amount: Double, start: Date, type: Int) -> String {
-        "\(Money.cents(amount))|\(Int(start.timeIntervalSince1970))|\(type)"
-    }
-
-    // MARK: Validation
-
-    /// Amounts are magnitudes (expenses store `income` separately), so a
-    /// negative or absurd value from a hand-edited file becomes 0/ceiling
-    /// instead of poisoning every total derived from it.
-    private func amount(_ value: Double) -> Double {
-        guard value.isFinite else { return 0 }
-        return min(max(value, 0), Money.maxAmount)
-    }
-
-    /// Opening balances can be negative (credit cards) but not infinite.
-    private func signedAmount(_ value: Double) -> Double {
-        guard value.isFinite else { return 0 }
-        return min(max(value, -Money.maxAmount), Money.maxAmount)
+    private static func isEmpty(_ context: ModelContext) -> Bool {
+        func count<T: PersistentModel>(_ type: T.Type) -> Int {
+            (try? context.fetchCount(FetchDescriptor<T>())) ?? 0
+        }
+        return count(TransactionModel.self) == 0
+            && count(CategoryModel.self) == 0
+            && count(AccountModel.self) == 0
+            && count(BudgetModel.self) == 0
+            && count(MainBudgetModel.self) == 0
+            && count(TemplateTransactionModel.self) == 0
     }
 }

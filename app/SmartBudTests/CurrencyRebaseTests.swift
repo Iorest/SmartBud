@@ -1,0 +1,135 @@
+//
+//  CurrencyRebaseTests.swift
+//  SmartBudTests
+//
+//  Switching the base currency has to convert every frozen amount and rebuild
+//  the rate table in one step. The maths lives in `CurrencyRebase`; these tests
+//  pin the direction of the conversion (the easy thing to get backwards) and
+//  the table rewrite.
+//
+
+import Testing
+import Foundation
+import SwiftData
+
+@Suite("CurrencyRebase")
+struct CurrencyRebaseTests {
+
+    /// 1 USD = 7.2 CNY, 1 EUR = 7.8 CNY, base is CNY.
+    private let cnyRates = ["USD": 7.2, "EUR": 7.8]
+
+    @Test("Old base amounts are divided by the new base's rate")
+    func factorDirection() throws {
+        let plan = try CurrencyRebase.plan(from: "CNY", to: "USD", rates: cnyRates).get()
+
+        // 100 CNY is about 13.89 USD, not 720 USD.
+        #expect(abs(plan.factor - 1.0 / 7.2) < 1e-9)
+        #expect(abs(100 * plan.factor - 13.888888) < 1e-5)
+    }
+
+    @Test("The rate table is re-expressed in the new base")
+    func tableRewrite() throws {
+        let plan = try CurrencyRebase.plan(from: "CNY", to: "USD", rates: cnyRates).get()
+
+        #expect(plan.rates["USD"] == nil)                       // new base has no row
+        #expect(plan.rates["CNY"] == 0.138889)                  // old base is now foreign
+        #expect(plan.rates["EUR"] == 1.083333)                  // 7.8 / 7.2
+    }
+
+    @Test("Switching to a currency without a stored rate is refused")
+    func missingRate() {
+        let result = CurrencyRebase.plan(from: "CNY", to: "GBP", rates: cnyRates)
+        #expect(result == .failure(.missingRate("GBP")))
+    }
+
+    @Test("Switching to the current base is a no-op")
+    func sameCurrency() {
+        #expect(CurrencyRebase.plan(from: "CNY", to: "CNY", rates: cnyRates) == .failure(.sameCurrency))
+    }
+
+    @Test("Codes are normalised before comparison")
+    func caseInsensitive() throws {
+        let plan = try CurrencyRebase.plan(from: "cny", to: "usd", rates: cnyRates).get()
+        #expect(plan.oldBase == "CNY")
+        #expect(plan.newBase == "USD")
+    }
+
+    @Test("A round trip returns to the original scale")
+    func roundTrip() throws {
+        let first = try CurrencyRebase.plan(from: "CNY", to: "USD", rates: cnyRates).get()
+        let second = try CurrencyRebase.plan(from: "USD", to: "CNY", rates: first.rates).get()
+
+        // 1 CNY → USD → CNY should be ~1 again; only the 6-decimal rate
+        // rounding is allowed to show.
+        #expect(abs(first.factor * second.factor - 1) < 1e-4)
+    }
+
+    @Test("Invalid rates are dropped instead of producing NaN")
+    func dropsInvalidRates() throws {
+        let plan = try CurrencyRebase.plan(
+            from: "CNY", to: "USD",
+            rates: ["USD": 7.2, "BAD": .nan, "ZERO": 0]
+        ).get()
+
+        #expect(plan.rates["BAD"] == nil)
+        #expect(plan.rates["ZERO"] == nil)
+        #expect(plan.rates.values.allSatisfy { $0.isFinite && $0 > 0 })
+    }
+}
+
+@MainActor
+@Suite("CurrencyRebase apply")
+struct CurrencyRebaseApplicationTests {
+
+    /// Held for the whole test: a released container invalidates its context.
+    private let container: ModelContainer
+    private var context: ModelContext { container.mainContext }
+
+    init() throws {
+        container = try ModelContainer(
+            for: Schema([
+                TransactionModel.self,
+                CategoryModel.self,
+                AccountModel.self,
+                CurrencyRate.self,
+                BudgetModel.self,
+                MainBudgetModel.self,
+                TemplateTransactionModel.self
+            ]),
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+    }
+
+    @Test("Every stored amount is converted and the table is rebuilt")
+    func convertsStoredAmounts() throws {
+
+        let modern = TransactionModel(baseAmount: 100, amount: 100, date: .now)
+        let legacy = TransactionModel(amount: 50, date: .now)      // no baseAmount
+        let budget = BudgetModel(amount: 1000)
+        let mainBudget = MainBudgetModel(amount: 2000)
+        let template = TemplateTransactionModel(amount: 30)
+        let usd = CurrencyRate(code: "USD", rate: 7.2)
+        let eur = CurrencyRate(code: "EUR", rate: 7.8)
+        for item in [modern, legacy, budget, mainBudget, template, usd, eur] as [any PersistentModel] {
+            context.insert(item)
+        }
+        try context.save()
+
+        let plan = try CurrencyRebase.plan(
+            from: "CNY", to: "USD", rates: ["USD": 7.2, "EUR": 7.8]
+        ).get()
+        let result = try CurrencyRebaseService.apply(plan, context: context)
+
+        #expect(result.transactions == 2)
+        #expect(abs((modern.baseAmount ?? 0) - 13.89) < 0.001)
+        #expect(abs((legacy.baseAmount ?? 0) - 6.94) < 0.001)   // materialised
+        #expect(abs(budget.amount - 138.89) < 0.001)
+        #expect(abs(mainBudget.amount - 277.78) < 0.001)
+        #expect(abs(template.amount - 4.17) < 0.001)
+
+        let rates = try context.fetch(FetchDescriptor<CurrencyRate>())
+        #expect(rates.first { $0.code == "USD" } == nil)          // new base has no row
+        #expect(rates.first { $0.code == "CNY" }?.rate == 0.138889)
+        #expect(rates.first { $0.code == "EUR" }?.rate == 1.083333)
+    }
+}

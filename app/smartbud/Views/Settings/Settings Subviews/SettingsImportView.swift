@@ -17,6 +17,13 @@ struct SettingsImportView: View {
     @State private var isPresentingPicker = false
     @State private var isImporting = false
     @State private var result: DataImporter.Summary?
+    @State private var pendingPayload: ExportSchema.Payload?
+    @State private var pendingSummary: DataImporter.Summary?
+    @State private var showImportConfirmation = false
+
+    @AppStorage("currency", store: .appGroup) private var currency: String = ""
+    @AppStorage("firstDayOfMonth", store: .appGroup) private var firstDayOfMonth: Int = 1
+    @AppStorage("firstWeekday", store: .appGroup) private var firstWeekday: Int = 1
     @State private var errorMessage: String?
     @State private var isPresentingError = false
 
@@ -61,7 +68,7 @@ struct SettingsImportView: View {
             switch pickerResult {
             case .success(let urls):
                 guard let url = urls.first else { return }
-                performImport(from: url)
+                loadForPreview(from: url)
             case .failure:
                 errorMessage = DataImporter.ImportError.unreadable.errorDescription
                 isPresentingError = true
@@ -74,6 +81,18 @@ struct SettingsImportView: View {
             Button(String.appLocalized(SettingsKey.importDone), role: .cancel) {}
         } message: {
             Text(errorMessage ?? "")
+        }
+        .alert(String.appLocalized(SettingsKey.importConfirmTitle),
+               isPresented: $showImportConfirmation,
+               presenting: pendingSummary) { _ in
+            Button(String.appLocalized(SettingsKey.importConfirmAction)) { applyPendingImport() }
+            Button(String.appLocalized("Cancel"), role: .cancel) {
+                pendingPayload = nil
+                pendingSummary = nil
+            }
+        } message: { summary in
+            Text(String.appFormatted(SettingsKey.importConfirmMessage,
+                                     previewDateText, summary.imported))
         }
     }
 
@@ -122,6 +141,12 @@ struct SettingsImportView: View {
                     .font(.footnote)
                     .foregroundStyle(Color.SubtitleText)
             }
+
+            if let settings = summary.settingsToApply, let code = settings.baseCurrency {
+                Text(String.appFormatted(SettingsKey.importSettingsApplied, code))
+                    .font(.footnote)
+                    .foregroundStyle(Color.SubtitleText)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 10)
@@ -131,7 +156,46 @@ struct SettingsImportView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func performImport(from url: URL) {
+    /// A backup restores the currency its amounts were frozen in. Only applied
+    /// when this device had no data (the importer decides that), so a restore
+    /// never rewrites an existing ledger's base currency.
+    private func applySettings(_ settings: ExportSchema.SettingsDTO?) {
+        guard let settings else { return }
+        if let code = settings.baseCurrency, !code.isEmpty {
+            currency = code
+            NSUbiquitousKeyValueStore.default.set(code, forKey: "currency")
+        }
+        if let day = settings.firstDayOfMonth { firstDayOfMonth = day }
+        if let weekday = settings.firstWeekday { firstWeekday = weekday }
+    }
+
+    /// Reads the file first so the user sees how much is inside before it is
+    /// merged. Nothing is written until the confirmation.
+    private func loadForPreview(from url: URL) {
+        do {
+            let payload = try DataImporter.decodeFile(at: url)
+            pendingPayload = payload
+            pendingSummary = DataImporter.preview(payload)
+            showImportConfirmation = true
+        } catch let error as DataImporter.ImportError {
+            errorMessage = error.errorDescription
+            isPresentingError = true
+        } catch {
+            errorMessage = DataImporter.ImportError.notABackup.errorDescription
+            isPresentingError = true
+        }
+    }
+
+    private var previewDateText: String {
+        guard let payload = pendingPayload else { return "" }
+        return payload.exportDate.formatted(
+            Date.FormatStyle(locale: .appLocale).year().month().day())
+    }
+
+    private func applyPendingImport() {
+        guard let payload = pendingPayload else { return }
+        pendingPayload = nil
+        pendingSummary = nil
         guard !isImporting else { return }
         isImporting = true
         result = nil
@@ -139,7 +203,8 @@ struct SettingsImportView: View {
         Task { @MainActor in
             defer { isImporting = false }
             do {
-                let summary = try DataImporter.importFile(at: url, context: DataRepository.shared.context)
+                let summary = try DataImporter.apply(payload, context: DataRepository.shared.context)
+                applySettings(summary.settingsToApply)
                 result = summary
                 // Every screen reads from the same store; refresh the ones
                 // that cache fetched rows so the imported data shows up

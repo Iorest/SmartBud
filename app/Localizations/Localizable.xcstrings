@@ -1,6 +1,314 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add an exchange rate for %@ first (Settings → Currency → Exchange Rates), then switch the base currency." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an exchange rate for %@ first (Settings → Currency → Exchange Rates), then switch the base currency."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先在「设置 → 货币 → 汇率」里添加 %@ 的汇率，再切换基准货币。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先在「設定 → 貨幣 → 匯率」裡新增 %@ 的匯率，再切換基準貨幣。"
+          }
+        }
+      }
+    },
+    "Archive this account?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive this account?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "归档这个账户？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "歸檔這個帳戶？"
+          }
+        }
+      }
+    },
+    "Could not switch base currency" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not switch base currency"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法切换基准货币"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法切換基準貨幣"
+          }
+        }
+      }
+    },
+    "Every stored amount will be converted at 1 %@ = %@ %@ (%lld records) and then stay fixed." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every stored amount will be converted at 1 %@ = %@ %@ (%lld records) and then stay fixed."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有已存金额会按 1 %@ = %@ %@ 折算（共 %lld 条记录），之后不再变化。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有已存金額會按 1 %@ = %@ %@ 折算（共 %lld 筆記錄），之後不再變化。"
+          }
+        }
+      }
+    },
+    "Switch base currency?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch base currency?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换基准货币？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換基準貨幣？"
+          }
+        }
+      }
+    },
+    "The switch could not be saved. Nothing was changed." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The switch could not be saved. Nothing was changed."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换未能保存，数据没有变化。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換未能儲存，資料沒有變化。"
+          }
+        }
+      }
+    },
+    "This backup was recorded in %@ but this device uses %@. Switch the base currency first, or erase the data and import again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup was recorded in %@ but this device uses %@. Switch the base currency first, or erase the data and import again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这份备份使用 %@ 记账，本机使用 %@。请先切换基准货币，或清空数据后再导入。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這份備份使用 %@ 記帳，本機使用 %@。請先切換基準貨幣，或清空資料後再匯入。"
+          }
+        }
+      }
+    },
+    "This is already your base currency." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is already your base currency."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这已经是你的基准货币。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這已經是您的基準貨幣。"
+          }
+        }
+      }
+    },
+    "“%@” still holds %@. Archived accounts are left out of the total balance and out of the account picker. Transfer the money out first if it is still in use." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” still holds %@. Archived accounts are left out of the total balance and out of the account picker. Transfer the money out first if it is still in use."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”里还有 %@。归档后不会计入总资产，也不会再出现在记账页的账户列表里。如果这笔钱还在用，建议先转出。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」裡還有 %@。歸檔後不會計入總資產，也不會再出現在記帳頁的帳戶列表裡。如果這筆錢還在用，建議先轉出。"
+          }
+        }
+      }
+    },
+    "Switch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切換"
+          }
+        }
+      }
+    },
+    "settings.import.confirm.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import this backup?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入这份备份？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入這份備份？"
+          }
+        }
+      }
+    },
+    "settings.import.confirm.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup from %@ with %lld records. Records already on this device are skipped."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备份日期 %@，共 %lld 条记录。本机已有的记录会自动跳过。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備份日期 %@，共 %lld 筆記錄。本機已有的記錄會自動略過。"
+          }
+        }
+      }
+    },
+    "settings.import.confirm.action" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入"
+          }
+        }
+      }
+    },
+    "settings.import.settingsApplied" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied the backup's base currency: %@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已应用备份中的基准货币：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已套用備份中的基準貨幣：%@"
+          }
+        }
+      }
+    },
     "This backup comes from a newer version of SmartBud. Update the app before restoring it." : {
       "localizations" : {
         "en" : {

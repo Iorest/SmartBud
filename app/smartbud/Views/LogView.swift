@@ -246,7 +246,9 @@ struct LogView: View {
         case .recurring:
             items = pastTransactions.filter(\.onceRecurring)
         case .type:
-            items = pastTransactions.filter { $0.income == income }
+            // Balance adjustments carry the income flag but are neither income
+            // nor expense; keep them out of this filter.
+            items = pastTransactions.filter { $0.income == income && !$0.adjustment }
         case .category:
             if let categoryFilter {
                 items = pastTransactions.filter { $0.category?.id == categoryFilter.id }

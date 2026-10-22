@@ -326,18 +326,21 @@ extension TransactionView {
     @ViewBuilder
     var entryOptionChips: some View {
         HStack(spacing: 6) {
-            TransactionOptionChip(
-                systemImage: "tag",
-                title: discount > 0
-                    ? Money.format(discount,
-                                   currencyCode: account?.resolvedCurrencyCode ?? currency,
-                                   showsCents: false, locale: .appLocale)
-                    : String.appLocalized("Discount"),
-                isOn: discount > 0
-            ) {
-                hideKeyboard()
-                discountInput = discount > 0 ? String(format: "%.2f", discount) : ""
-                showDiscountEditor = true
+            // A discount only means something on an expense.
+            if !income {
+                TransactionOptionChip(
+                    systemImage: "tag",
+                    title: discount > 0
+                        ? Money.format(discount,
+                                       currencyCode: account?.resolvedCurrencyCode ?? currency,
+                                       showsCents: false, locale: .appLocale)
+                        : String.appLocalized("Discount"),
+                    isOn: discount > 0
+                ) {
+                    hideKeyboard()
+                    discountInput = discount > 0 ? String(format: "%.2f", discount) : ""
+                    showDiscountEditor = true
+                }
             }
 
             if !income {

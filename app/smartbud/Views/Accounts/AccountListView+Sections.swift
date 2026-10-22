@@ -126,13 +126,27 @@ extension AccountListView {
                 Label(String.appLocalized("Adjust Balance"), systemImage: "equal.circle")
             }
             Button {
-                accountVM.setArchived(!account.archived, for: account)
+                requestArchiveToggle(for: account)
             } label: {
                 Label(String.appLocalized(account.archived ? "Unarchive" : "Archive"),
                       systemImage: "archivebox")
             }
         }
         .opacity(account.hidden ? 0.45 : 1)
+    }
+
+    /// Unarchiving is harmless; archiving with money left asks first.
+    func requestArchiveToggle(for account: AccountModel) {
+        if account.archived {
+            accountVM.setArchived(false, for: account)
+            return
+        }
+        let balance = accountVM.balance(for: account)
+        if abs(balance) < 0.005 {
+            accountVM.setArchived(true, for: account)
+        } else {
+            archivingAccount = account
+        }
     }
 
     @ViewBuilder
@@ -143,7 +157,7 @@ extension AccountListView {
             Label(String.appLocalized("Delete"), systemImage: "trash")
         }
         Button {
-            accountVM.setArchived(!account.archived, for: account)
+            requestArchiveToggle(for: account)
         } label: {
             Label(String.appLocalized(account.archived ? "Unarchive" : "Archive"),
                   systemImage: account.archived ? "tray.and.arrow.up" : "archivebox")

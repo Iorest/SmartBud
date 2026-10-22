@@ -84,7 +84,12 @@ final class ContentViewModel {
 
             seedCurrencyFromICloudIfNeeded()
         } else {
-            syncCurrencyFromICloud()
+            // The base currency is device-local. Adopting another device's
+            // value here would reinterpret every frozen `baseAmount` without
+            // converting it, so a switch only happens through the explicit
+            // rebase flow in Settings → Currency. We still publish this
+            // device's choice so a fresh install can seed from it.
+            NSUbiquitousKeyValueStore.default.set(currency, forKey: "currency")
         }
 
         // SwiftData doesn't need the CoreData-era migrations, but the
@@ -100,6 +105,9 @@ final class ContentViewModel {
     /// `getNotificationSettings` block in two places.
     func handleSceneBecameActive() {
         reconcileNotificationAuthorization()
+        // Catches anything the remote-change notifications missed while the
+        // app was suspended.
+        DataRefreshCenter.refreshAll()
     }
 
     // MARK: - Private helpers
@@ -115,20 +123,6 @@ final class ContentViewModel {
             currency = stored
         } else {
             let fallback = Locale.current.currency?.identifier ?? "USD"
-            store.set(fallback, forKey: "currency")
-        }
-    }
-
-    /// Subsequent launches: pull any updated currency from iCloud,
-    /// seeding the store with the device locale if iCloud doesn't
-    /// have one yet.
-    private func syncCurrencyFromICloud() {
-        let store = NSUbiquitousKeyValueStore.default
-        if let stored = store.string(forKey: "currency") {
-            currency = stored
-        } else {
-            let fallback = Locale.current.currency?.identifier ?? "USD"
-            currency = fallback
             store.set(fallback, forKey: "currency")
         }
     }

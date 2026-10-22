@@ -235,7 +235,12 @@ enum DataExporter {
             templates: templates,
             accounts: accounts,
             transfers: transfers,
-            rates: rates
+            rates: rates,
+            settings: ExportSchema.SettingsDTO(
+                baseCurrency: UserDefaults.appGroup.string(forKey: "currency"),
+                firstDayOfMonth: UserDefaults.appGroup.object(forKey: "firstDayOfMonth") as? Int,
+                firstWeekday: UserDefaults.appGroup.object(forKey: "firstWeekday") as? Int
+            )
         )
     }
 

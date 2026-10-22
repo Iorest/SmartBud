@@ -29,6 +29,8 @@ struct SmartBudApp: App {
 
     init() {
         CurrencyRateStore.shared.load()
+        // Another device's changes should show up without re-entering a screen.
+        DataRefreshCenter.start()
         // Tab-bar appearance is now the system default: the app uses the
         // native TabView so iPhone, iPad and Mac (Designed for iPad) share
         // one navigation shell.

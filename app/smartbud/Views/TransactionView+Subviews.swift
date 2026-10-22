@@ -82,8 +82,11 @@ extension TransactionView {
             if let category, category.income != newValue {
                 self.category = nil
             }
-            // Income cannot be claimed back.
-            if newValue { reimbursable = false }
+            // Income can be neither claimed back nor discounted.
+            if newValue {
+                reimbursable = false
+                discount = 0
+            }
         }
         .onChange(of: numberEntryType) { _, new in
             padVM.numberEntryType = new

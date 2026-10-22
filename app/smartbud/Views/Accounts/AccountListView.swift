@@ -25,6 +25,7 @@ struct AccountListView: View {
     @State var showArchived = false
     @State var adjusting: AccountModel?
     @State var adjustmentInput = ""
+    @State var archivingAccount: AccountModel?
 
     var body: some View {
         List {
@@ -153,6 +154,34 @@ struct AccountListView: View {
         } message: {
             Text(adjustmentMessage)
         }
+        .alert(
+            String.appLocalized("Archive this account?"),
+            isPresented: Binding(
+                get: { archivingAccount != nil },
+                set: { if !$0 { archivingAccount = nil } }
+            ),
+            presenting: archivingAccount
+        ) { account in
+            Button(String.appLocalized("Archive")) {
+                accountVM.setArchived(true, for: account)
+                archivingAccount = nil
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) { archivingAccount = nil }
+        } message: { account in
+            Text(archiveWarning(for: account))
+        }
+    }
+
+    /// Archiving hides the account from the default list and from net worth, so
+    /// a non-zero balance would silently disappear. Say so before doing it.
+    func archiveWarning(for account: AccountModel) -> String {
+        let balance = Money.format(accountVM.balance(for: account),
+                                   currencyCode: account.resolvedCurrencyCode,
+                                   showsCents: showCents, locale: .appLocale)
+        return String.appFormatted(
+            "“%@” still holds %@. Archived accounts are left out of the total balance "
+                + "and out of the account picker. Transfer the money out first if it is still in use.",
+            account.wrappedName, balance)
     }
 
     /// Archived accounts drop out of the daily list and the total but keep
