@@ -160,7 +160,12 @@ struct LogTransactionList<Header: View>: View {
     var future: Bool = false
     /// Repeating/future rows shown in their own section above the months.
     var upcoming: [TransactionModel] = []
+    /// Multi-select mode: rows show a selection circle instead of opening.
+    var isSelecting: Bool = false
+    @Binding var selection: Set<UUID>
     var header: Header
+
+    @State private var selectionHaptic = 0
 
     @Environment(TransactionViewModel.self) private var transactionVM
     @Environment(OverallTransactionManager.self) private var transactionManager
@@ -169,11 +174,15 @@ struct LogTransactionList<Header: View>: View {
         transactions: [TransactionModel],
         future: Bool = false,
         upcoming: [TransactionModel] = [],
+        isSelecting: Bool = false,
+        selection: Binding<Set<UUID>>? = nil,
         @ViewBuilder header: () -> Header
     ) {
         self.transactions = transactions
         self.future = future
         self.upcoming = upcoming
+        self.isSelecting = isSelecting
+        _selection = selection ?? .constant([])
         self.header = header()
     }
 
@@ -246,6 +255,7 @@ struct LogTransactionList<Header: View>: View {
         #endif
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0, for: .scrollContent)
+        .sensoryFeedback(.selection, trigger: selectionHaptic)
     }
 
     #if os(macOS)
@@ -285,9 +295,44 @@ struct LogTransactionList<Header: View>: View {
         }
     }
 
+    @ViewBuilder
     private func row(_ transaction: TransactionModel, isFuture: Bool? = nil) -> some View {
         let futureRow = isFuture ?? future
 
+        if isSelecting {
+            selectableRow(transaction, isFuture: futureRow)
+        } else {
+            editableRow(transaction, isFuture: futureRow)
+        }
+    }
+
+    /// Selection mode: the row toggles a checkmark instead of opening.
+    private func selectableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
+        let isSelected = selection.contains(transaction.id)
+
+        return HStack(spacing: SBSpace.small) {
+            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundStyle(isSelected ? Color.accentColor : Color.SubtitleText)
+                .accessibilityHidden(true)
+
+            LogTransactionRow(transaction: transaction, future: isFuture)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if isSelected {
+                selection.remove(transaction.id)
+            } else {
+                selection.insert(transaction.id)
+            }
+            selectionHaptic &+= 1
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private func editableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
+        let futureRow = isFuture
         return Button {
             transactionManager.toEdit = transaction
         } label: {

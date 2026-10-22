@@ -228,6 +228,27 @@ final class TransactionViewModel {
         repo.save()
     }
 
+    /// Deletes several transactions with a single save (batch selection).
+    func delete(_ transactions: [TransactionModel]) {
+        guard !transactions.isEmpty else { return }
+        for txn in transactions { repo.delete(txn) }
+        repo.save()
+    }
+
+    /// Moves several transactions to `category` in one save. The income flag
+    /// follows the category so a batch can't leave income rows on an expense
+    /// category (the form enforces the same rule).
+    func setCategory(_ category: CategoryModel?, for transactions: [TransactionModel]) {
+        guard !transactions.isEmpty else { return }
+        for txn in transactions {
+            txn.category = category
+            if let category {
+                txn.income = category.income
+            }
+        }
+        repo.save()
+    }
+
     // MARK: Staged delete (supports "undo" before the delete is committed)
 
     struct PendingDelete: Identifiable {

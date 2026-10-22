@@ -16,6 +16,7 @@ struct LogView: View {
     private var allTransactions: [TransactionModel]
 
     @Environment(TransactionViewModel.self) var transactionVM
+    @Environment(CategoryViewModel.self) private var categoryVM
     @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -30,6 +31,11 @@ struct LogView: View {
     @State private var searchText = ""
     @State private var searchPresented = false
     @State private var navBarText = ""
+
+    // Batch selection
+    @State private var isSelecting = false
+    @State private var selectedIDs: Set<UUID> = []
+    @State private var showBatchDelete = false
 
     @State private var filter = FilterType.all
     @State private var categoryFilter: CategoryModel?
@@ -79,6 +85,14 @@ struct LogView: View {
         )
         #endif
         .toolbar {
+            if !allTransactions.isEmpty {
+                #if os(iOS)
+                ToolbarItem(placement: .topBarLeading) { selectionToggle }
+                #else
+                ToolbarItem(placement: .navigation) { selectionToggle }
+                #endif
+            }
+
             ToolbarItemGroup(placement: .primaryAction) {
                 filterMenu
                 Button {
@@ -88,6 +102,21 @@ struct LogView: View {
                 }
                 .accessibilityLabel(Text(String.appLocalized("Add New Transaction")))
             }
+        }
+        .alert(
+            String.appFormatted("Delete %lld transactions?", selectedIDs.count),
+            isPresented: $showBatchDelete
+        ) {
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                transactionVM.delete(selectedTransactions)
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    selectedIDs.removeAll()
+                    isSelecting = false
+                }
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) {}
+        } message: {
+            Text(String.appLocalized("This action cannot be undone."))
         }
         .onChange(of: launchSearch) { _, newValue in
             if newValue { searchPresented = true }
@@ -103,6 +132,7 @@ struct LogView: View {
             }
         }
         .onAppear {
+            categoryVM.load()
             if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
                 transactionVM.updateAllRecurring()
             }
@@ -119,7 +149,9 @@ struct LogView: View {
                 LogTransactionList(
                     transactions: visibleTransactions,
                     future: filter == .upcoming,
-                    upcoming: upcomingTransactions
+                    upcoming: upcomingTransactions,
+                    isSelecting: isSelecting,
+                    selection: $selectedIDs
                 ) {
                     if filter == .all && searchText.isEmpty {
                         LogInsightsView(
@@ -136,6 +168,17 @@ struct LogView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             if showsStepper {
                 stepperBar
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if isSelecting && !selectedIDs.isEmpty {
+                LogSelectionBar(
+                    count: selectedIDs.count,
+                    expenseCategories: categoryVM.expenseCategories,
+                    incomeCategories: categoryVM.incomeCategories,
+                    onPick: moveSelection,
+                    onDelete: { showBatchDelete = true }
+                )
             }
         }
     }
@@ -161,41 +204,6 @@ struct LogView: View {
     }
 
     // MARK: - Filters
-
-    private var showsStepper: Bool {
-        switch filter {
-        case .category, .day, .week, .month, .type:
-            return true
-        case .all, .recurring, .upcoming:
-            return false
-        }
-    }
-
-    private var filterMenu: some View {
-        Menu {
-            Picker(String.appLocalized("Filter"), selection: $filter) {
-                ForEach(FilterType.allCases, id: \.self) { option in
-                    Label(
-                        LocalizedStringKey(option.rawValue),
-                        systemImage: FilterType.imageDictionary[option] ?? "line.3.horizontal.decrease"
-                    )
-                    .tag(option)
-                }
-            }
-
-            if filter != .all {
-                Divider()
-                Button(String.appLocalized("Clear Filter"), systemImage: "xmark.circle") {
-                    filter = .all
-                }
-            }
-        } label: {
-            Image(systemName: filter == .all
-                  ? "line.3.horizontal.decrease"
-                  : "line.3.horizontal.decrease.circle.fill")
-        }
-        .accessibilityLabel(Text(String.appLocalized("Filter")))
-    }
 
     // MARK: - Data
 
@@ -267,6 +275,16 @@ struct LogView: View {
         return items.sorted { $0.wrappedDate > $1.wrappedDate }
     }
 
+}
+
+extension LogView {
+
+    // MARK: - Batch selection
+
+    private var selectedTransactions: [TransactionModel] {
+        visibleTransactions.filter { selectedIDs.contains($0.id) }
+    }
+
     private func matchesSearch(_ transaction: TransactionModel) -> Bool {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return true }
@@ -278,9 +296,57 @@ struct LogView: View {
         let amount = String(format: "%.2f", transaction.amount)
         return amount.contains(query)
     }
-}
+    private var selectionToggle: some View {
+        Button(isSelecting ? String.appLocalized("Done") : String.appLocalized("Edit")) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isSelecting.toggle()
+                selectedIDs.removeAll()
+            }
+        }
+    }
 
-extension LogView {
+    private func moveSelection(to category: CategoryModel) {
+        transactionVM.setCategory(category, for: selectedTransactions)
+        withAnimation(.easeInOut(duration: 0.2)) {
+            selectedIDs.removeAll()
+            isSelecting = false
+        }
+    }
+
+    private var showsStepper: Bool {
+        switch filter {
+        case .category, .day, .week, .month, .type:
+            return true
+        case .all, .recurring, .upcoming:
+            return false
+        }
+    }
+
+    private var filterMenu: some View {
+        Menu {
+            Picker(String.appLocalized("Filter"), selection: $filter) {
+                ForEach(FilterType.allCases, id: \.self) { option in
+                    Label(
+                        LocalizedStringKey(option.rawValue),
+                        systemImage: FilterType.imageDictionary[option] ?? "line.3.horizontal.decrease"
+                    )
+                    .tag(option)
+                }
+            }
+
+            if filter != .all {
+                Divider()
+                Button(String.appLocalized("Clear Filter"), systemImage: "xmark.circle") {
+                    filter = .all
+                }
+            }
+        } label: {
+            Image(systemName: filter == .all
+                  ? "line.3.horizontal.decrease"
+                  : "line.3.horizontal.decrease.circle.fill")
+        }
+        .accessibilityLabel(Text(String.appLocalized("Filter")))
+    }
 
     var body: some View {
         #if os(iOS)

@@ -83,3 +83,58 @@ enum LogGrouping {
 }
 
 // MARK: - Row
+
+// MARK: - Batch selection bar
+
+/// Bottom action bar shown while multi-selecting log rows.
+struct LogSelectionBar: View {
+    let count: Int
+    let expenseCategories: [CategoryModel]
+    let incomeCategories: [CategoryModel]
+    let onPick: (CategoryModel) -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        HStack(spacing: SBSpace.medium) {
+            Menu {
+                Section(String.appLocalized("Expense")) {
+                    ForEach(expenseCategories) { category in
+                        categoryButton(category)
+                    }
+                }
+                if !incomeCategories.isEmpty {
+                    Section(String.appLocalized("Income")) {
+                        ForEach(incomeCategories) { category in
+                            categoryButton(category)
+                        }
+                    }
+                }
+            } label: {
+                Label(String.appLocalized("Move to Category"), systemImage: "folder")
+                    .font(.body.weight(.medium))
+            }
+
+            Spacer(minLength: 0)
+
+            Button(role: .destructive) {
+                onDelete()
+            } label: {
+                Label(String.appFormatted("Delete (%lld)", count), systemImage: "trash")
+                    .font(.body.weight(.medium))
+            }
+            .foregroundStyle(Color.AlertRed)
+        }
+        .padding(.horizontal, SBSpace.medium)
+        .padding(.vertical, SBSpace.small)
+        .frame(maxWidth: .infinity)
+        .background(.bar)
+        .overlay(alignment: .top) { Divider() }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    private func categoryButton(_ category: CategoryModel) -> some View {
+        Button("\(category.wrappedEmoji) \(category.wrappedName)") {
+            onPick(category)
+        }
+    }
+}
