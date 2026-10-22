@@ -17,6 +17,9 @@ struct TransferEditor: View {
     @State private var date = Date.now
     @State private var note = ""
 
+    @AppStorage("currency", store: .appGroup) private var currency: String =
+        Locale.current.currency?.identifier ?? "USD"
+
     private var accounts: [AccountModel] { accountVM.visibleAccounts }
 
     private var parsedAmount: Double {
@@ -45,7 +48,7 @@ struct TransferEditor: View {
                 }
 
                 Section {
-                    HStack {
+                    HStack(spacing: SBSpace.extraSmall) {
                         Text(String.appLocalized("Amount"))
                         Spacer()
                         TextField("0", text: $amount)
@@ -54,6 +57,11 @@ struct TransferEditor: View {
                             #endif
                             .multilineTextAlignment(.trailing)
                             .monospacedDigit()
+                        // Single-currency app: show the unit so the number is
+                        // unambiguous (accounts share the app currency).
+                        Text(currency)
+                            .font(.footnote)
+                            .foregroundStyle(Color.SubtitleText)
                     }
                     DatePicker(String.appLocalized("Date"), selection: $date, displayedComponents: .date)
                     TextField(String.appLocalized("Note"), text: $note)

@@ -15,6 +15,9 @@ struct LogView: View {
     @Query(sort: [SortDescriptor(\TransactionModel.date, order: .reverse)])
     private var allTransactions: [TransactionModel]
 
+    @Query(sort: [SortDescriptor(\TransferModel.date, order: .reverse)])
+    var allTransfers: [TransferModel]
+
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(CategoryViewModel.self) private var categoryVM
     @Environment(\.scenePhase) private var scenePhase
@@ -28,7 +31,7 @@ struct LogView: View {
     /// Invoked by the empty state's primary button ("Add Entry").
     var onAdd: () -> Void = {}
 
-    @State private var searchText = ""
+    @State var searchText = ""
     @State private var searchPresented = false
     @State private var navBarText = ""
 
@@ -37,7 +40,7 @@ struct LogView: View {
     @State private var selectedIDs: Set<UUID> = []
     @State private var showBatchDelete = false
 
-    @State private var filter = FilterType.all
+    @State var filter = FilterType.all
     @State private var categoryFilter: CategoryModel?
     @State private var dateFilter = Date.now
     @State private var weekFilter = Date.now
@@ -143,11 +146,11 @@ struct LogView: View {
 
     private var logList: some View {
         Group {
-            if visibleTransactions.isEmpty {
+            if visibleEntries.isEmpty {
                 emptyResultView
             } else {
                 LogTransactionList(
-                    transactions: visibleTransactions,
+                    entries: visibleEntries,
                     future: filter == .upcoming,
                     upcoming: upcomingTransactions,
                     isSelecting: isSelecting,
@@ -234,7 +237,7 @@ struct LogView: View {
         transaction.wrappedDate > .now ? transaction.wrappedDate : transaction.nextTransactionDate
     }
 
-    private var visibleTransactions: [TransactionModel] {
+    var visibleTransactions: [TransactionModel] {
         var items: [TransactionModel]
 
         switch filter {
@@ -285,17 +288,6 @@ extension LogView {
         visibleTransactions.filter { selectedIDs.contains($0.id) }
     }
 
-    private func matchesSearch(_ transaction: TransactionModel) -> Bool {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return true }
-
-        if transaction.wrappedNote.localizedStandardContains(query) { return true }
-        if transaction.wrappedCategoryName.localizedStandardContains(query) { return true }
-        if (transaction.category?.wrappedEmoji ?? "").contains(query) { return true }
-
-        let amount = String(format: "%.2f", transaction.amount)
-        return amount.contains(query)
-    }
     private var selectionToggle: some View {
         Button(isSelecting ? String.appLocalized("Done") : String.appLocalized("Edit")) {
             withAnimation(.easeInOut(duration: 0.2)) {

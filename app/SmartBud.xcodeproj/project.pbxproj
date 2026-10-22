@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000000F04 /* LogView+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F03 /* LogView+Entries.swift */; };
+		E1A2B3C40000000000000F05 /* LogView+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F03 /* LogView+Entries.swift */; };
+		E1A2B3C40000000000000F01 /* LogRowComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F00 /* LogRowComponents.swift */; };
+		E1A2B3C40000000000000F02 /* LogRowComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F00 /* LogRowComponents.swift */; };
 		E1A2B3C40000000000000E04 /* TransferEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E03 /* TransferEditor.swift */; };
 		E1A2B3C40000000000000E05 /* TransferEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E03 /* TransferEditor.swift */; };
 		E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
@@ -611,6 +615,8 @@
 		E1A2B3C40000000000000260 /* BudgetEditPreservesAnchorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetEditPreservesAnchorTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000300 /* TransactionCategoryGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/TransactionCategoryGrid.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000400 /* LogTransactionList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Log/LogTransactionList.swift; sourceTree = "<group>"; };
+		E1A2B3C40000000000000F03 /* LogView+Entries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogView+Entries.swift"; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000F00 /* LogRowComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogRowComponents.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000614 /* LogTransactionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Log/LogTransactionRow.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000500 /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Templates/TemplatesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -762,6 +768,8 @@
 				E1A2B3C400000000000002C0 /* TransactionCategoryRow.swift */,
 				E1A2B3C400000000000002D0 /* TransactionRepeatButton.swift */,
 				E1A2B3C40000000000000400 /* LogTransactionList.swift */,
+				E1A2B3C40000000000000F03 /* LogView+Entries.swift */,
+				E1A2B3C40000000000000F00 /* LogRowComponents.swift */,
 				E1A2B3C40000000000000614 /* LogTransactionRow.swift */,
 				E1A2B3C40000000000000500 /* TemplatesView.swift */,
 				5327D284287C697400F76ADF /* Products */,
@@ -1383,6 +1391,8 @@
 				E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */,
 				E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */,
 				E1A2B3C40000000000000E04 /* TransferEditor.swift in Sources */,
+				E1A2B3C40000000000000F01 /* LogRowComponents.swift in Sources */,
+				E1A2B3C40000000000000F04 /* LogView+Entries.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1605,6 +1615,8 @@
 				E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */,
 				E1A2B3C40000000000000E02 /* AccountEditorViews.swift in Sources */,
 				E1A2B3C40000000000000E05 /* TransferEditor.swift in Sources */,
+				E1A2B3C40000000000000F02 /* LogRowComponents.swift in Sources */,
+				E1A2B3C40000000000000F05 /* LogView+Entries.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

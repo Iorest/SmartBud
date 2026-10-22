@@ -2,11 +2,9 @@
 //  LogTransactionList.swift
 //  smartbud
 //
-//  Native replacement for the hand-rolled log list: one `List`, one section
-//  per month, a day header row per day, and real `swipeActions`. The old
-//  `SingleTransactionView` drag gesture drew its own delete affordance and
-//  relied on screen width; that lives on only inside the budget detail
-//  scroll views, where a `List` cannot be nested.
+//  One `List`, one section per month, a day header per day, real
+//  `swipeActions`. Rows are `LogEntry` values so account transfers can sit
+//  in the same timeline as transactions.
 //
 
 import SwiftData
@@ -14,14 +12,43 @@ import SwiftUI
 
 // MARK: - Grouping
 
+/// One row in the ledger: either a transaction or an account transfer.
+/// Transfers carry no net amount — moving money between your own accounts
+/// must not change income or spend totals.
+enum LogEntry: Identifiable {
+    case transaction(TransactionModel)
+    case transfer(TransferModel)
+
+    var id: UUID {
+        switch self {
+        case .transaction(let txn): return txn.id
+        case .transfer(let transfer): return transfer.id
+        }
+    }
+
+    var date: Date {
+        switch self {
+        case .transaction(let txn): return txn.wrappedDate
+        case .transfer(let transfer): return transfer.wrappedDate
+        }
+    }
+
+    var netAmount: Double {
+        switch self {
+        case .transaction(let txn): return txn.income ? txn.amount : -txn.amount
+        case .transfer: return 0
+        }
+    }
+}
+
 struct LogDayGroup: Identifiable {
     let day: Date
-    let transactions: [TransactionModel]
+    let entries: [LogEntry]
 
     var id: Date { day }
 
     var netTotal: Double {
-        transactions.reduce(0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+        entries.reduce(0) { $0 + $1.netAmount }
     }
 }
 
@@ -33,13 +60,13 @@ struct LogMonthGroup: Identifiable {
 }
 
 enum LogGrouping {
-    static func months(_ transactions: [TransactionModel], calendar: Calendar = .current) -> [LogMonthGroup] {
-        let byDay = Dictionary(grouping: transactions) { calendar.startOfDay(for: $0.wrappedDate) }
+    static func months(_ entries: [LogEntry], calendar: Calendar = .current) -> [LogMonthGroup] {
+        let byDay = Dictionary(grouping: entries) { calendar.startOfDay(for: $0.date) }
 
         let days = byDay.map { day, items in
             LogDayGroup(
                 day: day,
-                transactions: items.sorted { $0.wrappedDate > $1.wrappedDate }
+                entries: items.sorted { $0.date > $1.date }
             )
         }
         .sorted { $0.day > $1.day }
@@ -82,100 +109,292 @@ enum LogGrouping {
     }
 }
 
-// MARK: - Row
-
-// MARK: - Batch selection bar
-
-/// Bottom action bar shown while multi-selecting log rows.
-struct LogSelectionBar: View {
-    let count: Int
-    let expenseCategories: [CategoryModel]
-    let incomeCategories: [CategoryModel]
-    let onPick: (CategoryModel) -> Void
-    let onDelete: () -> Void
-
-    var body: some View {
-        HStack(spacing: SBSpace.medium) {
-            Menu {
-                Section(String.appLocalized("Expense")) {
-                    ForEach(expenseCategories) { category in
-                        categoryButton(category)
-                    }
-                }
-                if !incomeCategories.isEmpty {
-                    Section(String.appLocalized("Income")) {
-                        ForEach(incomeCategories) { category in
-                            categoryButton(category)
-                        }
-                    }
-                }
-            } label: {
-                Label(String.appLocalized("Move to Category"), systemImage: "folder")
-                    .font(.body.weight(.medium))
-            }
-
-            Spacer(minLength: 0)
-
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label(String.appFormatted("Delete (%lld)", count), systemImage: "trash")
-                    .font(.body.weight(.medium))
-            }
-            .foregroundStyle(Color.AlertRed)
-        }
-        .padding(.horizontal, SBSpace.medium)
-        .padding(.vertical, SBSpace.small)
-        .frame(maxWidth: .infinity)
-        .background(.bar)
-        .overlay(alignment: .top) { Divider() }
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-    }
-
-    private func categoryButton(_ category: CategoryModel) -> some View {
-        Button("\(category.wrappedEmoji) \(category.wrappedName)") {
-            onPick(category)
-        }
-    }
-}
-
-// MARK: - Day header
-
-struct LogDayHeaderRow: View {
-    let group: LogDayGroup
-
-    @AppStorage("showCents", store: .appGroup) private var showCents: Bool = true
-    @AppStorage("currency", store: .appGroup) private var currency: String = Locale
-        .current
-        .currency?
-        .identifier ?? "USD"
-
-    private var totalText: String {
-        LogGrouping.currency(
-            group.netTotal,
-            code: currency,
-            showCents: showCents,
-            signed: true,
-            income: group.netTotal >= 0
-        )
-    }
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(LogGrouping.dayTitle(group.day))
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.SubtitleText)
-            Spacer(minLength: SBSpace.extraSmall)
-            Text(totalText)
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(Color.SubtitleText)
-                .lineLimit(1)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            "\(LogGrouping.dayTitle(group.day)), \(totalText)"
-        )
-    }
-}
-
 // MARK: - List
+
+struct LogTransactionList<Header: View>: View {
+    var entries: [LogEntry]
+    var future: Bool = false
+    /// Repeating/future rows shown in their own section above the months.
+    var upcoming: [TransactionModel] = []
+    /// Multi-select mode: rows show a selection circle instead of opening.
+    var isSelecting: Bool = false
+    @Binding var selection: Set<UUID>
+    var header: Header
+
+    @State private var selectionHaptic = 0
+
+    @Environment(TransactionViewModel.self) private var transactionVM
+    @Environment(OverallTransactionManager.self) private var transactionManager
+    @Environment(AccountViewModel.self) private var accountVM
+
+    @State private var transferToDelete: TransferModel?
+
+    init(
+        entries: [LogEntry],
+        future: Bool = false,
+        upcoming: [TransactionModel] = [],
+        isSelecting: Bool = false,
+        selection: Binding<Set<UUID>>? = nil,
+        @ViewBuilder header: () -> Header
+    ) {
+        self.entries = entries
+        self.future = future
+        self.upcoming = upcoming
+        self.isSelecting = isSelecting
+        _selection = selection ?? .constant([])
+        self.header = header()
+    }
+
+    private var months: [LogMonthGroup] {
+        LogGrouping.months(entries)
+    }
+
+    /// A repeating transaction whose next occurrence is in the past can only
+    /// be stopped, not deleted, so it must not be full-swipe deletable.
+    private func stopsRecurring(_ transaction: TransactionModel, future: Bool? = nil) -> Bool {
+        let isFuture = future ?? self.future
+        return isFuture && transaction.wrappedDate < .now && transaction.recurringType > 0
+    }
+
+    var body: some View {
+        List {
+            header
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
+            if !upcoming.isEmpty {
+                Section {
+                    ForEach(upcoming) { transaction in
+                        row(transaction, isFuture: true)
+                    }
+                } header: {
+                    Text(String.appLocalized("UPCOMING"))
+                }
+            }
+
+            #if os(macOS)
+            // macOS renders a nested `ForEach` + `Section` list unreliably
+            // (the same month header appeared twice). Flatten the hierarchy
+            // into one row array with stable string identities instead.
+            ForEach(flatRows) { item in
+                switch item {
+                case .month(let date):
+                    Text(date, format: .dateTime.year().month(.wide))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.SubtitleText)
+                        .padding(.top, SBSpace.small)
+                        .padding(.horizontal, SBSpace.medium)
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                case .day(let day):
+                    LogDayHeaderRow(group: day)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 2, trailing: 16))
+                case .entry(let entry):
+                    entryRow(entry)
+                }
+            }
+            #else
+            ForEach(months) { month in
+                Section {
+                    monthRows(month)
+                } header: {
+                    Text(month.month, format: .dateTime.year().month(.wide))
+                        .font(.subheadline.weight(.semibold))
+                }
+            }
+            #endif
+        }
+        #if os(macOS)
+        .listStyle(.inset)
+        #else
+        .listStyle(.insetGrouped)
+        .listSectionSpacing(16)
+        #endif
+        .scrollContentBackground(.hidden)
+        .contentMargins(.top, 0, for: .scrollContent)
+        .sensoryFeedback(.selection, trigger: selectionHaptic)
+        .alert(
+            String.appLocalized("Delete this transfer?"),
+            isPresented: Binding(
+                get: { transferToDelete != nil },
+                set: { if !$0 { transferToDelete = nil } }
+            )
+        ) {
+            Button(String.appLocalized("Delete"), role: .destructive) {
+                if let transferToDelete {
+                    accountVM.deleteTransfer(transferToDelete)
+                }
+                transferToDelete = nil
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) { transferToDelete = nil }
+        } message: {
+            Text(String.appLocalized("Both account balances go back to what they were."))
+        }
+    }
+
+    #if os(macOS)
+    private enum FlatRow: Identifiable {
+        case month(Date)
+        case day(LogDayGroup)
+        case entry(LogEntry)
+
+        var id: String {
+            switch self {
+            case .month(let date): return "m-\(date.timeIntervalSince1970)"
+            case .day(let group): return "d-\(group.day.timeIntervalSince1970)"
+            case .entry(let entry): return "e-\(entry.id.uuidString)"
+            }
+        }
+    }
+
+    private var flatRows: [FlatRow] {
+        months.flatMap { month in
+            [FlatRow.month(month.month)] + month.days.flatMap { day in
+                [FlatRow.day(day)] + day.entries.map { FlatRow.entry($0) }
+            }
+        }
+    }
+    #endif
+
+    @ViewBuilder
+    private func monthRows(_ month: LogMonthGroup) -> some View {
+        ForEach(month.days) { day in
+            LogDayHeaderRow(group: day)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 2, trailing: 16))
+
+            ForEach(day.entries) { entry in
+                entryRow(entry)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func entryRow(_ entry: LogEntry) -> some View {
+        switch entry {
+        case .transaction(let transaction):
+            row(transaction)
+        case .transfer(let transfer):
+            transferRow(transfer)
+        }
+    }
+
+    /// Transfers sit in the ledger but are never selectable in batch mode:
+    /// they are not transactions and have no category to reassign.
+    private func transferRow(_ transfer: TransferModel) -> some View {
+        LogTransferRow(transfer: transfer)
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) {
+                    transferToDelete = transfer
+                } label: {
+                    Label(String.appLocalized("Delete"), systemImage: "trash")
+                }
+            }
+            .contextMenu {
+                Button(role: .destructive) {
+                    transferToDelete = transfer
+                } label: {
+                    Label(String.appLocalized("Delete"), systemImage: "trash")
+                }
+            }
+    }
+
+    @ViewBuilder
+    private func row(_ transaction: TransactionModel, isFuture: Bool? = nil) -> some View {
+        let futureRow = isFuture ?? future
+
+        if isSelecting {
+            selectableRow(transaction, isFuture: futureRow)
+        } else {
+            editableRow(transaction, isFuture: futureRow)
+        }
+    }
+
+    /// Selection mode: the row toggles a checkmark instead of opening.
+    private func selectableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
+        let isSelected = selection.contains(transaction.id)
+
+        return HStack(spacing: SBSpace.small) {
+            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundStyle(isSelected ? Color.accentColor : Color.SubtitleText)
+                .accessibilityHidden(true)
+
+            LogTransactionRow(transaction: transaction, future: isFuture)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if isSelected {
+                selection.remove(transaction.id)
+            } else {
+                selection.insert(transaction.id)
+            }
+            selectionHaptic &+= 1
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private func editableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
+        let futureRow = isFuture
+        return Button {
+            transactionManager.toEdit = transaction
+        } label: {
+            LogTransactionRow(transaction: transaction, future: futureRow)
+        }
+        .buttonStyle(.plain)
+        .swipeActions(edge: .trailing, allowsFullSwipe: !stopsRecurring(transaction, future: futureRow)) {
+            Button(role: .destructive) {
+                remove(transaction, future: futureRow)
+            } label: {
+                Label(String.appLocalized("Delete"), systemImage: "trash")
+            }
+
+            Button {
+                transactionManager.toEdit = transaction
+            } label: {
+                Label(String.appLocalized("Edit"), systemImage: "pencil")
+            }
+            .tint(.accentColor)
+        }
+        .contextMenu {
+            if transaction.recurringType > 0 {
+                Button {
+                    transactionVM.stopRecurring(transaction)
+                } label: {
+                    Label(String.appLocalized("Stop Recurring"), systemImage: "xmark")
+                }
+            }
+
+            Button {
+                transactionManager.toEdit = transaction
+            } label: {
+                Label(String.appLocalized("Edit"), systemImage: "pencil")
+            }
+
+            if !stopsRecurring(transaction, future: futureRow) {
+                Button(role: .destructive) {
+                    remove(transaction, future: futureRow)
+                } label: {
+                    Label(String.appLocalized("Delete"), systemImage: "trash")
+                }
+            }
+        }
+    }
+
+    private func remove(_ transaction: TransactionModel, future: Bool? = nil) {
+        if stopsRecurring(transaction, future: future) {
+            withAnimation {
+                transactionVM.stopRecurring(transaction)
+            }
+        } else {
+            // Staged so the undo banner can restore it; the view model owns
+            // the commit timer.
+            withAnimation {
+                transactionVM.stageDelete(transaction)
+            }
+        }
+    }
+}
