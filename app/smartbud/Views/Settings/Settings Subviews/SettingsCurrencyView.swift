@@ -13,6 +13,7 @@ struct SettingsCurrencyView: View {
     var currencyCode: String = Locale.current.currency?.identifier ?? "USD"
 
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dismissSearch) private var dismissSearch
     @Environment(CurrencyRateStore.self) private var rateStore
     @State private var search = ""
     @State private var pendingRebase: CurrencyRateStore.RebasePreview?
@@ -115,7 +116,7 @@ struct SettingsCurrencyView: View {
     /// to convert, otherwise we need an anchor rate and an explicit confirmation.
     private func select(_ currency: Currency) {
         guard currency.code != currencyCode else {
-            dismiss()
+            leaveScreen()
             return
         }
 
@@ -138,7 +139,7 @@ struct SettingsCurrencyView: View {
         pendingRebase = nil
         do {
             try rateStore.rebase(to: preview.newBase)
-            dismiss()
+            leaveScreen()
         } catch {
             rebaseError = error.localizedDescription
             showRebaseError = true
@@ -149,6 +150,13 @@ struct SettingsCurrencyView: View {
         currencyCode = code
         NSUbiquitousKeyValueStore.default.set(code, forKey: "currency")
         rateStore.load()
+        leaveScreen()
+    }
+
+    /// Leaving while the search field is still active leaves its bar floating
+    /// over the next screen, so close the search first.
+    private func leaveScreen() {
+        dismissSearch()
         dismiss()
     }
 
