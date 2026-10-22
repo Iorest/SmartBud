@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
+		E1A2B3C40000000000001042 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
+		E1A2B3C40000000000001043 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
 		E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001007 /* SettingsRatesView.swift */; };
 		E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001007 /* SettingsRatesView.swift */; };
 		E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001004 /* CurrencyRateStore.swift */; };
@@ -602,6 +605,7 @@
 		E1A2B3C40000000000001007 /* SettingsRatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Settings/Settings Subviews/SettingsRatesView.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000001004 /* CurrencyRateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/ViewModels/CurrencyRateStore.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000001000 /* CurrencyConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Logic/CurrencyConversion.swift"; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000001040 /* ExchangeRateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Services/ExchangeRateService.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000206 /* SBCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBCard.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000020F /* SBEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBEmptyState.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBSaveErrorBanner.swift; sourceTree = "<group>"; };
@@ -771,6 +775,7 @@
 				E1A2B3C40000000000001007 /* SettingsRatesView.swift */,
 				E1A2B3C40000000000001004 /* CurrencyRateStore.swift */,
 				E1A2B3C40000000000001000 /* CurrencyConversion.swift */,
+				E1A2B3C40000000000001040 /* ExchangeRateService.swift */,
 				E1A2B3C40000000000000206 /* SBCard.swift */,
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
@@ -1409,6 +1414,7 @@
 				E1A2B3C40000000000001001 /* CurrencyConversion.swift in Sources */,
 				E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */,
 				E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */,
+				E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1480,6 +1486,7 @@
 				E1A2B3C40000000000000261 /* BudgetEditPreservesAnchorTests.swift in Sources */,
 							E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */,
 				E1A2B3C40000000000001003 /* CurrencyConversion.swift in Sources */,
+				E1A2B3C40000000000001043 /* ExchangeRateService.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1637,6 +1644,7 @@
 				E1A2B3C40000000000001002 /* CurrencyConversion.swift in Sources */,
 				E1A2B3C40000000000001006 /* CurrencyRateStore.swift in Sources */,
 				E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */,
+				E1A2B3C40000000000001042 /* ExchangeRateService.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -188,3 +188,60 @@ struct CurrencyConversionTests {
         #expect(abs(converted - 6.46) < 0.0001)
     }
 }
+
+@Suite("Exchange rate service")
+struct ExchangeRateServiceTests {
+    private let sample = Data("""
+    {"amount":1.0,"base":"SGD","date":"2026-10-21","rates":{"CNY":5.26,"USD":0.74}}
+    """.utf8)
+
+    @Test("API quotes are inverted to 'one unit = base'")
+    func invertsRates() throws {
+        let rates = try ExchangeRateService.invertedRates(from: sample)
+        #expect(abs((rates["CNY"] ?? 0) - 1 / 5.26) < 0.000001)
+        #expect(abs((rates["USD"] ?? 0) - 1 / 0.74) < 0.000001)
+    }
+
+    @Test("Malformed payloads throw instead of returning empty rates")
+    func rejectsGarbage() {
+        let garbage = Data("not json".utf8)
+        #expect(throws: ExchangeRateService.ServiceError.self) {
+            try ExchangeRateService.invertedRates(from: garbage)
+        }
+    }
+
+    @Test("Non-positive quotes are dropped")
+    func dropsBadQuotes() throws {
+        let data = Data("""
+        {"amount":1.0,"base":"SGD","date":"2026-10-21","rates":{"CNY":0,"USD":0.74}}
+        """.utf8)
+        let rates = try ExchangeRateService.invertedRates(from: data)
+        #expect(rates["CNY"] == nil)
+        #expect(rates["USD"] != nil)
+    }
+}
+
+@Suite("Cross-currency transfers")
+struct CrossCurrencyTransferTests {
+    @Test("Received amount is what lands in the destination account")
+    func receivedAmount() {
+        let transfer = TransferModel(amount: 100, destinationAmount: 526)
+        #expect(transfer.receivedAmount == 526)
+        #expect(abs((transfer.impliedRate ?? 0) - 5.26) < 0.0001)
+    }
+
+    @Test("Same-currency transfers keep the legacy shape")
+    func sameCurrency() {
+        let transfer = TransferModel(amount: 100)
+        #expect(transfer.receivedAmount == 100)
+        #expect(transfer.impliedRate == nil)
+    }
+
+    @Test("Balances use the received amount, not the sent amount")
+    func balancesDiffer() {
+        let source = AccountBalance.current(opening: 1000, transactions: [], transfersOut: 100)
+        let destination = AccountBalance.current(opening: 0, transactions: [], transfersIn: 526)
+        #expect(source == 900)
+        #expect(destination == 526)
+    }
+}

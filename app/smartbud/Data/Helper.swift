@@ -172,15 +172,6 @@ final class AccountModel {
     }
 }
 
-extension AccountModel {
-    @Transient var wrappedName: String { name }
-    @Transient var wrappedEmoji: String { emoji }
-    @Transient var wrappedColour: String { colour }
-    @Transient var allTransactions: [TransactionModel] {
-        (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
-    }
-}
-
 // MARK: - Currency rate
 
 /// One row per foreign currency the user holds: how many base-currency units
@@ -205,7 +196,11 @@ final class CurrencyRate {
 @Model
 final class TransferModel {
     var id: UUID = UUID()
+    /// Amount leaving the source account, in that account's currency.
     var amount: Double = 0
+    /// Amount arriving in the destination account, in its currency. `0` means
+    /// same-currency transfer (legacy rows and same-currency transfers).
+    var destinationAmount: Double = 0
     var date: Date = Date.now
     var note: String?
     var dateCreated: Date = Date.now
@@ -218,6 +213,7 @@ final class TransferModel {
 
     init(
         amount: Double = 0,
+        destinationAmount: Double = 0,
         date: Date = .now,
         note: String? = nil,
         source: AccountModel? = nil,
@@ -225,6 +221,7 @@ final class TransferModel {
     ) {
         self.id = UUID()
         self.amount = amount
+        self.destinationAmount = destinationAmount
         self.date = date
         self.note = note
         self.source = source
@@ -236,6 +233,15 @@ final class TransferModel {
 extension TransferModel {
     @Transient var wrappedDate: Date { date }
     @Transient var wrappedNote: String { note ?? "" }
+    /// What lands in the destination account (falls back to `amount`).
+    @Transient var receivedAmount: Double {
+        destinationAmount > 0 ? destinationAmount : amount
+    }
+    /// Effective rate applied by this transfer, when it crossed currencies.
+    @Transient var impliedRate: Double? {
+        guard destinationAmount > 0, amount > 0 else { return nil }
+        return destinationAmount / amount
+    }
 }
 
 // MARK: - Category Budget

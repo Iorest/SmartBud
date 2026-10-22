@@ -24,7 +24,7 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 | `TransferModel` | 1.1 | 新增实体，`source` / `destination` 指向 `AccountModel` |
 | `CurrencyRate` | 1.2 | 新增实体，每个外币一行（code / rate / updatedAt） |
 
-`AccountModel.currencyCode` 与 `TransactionModel.baseAmount` 是 1.2 新增的普通字段（非关系），CloudKit 可直接兼容。
+`AccountModel.currencyCode`、`TransactionModel.baseAmount`、`TransferModel.destinationAmount` 都是普通字段（非关系），CloudKit 可直接兼容。
 
 ## 每次改 schema 后要做的四步
 
@@ -48,3 +48,7 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 - 删除账户会连带删除与它相关的转账（转账需要两头都有账户才有意义）；交易本身保留，只清空归属。
 - 汇率在启动时由 `CurrencyRateStore.load()` 读入，记账时用它把金额折算到基准货币写进 `baseAmount`。
   改汇率不会改写历史交易的 `baseAmount`，所以统计口径稳定。
+- 汇率可由用户在「设置 → 货币 → 汇率」手动填写，也可点「从网络更新」拉取欧洲央行参考汇率
+  （`ExchangeRateService`，Frankfurter 公开接口，无需密钥）。接口未收录的货币保留手动值。
+- 跨币种转账会把「转出金额」与「到账金额」都写进 `TransferModel`，汇率随记录保存，
+  之后改汇率不会影响这笔转账。

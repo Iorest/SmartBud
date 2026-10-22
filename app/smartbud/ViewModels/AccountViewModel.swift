@@ -83,7 +83,7 @@ final class AccountViewModel {
         AccountBalance.current(
             opening: account.openingBalance,
             transactions: (account.transactions ?? []).map { ($0.amount, $0.income) },
-            transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.amount },
+            transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.receivedAmount },
             transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.amount }
         )
     }
@@ -98,12 +98,22 @@ final class AccountViewModel {
         source: AccountModel,
         destination: AccountModel,
         amount: Double,
+        destinationAmount: Double = 0,
         date: Date,
         note: String
     ) -> TransferModel? {
         guard source.id != destination.id, amount > 0, amount.isFinite else { return nil }
+
+        // Same currency keeps the legacy shape (destinationAmount left at 0);
+        // crossing currencies records what actually landed in the target.
+        let received = destination.resolvedCurrencyCode == source.resolvedCurrencyCode
+            ? 0
+            : destinationAmount
+        if received != 0, !(received > 0 && received.isFinite) { return nil }
+
         let transfer = TransferModel(
             amount: amount,
+            destinationAmount: received,
             date: date,
             note: note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note,
             source: source,
@@ -178,5 +188,14 @@ final class AccountViewModel {
             return match
         }
         return visibleAccounts.first
+    }
+}
+
+extension AccountModel {
+    @Transient var wrappedName: String { name }
+    @Transient var wrappedEmoji: String { emoji }
+    @Transient var wrappedColour: String { colour }
+    @Transient var allTransactions: [TransactionModel] {
+        (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
     }
 }

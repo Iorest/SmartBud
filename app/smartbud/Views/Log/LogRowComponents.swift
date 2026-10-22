@@ -139,14 +139,25 @@ struct LogTransferRow: View {
 
             Spacer(minLength: SBSpace.extraSmall)
 
-            Text(Money.format(transfer.amount, currencyCode: currency,
-                              showsCents: showCents, locale: .appLocale))
+            Text(amountText)
                 .font(.callout.weight(.medium).monospacedDigit())
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
         .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
+    }
+
+    private var amountText: String {
+        let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
+        let sent = Money.format(transfer.amount, currencyCode: outgoing,
+                                showsCents: showCents, locale: .appLocale)
+        guard transfer.destinationAmount > 0 else { return sent }
+
+        let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
+        let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
+                                  showsCents: showCents, locale: .appLocale)
+        return "\(sent) → \(landed)"
     }
 
     private var timeText: String {

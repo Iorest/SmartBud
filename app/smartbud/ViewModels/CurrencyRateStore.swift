@@ -57,6 +57,47 @@ final class CurrencyRateStore {
         load()
     }
 
+    /// How many units of `target` one unit of `source` buys, derived from both
+    /// currencies' rates against the base currency.
+    func rate(from source: String, to target: String) -> Double {
+        let sourceRate = rate(for: source)
+        let targetRate = rate(for: target)
+        guard targetRate > 0 else { return 1 }
+        return sourceRate / targetRate
+    }
+
+    /// Pulls reference rates for `codes` from the public service and stores
+    /// them. Codes the service does not publish keep their existing rate.
+    /// Returns how many currencies were refreshed.
+    @discardableResult
+    func refreshRates(for codes: [String], service: ExchangeRateService = ExchangeRateService()) async throws -> Int {
+        let base = baseCurrency
+        let wanted = Set(codes.map { $0.uppercased() }).subtracting([base.uppercased(), ""])
+        guard !wanted.isEmpty else { return 0 }
+
+        let fetched = try await service.fetch(base: base)
+        var updated = 0
+
+        for code in wanted {
+            guard let value = fetched[code], value > 0, value.isFinite else { continue }
+            // Six decimals keeps small rates (e.g. 1 VND) usable.
+            let rounded = (value * 1_000_000).rounded() / 1_000_000
+            if let existing = records.first(where: { $0.code.uppercased() == code }) {
+                existing.rate = rounded
+                existing.updatedAt = .now
+            } else {
+                repo.insert(CurrencyRate(code: code, rate: rounded))
+            }
+            updated += 1
+        }
+
+        if updated > 0 {
+            repo.save()
+            load()
+        }
+        return updated
+    }
+
     func convertToBase(_ amount: Double, from code: String) -> Double {
         CurrencyConversion.convertRounded(
             amount, from: code, to: baseCurrency, rates: rates)

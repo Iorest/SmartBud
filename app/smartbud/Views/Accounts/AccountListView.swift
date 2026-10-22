@@ -143,6 +143,18 @@ struct AccountListView: View {
         .listRowSeparator(.hidden)
     }
 
+    private func transferAmountText(_ transfer: TransferModel) -> String {
+        let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
+        let sent = Money.format(transfer.amount, currencyCode: outgoing,
+                                showsCents: showCents, locale: .appLocale)
+        guard transfer.destinationAmount > 0 else { return sent }
+
+        let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
+        let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
+                                  showsCents: showCents, locale: .appLocale)
+        return "\(sent) → \(landed)"
+    }
+
     private func kindLabel(_ account: AccountModel) -> String {
         let kind = String.appLocalized(
             AccountKind(rawValue: account.kind)?.titleKey ?? AccountKind.cash.titleKey)
@@ -171,8 +183,7 @@ struct AccountListView: View {
 
             Spacer(minLength: SBSpace.extraSmall)
 
-            Text(Money.format(transfer.amount, currencyCode: currency,
-                              showsCents: showCents, locale: .appLocale))
+            Text(transferAmountText(transfer))
                 .font(.callout.weight(.medium).monospacedDigit())
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
