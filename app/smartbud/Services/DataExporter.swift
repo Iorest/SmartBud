@@ -30,7 +30,7 @@ enum DataExporter {
     /// Bumped manually if the export format changes in a way that
     /// importers need to distinguish (e.g. moving a category into a
     /// nested structure). Old values are never reused.
-    static let schemaVersion: Int = 1
+    static let schemaVersion: Int = 2
 
     enum ExportError: Error, LocalizedError {
         case noData
@@ -55,6 +55,8 @@ enum DataExporter {
         var budgets: [BudgetDTO]
         var mainBudgets: [MainBudgetDTO]
         var templates: [TemplateTransactionDTO]
+        var accounts: [AccountDTO]
+        var transfers: [TransferDTO]
     }
 
     // MARK: - DTOs (decoupled from @Model so the export format is stable)
@@ -72,6 +74,31 @@ enum DataExporter {
         var onceRecurring: Bool
         var categoryId: UUID?
         var categoryName: String?
+        var accountId: UUID?
+        var accountName: String?
+    }
+
+    struct AccountDTO: Codable {
+        var id: UUID
+        var name: String
+        var emoji: String
+        var colour: String
+        var kind: Int
+        var openingBalance: Double
+        var hidden: Bool
+        var order: Int
+        var dateCreated: Date
+    }
+
+    struct TransferDTO: Codable {
+        var id: UUID
+        var amount: Double
+        var date: Date
+        var note: String?
+        var sourceId: UUID?
+        var sourceName: String?
+        var destinationId: UUID?
+        var destinationName: String?
     }
 
     struct CategoryDTO: Codable {
@@ -127,7 +154,8 @@ enum DataExporter {
            payload.categories.isEmpty,
            payload.budgets.isEmpty,
            payload.mainBudgets.isEmpty,
-           payload.templates.isEmpty {
+           payload.templates.isEmpty,
+           payload.accounts.isEmpty {
             throw ExportError.noData
         }
 
@@ -182,10 +210,39 @@ enum DataExporter {
                 recurringCoefficient: txn.recurringCoefficient,
                 onceRecurring: txn.onceRecurring,
                 categoryId: txn.category?.id,
-                categoryName: txn.category?.name
+                categoryName: txn.category?.name,
+                accountId: txn.account?.id,
+                accountName: txn.account?.name
             )
         }
 
+    }
+
+    private static func accountsDTOs(_ repo: DataRepository) -> [AccountDTO] {
+        repo.fetch(AccountModel.self)
+            .sorted { $0.order < $1.order }
+            .map { account in
+                AccountDTO(
+                    id: account.id, name: account.name, emoji: account.emoji,
+                    colour: account.colour, kind: account.kind,
+                    openingBalance: account.openingBalance, hidden: account.hidden,
+                    order: account.order, dateCreated: account.dateCreated
+                )
+            }
+    }
+
+    private static func transfersDTOs(_ repo: DataRepository) -> [TransferDTO] {
+        repo.fetch(TransferModel.self)
+            .sorted { $0.date > $1.date }
+            .map { transfer in
+                TransferDTO(
+                    id: transfer.id, amount: transfer.amount, date: transfer.date,
+                    note: transfer.note,
+                    sourceId: transfer.source?.id, sourceName: transfer.source?.name,
+                    destinationId: transfer.destination?.id,
+                    destinationName: transfer.destination?.name
+                )
+            }
     }
 
     private static func budgetsDTOs(_ repo: DataRepository) -> [BudgetDTO] {
@@ -242,6 +299,10 @@ enum DataExporter {
 
         let templates = templatesDTOs(repo)
 
+        let accounts = accountsDTOs(repo)
+
+        let transfers = transfersDTOs(repo)
+
         return ExportPayload(
             exportDate: exportDate,
             appVersion: appVersion,
@@ -250,7 +311,9 @@ enum DataExporter {
             categories: categories,
             budgets: budgets,
             mainBudgets: mainBudgets,
-            templates: templates
+            templates: templates,
+            accounts: accounts,
+            transfers: transfers
         )
     }
 

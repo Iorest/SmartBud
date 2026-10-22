@@ -54,9 +54,11 @@ final class AccountViewModel {
     private let repo = DataRepository.shared
 
     var accounts: [AccountModel] = []
+    var transfers: [TransferModel] = []
 
     func load() {
         accounts = repo.fetch(AccountModel.self, sort: [SortDescriptor(\.order)])
+        transfers = repo.fetch(TransferModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
     }
 
     var visibleAccounts: [AccountModel] {
@@ -71,8 +73,43 @@ final class AccountViewModel {
     func balance(for account: AccountModel) -> Double {
         AccountBalance.current(
             opening: account.openingBalance,
-            transactions: (account.transactions ?? []).map { ($0.amount, $0.income) }
+            transactions: (account.transactions ?? []).map { ($0.amount, $0.income) },
+            transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.amount },
+            transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.amount }
         )
+    }
+
+    /// Transfers touching `account`, newest first.
+    func transfers(for account: AccountModel) -> [TransferModel] {
+        transfers.filter { $0.source?.id == account.id || $0.destination?.id == account.id }
+    }
+
+    @discardableResult
+    func createTransfer(
+        source: AccountModel,
+        destination: AccountModel,
+        amount: Double,
+        date: Date,
+        note: String
+    ) -> TransferModel? {
+        guard source.id != destination.id, amount > 0, amount.isFinite else { return nil }
+        let transfer = TransferModel(
+            amount: amount,
+            date: date,
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note,
+            source: source,
+            destination: destination
+        )
+        repo.insert(transfer)
+        repo.save()
+        load()
+        return transfer
+    }
+
+    func deleteTransfer(_ transfer: TransferModel) {
+        repo.delete(transfer)
+        repo.save()
+        load()
     }
 
     @discardableResult
@@ -106,6 +143,11 @@ final class AccountViewModel {
     func delete(_ account: AccountModel) {
         for txn in account.transactions ?? [] {
             txn.account = nil
+        }
+        // A transfer needs both ends to stay meaningful, so it goes with
+        // whichever account is deleted.
+        for transfer in (account.outgoingTransfers ?? []) + (account.incomingTransfers ?? []) {
+            repo.delete(transfer)
         }
         repo.delete(account)
         repo.save()

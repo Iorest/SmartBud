@@ -136,6 +136,8 @@ final class AccountModel {
     var dateCreated: Date = Date.now
     /// CloudKit requires all to-many relationships to be optional.
     var transactions: [TransactionModel]?
+    var outgoingTransfers: [TransferModel]?
+    var incomingTransfers: [TransferModel]?
 
     init(
         name: String = "",
@@ -163,6 +165,46 @@ extension AccountModel {
     @Transient var allTransactions: [TransactionModel] {
         (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
     }
+}
+
+// MARK: - Transfer
+
+/// Money moved between two accounts. Kept out of `TransactionModel` so the
+/// ledger, statistics and budgets never treat a transfer as income or spend.
+@Model
+final class TransferModel {
+    var id: UUID = UUID()
+    var amount: Double = 0
+    var date: Date = Date.now
+    var note: String?
+    var dateCreated: Date = Date.now
+    // Two relationships to the same type need explicit inverses, otherwise
+    // CloudKit refuses to load the store ("all relationships have an inverse").
+    @Relationship(inverse: \AccountModel.outgoingTransfers)
+    var source: AccountModel?
+    @Relationship(inverse: \AccountModel.incomingTransfers)
+    var destination: AccountModel?
+
+    init(
+        amount: Double = 0,
+        date: Date = .now,
+        note: String? = nil,
+        source: AccountModel? = nil,
+        destination: AccountModel? = nil
+    ) {
+        self.id = UUID()
+        self.amount = amount
+        self.date = date
+        self.note = note
+        self.source = source
+        self.destination = destination
+        self.dateCreated = .now
+    }
+}
+
+extension TransferModel {
+    @Transient var wrappedDate: Date { date }
+    @Transient var wrappedNote: String { note ?? "" }
 }
 
 // MARK: - Category Budget

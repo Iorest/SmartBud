@@ -138,3 +138,44 @@ struct LogSelectionBar: View {
         }
     }
 }
+
+// MARK: - Day header
+
+struct LogDayHeaderRow: View {
+    let group: LogDayGroup
+
+    @AppStorage("showCents", store: .appGroup) private var showCents: Bool = true
+    @AppStorage("currency", store: .appGroup) private var currency: String = Locale
+        .current
+        .currency?
+        .identifier ?? "USD"
+
+    private var totalText: String {
+        LogGrouping.currency(
+            group.netTotal,
+            code: currency,
+            showCents: showCents,
+            signed: true,
+            income: group.netTotal >= 0
+        )
+    }
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(LogGrouping.dayTitle(group.day))
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.SubtitleText)
+            Spacer(minLength: SBSpace.extraSmall)
+            Text(totalText)
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(Color.SubtitleText)
+                .lineLimit(1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            "\(LogGrouping.dayTitle(group.day)), \(totalText)"
+        )
+    }
+}
+
+// MARK: - List

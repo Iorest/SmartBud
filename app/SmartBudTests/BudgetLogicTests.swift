@@ -141,4 +141,15 @@ struct AccountBalanceTests {
     func negativeBalance() {
         #expect(AccountBalance.current(opening: 10, transactions: [(amount: 35, income: false)]) == -25)
     }
+
+    @Test("Transfers move money without touching income or spend")
+    func transfersMoveMoney() {
+        let source = AccountBalance.current(
+            opening: 500, transactions: [], transfersIn: 0, transfersOut: 120)
+        let destination = AccountBalance.current(
+            opening: 0, transactions: [], transfersIn: 120, transfersOut: 0)
+        #expect(source == 380)
+        #expect(destination == 120)
+        #expect(source + destination == 500)
+    }
 }

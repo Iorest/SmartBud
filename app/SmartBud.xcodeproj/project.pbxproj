@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000000E04 /* TransferEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E03 /* TransferEditor.swift */; };
+		E1A2B3C40000000000000E05 /* TransferEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E03 /* TransferEditor.swift */; };
+		E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
+		E1A2B3C40000000000000E02 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
 		E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
 		E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
 		E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
@@ -579,6 +583,8 @@
 		E1A2B3C40000000000000800 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppCommands.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000900 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/AppLockView.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000A03 /* AccountListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/AccountListView.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000E03 /* TransferEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/TransferEditor.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000E00 /* AccountEditorViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Accounts/AccountEditorViews.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000B00 /* SettingsRowLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Settings/SettingsRowLink.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000A00 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/ViewModels/AccountViewModel.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000D00 /* AccountBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AccountBalance.swift; sourceTree = SOURCE_ROOT; };
@@ -741,6 +747,8 @@
 				E1A2B3C40000000000000800 /* AppCommands.swift */,
 				E1A2B3C40000000000000900 /* AppLockView.swift */,
 				E1A2B3C40000000000000A03 /* AccountListView.swift */,
+				E1A2B3C40000000000000E03 /* TransferEditor.swift */,
+				E1A2B3C40000000000000E00 /* AccountEditorViews.swift */,
 				E1A2B3C40000000000000B00 /* SettingsRowLink.swift */,
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
@@ -1373,6 +1381,8 @@
 				E1A2B3C40000000000000A04 /* AccountListView.swift in Sources */,
 				E1A2B3C40000000000000B01 /* SettingsRowLink.swift in Sources */,
 				E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */,
+				E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */,
+				E1A2B3C40000000000000E04 /* TransferEditor.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1593,6 +1603,8 @@
 				E1A2B3C40000000000000A05 /* AccountListView.swift in Sources */,
 				E1A2B3C40000000000000B02 /* SettingsRowLink.swift in Sources */,
 				E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */,
+				E1A2B3C40000000000000E02 /* AccountEditorViews.swift in Sources */,
+				E1A2B3C40000000000000E05 /* TransferEditor.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

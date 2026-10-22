@@ -1,0 +1,45 @@
+# CloudKit 上架前检查清单
+
+SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了，云端不会自动跟着变**：
+开发环境（Development）会在首次写入时自动建表，但生产环境（Production）必须手动部署，否则老用户升级后
+同步会失败（本地数据仍在，只是不进 iCloud）。
+
+## 涉及的两个 CloudKit 容器
+
+| 用途 | Container | 说明 |
+|---|---|---|
+| App 主库 | `iCloud.com.iorest.smartbud` | 见 `smartbud/SmartBud.entitlements` |
+| 小组件 | 同一个容器 | 小组件只读，不需要单独部署 |
+
+## 当前 schema（`smartbud/Data/SwiftDataCore.swift` 的 `Schema([...])`）
+
+| 实体 | 首次引入版本 | 备注 |
+|---|---|---|
+| `TransactionModel` | 1.0 | |
+| `CategoryModel` | 1.0 | |
+| `BudgetModel` | 1.0 | |
+| `MainBudgetModel` | 1.0 | |
+| `TemplateTransactionModel` | 1.0 | |
+| `AccountModel` | 1.1 | 新增实体，`transactions` / `outgoingTransfers` / `incomingTransfers` 必须是可选数组（CloudKit 限制 to-many 可空） |
+| `TransferModel` | 1.1 | 新增实体，`source` / `destination` 指向 `AccountModel` |
+
+## 每次改 schema 后要做的四步
+
+1. **本机跑一遍真实写入**
+   在模拟器或真机上：新建账户、记一笔、做一次转账、改一次分类。目的不是测 UI，而是让 CloudKit
+   在 Development 环境把新表/新字段建出来。
+2. **CloudKit Dashboard → Schema → Deploy Schema Changes**
+   逐条确认 `AccountModel`、`TransferModel` 及其 `CD_*` 字段、关系都被列出，然后 Deploy 到 Production。
+3. **验证生产环境**
+   用 TestFlight 包（不是 Debug 包）在已登录 iCloud 的设备上记一笔，确认 Dashboard → Data →
+   Records 能看到新记录。
+4. **旧版本兼容**
+   已发布版本的客户端不认识新实体，CloudKit 会忽略未知 record type，因此**不需要**强制升级；
+   但反向（新客户端写、旧客户端读）会出现"看不到账户"的现象，发布说明里要写清楚。
+
+## 已知限制
+
+- 本地降级路径：`SwiftDataCore` 在 CloudKit 初始化失败时会退回本地库并显示"离线模式"横幅
+  （截图里橙色横幅）。这是设计内行为，不是崩溃。
+- 无 iCloud 账号的模拟器一定走降级路径，做同步相关验证必须用登录了 iCloud 的真机。
+- 删除账户会连带删除与它相关的转账（转账需要两头都有账户才有意义）；交易本身保留，只清空归属。
