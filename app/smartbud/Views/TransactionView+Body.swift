@@ -221,10 +221,14 @@ extension TransactionView {
             NumberPad(
                 viewModel: padVM,
                 showingNotePicker: showingNotePicker,
-                category: category
-            ) {
-                submit()
-            }
+                category: category,
+                submit: { submit() },
+                submitAndContinue: {
+                    // One-off "stay open" for users who keep the setting off.
+                    keepEntering = true
+                    submit()
+                }
+            )
             .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
         }
     }

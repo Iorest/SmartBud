@@ -57,6 +57,11 @@ struct TransactionView: View {
     @State var toastTitle = ""
     @State var toastImage = ""
 
+    /// Keeps the form open after saving (Settings → Number Entry, or a
+    /// one-off long-press on the checkmark).
+    @AppStorage("continuousEntry", store: .appGroup) private var continuousEntry = false
+    @State var keepEntering = false
+
     // sensory feedback triggers
     @State var errorHaptic = 0
     @State private var isSubmitting = false
@@ -251,7 +256,28 @@ struct TransactionView: View {
         // but we clear again here in case the user taps a different commit
         // path (e.g. via the keyboard return key) before the pad re-renders.
         padVM.submit()
-        dismiss()
+        finishEntry()
+    }
+
+    /// Closes the form, or keeps it open in continuous-entry mode.
+    private func finishEntry() {
+        let stayOpen = continuousEntry || keepEntering
+        keepEntering = false
+
+        guard stayOpen else {
+            dismiss()
+            return
+        }
+
+        // Keep category, date, income and recurrence so the next transaction
+        // is a one-tap repeat, but clear what's per-entry.
+        note = ""
+        toastImage = "checkmark.circle.fill"
+        toastTitle = String.appLocalized("Saved")
+        showToast = true
+        // Without this the guard at the top of `submit()` would swallow the
+        // next tap; `dismiss()` used to make the reset unnecessary.
+        isSubmitting = false
     }
 
     init(toEdit: TransactionModel? = nil) {

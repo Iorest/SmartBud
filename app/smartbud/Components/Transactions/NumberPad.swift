@@ -30,6 +30,8 @@ struct NumberPad: View {
     /// calls `viewModel.submit()` first, which clears the state. Declared last so
     /// the trailing-closure syntax reads naturally at the call site.
     var submit: () -> Void = {}
+    /// Long-press alternative: save without closing the form.
+    var submitAndContinue: () -> Void = {}
 
     private let numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     private let rowShape = RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
@@ -207,6 +209,13 @@ struct NumberPad: View {
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
+        .contextMenu {
+            Button {
+                submitAndContinue()
+            } label: {
+                Label(String.appLocalized("Save and Continue"), systemImage: "plus.circle")
+            }
+        }
     }
 }
 

@@ -12,6 +12,10 @@ struct SettingsNumberEntryView: View {
     @AppStorage("numberEntryType", store: .appGroup)
     var numberEntryType: Int = 1
 
+    /// Shared with `TransactionView`: keep the form open after saving.
+    @AppStorage("continuousEntry", store: .appGroup)
+    var continuousEntry: Bool = false
+
     private let options = [
         String.appLocalized(SettingsKey.numberEntryType1),
         String.appLocalized(SettingsKey.numberEntryType2)
@@ -32,6 +36,14 @@ struct SettingsNumberEntryView: View {
             } footer: {
                 Text(String.appLocalized("Decimal entry adds a decimal key to the "
                      + "keypad; whole numbers only hides it."))
+            }
+
+            Section {
+                Toggle(String.appLocalized("Save and Continue"), isOn: $continuousEntry)
+            } footer: {
+                Text(String.appLocalized(
+                    "Keeps the form open after saving, with the category and date kept, "
+                        + "so you can log several transactions in a row."))
             }
         }
         #if os(macOS)
