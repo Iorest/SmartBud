@@ -30,7 +30,7 @@ enum DataExporter {
     /// Bumped manually if the export format changes in a way that
     /// importers need to distinguish (e.g. moving a category into a
     /// nested structure). Old values are never reused.
-    static let schemaVersion: Int = 3
+    static let schemaVersion: Int = ExportSchema.version
 
     enum ExportError: Error, LocalizedError {
         case noData
@@ -42,22 +42,6 @@ enum DataExporter {
             case .writeFailed: String.appLocalized(SettingsKey.exportFailure)
             }
         }
-    }
-
-    /// Top-level export shape. The Codable conformance serialises to
-    /// the format documented in the file header.
-    struct ExportPayload: Codable {
-        var exportDate: Date
-        var appVersion: String
-        var schemaVersion: Int
-        var transactions: [TransactionDTO]
-        var categories: [CategoryDTO]
-        var budgets: [BudgetDTO]
-        var mainBudgets: [MainBudgetDTO]
-        var templates: [TemplateTransactionDTO]
-        var accounts: [AccountDTO]
-        var transfers: [TransferDTO]
-        var rates: [RateDTO]
     }
 
     // MARK: - Entry point
@@ -73,7 +57,8 @@ enum DataExporter {
            payload.budgets.isEmpty,
            payload.mainBudgets.isEmpty,
            payload.templates.isEmpty,
-           payload.accounts.isEmpty {
+           payload.accounts.isEmpty,
+           payload.transfers.isEmpty {
             throw ExportError.noData
         }
 
@@ -132,7 +117,11 @@ enum DataExporter {
                 accountId: txn.account?.id,
                 accountName: txn.account?.name,
                 baseAmount: txn.baseAmount,
-                accountCurrency: txn.account?.currencyCode
+                accountCurrency: txn.account?.currencyCode,
+                discount: txn.discount,
+                reimbursable: txn.reimbursable,
+                reimbursedAt: txn.reimbursedAt,
+                adjustment: txn.adjustment
             )
         }
 
@@ -147,7 +136,8 @@ enum DataExporter {
                     colour: account.colour, kind: account.kind,
                     openingBalance: account.openingBalance, hidden: account.hidden,
                     order: account.order, dateCreated: account.dateCreated,
-                    currencyCode: account.currencyCode
+                    currencyCode: account.currencyCode,
+                    archived: account.archived
                 )
             }
     }
@@ -161,7 +151,9 @@ enum DataExporter {
                     note: transfer.note,
                     sourceId: transfer.source?.id, sourceName: transfer.source?.name,
                     destinationId: transfer.destination?.id,
-                    destinationName: transfer.destination?.name
+                    destinationName: transfer.destination?.name,
+                    destinationAmount: transfer.destinationAmount,
+                    fee: transfer.fee
                 )
             }
     }
@@ -253,99 +245,22 @@ enum DataExporter {
         formatter.dateFormat = "yyyyMMdd-HHmmss"
         return "smartbud-export-\(formatter.string(from: exportDate)).json"
     }
+
 }
 
+// MARK: - Schema aliases
+//
+// The on-disk shape lives in ExportSchema.swift so the importer and the
+// tests can share it without pulling in SwiftData or DataRepository.
+
 extension DataExporter {
-
-    // MARK: - DTOs (decoupled from @Model so the export format is stable)
-
-    struct TransactionDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var date: Date?
-        var day: Date?
-        var month: Date?
-        var note: String?
-        var income: Bool
-        var recurringType: Int
-        var recurringCoefficient: Int
-        var onceRecurring: Bool
-        var categoryId: UUID?
-        var categoryName: String?
-        var accountId: UUID?
-        var accountName: String?
-        var baseAmount: Double?
-        var accountCurrency: String?
-    }
-
-    struct AccountDTO: Codable {
-        var id: UUID
-        var name: String
-        var emoji: String
-        var colour: String
-        var kind: Int
-        var openingBalance: Double
-        var hidden: Bool
-        var order: Int
-        var dateCreated: Date
-        var currencyCode: String
-    }
-
-    struct RateDTO: Codable {
-        var code: String
-        var rate: Double
-        var updatedAt: Date
-    }
-
-    struct TransferDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var date: Date
-        var note: String?
-        var sourceId: UUID?
-        var sourceName: String?
-        var destinationId: UUID?
-        var destinationName: String?
-    }
-
-    struct CategoryDTO: Codable {
-        var id: UUID
-        var name: String
-        var emoji: String
-        var colour: String
-        var income: Bool
-        var order: Int
-        var dateCreated: Date
-    }
-
-    struct BudgetDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var startDate: Date
-        var dateCreated: Date
-        var type: Int
-        var green: Bool
-        var categoryId: UUID?
-        var categoryName: String?
-    }
-
-    struct MainBudgetDTO: Codable {
-        var amount: Double
-        var startDate: Date
-        var dateCreated: Date
-        var type: Int
-        var green: Bool
-    }
-
-    struct TemplateTransactionDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var note: String?
-        var income: Bool
-        var order: Int
-        var recurringType: Int
-        var recurringCoefficient: Int
-        var categoryId: UUID?
-        var categoryName: String?
-    }
+    typealias ExportPayload = ExportSchema.Payload
+    typealias TransactionDTO = ExportSchema.TransactionDTO
+    typealias AccountDTO = ExportSchema.AccountDTO
+    typealias RateDTO = ExportSchema.RateDTO
+    typealias TransferDTO = ExportSchema.TransferDTO
+    typealias CategoryDTO = ExportSchema.CategoryDTO
+    typealias BudgetDTO = ExportSchema.BudgetDTO
+    typealias MainBudgetDTO = ExportSchema.MainBudgetDTO
+    typealias TemplateTransactionDTO = ExportSchema.TemplateTransactionDTO
 }

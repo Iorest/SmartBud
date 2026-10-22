@@ -32,6 +32,10 @@ final class InsightsViewModel {
     var todayTransactions: [TransactionModel] = []
     var yesterdayTotal: Double = 0
     var yesterdayTransactions: [TransactionModel] = []
+    /// Expenses waiting to be paid back. Not period-bound: an open claim from
+    /// three months ago is still money the user is owed.
+    var pendingReimbursements: [TransactionModel] = []
+    var pendingReimbursementTotal: Double = 0
     var currency: String = Locale.current.currency?.identifier ?? "USD"
     var showCents: Bool = true
     var currencySymbol: String = Locale.appLocale.currencySymbol ?? "$"
@@ -84,8 +88,8 @@ final class InsightsViewModel {
             guard let date = txn.date else { return false }
             return date >= periodStart && date < periodEnd
         }
-        let spent = Money.sum(inPeriod.filter { !$0.income }.map(\.wrappedBaseAmount))
-        let inc = Money.sum(inPeriod.filter(\.income).map(\.wrappedBaseAmount))
+        let spent = Money.sum(inPeriod.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
+        let inc = Money.sum(inPeriod.filter(\.countsAsIncome).map(\.wrappedBaseAmount))
         let net = inc - spent
         periodTotalSpent = Money.double(spent)
         periodTotalIncome = Money.double(inc)
@@ -112,16 +116,24 @@ final class InsightsViewModel {
         let yesterday = cal.date(byAdding: .day, value: -1, to: today) ?? today
 
         let todayTxns = inPeriod
+            .filter(\.countsInTotals)
             .filter { ($0.date ?? .distantPast) >= today && ($0.date ?? .distantPast) < tomorrow }
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         todayTransactions = todayTxns
-        todayTotal = Money.double(Money.sum(todayTxns.map { $0.income ? $0.amount : -$0.amount }))
+        todayTotal = Money.double(Money.sum(todayTxns.map(\.signedBaseAmount)))
 
         let yesterdayTxns = inPeriod
+            .filter(\.countsInTotals)
             .filter { ($0.date ?? .distantPast) >= yesterday && ($0.date ?? .distantPast) < today }
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         yesterdayTransactions = yesterdayTxns
-        yesterdayTotal = Money.double(Money.sum(yesterdayTxns.map { $0.income ? $0.amount : -$0.amount }))
+        yesterdayTotal = Money.double(Money.sum(yesterdayTxns.map(\.signedBaseAmount)))
+
+        pendingReimbursements = all
+            .filter(\.isPendingReimbursement)
+            .sorted { $0.wrappedDate > $1.wrappedDate }
+        pendingReimbursementTotal = Money.double(
+            Money.sum(pendingReimbursements.map(\.wrappedBaseAmount)))
     }
 
     /// Bar-chart buckets for the period. Week: 7 daily buckets, single-letter M T W T F S S labels.
@@ -150,7 +162,7 @@ final class InsightsViewModel {
         for index in 0..<count {
             let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
             let sum = Money.sum(all
-                .filter { !$0.income }
+                .filter(\.countsAsSpend)
                 .filter {
                     if let date = $0.date { return date >= cursor && date < next }
                     return false
@@ -184,7 +196,7 @@ final class InsightsViewModel {
     func getCategoryBreakdown(for period: Int) -> [PowerCategory] {
         let (periodStart, periodEnd) = getPeriodDateRange(for: period)
         let txns = repo.fetch(TransactionModel.self).filter { txn in
-            guard let date = txn.date, !txn.income, let category = txn.category else { return false }
+            guard let date = txn.date, txn.countsAsSpend, let category = txn.category else { return false }
             return date >= periodStart && date < periodEnd && !category.income
         }
         var amounts = [UUID: Decimal]()

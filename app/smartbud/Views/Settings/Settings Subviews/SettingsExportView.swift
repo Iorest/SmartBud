@@ -36,6 +36,14 @@ struct SettingsExportView: View {
 
                     exportButton
 
+                    VStack(alignment: .leading, spacing: 6) {
+                        csvButton
+                        Text(String.appLocalized(SettingsKey.exportCSVHint))
+                            .font(.footnote)
+                            .foregroundStyle(Color.SubtitleText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                     if isExporting {
                         HStack(spacing: 8) {
                             ProgressView()
@@ -105,6 +113,22 @@ struct SettingsExportView: View {
         .disabled(isExporting)
     }
 
+    private var csvButton: some View {
+        Button {
+            generateCSV()
+        } label: {
+            HStack {
+                Image(systemName: "tablecells")
+                Text(String.appLocalized(SettingsKey.exportCSVAction))
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.bordered)
+        .disabled(isExporting)
+    }
+
     private func generateExport() {
         guard !isExporting else { return }
         isExporting = true
@@ -123,6 +147,33 @@ struct SettingsExportView: View {
                 if case .noData = error {
                     // Empty-state is not really an error — just tell
                     // the user there's nothing to export.
+                    errorMessage = String.appLocalized(SettingsKey.exportEmpty)
+                } else {
+                    errorMessage = error.errorDescription
+                }
+                isPresentingError = true
+            } catch {
+                isExporting = false
+                errorMessage = String.appLocalized(SettingsKey.exportFailure)
+                isPresentingError = true
+            }
+        }
+    }
+
+    private func generateCSV() {
+        guard !isExporting else { return }
+        isExporting = true
+        errorMessage = nil
+
+        Task { @MainActor in
+            do {
+                let url = try DataExporter.exportCSVToFile()
+                exportedFileURL = url
+                isExporting = false
+                isPresentingShareSheet = true
+            } catch let error as DataExporter.ExportError {
+                isExporting = false
+                if case .noData = error {
                     errorMessage = String.appLocalized(SettingsKey.exportEmpty)
                 } else {
                     errorMessage = error.errorDescription

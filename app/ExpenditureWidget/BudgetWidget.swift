@@ -100,7 +100,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let allTransactions = (try? context.fetch(txnDesc)) ?? []
         let filtered = allTransactions.filter {
             guard let categoryID = budgetCategory?.id else { return false }
-            return !$0.income
+            return $0.countsAsSpend
                 && $0.wrappedDate >= budgetStartDate
                 && $0.wrappedDate <= now
                 && $0.category?.id == categoryID

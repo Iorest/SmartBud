@@ -26,8 +26,11 @@
 		E1A2B3C40000000000000E01 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
 		E1A2B3C40000000000000E02 /* AccountEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000E00 /* AccountEditorViews.swift */; };
 		E1A2B3C40000000000000D01 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
+		E1A2B3C4000000000000A044 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C40000000000000C00 /* AccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000A00 /* AccountViewModel.swift */; };
 		E1A2B3C40000000000000B01 /* SettingsRowLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000B00 /* SettingsRowLink.swift */; };
 		E1A2B3C40000000000000B02 /* SettingsRowLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000B00 /* SettingsRowLink.swift */; };
@@ -39,6 +42,7 @@
 		E1A2B3C40000000000000902 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000801 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
 		E1A2B3C40000000000000802 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
+		E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
 		E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
 		E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
 		E1A2B3C4000000000000062B /* CategoryEditor+Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000629 /* CategoryEditor+Validation.swift */; };
@@ -190,10 +194,24 @@
 		E1A2B3C40000000000000627 /* SubscriptionLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000626 /* SubscriptionLinks.swift */; };
 		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* ReviewRequester.swift */; };
 		AAAA00000000000000000031 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
+		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
+		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
+		E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
+		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
+		C10000000000000000000002 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
+		C10000000000000000000003 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
+		C10000000000000000000004 /* SharedSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000001 /* SharedSupport.swift */; };
+		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
+		C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
+		C10100000000000000000003 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
+		C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10100000000000000000001 /* TemplateTransactionModel.swift */; };
+		C10200000000000000000002 /* DataExporter+CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10200000000000000000001 /* DataExporter+CSV.swift */; };
+		C10200000000000000000004 /* DataExporter+CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10200000000000000000001 /* DataExporter+CSV.swift */; };
 		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
 		B0A0F00000000000000000A2 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000B1 /* BudgetLogicTests.swift */; };
+		E1A2B3C4000000000000B102 /* DataPortabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
 		B0A0F00000000000000000D2 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
 		B0A0F00000000000000000D3 /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000D1 /* Money.swift */; };
@@ -349,6 +367,9 @@
 		E1A2B3C40000000000000628 /* SubscriptionLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000626 /* SubscriptionLinks.swift */; };
 		D0C0FFEED0C0FFEE0000000000000193 /* ReviewRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* ReviewRequester.swift */; };
 		D0C0FFEED0C0FFEE0000000000000194 /* DataExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000030 /* DataExporter.swift */; };
+		E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A031 /* ExportSchema.swift */; };
+		E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
+		E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
 		E1A2B3C40000000000000201 /* SBTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000200 /* SBTokens.swift */; };
 		E1A2B3C40000000000000202 /* SBTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000200 /* SBTokens.swift */; };
@@ -549,9 +570,17 @@
 		E1A2B3C40000000000000626 /* SubscriptionLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SubscriptionLinks.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000020 /* ReviewRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequester.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000030 /* DataExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataExporter.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000A001 /* DataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataImporter.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000A011 /* SettingsImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsImportView.swift; sourceTree = "<group>"; };
+		C10000000000000000000001 /* SharedSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/SharedSupport.swift; sourceTree = SOURCE_ROOT; };
+		C10100000000000000000001 /* TemplateTransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Data/TemplateTransactionModel.swift; sourceTree = SOURCE_ROOT; };
+		C10200000000000000000001 /* DataExporter+CSV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Services/DataExporter+CSV.swift"; sourceTree = SOURCE_ROOT; };
 		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortabilityTests.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000C5 /* SmartBudTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0A0F00000000000000000D1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPadViewModelTests.swift; sourceTree = "<group>"; };
@@ -678,6 +707,7 @@
 			isa = PBXGroup;
 			children = (
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
+				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
 				B0A0F00000000000000000D5 /* NumberPadViewModelTests.swift */,
 				B1C2D3E4F5A60718293A4B04 /* LLMProviderTests.swift */,
 				E1A2B3C4000000000000021B /* CSVTableTests.swift */,
@@ -772,6 +802,7 @@
 				E1A2B3C40000000000000B00 /* SettingsRowLink.swift */,
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
+				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				E1A2B3C40000000000001007 /* SettingsRatesView.swift */,
 				E1A2B3C40000000000001004 /* CurrencyRateStore.swift */,
 				E1A2B3C40000000000001000 /* CurrencyConversion.swift */,
@@ -835,6 +866,8 @@
 				AAAA00000000000000000010 /* SubscriptionManager.swift */,
 				E1A2B3C40000000000000626 /* SubscriptionLinks.swift */,
 				AAAA00000000000000000030 /* DataExporter.swift */,
+				E1A2B3C4000000000000A001 /* DataImporter.swift */,
+				E1A2B3C4000000000000A031 /* ExportSchema.swift */,
 				B0A0F0000000000000000133 /* LLMClient.swift */,
 				B1C2D3E4F5A60718293A4B01 /* LLMProvider.swift */,
 				B1C2D3E4F5A60718293A4C01 /* PlatformCompat.swift */,
@@ -1031,6 +1064,10 @@
 				395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */,
 				E1A2B3C40000000000000623 /* SettingsProView+Sections.swift */,
 				AAAA00000000000000000040 /* SettingsExportView.swift */,
+				E1A2B3C4000000000000A011 /* SettingsImportView.swift */,
+				C10000000000000000000001 /* SharedSupport.swift */,
+				C10100000000000000000001 /* TemplateTransactionModel.swift */,
+				C10200000000000000000001 /* DataExporter+CSV.swift */,
 			);
 			path = "Settings Subviews";
 			sourceTree = "<group>";
@@ -1264,7 +1301,14 @@
 		E1A2B3C40000000000000627 /* SubscriptionLinks.swift in Sources */,
 		AAAA00000000000000000021 /* ReviewRequester.swift in Sources */,
 		AAAA00000000000000000031 /* DataExporter.swift in Sources */,
+		E1A2B3C4000000000000A002 /* DataImporter.swift in Sources */,
+		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
+		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
+		C10000000000000000000002 /* SharedSupport.swift in Sources */,
+		C10100000000000000000002 /* TemplateTransactionModel.swift in Sources */,
+		C10200000000000000000002 /* DataExporter+CSV.swift in Sources */,
 		AAAA00000000000000000041 /* SettingsExportView.swift in Sources */,
+		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */,
 				53D6BDCA2AF73B7A00F5728E /* SettingsAppIconView.swift in Sources */,
 				5327D2D9287C6B5F00F76ADF /* HomeView.swift in Sources */,
 				53D6BDCC2AF73BC800F5728E /* SettingsCurrencyView.swift in Sources */,
@@ -1444,6 +1488,8 @@
 				7AC1901BBB8747D699DA97BB /* WidgetConfigurationIntents.swift in Sources */,
 				5321E1DE291FE2CE00D5A931 /* CategoryCreationErrors.swift in Sources */,
 				53980E5D28A77B62009CC4E2 /* Helper.swift in Sources */,
+				C10000000000000000000003 /* SharedSupport.swift in Sources */,
+				C10100000000000000000003 /* TemplateTransactionModel.swift in Sources */,
 				53D0298128C62BF600443F2B /* Currency.swift in Sources */,
 				53A32B3928AB6C8700628905 /* Line.swift in Sources */,
 				93C1197B4CC441C3B22E09D1 /* CategoryViewModel.swift in Sources */,
@@ -1467,6 +1513,7 @@
 			files = (
 				B0A0F00000000000000000A3 /* BudgetLogic.swift in Sources */,
 				B0A0F00000000000000000B2 /* BudgetLogicTests.swift in Sources */,
+				E1A2B3C4000000000000B102 /* DataPortabilityTests.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,
 				B0A0F00000000000000000D4 /* NumberPadViewModel.swift in Sources */,
 				B0A0F00000000000000000D6 /* NumberPadViewModelTests.swift in Sources */,
@@ -1480,6 +1527,7 @@
 				E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */,
 				E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */,
 				E1A2B3C40000000000000276 /* Helper.swift in Sources */,
+				C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */,
 				E1A2B3C40000000000000277 /* AppLocale.swift in Sources */,
 				E1A2B3C40000000000000278 /* AppLanguage.swift in Sources */,
 				E1A2B3C40000000000000279 /* Currency.swift in Sources */,
@@ -1487,6 +1535,9 @@
 							E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */,
 				E1A2B3C40000000000001003 /* CurrencyConversion.swift in Sources */,
 				E1A2B3C40000000000001043 /* ExchangeRateService.swift in Sources */,
+				E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */,
+				E1A2B3C4000000000000A044 /* CSVSupport.swift in Sources */,
+				E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1608,7 +1659,14 @@
 				E1A2B3C40000000000000628 /* SubscriptionLinks.swift in Sources */,
 				D0C0FFEED0C0FFEE0000000000000193 /* ReviewRequester.swift in Sources */,
 				D0C0FFEED0C0FFEE0000000000000194 /* DataExporter.swift in Sources */,
+				E1A2B3C4000000000000A003 /* DataImporter.swift in Sources */,
+				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
+				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
+				C10000000000000000000004 /* SharedSupport.swift in Sources */,
+				C10100000000000000000004 /* TemplateTransactionModel.swift in Sources */,
+				C10200000000000000000004 /* DataExporter+CSV.swift in Sources */,
 				D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */,
+				E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */,
 				E1A2B3C40000000000000202 /* SBTokens.swift in Sources */,
 				E1A2B3C40000000000000208 /* SBCard.swift in Sources */,
 				E1A2B3C40000000000000211 /* SBEmptyState.swift in Sources */,

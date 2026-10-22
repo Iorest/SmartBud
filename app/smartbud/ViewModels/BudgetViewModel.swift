@@ -108,7 +108,7 @@ final class BudgetViewModel {
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
             return date >= budget.startDate && date <= Date.now
-                && !txn.income && txn.category?.id == categoryID
+                && txn.countsAsSpend && txn.category?.id == categoryID
         }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
@@ -116,7 +116,7 @@ final class BudgetViewModel {
     func leftoverOverall(_ budget: MainBudgetModel) -> Double {
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
-            return date >= budget.startDate && date <= Date.now && !txn.income
+            return date >= budget.startDate && date <= Date.now && txn.countsAsSpend
         }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }

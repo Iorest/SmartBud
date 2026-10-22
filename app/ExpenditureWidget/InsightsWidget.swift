@@ -111,7 +111,8 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
         let allTransactions = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         let transactions = allTransactions.filter {
-            $0.income == income && $0.wrappedDate >= period.startDate && $0.wrappedDate <= now
+            let counted = income ? $0.countsAsIncome : $0.countsAsSpend
+            return counted && $0.wrappedDate >= period.startDate && $0.wrappedDate <= now
         }
         let allCategories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
         let categories = allCategories.filter { $0.income == income }

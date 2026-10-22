@@ -34,6 +34,7 @@ enum SettingsRoute: Hashable {
     case upcoming
     case erase
     case export
+    case importBackup
     case haptics
     case numberEntry
     case categories
@@ -236,6 +237,7 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
+            settingsLink(.importBackup, "arrow.clockwise.icloud.fill", 105, SettingsKey.rowImportBackup, nil)
             settingsLink(.export, "square.and.arrow.up.fill", 113, SettingsKey.rowExportData, nil)
             settingsLink(.erase, "xmark.bin.fill", 114, SettingsKey.rowEraseData, nil)
           }
@@ -303,6 +305,7 @@ struct SettingsView: View {
           case .upcoming: SettingsUpcomingView()
           case .erase: SettingsEraseView()
           case .export: SettingsExportView()
+          case .importBackup: SettingsImportView()
           case .haptics: SettingsHapticsView()
           case .llm: SettingsLLMView()
           case .numberEntry: SettingsNumberEntryView()

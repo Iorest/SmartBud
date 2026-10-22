@@ -31,8 +31,8 @@ extension InsightsViewModel {
             avgDivisor = Double(cal.range(of: .day, in: .month, for: now)?.count ?? 30)
         }
         let filtered = all.filter { ($0.date ?? .distantPast) >= start }
-        let spent = Money.sum(filtered.filter { !$0.income }.map(\.wrappedBaseAmount))
-        let income = Money.sum(filtered.filter(\.income).map(\.wrappedBaseAmount))
+        let spent = Money.sum(filtered.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
+        let income = Money.sum(filtered.filter(\.countsAsIncome).map(\.wrappedBaseAmount))
         let net = income - spent
         summary = SummaryData(spent: Money.double(spent), income: Money.double(income),
                               net: Money.double(abs(net)), positive: net >= 0,
@@ -61,7 +61,7 @@ extension InsightsViewModel {
         for _ in 0..<periods {
             let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
             let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }
-                .map { $0.income ? $0.amount : -$0.amount })
+                .map(\.signedBaseAmount))
             result.append(LineGraphDataPoint(date: cursor, amount: Money.double(sum)))
             cursor = next
         }
@@ -101,8 +101,10 @@ extension InsightsViewModel {
         if let start = logViewPeriodStart(type: type) {
             all = all.filter { ($0.date ?? .distantPast) >= start }
         }
-        if let income {
-            all = all.filter { $0.income == income }
+        switch income {
+        case .some(false): all = all.filter(\.countsAsSpend)
+        case .some(true): all = all.filter(\.countsAsIncome)
+        case .none: all = all.filter(\.countsInTotals)
         }
         return all
     }
@@ -117,7 +119,7 @@ extension InsightsViewModel {
 
     func getLogViewTotalNet(type: Int) -> (value: Double, positive: Bool) {
         let net = Money.sum(logViewTransactions(type: type, income: nil)
-            .map { $0.income ? $0.amount : -$0.amount })
+            .map(\.signedBaseAmount))
         return (Money.double(abs(net)), net >= 0)
     }
 
@@ -146,14 +148,14 @@ extension InsightsViewModel {
         let calendar = Calendar.current
         let all = repo.fetch(TransactionModel.self)
         var runningTotal = Money.sum(all.filter { ($0.date ?? .distantPast) < start }
-            .map { $0.income ? $0.amount : -$0.amount })
+            .map(\.signedBaseAmount))
         return dates.map { bucketStart in
             let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart) ?? bucketStart
             runningTotal += Money.sum(all.filter {
                 let date = $0.date ?? .distantPast
                 return date >= bucketStart && date < bucketEnd
             }
-                .map { $0.income ? $0.amount : -$0.amount })
+                .map(\.signedBaseAmount))
             return LineGraphDataPoint(date: bucketStart, amount: Money.double(runningTotal))
         }
     }
@@ -162,7 +164,9 @@ extension InsightsViewModel {
     func getLogLineGraphData(income: Bool, type: Int) -> [LineGraphDataPoint] {
         guard let (dates, step) = logLineGraphBuckets(type: type) else { return [] }
         let calendar = Calendar.current
-        let all = repo.fetch(TransactionModel.self).filter { $0.income == income }
+        let all = repo.fetch(TransactionModel.self).filter {
+            income ? $0.countsAsIncome : $0.countsAsSpend
+        }
         return dates.map { bucketStart in
             let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart) ?? bucketStart
             let total = Money.sum(all.filter {
@@ -302,7 +306,7 @@ extension InsightsViewModel {
             txns = txns.filter { $0.category.map { ids.contains($0.id) } ?? false }
         }
         if type == 1 {
-            return Money.double(Money.sum(txns.map { $0.income ? $0.amount : -$0.amount }))
+            return Money.double(Money.sum(txns.map(\.signedBaseAmount)))
         } else {
             return Money.double(Money.sum(txns.map(\.wrappedBaseAmount)))
         }

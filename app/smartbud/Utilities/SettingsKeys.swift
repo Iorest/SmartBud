@@ -76,6 +76,19 @@ enum SettingsKey {
     static let exportProgress = "settings.export.progress"
     static let exportFailure = "settings.export.failure"
     static let exportEmpty = "settings.export.empty"
+    static let exportCSVAction = "settings.export.csv.action"
+    static let exportCSVHint = "settings.export.csv.hint"
+
+    // MARK: - Import backup (JSON restore)
+
+    static let importTitle = "settings.import.title"
+    static let importSubtitle = "settings.import.subtitle"
+    static let importAction = "settings.import.action"
+    static let importProgress = "settings.import.progress"
+    static let importSuccess = "settings.import.success"
+    static let importSkipped = "settings.import.skipped"
+    static let importEmpty = "settings.import.empty"
+    static let importDone = "settings.import.done"
 
     // MARK: - Banner (offline / fallback mode)
 
@@ -106,6 +119,7 @@ enum SettingsKey {
     static let rowAccounts = "settings.row.accounts"
     static let rowTemplates = "settings.row.templates"
     static let rowImportData = "settings.row.importData"
+    static let rowImportBackup = "settings.row.importBackup"
     static let rowExportData = "settings.row.exportData"
     static let rowEraseData = "settings.row.eraseData"
 

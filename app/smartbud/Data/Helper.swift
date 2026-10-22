@@ -31,6 +31,18 @@ final class TransactionModel {
     /// Amount converted to the app's base currency at entry time. `nil` on
     /// rows written before multi-currency support (amount already in base).
     var baseAmount: Double?
+    /// Discount applied at entry time. `amount` already holds the net total,
+    /// so this is display-only ("原价 = amount + discount").
+    var discount: Double = 0
+    /// Expense the user will claim back. Reimbursable rows are pass-through
+    /// money: they stay in the ledger and in the account balance, but never
+    /// count towards spend statistics or budgets.
+    var reimbursable: Bool = false
+    /// Set when the money actually came back.
+    var reimbursedAt: Date?
+    /// A balance correction written by "调整余额". It moves the account
+    /// balance but is neither income nor spend.
+    var adjustment: Bool = false
 
     init(
         note: String = "",
@@ -41,13 +53,19 @@ final class TransactionModel {
         amount: Double = 0,
         date: Date = Date.now,
         repeatType: Int = 0,
-        repeatCoefficient: Int = 0
+        repeatCoefficient: Int = 0,
+        discount: Double = 0,
+        reimbursable: Bool = false,
+        adjustment: Bool = false
     ) {
         self.id = UUID()
         self.note = note
         self.category = category
         self.account = account
         self.baseAmount = baseAmount
+        self.discount = discount
+        self.reimbursable = reimbursable
+        self.adjustment = adjustment
         self.income = income
         self.amount = amount
         self.date = date
@@ -70,6 +88,32 @@ extension TransactionModel {
     @Transient var wrappedNote: String { note ?? "" }
     @Transient var wrappedCategoryName: String { category?.name ?? "" }
     @Transient var wrappedColour: String { category?.colour ?? "#FFFFFF" }
+
+    /// Price before the discount, when one was recorded.
+    @Transient var grossAmount: Double { amount + discount }
+
+    /// Still waiting for the money to come back.
+    @Transient var isPendingReimbursement: Bool { reimbursable && reimbursedAt == nil }
+
+    /// Counts towards "spent" in insights and budgets. Reimbursable rows are
+    /// pass-through and balance adjustments are not spend at all.
+    @Transient var countsAsSpend: Bool { !income && !adjustment && !reimbursable }
+
+    /// Counts towards "earned" in insights.
+    @Transient var countsAsIncome: Bool { income && !adjustment }
+
+    /// A row that belongs in income/spend totals. Adjustments and
+    /// reimbursable claims are pass-through money and stay out of both.
+    @Transient var countsInTotals: Bool { countsAsSpend || countsAsIncome }
+
+    /// Signed amount in the base currency for net-total maths. Pass-through
+    /// rows (balance adjustments and reimbursable claims) count as zero so
+    /// "net" always equals income minus the spend figure shown next to it.
+    @Transient var signedBaseAmount: Double {
+        if countsAsIncome { return wrappedBaseAmount }
+        if countsAsSpend { return -wrappedBaseAmount }
+        return 0
+    }
 
     @Transient var nextTransactionDate: Date {
         guard let day else { return date ?? .now }
@@ -143,7 +187,11 @@ final class AccountModel {
     var currencyCode: String = ""
     /// Balance before any recorded transaction.
     var openingBalance: Double = 0
+    /// Hidden accounts stay in the list but stop counting towards the total.
     var hidden: Bool = false
+    /// Archived accounts leave the default list and the total, but every
+    /// transaction, transfer and report still resolves their history.
+    var archived: Bool = false
     var order: Int = 0
     var dateCreated: Date = Date.now
     /// CloudKit requires all to-many relationships to be optional.
@@ -201,6 +249,10 @@ final class TransferModel {
     /// Amount arriving in the destination account, in its currency. `0` means
     /// same-currency transfer (legacy rows and same-currency transfers).
     var destinationAmount: Double = 0
+    /// Fee charged on top of `amount`, in the source account's currency. The
+    /// source loses `amount + fee`; the destination still receives
+    /// `receivedAmount`.
+    var fee: Double = 0
     var date: Date = Date.now
     var note: String?
     var dateCreated: Date = Date.now
@@ -214,6 +266,7 @@ final class TransferModel {
     init(
         amount: Double = 0,
         destinationAmount: Double = 0,
+        fee: Double = 0,
         date: Date = .now,
         note: String? = nil,
         source: AccountModel? = nil,
@@ -222,6 +275,7 @@ final class TransferModel {
         self.id = UUID()
         self.amount = amount
         self.destinationAmount = destinationAmount
+        self.fee = fee
         self.date = date
         self.note = note
         self.source = source
@@ -241,6 +295,10 @@ extension TransferModel {
     @Transient var impliedRate: Double? {
         guard destinationAmount > 0, amount > 0 else { return nil }
         return destinationAmount / amount
+    }
+    /// What leaves the source account, fee included.
+    @Transient var outgoingTotal: Double {
+        amount + max(0, fee.isFinite ? fee : 0)
     }
 }
 
@@ -300,99 +358,5 @@ extension MainBudgetModel {
 
     @Transient var endDate: Date {
         BudgetPeriod.endDate(from: startDate, type: type)
-    }
-}
-
-// MARK: - Template Transaction
-
-@Model
-final class TemplateTransactionModel {
-    var amount: Double = 0
-    var id: UUID = UUID()
-    var income: Bool = false
-    var note: String?
-    var order: Int = 0
-    var recurringCoefficient: Int = 0
-    var recurringType: Int = 0
-    var category: CategoryModel?
-
-    init(
-        note: String = "",
-        category: CategoryModel? = nil,
-        income: Bool = false,
-        amount: Double = 0,
-        order: Int = 0,
-        repeatType: Int = 0,
-        repeatCoefficient: Int = 0
-    ) {
-        self.id = UUID()
-        self.note = note
-        self.category = category
-        self.income = income
-        self.amount = amount
-        self.order = order
-        self.recurringType = repeatType
-        self.recurringCoefficient = repeatCoefficient
-    }
-}
-
-extension TemplateTransactionModel {
-    @Transient var wrappedAmount: Double { amount }
-    @Transient var wrappedNote: String { note ?? "" }
-    @Transient var wrappedEmoji: String { category?.emoji ?? "" }
-    @Transient var wrappedColour: String { category?.colour ?? "" }
-}
-
-// MARK: - Shared date utilities
-//
-// Free functions used by the app (`InsightsViewModel`), widgets (`InsightsWidget`), and App Intents.
-// Originally lived in the single legacy data controller.
-
-/// Returns the start-of-day for the current month, offset by `startDay` (1–28).
-/// If `startDay` is 1, this is the 1st of the month at 00:00. If `startDay` is 15, it's the 15th at 00:00.
-/// Months where the configured `startDay` doesn't exist (e.g. Feb 30) fall back to the last day of the month.
-func getStartOfMonth(startDay: Int) -> Date {
-    let calendar = Calendar.current
-    let now = Date.now
-    let comps = calendar.dateComponents([.year, .month], from: now)
-    var startComps = comps
-    startComps.day = max(1, min(startDay, 28))
-    startComps.hour = 0
-    startComps.minute = 0
-    startComps.second = 0
-    return calendar.date(from: startComps) ?? now
-}
-
-// MARK: - Line graph
-//
-// A single sampled data point on the `LineGraph` view, used by the Insights screen and the
-// "Get Insights" App Intent snippet. `Equatable` so SwiftUI diffing can skip no-op redraws.
-
-struct LineGraphDataPoint: Equatable, Identifiable {
-    let date: Date
-    let amount: Double
-
-    var id: Date { date }
-
-    var dateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
-        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
-        return dateFormatter.string(from: date)
-    }
-
-    var monthString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
-        dateFormatter.setLocalizedDateFormatFromTemplate("yMMM")
-        return dateFormatter.string(from: date)
-    }
-
-    var amountString: String {
-        if abs(amount) < 1000 {
-            return amount.formatted(.number.precision(.fractionLength(2)))
-        } else {
-            return amount.formatted(.number.precision(.fractionLength(0)))
-        }
     }
 }

@@ -240,7 +240,10 @@ final class DataRepository {
     @discardableResult
     func deleteAll() -> Bool {
         for txn in fetch(TransactionModel.self) { context.delete(txn) }
+        for transfer in fetch(TransferModel.self) { context.delete(transfer) }
         for category in fetch(CategoryModel.self) { context.delete(category) }
+        for account in fetch(AccountModel.self) { context.delete(account) }
+        for rate in fetch(CurrencyRate.self) { context.delete(rate) }
         for budget in fetch(BudgetModel.self) { context.delete(budget) }
         for mainBudget in fetch(MainBudgetModel.self) { context.delete(mainBudget) }
         for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
