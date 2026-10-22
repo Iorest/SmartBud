@@ -241,9 +241,18 @@ final class TransactionViewModel {
     func setCategory(_ category: CategoryModel?, for transactions: [TransactionModel]) {
         guard !transactions.isEmpty else { return }
         for txn in transactions {
+            // Rows created without a note fall back to the category name, so
+            // move that auto-derived note along with the category; a real
+            // user-written note is left alone.
+            let noteWasCategoryName = txn.note?.isEmpty ?? true
+                || txn.note == txn.category?.wrappedName
+
             txn.category = category
             if let category {
                 txn.income = category.income
+                if noteWasCategoryName {
+                    txn.note = category.wrappedName
+                }
             }
         }
         repo.save()
