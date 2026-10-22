@@ -377,5 +377,7 @@ extension HomeView {
                 currentTab = "Budget"
             }
         }
+        .focusedSceneValue(\.newTransaction, { addTransaction = true })
+        .focusedSceneValue(\.selectTab, { tab in currentTab = tab })
     }
 }

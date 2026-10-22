@@ -92,6 +92,7 @@ struct LogView: View {
         .onChange(of: launchSearch) { _, newValue in
             if newValue { searchPresented = true }
         }
+        .focusedSceneValue(\.searchLog, { searchPresented = true })
         .onOpenURL { url in
             if url.host == "search" { searchPresented = true }
         }
