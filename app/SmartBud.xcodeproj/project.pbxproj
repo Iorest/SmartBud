@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001007 /* SettingsRatesView.swift */; };
+		E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001007 /* SettingsRatesView.swift */; };
+		E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001004 /* CurrencyRateStore.swift */; };
+		E1A2B3C40000000000001006 /* CurrencyRateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001004 /* CurrencyRateStore.swift */; };
+		E1A2B3C40000000000001001 /* CurrencyConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001000 /* CurrencyConversion.swift */; };
+		E1A2B3C40000000000001002 /* CurrencyConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001000 /* CurrencyConversion.swift */; };
+		E1A2B3C40000000000001003 /* CurrencyConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001000 /* CurrencyConversion.swift */; };
 		E1A2B3C40000000000000F04 /* LogView+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F03 /* LogView+Entries.swift */; };
 		E1A2B3C40000000000000F05 /* LogView+Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F03 /* LogView+Entries.swift */; };
 		E1A2B3C40000000000000F01 /* LogRowComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000F00 /* LogRowComponents.swift */; };
@@ -592,6 +599,9 @@
 		E1A2B3C40000000000000B00 /* SettingsRowLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Settings/SettingsRowLink.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000A00 /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/ViewModels/AccountViewModel.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000D00 /* AccountBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AccountBalance.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000001007 /* SettingsRatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Settings/Settings Subviews/SettingsRatesView.swift"; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000001004 /* CurrencyRateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/ViewModels/CurrencyRateStore.swift"; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000001000 /* CurrencyConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Logic/CurrencyConversion.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000206 /* SBCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBCard.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000020F /* SBEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBEmptyState.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBSaveErrorBanner.swift; sourceTree = "<group>"; };
@@ -758,6 +768,9 @@
 				E1A2B3C40000000000000B00 /* SettingsRowLink.swift */,
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
+				E1A2B3C40000000000001007 /* SettingsRatesView.swift */,
+				E1A2B3C40000000000001004 /* CurrencyRateStore.swift */,
+				E1A2B3C40000000000001000 /* CurrencyConversion.swift */,
 				E1A2B3C40000000000000206 /* SBCard.swift */,
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
@@ -1393,6 +1406,9 @@
 				E1A2B3C40000000000000E04 /* TransferEditor.swift in Sources */,
 				E1A2B3C40000000000000F01 /* LogRowComponents.swift in Sources */,
 				E1A2B3C40000000000000F04 /* LogView+Entries.swift in Sources */,
+				E1A2B3C40000000000001001 /* CurrencyConversion.swift in Sources */,
+				E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */,
+				E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1463,6 +1479,7 @@
 				E1A2B3C40000000000000279 /* Currency.swift in Sources */,
 				E1A2B3C40000000000000261 /* BudgetEditPreservesAnchorTests.swift in Sources */,
 							E1A2B3C40000000000000D03 /* AccountBalance.swift in Sources */,
+				E1A2B3C40000000000001003 /* CurrencyConversion.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1617,6 +1634,9 @@
 				E1A2B3C40000000000000E05 /* TransferEditor.swift in Sources */,
 				E1A2B3C40000000000000F02 /* LogRowComponents.swift in Sources */,
 				E1A2B3C40000000000000F05 /* LogView+Entries.swift in Sources */,
+				E1A2B3C40000000000001002 /* CurrencyConversion.swift in Sources */,
+				E1A2B3C40000000000001006 /* CurrencyRateStore.swift in Sources */,
+				E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

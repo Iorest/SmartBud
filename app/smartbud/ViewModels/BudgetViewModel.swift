@@ -109,7 +109,7 @@ final class BudgetViewModel {
             let date = txn.date ?? .distantPast
             return date >= budget.startDate && date <= Date.now
                 && !txn.income && txn.category?.id == categoryID
-        }.map(\.amount))
+        }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
@@ -117,7 +117,7 @@ final class BudgetViewModel {
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
             return date >= budget.startDate && date <= Date.now && !txn.income
-        }.map(\.amount))
+        }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 

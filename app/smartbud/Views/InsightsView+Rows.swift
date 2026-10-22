@@ -80,7 +80,8 @@ struct InsightsTransactionRow: View {
     }
 
     private var amountString: String {
-        Money.format(transaction.amount, currencyCode: currencyCode,
+        Money.format(transaction.amount,
+                     currencyCode: transaction.account?.resolvedCurrencyCode ?? currencyCode,
                      showsCents: showCents, plus: transaction.income)
     }
 

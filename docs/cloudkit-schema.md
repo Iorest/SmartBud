@@ -22,6 +22,9 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 | `TemplateTransactionModel` | 1.0 | |
 | `AccountModel` | 1.1 | 新增实体，`transactions` / `outgoingTransfers` / `incomingTransfers` 必须是可选数组（CloudKit 限制 to-many 可空） |
 | `TransferModel` | 1.1 | 新增实体，`source` / `destination` 指向 `AccountModel` |
+| `CurrencyRate` | 1.2 | 新增实体，每个外币一行（code / rate / updatedAt） |
+
+`AccountModel.currencyCode` 与 `TransactionModel.baseAmount` 是 1.2 新增的普通字段（非关系），CloudKit 可直接兼容。
 
 ## 每次改 schema 后要做的四步
 
@@ -43,3 +46,5 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
   （截图里橙色横幅）。这是设计内行为，不是崩溃。
 - 无 iCloud 账号的模拟器一定走降级路径，做同步相关验证必须用登录了 iCloud 的真机。
 - 删除账户会连带删除与它相关的转账（转账需要两头都有账户才有意义）；交易本身保留，只清空归属。
+- 汇率在启动时由 `CurrencyRateStore.load()` 读入，记账时用它把金额折算到基准货币写进 `baseAmount`。
+  改汇率不会改写历史交易的 `baseAmount`，所以统计口径稳定。

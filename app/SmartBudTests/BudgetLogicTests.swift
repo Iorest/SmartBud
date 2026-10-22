@@ -153,3 +153,38 @@ struct AccountBalanceTests {
         #expect(source + destination == 500)
     }
 }
+
+@Suite("Currency conversion")
+struct CurrencyConversionTests {
+    private let rates = ["CNY": 0.19, "USD": 1.0]
+
+    @Test("Base currency converts 1:1")
+    func baseIsOne() {
+        #expect(CurrencyConversion.rate(for: "SGD", base: "SGD", rates: rates) == 1)
+        #expect(CurrencyConversion.convert(50, from: "SGD", to: "SGD", rates: rates) == 50)
+    }
+
+    @Test("Foreign currency multiplies by its rate")
+    func convertsWithRate() {
+        #expect(CurrencyConversion.convert(100, from: "CNY", to: "SGD", rates: rates) == 19)
+    }
+
+    @Test("Unknown currency falls back to 1:1 instead of zero")
+    func missingRateFallsBack() {
+        #expect(CurrencyConversion.rate(for: "JPY", base: "SGD", rates: rates) == 1)
+    }
+
+    @Test("Non-positive or non-finite rates are ignored")
+    func badRatesIgnored() {
+        #expect(CurrencyConversion.rate(for: "CNY", base: "SGD", rates: ["CNY": 0]) == 1)
+        #expect(CurrencyConversion.rate(for: "CNY", base: "SGD", rates: ["CNY": .infinity]) == 1)
+    }
+
+    @Test("Rounded conversion keeps two decimals")
+    func roundsToCents() {
+        let converted = CurrencyConversion.convertRounded(33.33, from: "CNY", to: "SGD",
+                                                         rates: ["CNY": 0.1937])
+        // Float maths: compare with a small tolerance rather than bit equality.
+        #expect(abs(converted - 6.46) < 0.0001)
+    }
+}

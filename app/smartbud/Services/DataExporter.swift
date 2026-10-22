@@ -30,7 +30,7 @@ enum DataExporter {
     /// Bumped manually if the export format changes in a way that
     /// importers need to distinguish (e.g. moving a category into a
     /// nested structure). Old values are never reused.
-    static let schemaVersion: Int = 2
+    static let schemaVersion: Int = 3
 
     enum ExportError: Error, LocalizedError {
         case noData
@@ -57,89 +57,7 @@ enum DataExporter {
         var templates: [TemplateTransactionDTO]
         var accounts: [AccountDTO]
         var transfers: [TransferDTO]
-    }
-
-    // MARK: - DTOs (decoupled from @Model so the export format is stable)
-
-    struct TransactionDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var date: Date?
-        var day: Date?
-        var month: Date?
-        var note: String?
-        var income: Bool
-        var recurringType: Int
-        var recurringCoefficient: Int
-        var onceRecurring: Bool
-        var categoryId: UUID?
-        var categoryName: String?
-        var accountId: UUID?
-        var accountName: String?
-    }
-
-    struct AccountDTO: Codable {
-        var id: UUID
-        var name: String
-        var emoji: String
-        var colour: String
-        var kind: Int
-        var openingBalance: Double
-        var hidden: Bool
-        var order: Int
-        var dateCreated: Date
-    }
-
-    struct TransferDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var date: Date
-        var note: String?
-        var sourceId: UUID?
-        var sourceName: String?
-        var destinationId: UUID?
-        var destinationName: String?
-    }
-
-    struct CategoryDTO: Codable {
-        var id: UUID
-        var name: String
-        var emoji: String
-        var colour: String
-        var income: Bool
-        var order: Int
-        var dateCreated: Date
-    }
-
-    struct BudgetDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var startDate: Date
-        var dateCreated: Date
-        var type: Int
-        var green: Bool
-        var categoryId: UUID?
-        var categoryName: String?
-    }
-
-    struct MainBudgetDTO: Codable {
-        var amount: Double
-        var startDate: Date
-        var dateCreated: Date
-        var type: Int
-        var green: Bool
-    }
-
-    struct TemplateTransactionDTO: Codable {
-        var id: UUID
-        var amount: Double
-        var note: String?
-        var income: Bool
-        var order: Int
-        var recurringType: Int
-        var recurringCoefficient: Int
-        var categoryId: UUID?
-        var categoryName: String?
+        var rates: [RateDTO]
     }
 
     // MARK: - Entry point
@@ -212,7 +130,9 @@ enum DataExporter {
                 categoryId: txn.category?.id,
                 categoryName: txn.category?.name,
                 accountId: txn.account?.id,
-                accountName: txn.account?.name
+                accountName: txn.account?.name,
+                baseAmount: txn.baseAmount,
+                accountCurrency: txn.account?.currencyCode
             )
         }
 
@@ -226,7 +146,8 @@ enum DataExporter {
                     id: account.id, name: account.name, emoji: account.emoji,
                     colour: account.colour, kind: account.kind,
                     openingBalance: account.openingBalance, hidden: account.hidden,
-                    order: account.order, dateCreated: account.dateCreated
+                    order: account.order, dateCreated: account.dateCreated,
+                    currencyCode: account.currencyCode
                 )
             }
     }
@@ -243,6 +164,12 @@ enum DataExporter {
                     destinationName: transfer.destination?.name
                 )
             }
+    }
+
+    private static func ratesDTOs(_ repo: DataRepository) -> [RateDTO] {
+        repo.fetch(CurrencyRate.self)
+            .sorted { $0.code < $1.code }
+            .map { RateDTO(code: $0.code, rate: $0.rate, updatedAt: $0.updatedAt) }
     }
 
     private static func budgetsDTOs(_ repo: DataRepository) -> [BudgetDTO] {
@@ -303,6 +230,8 @@ enum DataExporter {
 
         let transfers = transfersDTOs(repo)
 
+        let rates = ratesDTOs(repo)
+
         return ExportPayload(
             exportDate: exportDate,
             appVersion: appVersion,
@@ -313,7 +242,8 @@ enum DataExporter {
             mainBudgets: mainBudgets,
             templates: templates,
             accounts: accounts,
-            transfers: transfers
+            transfers: transfers,
+            rates: rates
         )
     }
 
@@ -322,5 +252,100 @@ enum DataExporter {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyyMMdd-HHmmss"
         return "smartbud-export-\(formatter.string(from: exportDate)).json"
+    }
+}
+
+extension DataExporter {
+
+    // MARK: - DTOs (decoupled from @Model so the export format is stable)
+
+    struct TransactionDTO: Codable {
+        var id: UUID
+        var amount: Double
+        var date: Date?
+        var day: Date?
+        var month: Date?
+        var note: String?
+        var income: Bool
+        var recurringType: Int
+        var recurringCoefficient: Int
+        var onceRecurring: Bool
+        var categoryId: UUID?
+        var categoryName: String?
+        var accountId: UUID?
+        var accountName: String?
+        var baseAmount: Double?
+        var accountCurrency: String?
+    }
+
+    struct AccountDTO: Codable {
+        var id: UUID
+        var name: String
+        var emoji: String
+        var colour: String
+        var kind: Int
+        var openingBalance: Double
+        var hidden: Bool
+        var order: Int
+        var dateCreated: Date
+        var currencyCode: String
+    }
+
+    struct RateDTO: Codable {
+        var code: String
+        var rate: Double
+        var updatedAt: Date
+    }
+
+    struct TransferDTO: Codable {
+        var id: UUID
+        var amount: Double
+        var date: Date
+        var note: String?
+        var sourceId: UUID?
+        var sourceName: String?
+        var destinationId: UUID?
+        var destinationName: String?
+    }
+
+    struct CategoryDTO: Codable {
+        var id: UUID
+        var name: String
+        var emoji: String
+        var colour: String
+        var income: Bool
+        var order: Int
+        var dateCreated: Date
+    }
+
+    struct BudgetDTO: Codable {
+        var id: UUID
+        var amount: Double
+        var startDate: Date
+        var dateCreated: Date
+        var type: Int
+        var green: Bool
+        var categoryId: UUID?
+        var categoryName: String?
+    }
+
+    struct MainBudgetDTO: Codable {
+        var amount: Double
+        var startDate: Date
+        var dateCreated: Date
+        var type: Int
+        var green: Bool
+    }
+
+    struct TemplateTransactionDTO: Codable {
+        var id: UUID
+        var amount: Double
+        var note: String?
+        var income: Bool
+        var order: Int
+        var recurringType: Int
+        var recurringCoefficient: Int
+        var categoryId: UUID?
+        var categoryName: String?
     }
 }

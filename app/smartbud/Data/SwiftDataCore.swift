@@ -62,6 +62,7 @@ final class DataRepository {
         CategoryModel.self,
         AccountModel.self,
         TransferModel.self,
+        CurrencyRate.self,
         BudgetModel.self,
         MainBudgetModel.self,
         TemplateTransactionModel.self

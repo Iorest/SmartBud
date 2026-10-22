@@ -21,7 +21,13 @@ struct AccountEditor: View {
     @State private var emoji = "💳"
     @State private var colour = Theme.Palette.swatches.first ?? "#279AF4"
     @State private var kind: AccountKind = .cash
+    @State private var currencyCode = ""
     @State private var openingBalance = ""
+
+    @AppStorage("currency", store: .appGroup) private var baseCurrency: String =
+        Locale.current.currency?.identifier ?? "USD"
+
+    private var currencies: [Currency] { Currency.allCurrencies }
 
     private var isEditing: Bool { account != nil }
 
@@ -54,6 +60,18 @@ struct AccountEditor: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                }
+
+                Section {
+                    Picker(String.appLocalized("Currency"), selection: $currencyCode) {
+                        ForEach(currencies, id: \.code) { currency in
+                            Text("\(currency.code) · \(currency.name)").tag(currency.code)
+                        }
+                    }
+                } footer: {
+                    Text(String.appLocalized(
+                        "Amounts in this account use this currency. Totals convert "
+                            + "to your base currency using the rates in Settings."))
                 }
 
                 Section {
@@ -122,12 +140,14 @@ struct AccountEditor: View {
     private func loadValues() {
         guard let account else {
             openingBalance = ""
+            currencyCode = baseCurrency
             return
         }
         name = account.wrappedName
         emoji = account.wrappedEmoji
         colour = account.wrappedColour
         kind = AccountKind(rawValue: account.kind) ?? .cash
+        currencyCode = account.currencyCode.isEmpty ? baseCurrency : account.currencyCode
         openingBalance = account.openingBalance == 0
             ? ""
             : String(format: "%.2f", account.openingBalance)
@@ -139,7 +159,8 @@ struct AccountEditor: View {
         guard opening.isFinite else { return }
 
         let draft = AccountDraft(name: trimmedName, emoji: emoji, colour: colour,
-                                 kind: kind, openingBalance: opening)
+                                 kind: kind, currencyCode: currencyCode,
+                                 openingBalance: opening)
         if let account {
             accountVM.update(account, with: draft)
         } else {

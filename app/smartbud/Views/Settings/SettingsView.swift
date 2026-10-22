@@ -26,6 +26,7 @@ enum SettingsRoute: Hashable {
     case pro
     case notifications
     case currency
+    case rates
     case weekStart
     case appearance
     case appIcon
@@ -294,6 +295,7 @@ struct SettingsView: View {
           case .pro: SettingsProView()
           case .notifications: SettingsNotificationsView()
           case .currency: SettingsCurrencyView()
+          case .rates: SettingsRatesView()
           case .weekStart: SettingsWeekStartView()
           case .appearance: SettingsAppearanceView()
           case .appIcon: SettingsAppIconView()

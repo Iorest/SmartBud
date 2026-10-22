@@ -22,6 +22,18 @@ struct TransferEditor: View {
 
     private var accounts: [AccountModel] { accountVM.visibleAccounts }
 
+    /// Cross-currency transfers need an exchange rate per transfer, which this
+    /// build does not model yet, so the destination list only offers accounts
+    /// in the source currency.
+    private var destinations: [AccountModel] {
+        guard let source else { return accounts }
+        return accounts.filter { $0.resolvedCurrencyCode == source.resolvedCurrencyCode }
+    }
+
+    private var hasCrossCurrencyAccounts: Bool {
+        Set(accounts.map(\.resolvedCurrencyCode)).count > 1
+    }
+
     private var parsedAmount: Double {
         Double(amount.replacingOccurrences(of: ",", with: ".")) ?? 0
     }
@@ -41,7 +53,7 @@ struct TransferEditor: View {
                         }
                     }
                     Picker(String.appLocalized("To"), selection: $destination) {
-                        ForEach(accounts) { account in
+                        ForEach(destinations) { account in
                             Text("\(account.wrappedEmoji) \(account.wrappedName)").tag(Optional(account))
                         }
                     }
@@ -65,6 +77,16 @@ struct TransferEditor: View {
                     }
                     DatePicker(String.appLocalized("Date"), selection: $date, displayedComponents: .date)
                     TextField(String.appLocalized("Note"), text: $note)
+                }
+
+                if hasCrossCurrencyAccounts {
+                    Section {
+                        Text(String.appLocalized(
+                            "Only accounts in the same currency can be used for a transfer. "
+                                + "Cross-currency transfers are not supported yet."))
+                            .font(.footnote)
+                            .foregroundStyle(Color.SubtitleText)
+                    }
                 }
 
                 if source?.id == destination?.id, source != nil {
@@ -96,7 +118,7 @@ struct TransferEditor: View {
     private func pickDefaults() {
         accountVM.load()
         if source == nil { source = accounts.first }
-        if destination == nil { destination = accounts.first { $0.id != source?.id } }
+        if destination == nil { destination = destinations.first { $0.id != source?.id } }
     }
 
     private func save() {

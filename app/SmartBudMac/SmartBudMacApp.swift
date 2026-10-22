@@ -17,9 +17,14 @@ struct SmartBudMacApp: App {
     @State private var transactionVM = TransactionViewModel.shared
     @State private var categoryVM = CategoryViewModel.shared
     @State private var accountVM = AccountViewModel.shared
+    @State private var rateStore = CurrencyRateStore.shared
     @State private var budgetVM = BudgetViewModel.shared
     @State private var insightsVM = InsightsViewModel.shared
     @State private var settingsVM = SettingsViewModel.shared
+
+    init() {
+        CurrencyRateStore.shared.load()
+    }
 
     var body: some Scene {
         // A single, restorable window. `WindowGroup` can end up with no
@@ -33,6 +38,7 @@ struct SmartBudMacApp: App {
                 .environment(transactionVM)
                 .environment(categoryVM)
                 .environment(accountVM)
+                .environment(rateStore)
                 .environment(budgetVM)
                 .environment(insightsVM)
                 .environment(settingsVM)

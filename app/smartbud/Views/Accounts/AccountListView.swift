@@ -143,6 +143,13 @@ struct AccountListView: View {
         .listRowSeparator(.hidden)
     }
 
+    private func kindLabel(_ account: AccountModel) -> String {
+        let kind = String.appLocalized(
+            AccountKind(rawValue: account.kind)?.titleKey ?? AccountKind.cash.titleKey)
+        let code = account.resolvedCurrencyCode
+        return code == currency ? kind : "\(kind) · \(code)"
+    }
+
     private func transferRow(_ transfer: TransferModel) -> some View {
         HStack(spacing: SBSpace.small) {
             Image(systemName: "arrow.left.arrow.right")
@@ -192,16 +199,15 @@ struct AccountListView: View {
                 Text(account.wrappedName)
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color.PrimaryText)
-                Text(String.appLocalized(
-                    AccountKind(rawValue: account.kind)?.titleKey ?? AccountKind.cash.titleKey
-                ))
-                .font(.caption)
-                .foregroundStyle(Color.SubtitleText)
+                Text(kindLabel(account))
+                    .font(.caption)
+                    .foregroundStyle(Color.SubtitleText)
             }
 
             Spacer(minLength: SBSpace.extraSmall)
 
-            Text(Money.format(accountVM.balance(for: account), currencyCode: currency,
+            Text(Money.format(accountVM.balance(for: account),
+                              currencyCode: account.resolvedCurrencyCode,
                               showsCents: showCents, locale: .appLocale))
                 .font(.callout.weight(.medium).monospacedDigit())
                 .foregroundStyle(accountVM.balance(for: account) < 0

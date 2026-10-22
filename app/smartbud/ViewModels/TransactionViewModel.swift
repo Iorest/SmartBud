@@ -37,6 +37,8 @@ final class TransactionViewModel {
     func create(_ edit: TransactionEdit) -> TransactionModel {
         let txn = TransactionModel(note: edit.note, category: edit.category,
                                    account: edit.account,
+                                   baseAmount: CurrencyRateStore.shared.convertToBase(
+                                       edit.amount, from: edit.account?.currencyCode ?? ""),
                                    income: edit.income, amount: edit.amount, date: edit.date,
                                    repeatType: edit.repeatType,
                                    repeatCoefficient: edit.repeatCoefficient)
@@ -57,7 +59,10 @@ final class TransactionViewModel {
     func update(_ txn: TransactionModel, with edit: TransactionEdit) {
         txn.note = edit.note
         txn.category = edit.category
+        txn.account = edit.account
         txn.amount = edit.amount
+        txn.baseAmount = CurrencyRateStore.shared.convertToBase(
+            edit.amount, from: edit.account?.currencyCode ?? "")
         txn.date = edit.date
         txn.income = edit.income
 
@@ -109,6 +114,7 @@ final class TransactionViewModel {
                       type: txn.recurringType,
                       coefficient: txn.recurringCoefficient) {
                 let new = TransactionModel(note: txn.note ?? "", category: txn.category,
+                                           account: txn.account, baseAmount: txn.wrappedBaseAmount,
                                            income: txn.income, amount: txn.amount, date: cursor)
                 repo.insert(new)
                 new.onceRecurring = true
@@ -118,7 +124,9 @@ final class TransactionViewModel {
             txn.recurringType = 0
         } else if Calendar.current.isDateInToday(txn.nextTransactionDate) {
             let new = TransactionModel(note: txn.note ?? "", category: txn.category,
-                                       income: txn.income, amount: txn.amount, date: txn.nextTransactionDate)
+                                       account: txn.account, baseAmount: txn.wrappedBaseAmount,
+                                       income: txn.income, amount: txn.amount,
+                                       date: txn.nextTransactionDate)
             repo.insert(new)
             new.onceRecurring = true
             txn.recurringType = 0

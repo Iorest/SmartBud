@@ -31,8 +31,8 @@ extension InsightsViewModel {
             avgDivisor = Double(cal.range(of: .day, in: .month, for: now)?.count ?? 30)
         }
         let filtered = all.filter { ($0.date ?? .distantPast) >= start }
-        let spent = Money.sum(filtered.filter { !$0.income }.map(\.amount))
-        let income = Money.sum(filtered.filter(\.income).map(\.amount))
+        let spent = Money.sum(filtered.filter { !$0.income }.map(\.wrappedBaseAmount))
+        let income = Money.sum(filtered.filter(\.income).map(\.wrappedBaseAmount))
         let net = income - spent
         summary = SummaryData(spent: Money.double(spent), income: Money.double(income),
                               net: Money.double(abs(net)), positive: net >= 0,
@@ -108,11 +108,11 @@ extension InsightsViewModel {
     }
 
     func getLogViewTotalSpent(type: Int) -> Double {
-        Money.double(Money.sum(logViewTransactions(type: type, income: false).map(\.amount)))
+        Money.double(Money.sum(logViewTransactions(type: type, income: false).map(\.wrappedBaseAmount)))
     }
 
     func getLogViewTotalIncome(type: Int) -> Double {
-        Money.double(Money.sum(logViewTransactions(type: type, income: true).map(\.amount)))
+        Money.double(Money.sum(logViewTransactions(type: type, income: true).map(\.wrappedBaseAmount)))
     }
 
     func getLogViewTotalNet(type: Int) -> (value: Double, positive: Bool) {
@@ -169,7 +169,7 @@ extension InsightsViewModel {
                 let date = $0.date ?? .distantPast
                 return date >= bucketStart && date < bucketEnd
             }
-                .map(\.amount))
+                .map(\.wrappedBaseAmount))
             return LineGraphDataPoint(date: bucketStart, amount: Money.double(total))
         }
     }
@@ -304,7 +304,7 @@ extension InsightsViewModel {
         if type == 1 {
             return Money.double(Money.sum(txns.map { $0.income ? $0.amount : -$0.amount }))
         } else {
-            return Money.double(Money.sum(txns.map(\.amount)))
+            return Money.double(Money.sum(txns.map(\.wrappedBaseAmount)))
         }
     }
 

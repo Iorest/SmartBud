@@ -28,11 +28,15 @@ final class TransactionModel {
     var category: CategoryModel?
     /// Optional so existing rows keep working; new entries set it.
     var account: AccountModel?
+    /// Amount converted to the app's base currency at entry time. `nil` on
+    /// rows written before multi-currency support (amount already in base).
+    var baseAmount: Double?
 
     init(
         note: String = "",
         category: CategoryModel? = nil,
         account: AccountModel? = nil,
+        baseAmount: Double? = nil,
         income: Bool = false,
         amount: Double = 0,
         date: Date = Date.now,
@@ -43,6 +47,7 @@ final class TransactionModel {
         self.note = note
         self.category = category
         self.account = account
+        self.baseAmount = baseAmount
         self.income = income
         self.amount = amount
         self.date = date
@@ -57,6 +62,10 @@ final class TransactionModel {
 
 extension TransactionModel {
     @Transient var wrappedAmount: Double { amount }
+    /// Amount in the app's base currency. Legacy rows (written before
+    /// multi-currency) stored the base amount directly.
+    @Transient var wrappedBaseAmount: Double { baseAmount ?? amount }
+    @Transient var currencyCode: String { account?.currencyCode ?? "" }
     @Transient var wrappedDate: Date { date ?? .now }
     @Transient var wrappedNote: String { note ?? "" }
     @Transient var wrappedCategoryName: String { category?.name ?? "" }
@@ -129,6 +138,9 @@ final class AccountModel {
     var colour: String = ""
     /// 0 = cash, 1 = debit card, 2 = credit card.
     var kind: Int = 0
+    /// ISO code this account is denominated in. Empty means the app's base
+    /// currency (rows created before multi-currency support).
+    var currencyCode: String = ""
     /// Balance before any recorded transaction.
     var openingBalance: Double = 0
     var hidden: Bool = false
@@ -144,6 +156,7 @@ final class AccountModel {
         emoji: String = "",
         colour: String = "",
         kind: Int = 0,
+        currencyCode: String = "",
         openingBalance: Double = 0,
         order: Int = 0
     ) {
@@ -152,6 +165,7 @@ final class AccountModel {
         self.emoji = emoji
         self.colour = colour
         self.kind = kind
+        self.currencyCode = currencyCode
         self.openingBalance = openingBalance
         self.order = order
         self.dateCreated = .now
@@ -164,6 +178,23 @@ extension AccountModel {
     @Transient var wrappedColour: String { colour }
     @Transient var allTransactions: [TransactionModel] {
         (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
+    }
+}
+
+// MARK: - Currency rate
+
+/// One row per foreign currency the user holds: how many base-currency units
+/// one unit is worth. The base currency itself never needs a row (rate = 1).
+@Model
+final class CurrencyRate {
+    var code: String = ""
+    var rate: Double = 1
+    var updatedAt: Date = Date.now
+
+    init(code: String = "", rate: Double = 1) {
+        self.code = code
+        self.rate = rate
+        self.updatedAt = .now
     }
 }
 

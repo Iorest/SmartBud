@@ -15052,6 +15052,138 @@
           }
         }
       }
+    },
+    "Exchange Rates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchange Rates"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "汇率"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯率"
+          }
+        }
+      }
+    },
+    "1 unit of each currency in %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 unit of each currency in %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每 1 单位外币 = 多少 %@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每 1 單位外幣 = 多少 %@"
+          }
+        }
+      }
+    },
+    "All your accounts use the base currency, so no rates are needed." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All your accounts use the base currency, so no rates are needed."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有账户都使用基准货币，无需设置汇率。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有帳戶都使用基準貨幣，無需設定匯率。"
+          }
+        }
+      }
+    },
+    "Totals and the accounts screen convert with these rates. A transaction keeps the rate it was saved with, so history never changes." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totals and the accounts screen convert with these rates. A transaction keeps the rate it was saved with, so history never changes."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "总资产与统计按这里的汇率换算；每笔交易保存时用的汇率会被记录下来，历史金额不会因改汇率而变化。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "總資產與統計按這裡的匯率換算；每筆交易儲存時用的匯率會被記錄下來，歷史金額不會因改匯率而變化。"
+          }
+        }
+      }
+    },
+    "Amounts in this account use this currency. Totals convert to your base currency using the rates in Settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amounts in this account use this currency. Totals convert to your base currency using the rates in Settings."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该账户的金额使用此货币；汇总时按设置里的汇率换算成基准货币。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "該帳戶的金額使用此貨幣；彙總時按設定裡的匯率換算成基準貨幣。"
+          }
+        }
+      }
+    },
+    "Only accounts in the same currency can be used for a transfer. Cross-currency transfers are not supported yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only accounts in the same currency can be used for a transfer. Cross-currency transfers are not supported yet."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转账只能在同币种的账户之间进行，跨币种转账暂不支持。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "轉帳只能在同幣種的帳戶之間進行，跨幣種轉帳暫不支援。"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"

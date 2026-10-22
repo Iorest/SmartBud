@@ -231,13 +231,12 @@ extension HomeView {
         // Light selection feedback when switching sections (HIG: every
         // interaction gets feedback).
         .sensoryFeedback(.selection, trigger: currentTab)
-        // An inset rather than an overlay: the banner used to cover the
-        // first list row (e.g. 总资产 on the accounts screen).
-        .safeAreaInset(edge: .top, spacing: 0) {
+        // Bottom inset rather than a top overlay: at the top the banner sat on
+        // top of the navigation bar (it covered 总资产 and the Accounts title).
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             if isInFallbackMode {
                 FallbackSyncBanner()
                     .padding(.horizontal, 14)
-                    .padding(.top, 6)
                     .padding(.bottom, 6)
             }
         }

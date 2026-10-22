@@ -18,6 +18,7 @@ struct AccountDraft {
     let emoji: String
     let colour: String
     let kind: AccountKind
+    let currencyCode: String
     let openingBalance: Double
 }
 
@@ -57,6 +58,9 @@ final class AccountViewModel {
     var transfers: [TransferModel] = []
 
     func load() {
+        // Balances and totals convert with the user's rates, so refresh them
+        // alongside the accounts (cheap: one small fetch).
+        CurrencyRateStore.shared.load()
         accounts = repo.fetch(AccountModel.self, sort: [SortDescriptor(\.order)])
         transfers = repo.fetch(TransferModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
     }
@@ -66,8 +70,13 @@ final class AccountViewModel {
     }
 
     /// Sum of every visible account, the number a "net worth" header shows.
+    /// Sum of visible accounts converted to the app's base currency, so a
+    /// mixed-currency list still yields one meaningful number.
     var totalBalance: Double {
-        visibleAccounts.reduce(0) { $0 + balance(for: $1) }
+        visibleAccounts.reduce(0) { total, account in
+            total + CurrencyRateStore.shared.convertToBase(
+                balance(for: account), from: account.resolvedCurrencyCode)
+        }
     }
 
     func balance(for account: AccountModel) -> Double {
@@ -119,6 +128,7 @@ final class AccountViewModel {
             emoji: draft.emoji,
             colour: draft.colour,
             kind: draft.kind.rawValue,
+            currencyCode: draft.currencyCode,
             openingBalance: draft.openingBalance,
             order: (accounts.last?.order ?? 0) + 1
         )
@@ -133,6 +143,7 @@ final class AccountViewModel {
         account.emoji = draft.emoji
         account.colour = draft.colour
         account.kind = draft.kind.rawValue
+        account.currencyCode = draft.currencyCode
         account.openingBalance = draft.openingBalance
         repo.save()
         load()

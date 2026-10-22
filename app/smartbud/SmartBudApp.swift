@@ -20,6 +20,7 @@ struct SmartBudApp: App {
     @State private var transactionVM = TransactionViewModel.shared
     @State private var categoryVM = CategoryViewModel.shared
     @State private var accountVM = AccountViewModel.shared
+    @State private var rateStore = CurrencyRateStore.shared
     @State private var budgetVM = BudgetViewModel.shared
     @State private var insightsVM = InsightsViewModel.shared
     @State private var settingsVM = SettingsViewModel.shared
@@ -27,6 +28,7 @@ struct SmartBudApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
+        CurrencyRateStore.shared.load()
         // Tab-bar appearance is now the system default: the app uses the
         // native TabView so iPhone, iPad and Mac (Designed for iPad) share
         // one navigation shell.
@@ -40,6 +42,7 @@ struct SmartBudApp: App {
                 .environment(transactionVM)
                 .environment(categoryVM)
                 .environment(accountVM)
+                .environment(rateStore)
                 .environment(budgetVM)
                 .environment(insightsVM)
                 .environment(settingsVM)

@@ -19,7 +19,9 @@ struct SingleTransactionView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var transactionAmountString: String {
-        Money.format(transaction.amount, currencyCode: currency, showsCents: showCents)
+        Money.format(transaction.amount,
+                     currencyCode: transaction.account?.resolvedCurrencyCode ?? currency,
+                     showsCents: showCents)
     }
 
     var transactionAmountAccessibilityString: String {

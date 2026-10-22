@@ -22,7 +22,9 @@ struct LogTransactionRow: View {
     private var amountText: String {
         LogGrouping.currency(
             transaction.amount,
-            code: currency,
+            // Amounts are denominated in the account's currency; rows without
+            // an account fall back to the app's base currency.
+            code: transaction.account?.resolvedCurrencyCode ?? currency,
             showCents: showCents,
             signed: showExpenseOrIncomeSign,
             income: transaction.income

@@ -52,8 +52,10 @@ struct TransactionView: View {
     @AppStorage("lastAccountID", store: .appGroup) var lastAccountID: String = ""
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
+    /// The form edits an amount in the selected account's currency.
     var currencySymbol: String {
-        return Locale.appCurrencySymbol(forCurrencyCode: currency)
+        let code = account?.resolvedCurrencyCode ?? currency
+        return Locale.appCurrencySymbol(forCurrencyCode: code)
     }
 
     @State var showingDatePicker = false

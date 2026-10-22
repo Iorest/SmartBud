@@ -35,7 +35,7 @@ enum LogEntry: Identifiable {
 
     var netAmount: Double {
         switch self {
-        case .transaction(let txn): return txn.income ? txn.amount : -txn.amount
+        case .transaction(let txn): return txn.income ? txn.wrappedBaseAmount : -txn.wrappedBaseAmount
         case .transfer: return 0
         }
     }

@@ -84,8 +84,8 @@ final class InsightsViewModel {
             guard let date = txn.date else { return false }
             return date >= periodStart && date < periodEnd
         }
-        let spent = Money.sum(inPeriod.filter { !$0.income }.map(\.amount))
-        let inc = Money.sum(inPeriod.filter(\.income).map(\.amount))
+        let spent = Money.sum(inPeriod.filter { !$0.income }.map(\.wrappedBaseAmount))
+        let inc = Money.sum(inPeriod.filter(\.income).map(\.wrappedBaseAmount))
         let net = inc - spent
         periodTotalSpent = Money.double(spent)
         periodTotalIncome = Money.double(inc)
@@ -155,7 +155,7 @@ final class InsightsViewModel {
                     if let date = $0.date { return date >= cursor && date < next }
                     return false
                 }
-                .map(\.amount))
+                .map(\.wrappedBaseAmount))
 
             let label: String
             switch period {
@@ -191,7 +191,7 @@ final class InsightsViewModel {
         var categories = [UUID: CategoryModel]()
         for txn in txns {
             guard let category = txn.category else { continue }
-            amounts[category.id, default: 0] += Money.cents(txn.amount)
+            amounts[category.id, default: 0] += Money.cents(txn.wrappedBaseAmount)
             categories[category.id] = category
         }
         let total = amounts.values.reduce(Decimal.zero, +)

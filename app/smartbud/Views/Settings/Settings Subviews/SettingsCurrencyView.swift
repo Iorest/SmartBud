@@ -26,7 +26,41 @@ struct SettingsCurrencyView: View {
     }
 
     var body: some View {
-        List(filtered, id: \.self) { currency in
+        List {
+            Section {
+                NavigationLink(value: SettingsRoute.rates) {
+                    Label(String.appLocalized("Exchange Rates"), systemImage: "arrow.left.arrow.right")
+                }
+            }
+
+            Section {
+                ForEach(filtered, id: \.self) { currency in
+                    currencyRow(currency)
+                }
+            }
+        }
+        #if os(macOS)
+        .listStyle(.inset)
+        #else
+        .listStyle(.insetGrouped)
+        #endif
+        #if os(iOS)
+        .searchable(
+            text: $search,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: Text(String.appLocalized("Search currencies"))
+        )
+        #else
+        .searchable(text: $search, prompt: Text(String.appLocalized("Search currencies")))
+        #endif
+        .navigationTitle(String.appLocalized("Currencies"))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+    }
+
+    private func currencyRow(_ currency: Currency) -> some View {
+        Group {
             Button {
                 select(currency)
             } label: {
@@ -55,24 +89,6 @@ struct SettingsCurrencyView: View {
             .accessibilityLabel("\(currency.name) (\(currency.code))")
             .accessibilityAddTraits(currency.code == currencyCode ? [.isButton, .isSelected] : .isButton)
         }
-        #if os(macOS)
-        .listStyle(.inset)
-        #else
-        .listStyle(.plain)
-        #endif
-        #if os(iOS)
-        .searchable(
-            text: $search,
-            placement: .navigationBarDrawer(displayMode: .always),
-            prompt: Text(String.appLocalized("Search currencies"))
-        )
-        #else
-        .searchable(text: $search, prompt: Text(String.appLocalized("Search currencies")))
-        #endif
-        .navigationTitle(String.appLocalized("Currencies"))
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
     }
 
     private func select(_ currency: Currency) {
