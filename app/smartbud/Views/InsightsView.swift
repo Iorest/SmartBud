@@ -20,6 +20,9 @@ import WidgetKit
 // MARK: - InsightsView
 
 struct InsightsView: View {
+    /// Opens the new-transaction sheet; the empty state offers it as a CTA.
+    var onAdd: (() -> Void)?
+
     @Environment(InsightsViewModel.self) var insightsVM
 
     @AppStorage("currency", store: .appGroup)
@@ -33,27 +36,53 @@ struct InsightsView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                dateRangeRow
-                summaryCards
-                    .padding(.bottom, 13)
-                barChartSection
-                    .padding(.bottom, 18)
-                categoryBreakdownSection
-                    .padding(.bottom, 18)
-                if !insightsVM.todayTransactions.isEmpty {
-                    todaySection
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                    dateRangeRow
+
+                    if insightsVM.periodTotalIncome == 0 && insightsVM.periodTotalSpent == 0 {
+                        // Nothing to chart this period: one explicit empty
+                        // state beats four cards reading 0.00 plus a blank graph.
+                        SBEmptyState(
+                            systemImage: "chart.bar.xaxis",
+                            title: String.appLocalized("No entries in this period"),
+                            message: String.appLocalized(
+                                "Transactions you add will show up here as trends and category shares."),
+                            actionTitle: String.appLocalized("Add New Transaction"),
+                            action: onAdd
+                        )
+                        .padding(.top, 24)
+                    } else {
+                        summaryCards
+                            .padding(.bottom, 13)
+                        barChartSection
+                            .padding(.bottom, 18)
+                        categoryBreakdownSection
+                            .padding(.bottom, 18)
+                        if !insightsVM.todayTransactions.isEmpty {
+                            todaySection
+                        }
+                        if !insightsVM.yesterdayTransactions.isEmpty {
+                            yesterdaySection
+                        }
+                    }
                 }
-                if !insightsVM.yesterdayTransactions.isEmpty {
-                    yesterdaySection
+                // Clear the floating add button and the tab bar.
+                .padding(.bottom, 130)
+            }
+            .background(Color.clear.ignoresSafeArea())
+            .navigationTitle(String.appLocalized("Insights"))
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.large)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    aiButton
                 }
             }
-            // Clear the floating add button and the tab bar.
-            .padding(.bottom, 130)
         }
-        .background(Color.clear.ignoresSafeArea())
         .onAppear {
             insightsVM.setPeriod(period)
             insightsVM.refreshAll()
@@ -70,38 +99,13 @@ struct InsightsView: View {
 
     // MARK: - Header
 
+    /// The period control is the page's only header content now: the title
+    /// lives in the navigation bar and the AI action in the toolbar.
     private var header: some View {
-        Group {
-            if typeSize.isAccessibilitySize {
-                // Title + AI on one row, period control full width below.
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(alignment: .center) {
-                        titleText
-                        Spacer(minLength: 8)
-                        aiButton
-                    }
-                    periodSegmented
-                        .frame(maxWidth: .infinity)
-                }
-            } else {
-                HStack(alignment: .center) {
-                    titleText
-                    Spacer()
-                    aiButton
-                    periodSegmented
-                        .frame(maxWidth: SBControlWidth.segment)
-                }
-            }
-        }
-        .padding(.horizontal, 30)
-        .padding(.top, 20)
-        .padding(.bottom, 20)
-    }
-
-    private var titleText: some View {
-        Text("Insights", comment: "Insights screen title")
-            .font(.title.bold())
-            .foregroundStyle(Color.PrimaryText)
+        periodSegmented
+            .padding(.horizontal, 30)
+            .padding(.top, SBSpace.extraSmall)
+            .padding(.bottom, SBSpace.medium)
     }
 
     private var aiButton: some View {
@@ -109,11 +113,7 @@ struct InsightsView: View {
             showAIAnalysis = true
         } label: {
             Label(String.appLocalized("AI"), systemImage: "sparkles")
-                .font(.subheadline.weight(.medium))
-                .padding(.horizontal, SBSpace.extraSmall)
-                .frame(minHeight: 34)
         }
-        .buttonStyle(.bordered)
         .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
     }
 

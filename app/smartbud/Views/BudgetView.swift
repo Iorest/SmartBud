@@ -56,33 +56,10 @@ struct ActualBudgetView: View {
         NavigationStack {
             ZStack {
                 VStack(spacing: 0) {
-                    HStack {
-                        Text("Budgets")
-                            .font(.title.weight(.semibold))
-                            .accessibility(addTraits: .isHeader)
-
-                        Button {
-                            newBudget = true
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(Color.SubtitleText)
-                                .padding(4)
-                                .systemChip(in: Circle())
-                                .frame(minWidth: 44, minHeight: 44)
-                                .contentShape(Rectangle())
-                        }
-
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 20)
-                    .padding(.horizontal, 30)
-                    .padding(.bottom, 20)
-
                     if !budgets.isEmpty || !mainBudget.isEmpty {
                         ScrollView(showsIndicators: false) {
                             VStack {
+                                Color.clear.frame(height: 8)
                                 if let first = mainBudget.first {
                                     NavigationLink(value: first) {
                                         MainBudgetView(budget: first)
@@ -138,8 +115,20 @@ struct ActualBudgetView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
             }
-            .navigationTitle("")
-            .hiddenNavigationBar()
+            .navigationTitle(String.appLocalized("Budget"))
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.large)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        newBudget = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel(String.appLocalized("New Budget"))
+                }
+            }
             .navigationDestination(for: MainBudgetModel.self) { budget in
                 DetailedMainBudgetView(budget: budget)
             }

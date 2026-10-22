@@ -88,7 +88,7 @@ struct HomeView: View {
         Group {
             switch currentTab {
             case "Insights":
-                InsightsView()
+                InsightsView(onAdd: { addTransaction = true })
             case "Budget":
                 BudgetView()
             case "Settings":
@@ -217,7 +217,7 @@ extension HomeView {
                         Label(String.appLocalized("Log"), systemImage: "list.bullet")
                     }
 
-                InsightsView()
+                InsightsView(onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
                     .tag("Insights")

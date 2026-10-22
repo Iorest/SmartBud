@@ -284,28 +284,25 @@ extension SingleBudgetView {
 
                     Spacer(minLength: 30)
 
-                    HStack {
-                        VStack(alignment: .leading, spacing: -2) {
-                            if totalSpent < budgetAmount {
-                                Text(String.appFormatted("%@ SPENT", percentString1))
-                                    .font(.caption2.weight(.semibold))
-                                    .lineLimit(1)
-                                    .foregroundStyle(totalSpent / budgetAmount > 1 ? Color.AlertRed : Color.IncomeGreen)
-                                    .padding(.bottom, 5)
-                            }
+                    // Main figure is the remaining amount; the status word
+                    // sits beside it so the number is never ambiguous.
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(remainingStatus)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Color.SubtitleText)
 
-                            BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2)
+                        BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2)
 
-                            Text("\(remainingStatus) \(budgetType)")
-                                .font(.footnote.weight(.medium))
-                                .foregroundStyle(Color.SubtitleText)
-                                .minimumScaleFactor(0.7)
-                                .lineLimit(1)
-                        }
-
-                        Spacer()
+                        Spacer(minLength: 0)
                     }
                     .frame(maxWidth: .infinity)
+
+                    Text(String.appFormatted("%@ • %@ spent", budgetType, percentString1))
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(totalSpent >= budgetAmount ? Color.AlertRed : Color.SubtitleText)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     GeometryReader { proxy in
                         ProgressView(value: min(max(totalSpent / max(budgetAmount, 1), 0), 1))
