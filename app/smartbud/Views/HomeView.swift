@@ -29,6 +29,7 @@ struct HomeView: View {
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(CategoryViewModel.self) var categoryVM
     @Environment(AccountViewModel.self) var accountVM
+    @Environment(InsightsViewModel.self) var insightsVM
     @Environment(\.openURL) var openURL
 
     @State var currentTab = "Log"

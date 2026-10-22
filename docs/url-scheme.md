@@ -44,12 +44,14 @@ smartbud://add?amount=12.5&note=午饭
 
 - 成功：`...?id=<UUID>&amount=12.50&date=<ISO 8601>`
 - 失败：`...?error=invalid_amount`（金额缺失、为 0 或不是数字）
+  或 `...?error=app_locked`（App 密码锁未解锁，拒绝写入）
 
 回调 URL 原有的查询参数会保留，SmartBud 只往后追加。
 
 ## 注意事项
 
-- 密码锁开启时，URL 只在已解锁的会话里生效；锁屏状态下系统不会把 URL 交给 App。
+- 密码锁开启且未解锁时，`add` 直接回 `x-error=app_locked`，不会写任何数据：
+  锁屏状态下系统不会把 URL 交给 App，但应用在后台被锁定时仍可能收到。
 - `add` 不做重复检测：同一秒内调用两次会新增两条记录，需要幂等请由调用方负责。
 - 从别的 App 或 `simctl openurl` 触发时，iOS 会先弹一次"在 SmartBud 中打开？"确认，
   这是系统行为，App 无法绕过。

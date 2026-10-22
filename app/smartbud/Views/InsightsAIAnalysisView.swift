@@ -135,6 +135,9 @@ struct InsightsAIAnalysisView: View {
             totalSpent: insightsVM.formattedCurrency(insightsVM.periodTotalSpent),
             net: insightsVM.formattedCurrency(insightsVM.periodTotalNet, sign: true),
             topCategories: Array(categoryTotals),
+            pendingReimbursement: insightsVM.pendingReimbursementTotal > 0
+                ? insightsVM.formattedCurrency(insightsVM.pendingReimbursementTotal)
+                : nil,
             language: Locale.appLocale.identifier
         )
     }

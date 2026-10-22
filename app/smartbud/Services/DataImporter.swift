@@ -52,12 +52,16 @@ enum DataImporter {
     enum ImportError: LocalizedError {
         case unreadable
         case notABackup
+        case newerVersion
         case writeFailed
 
         var errorDescription: String? {
             switch self {
             case .unreadable: String.appLocalized("This file could not be read.")
             case .notABackup: String.appLocalized("This file is not a SmartBud backup.")
+            case .newerVersion:
+                String.appLocalized("This backup comes from a newer version of SmartBud. "
+                                    + "Update the app before restoring it.")
             case .writeFailed: String.appLocalized("The backup could not be saved. Try again.")
             }
         }
@@ -84,6 +88,11 @@ enum DataImporter {
             // empty file. A real backup always carries a schema version, so
             // that is the one key we insist on.
             guard payload.exportedBySmartBud else { throw ImportError.notABackup }
+            // A future format may store amounts or relationships differently;
+            // importing it silently would write wrong numbers into the ledger.
+            guard payload.schemaVersion <= ExportSchema.version else {
+                throw ImportError.newerVersion
+            }
             return payload
         } catch let error as ImportError {
             throw error
@@ -175,7 +184,7 @@ private struct BackupMerger {
             let account = AccountModel(
                 name: dto.name, emoji: dto.emoji, colour: dto.colour,
                 kind: dto.kind, currencyCode: dto.currencyCode,
-                openingBalance: dto.openingBalance, order: dto.order
+                openingBalance: signedAmount(dto.openingBalance), order: dto.order
             )
             account.id = dto.id
             account.hidden = dto.hidden
@@ -193,11 +202,15 @@ private struct BackupMerger {
         for rate in fetch(CurrencyRate.self) { byCode[rate.code] = rate }
 
         for dto in dtos where !dto.code.isEmpty {
+            guard dto.rate.isFinite, dto.rate > 0 else {
+                summary.skipped += 1
+                continue
+            }
             if let rate = byCode[dto.code] {
-                rate.rate = dto.rate
+                rate.rate = min(dto.rate, 1_000_000)
                 rate.updatedAt = dto.updatedAt
             } else {
-                let rate = CurrencyRate(code: dto.code, rate: dto.rate)
+                let rate = CurrencyRate(code: dto.code, rate: min(dto.rate, 1_000_000))
                 rate.updatedAt = dto.updatedAt
                 context.insert(rate)
                 byCode[dto.code] = rate
@@ -220,13 +233,13 @@ private struct BackupMerger {
                 note: dto.note ?? "",
                 category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
                 account: resolveAccount(id: dto.accountId, name: dto.accountName),
-                baseAmount: dto.baseAmount,
+                baseAmount: dto.baseAmount.map(amount),
                 income: dto.income,
-                amount: dto.amount,
+                amount: amount(dto.amount),
                 date: dto.date ?? .now,
                 repeatType: dto.recurringType,
                 repeatCoefficient: dto.recurringCoefficient,
-                discount: dto.discount ?? 0,
+                discount: amount(dto.discount ?? 0),
                 reimbursable: dto.reimbursable ?? false,
                 adjustment: dto.adjustment ?? false
             )
@@ -258,9 +271,9 @@ private struct BackupMerger {
             }
 
             let transfer = TransferModel(
-                amount: dto.amount,
-                destinationAmount: dto.destinationAmount ?? 0,
-                fee: dto.fee ?? 0,
+                amount: amount(dto.amount),
+                destinationAmount: amount(dto.destinationAmount ?? 0),
+                fee: amount(dto.fee ?? 0),
                 date: dto.date,
                 note: dto.note,
                 source: source,
@@ -282,7 +295,8 @@ private struct BackupMerger {
                 summary.skipped += 1
                 continue
             }
-            let budget = BudgetModel(amount: dto.amount, startDate: dto.startDate, type: dto.type)
+            let budget = BudgetModel(amount: amount(dto.amount),
+                                     startDate: dto.startDate, type: dto.type)
             budget.id = dto.id
             budget.dateCreated = dto.dateCreated
             budget.green = dto.green
@@ -304,7 +318,7 @@ private struct BackupMerger {
                 continue
             }
             let mainBudget = MainBudgetModel(
-                amount: dto.amount, startDate: dto.startDate, type: dto.type)
+                amount: amount(dto.amount), startDate: dto.startDate, type: dto.type)
             mainBudget.dateCreated = dto.dateCreated
             mainBudget.green = dto.green
             context.insert(mainBudget)
@@ -322,7 +336,7 @@ private struct BackupMerger {
             }
             let template = TemplateTransactionModel(
                 note: dto.note ?? "", category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
-                income: dto.income, amount: dto.amount, order: dto.order,
+                income: dto.income, amount: amount(dto.amount), order: dto.order,
                 repeatType: dto.recurringType, repeatCoefficient: dto.recurringCoefficient
             )
             template.id = dto.id
@@ -351,5 +365,21 @@ private struct BackupMerger {
 
     private func key(amount: Double, start: Date, type: Int) -> String {
         "\(Money.cents(amount))|\(Int(start.timeIntervalSince1970))|\(type)"
+    }
+
+    // MARK: Validation
+
+    /// Amounts are magnitudes (expenses store `income` separately), so a
+    /// negative or absurd value from a hand-edited file becomes 0/ceiling
+    /// instead of poisoning every total derived from it.
+    private func amount(_ value: Double) -> Double {
+        guard value.isFinite else { return 0 }
+        return min(max(value, 0), Money.maxAmount)
+    }
+
+    /// Opening balances can be negative (credit cards) but not infinite.
+    private func signedAmount(_ value: Double) -> Double {
+        guard value.isFinite else { return 0 }
+        return min(max(value, -Money.maxAmount), Money.maxAmount)
     }
 }

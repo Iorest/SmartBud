@@ -21,6 +21,13 @@ extension HomeView {
 
         switch request.action {
         case .add:
+            // Writing while the privacy lock is up would let a shortcut put
+            // data in a ledger the user has explicitly hidden.
+            guard !appLockVM.isAppLockEnabled || appLockVM.isAppUnLocked else {
+                fireCallback(request.callbackError,
+                             items: [URLQueryItem(name: "error", value: "app_locked")])
+                return true
+            }
             performDeepLinkAdd(request)
             return true
         case .open:
@@ -65,6 +72,11 @@ extension HomeView {
             discount: request.discount,
             reimbursable: request.isReimbursable && !income
         ))
+
+        // The insights screen keeps a snapshot of the totals, and no view
+        // transition happens here to refresh it (unlike closing the entry
+        // form), so refresh explicitly.
+        insightsVM.refreshAll()
 
         fireCallback(request.callbackSuccess, items: [
             URLQueryItem(name: "id", value: transaction.id.uuidString),

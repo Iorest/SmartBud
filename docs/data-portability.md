@@ -52,6 +52,10 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 4. 总预算（`MainBudgetModel`）没有 id，按 `金额 + 起始日 + 周期` 三元组去重。
 5. 汇率按货币代码更新本机值（属于配置，不算"数据条数"）。
 6. 整个导入只在最后 `save()` 一次；失败会 `rollback()`，不会留下半份数据。
+7. `schemaVersion` 比当前版本新时直接拒绝：新格式可能换了金额或关系的存法，
+   静默导入会把错数字写进账本。
+8. 金额做防御性收敛：负数/超上限的金额被夹到 `0...1 亿`，非有限值按 0，
+   汇率必须大于 0 否则跳过该条。手工改过的文件不会污染统计。
 
 导入完成后界面会显示「已导入 N 条记录 / 跳过 M 条已存在的记录」。
 
@@ -67,3 +71,9 @@ date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbur
 - 按 RFC 4180 转义：含逗号、引号或换行的字段加引号，内部引号翻倍
 
 CSV 是单向的，没有导入实现 —— 需要能导回的场合请用 JSON。
+
+## 导入之后
+
+导入不经过 `DataRepository.save()`（整份文件一次提交），所以要显式刷新：
+账户、分类、统计视图模型和小组件时间线。`SettingsImportView` 已经这么做；
+新增导入入口时别漏掉这一步。账目口径见 [ledger-rules.md](ledger-rules.md)。

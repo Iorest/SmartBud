@@ -221,9 +221,12 @@ final class AccountViewModel {
     }
 
     /// Default for a new transaction: the account used last, otherwise the
-    /// first visible one.
+    /// first visible one. An archived account is never auto-selected — it is
+    /// out of the daily flow, so a new entry must not land there by accident.
     func defaultAccount(lastUsedID: String?) -> AccountModel? {
-        if let lastUsedID, let match = accounts.first(where: { $0.id.uuidString == lastUsedID }) {
+        if let lastUsedID,
+           let match = accounts.first(where: { $0.id.uuidString == lastUsedID }),
+           !match.archived {
             return match
         }
         return visibleAccounts.first

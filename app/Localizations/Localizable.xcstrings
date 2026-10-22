@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "This backup comes from a newer version of SmartBud. Update the app before restoring it." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This backup comes from a newer version of SmartBud. Update the app before restoring it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这份备份来自更新版本的 SmartBud。请先升级应用再恢复。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這份備份來自更新版本的 SmartBud。請先升級應用程式再還原。"
+          }
+        }
+      }
+    },
     "Discount" : {
       "localizations" : {
         "en" : {

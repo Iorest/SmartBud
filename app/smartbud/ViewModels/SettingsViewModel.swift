@@ -12,7 +12,20 @@ final class SettingsViewModel {
     /// for App Store Guideline 5.1.1(v) compliance. See
     /// `DataRepository.wipeEverything()` for the full path.
     func wipeAllData() async -> DataRepository.WipeOutcome {
-        await repo.wipeEverything()
+        let outcome = await repo.wipeEverything()
+        // Everything that caches fetched rows has to forget them: the user
+        // stays in the app after erasing, and a stale account or rate table
+        // would keep showing (and converting with) deleted data.
+        accountReload()
+        return outcome
+    }
+
+    /// Pulled out so the erase flow reads as one action.
+    private func accountReload() {
+        AccountViewModel.shared.load()
+        CategoryViewModel.shared.load()
+        BudgetViewModel.shared.load()
+        InsightsViewModel.shared.refreshAll()
     }
 
     // MARK: - In-app language

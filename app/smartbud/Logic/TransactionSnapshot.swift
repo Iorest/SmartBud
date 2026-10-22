@@ -9,18 +9,26 @@
 
 import Foundation
 
-/// Everything needed to rebuild a transaction row. Recurrence fields are part
-/// of the snapshot so undo never turns a repeating transaction into a one-off.
+/// Everything needed to rebuild a transaction row *exactly*. Anything the
+/// editor can write has to be captured here: a restore that silently dropped
+/// the account, the frozen base amount or the claim flag would change the
+/// account balance and the statistics behind the user's back.
 struct TransactionSnapshot {
     let id: UUID
     let note: String
     let amount: Double
     let date: Date
     let category: CategoryModel?
+    let account: AccountModel?
+    let baseAmount: Double?
     let income: Bool
     let repeatType: Int
     let repeatCoefficient: Int
     let onceRecurring: Bool
+    let discount: Double
+    let reimbursable: Bool
+    let reimbursedAt: Date?
+    let adjustment: Bool
 
     @MainActor
     init(_ txn: TransactionModel) {
@@ -29,10 +37,16 @@ struct TransactionSnapshot {
         amount = txn.amount
         date = txn.wrappedDate
         category = txn.category
+        account = txn.account
+        baseAmount = txn.baseAmount
         income = txn.income
         repeatType = txn.recurringType
         repeatCoefficient = txn.recurringCoefficient
         onceRecurring = txn.onceRecurring
+        discount = txn.discount
+        reimbursable = txn.reimbursable
+        reimbursedAt = txn.reimbursedAt
+        adjustment = txn.adjustment
     }
 
     /// Rebuilds the row when `rollback()` could not bring the original object
@@ -42,14 +56,20 @@ struct TransactionSnapshot {
         let txn = TransactionModel(
             note: note,
             category: category,
+            account: account,
+            baseAmount: baseAmount,
             income: income,
             amount: amount,
             date: date,
             repeatType: repeatType,
-            repeatCoefficient: repeatCoefficient
+            repeatCoefficient: repeatCoefficient,
+            discount: discount,
+            reimbursable: reimbursable,
+            adjustment: adjustment
         )
         txn.id = id
         txn.onceRecurring = onceRecurring
+        txn.reimbursedAt = reimbursedAt
         return txn
     }
 }

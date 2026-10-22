@@ -78,6 +78,10 @@ struct LedgerSummary: Codable {
     let totalSpent: String
     let net: String
     let topCategories: [CategoryTotal]
+    /// Expenses the user will be paid back for. They are excluded from
+    /// `totalSpent`, so the analyst has to know they exist to explain why the
+    /// card is lower than the bank statement.
+    let pendingReimbursement: String?
     let language: String
 }
 
@@ -227,8 +231,10 @@ struct LLMClient {
         ledger figures as JSON (already formatted strings; do not recompute). \
         Reply in the language given by the "language" field. Give 3-5 short, \
         concrete observations: spending pattern, the largest category trend, \
-        and one actionable suggestion. No preamble, no markdown headings, \
-        no invented numbers beyond the JSON.
+        and one actionable suggestion. "pendingReimbursement" is money the \
+        user expects back and is already excluded from "totalSpent"; mention \
+        it only when present. No preamble, no markdown headings, no invented \
+        numbers beyond the JSON.
         """
         let json = String(data: try JSONEncoder().encode(summary), encoding: .utf8) ?? "{}"
         return try await complete(system: system, user: json)

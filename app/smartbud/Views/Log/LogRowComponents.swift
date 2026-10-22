@@ -148,16 +148,23 @@ struct LogTransferRow: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// What actually left the source account, fee included. Without the fee
+    /// the row would disagree with the balance the account screen shows.
     private var amountText: String {
         let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
         let sent = Money.format(transfer.amount, currencyCode: outgoing,
                                 showsCents: showCents, locale: .appLocale)
-        guard transfer.destinationAmount > 0 else { return sent }
+        let feeText = transfer.fee > 0
+            ? Money.format(transfer.fee, currencyCode: outgoing,
+                           showsCents: showCents, locale: .appLocale)
+            : nil
+        let sentWithFee = feeText.map { "\(sent) + \($0)" } ?? sent
+        guard transfer.destinationAmount > 0 else { return sentWithFee }
 
         let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
         let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
                                   showsCents: showCents, locale: .appLocale)
-        return "\(sent) → \(landed)"
+        return "\(sentWithFee) → \(landed)"
     }
 
     private var timeText: String {

@@ -9,6 +9,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import WidgetKit
 
 struct SettingsImportView: View {
     @Environment(\.dismiss) private var dismiss
@@ -146,6 +147,10 @@ struct SettingsImportView: View {
                 AccountViewModel.shared.load()
                 CategoryViewModel.shared.load()
                 InsightsViewModel.shared.refreshAll()
+                // The import saves the context directly (one transaction for
+                // the whole file), which bypasses the repository's own
+                // timeline reload.
+                WidgetCenter.shared.reloadAllTimelines()
             } catch let error as DataImporter.ImportError {
                 errorMessage = error.errorDescription
                 isPresentingError = true

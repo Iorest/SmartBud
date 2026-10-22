@@ -80,11 +80,13 @@ struct FilteredCategoryDayBudgetView: View {
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                ($0.day ?? past) == day && !$0.income && ($0.date ?? future) <= now && $0.category?.id == categoryId
+                ($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? future) <= now && $0.category?.id == categoryId
             }, sort: [SortDescriptor(\.date, order: .reverse)])
         } else {
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                ($0.day ?? past) == day && !$0.income && ($0.date ?? future) <= now
+                ($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? future) <= now
             }, sort: [SortDescriptor(\.date, order: .reverse)])
         }
 
@@ -229,14 +231,14 @@ struct FilteredBudgetView: View {
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                !$0
-                    .income && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate && $0
-                    .category?
-                    .id == categoryId
+                !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
+                    && $0.category?.id == categoryId
             })
         } else {
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                !$0.income && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
+                !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
             })
         }
 

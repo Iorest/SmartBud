@@ -75,7 +75,8 @@ final class TransactionViewModel {
         txn.income = edit.income
         txn.discount = edit.discount
         // Only expenses can be claimed back; switching to income drops the flag.
-        txn.reimbursable = edit.reimbursable && !edit.income
+        // Balance adjustments are corrections, never claims.
+        txn.reimbursable = edit.reimbursable && !edit.income && !txn.adjustment
         if !txn.reimbursable { txn.reimbursedAt = nil }
 
         let calendar = Calendar(identifier: .gregorian)
@@ -296,6 +297,14 @@ final class TransactionViewModel {
             txn.category = category
             if let category {
                 txn.income = category.income
+                // An income row cannot be a reimbursement claim: moving a
+                // claim into an income category would otherwise leave it in
+                // the pending list and count it as earned money at the same
+                // time. Balance adjustments are never claims either.
+                if category.income || txn.adjustment {
+                    txn.reimbursable = false
+                    txn.reimbursedAt = nil
+                }
                 if noteWasCategoryName {
                     txn.note = category.wrappedName
                 }

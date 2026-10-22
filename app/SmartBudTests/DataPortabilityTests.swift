@@ -214,12 +214,71 @@ struct DataImporterTests {
         #expect(file.rates.isEmpty)
     }
 
+    @Test("A backup written by a newer app version is refused")
+    func rejectsNewerSchema() {
+        let future = Data("{\"schemaVersion\": 99, \"transactions\": []}".utf8)
+        #expect(throws: DataImporter.ImportError.self) {
+            _ = try DataImporter.decode(future)
+        }
+    }
+
+    @Test("Corrupt amounts are clamped and bad rates are skipped")
+    func sanitizesValues() throws {
+        let transaction = ExportSchema.TransactionDTO(
+            id: UUID(), amount: -5, date: .now, day: nil, month: nil,
+            note: "", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: nil, categoryName: nil,
+            accountId: nil, accountName: nil, baseAmount: .infinity,
+            accountCurrency: nil, discount: 1e12, reimbursable: nil,
+            reimbursedAt: nil, adjustment: nil
+        )
+        let badRate = ExportSchema.RateDTO(code: "USD", rate: 0, updatedAt: .now)
+
+        let summary = try DataImporter.apply(
+            payload(transactions: [transaction], rates: [badRate]),
+            context: context
+        )
+
+        let stored = try context.fetch(FetchDescriptor<TransactionModel>()).first
+        #expect(stored?.amount == 0)
+        #expect(stored?.baseAmount == 0)
+        #expect(stored?.discount == Money.maxAmount)
+        #expect(try context.fetch(FetchDescriptor<CurrencyRate>()).isEmpty)
+        #expect(summary.skipped == 1)
+    }
+
     @Test("A file that is not a backup is rejected")
     func rejectsForeignFile() {
         let notBackup = Data("{\"hello\":1}".utf8)
         #expect(throws: DataImporter.ImportError.self) {
             _ = try DataImporter.decode(notBackup)
         }
+    }
+
+    @Test("Undo snapshots keep every field the editor can write")
+    func snapshotRoundTripsEverything() throws {
+        let category = CategoryModel(name: "餐饮", emoji: "🍜", colour: "#FF0000")
+        context.insert(category)
+        let account = AccountModel(name: "招行", currencyCode: "CNY", openingBalance: 100)
+        context.insert(account)
+
+        let original = TransactionModel(
+            note: "午餐", category: category, account: account, baseAmount: 42.5,
+            income: false, amount: 42.5, date: .now,
+            discount: 5, reimbursable: true, adjustment: false
+        )
+        original.reimbursedAt = Date(timeIntervalSince1970: 1_700_000_000)
+        context.insert(original)
+
+        let restored = TransactionSnapshot(original).makeTransaction()
+
+        #expect(restored.account?.id == account.id)
+        #expect(restored.baseAmount == 42.5)
+        #expect(restored.discount == 5)
+        #expect(restored.reimbursable)
+        #expect(restored.reimbursedAt == original.reimbursedAt)
+        #expect(!restored.adjustment)
+        #expect(restored.id == original.id)
     }
 
     @Test("Archived accounts stay archived and out of the visible list")

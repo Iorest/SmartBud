@@ -43,6 +43,14 @@ struct InsightsView: View {
                     header
                     dateRangeRow
 
+                    // Claims are excluded from income and spend, so a period
+                    // with nothing but claims would otherwise fall into the
+                    // "no entries" state and hide the money the user is owed.
+                    if insightsVM.pendingReimbursementTotal > 0 {
+                        pendingReimbursementCard
+                            .padding(.bottom, 13)
+                    }
+
                     if insightsVM.periodTotalIncome == 0 && insightsVM.periodTotalSpent == 0 {
                         // Nothing to chart this period: one explicit empty
                         // state beats four cards reading 0.00 plus a blank graph.
@@ -58,10 +66,6 @@ struct InsightsView: View {
                     } else {
                         summaryCards
                             .padding(.bottom, 13)
-                        if insightsVM.pendingReimbursementTotal > 0 {
-                            pendingReimbursementCard
-                                .padding(.bottom, 13)
-                        }
                         barChartSection
                             .padding(.bottom, 18)
                         categoryBreakdownSection
