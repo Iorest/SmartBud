@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1A2B3C40000000000000901 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
+		E1A2B3C40000000000000902 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000900 /* AppLockView.swift */; };
 		E1A2B3C40000000000000801 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
 		E1A2B3C40000000000000802 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000800 /* AppCommands.swift */; };
 		E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */; };
@@ -565,6 +567,7 @@
 		D0C0FFEE0000000000000190 /* SmartBud-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "SmartBud-macOS.entitlements"; sourceTree = "<group>"; };
 		E1A2B3C40000000000000200 /* SBTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/DesignSystem/SBTokens.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000800 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppCommands.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C40000000000000900 /* AppLockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/AppLockView.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000206 /* SBCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBCard.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000020F /* SBEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBEmptyState.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Components/DesignSystem/SBSaveErrorBanner.swift; sourceTree = "<group>"; };
@@ -722,6 +725,7 @@
 				D0C0FFEE0000000000000009 /* SmartBudMac */,
 				E1A2B3C40000000000000200 /* SBTokens.swift */,
 				E1A2B3C40000000000000800 /* AppCommands.swift */,
+				E1A2B3C40000000000000900 /* AppLockView.swift */,
 				E1A2B3C40000000000000206 /* SBCard.swift */,
 				E1A2B3C4000000000000020F /* SBEmptyState.swift */,
 				E1A2B3C40000000000000215 /* SBSaveErrorBanner.swift */,
@@ -1346,6 +1350,7 @@
 				E1A2B3C40000000000000501 /* TemplatesView.swift in Sources */,
 							E1A2B3C40000000000000702 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000801 /* AppCommands.swift in Sources */,
+				E1A2B3C40000000000000901 /* AppLockView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1560,6 +1565,7 @@
 				E1A2B3C40000000000000502 /* TemplatesView.swift in Sources */,
 							E1A2B3C40000000000000703 /* HomeView+DeleteConfirmation.swift in Sources */,
 				E1A2B3C40000000000000802 /* AppCommands.swift in Sources */,
+				E1A2B3C40000000000000902 /* AppLockView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

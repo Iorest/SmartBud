@@ -21,6 +21,9 @@ class OverallTransactionManager {
 
 struct HomeView: View {
     @Environment(AppLockViewModel.self) var appLockVM
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
 
     @State var transactionManager = OverallTransactionManager()
     @Environment(TransactionViewModel.self) var transactionVM
@@ -60,31 +63,52 @@ struct HomeView: View {
         #endif
     }
 
-    #if os(macOS)
-    /// Mac uses a real sidebar instead of the compact tab strip. The detail
-    /// column keeps the same 860pt reading width as the iPad layout.
-    private var macShell: some View {
+    /// Sidebar entries for the wide layout. `id` matches the tab tags.
+    struct SidebarSection: Identifiable {
+        let id: String
+        let titleKey: String
+        let symbol: String
+    }
+
+    static let sections: [SidebarSection] = [
+        SidebarSection(id: "Log", titleKey: "Log", symbol: "list.bullet"),
+        SidebarSection(id: "Insights", titleKey: "Insights", symbol: "chart.bar.fill"),
+        SidebarSection(id: "Budget", titleKey: "Budget", symbol: "chart.pie.fill"),
+        SidebarSection(id: "Settings", titleKey: "Settings", symbol: "gearshape.fill")
+    ]
+
+    /// Wide layouts (Mac, iPad in regular width) use a real sidebar instead of
+    /// the compact tab strip. The detail column keeps an 860pt reading width.
+    private var splitShell: some View {
         NavigationSplitView {
-            List(selection: $currentTab) {
-                Label(String.appLocalized("Log"), systemImage: "list.bullet")
-                    .tag("Log")
-                Label(String.appLocalized("Insights"), systemImage: "chart.bar.fill")
-                    .tag("Insights")
-                Label(String.appLocalized("Budget"), systemImage: "chart.pie.fill")
-                    .tag("Budget")
-                Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
-                    .tag("Settings")
+            List {
+                ForEach(Self.sections) { section in
+                    Button {
+                        currentTab = section.id
+                    } label: {
+                        Label(String.appLocalized(section.titleKey), systemImage: section.symbol)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .listRowBackground(
+                        currentTab == section.id
+                            ? Color.accentColor.opacity(0.15)
+                            : Color.clear
+                    )
+                }
             }
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
         } detail: {
-            macDetail
+            splitDetail
         }
-                .environment(transactionManager)
+        .navigationSplitViewStyle(.balanced)
+        .environment(transactionManager)
     }
 
     @ViewBuilder
-    private var macDetail: some View {
+    private var splitDetail: some View {
         Group {
             switch currentTab {
             case "Insights":
@@ -109,7 +133,6 @@ struct HomeView: View {
             }
         }
     }
-    #endif
 
     /// Explicit undo affordance for a staged delete. Replaces the previous
     /// AlertToast, whose tap handler was swallowed on iOS 26 so "undo" only
@@ -152,62 +175,12 @@ struct HomeView: View {
     }
 }
 
-struct AppLockView: View {
-    @Environment(AppLockViewModel.self) var appLockVM
-
-    var body: some View {
-        VStack(spacing: 15) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 65))
-                .foregroundStyle(Color.DarkIcon.opacity(0.7))
-
-            Text("App Locked")
-                .font(.title.weight(.semibold))
-                .foregroundStyle(Color.PrimaryText)
-                .padding(.bottom, 30)
-
-            Button {
-                appLockVM.appLockValidation()
-            } label: {
-                HStack {
-                    Image(systemName: "faceid")
-
-                    Text("Unlock App")
-                }
-                .font(.title3.weight(.medium))
-                .foregroundStyle(Color.PrimaryText)
-                .padding(.horizontal, 40)
-                .padding(.vertical, 15)
-                .overlay {
-                    RoundedRectangle(cornerRadius: SBRadius.card)
-                        .stroke(Color.Outline)
-                }
-            }
-
-            if appLockVM.enrollmentError {
-                Text("Please re-enable Face ID access in the Settings app to unlock application.")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.SubtitleText)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .padding(.horizontal, 30)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.PrimaryBackground.opacity(0.3))
-        .background(.ultraThinMaterial)
-    }
-}
-
 extension HomeView {
 
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            AppBackground()
-
-            #if os(macOS)
-            macShell
-            #else
-            TabView(selection: $currentTab) {
+    /// Compact layouts keep the bottom tab strip.
+    @ViewBuilder
+    private var tabShell: some View {
+        TabView(selection: $currentTab) {
                 LogView(launchSearch: launchSearch,
                         onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
@@ -240,19 +213,45 @@ extension HomeView {
                     .tabItem {
                         Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
                     }
+        }
+    }
+
+    /// Mac always, iPad when it has room; iPhone keeps the tab strip.
+    private var isWideLayout: Bool {
+        #if os(macOS)
+        true
+        #else
+        horizontalSizeClass == .regular
+        #endif
+    }
+
+    @ViewBuilder
+    private var shell: some View {
+        Group {
+            if isWideLayout {
+                splitShell
+            } else {
+                tabShell
             }
-                        .environment(transactionManager)
-            // Light selection feedback when switching tabs (HIG: every
-            // interaction gets feedback).
-            .sensoryFeedback(.selection, trigger: currentTab)
-            .overlay(alignment: .top) {
-                if isInFallbackMode {
-                    FallbackSyncBanner()
-                        .padding(.horizontal, 14)
-                        .padding(.top, topEdge + 6)
-                }
+        }
+        .environment(transactionManager)
+        // Light selection feedback when switching sections (HIG: every
+        // interaction gets feedback).
+        .sensoryFeedback(.selection, trigger: currentTab)
+        .overlay(alignment: .top) {
+            if isInFallbackMode {
+                FallbackSyncBanner()
+                    .padding(.horizontal, 14)
+                    .padding(.top, topEdge + 6)
             }
-            #endif
+        }
+    }
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            AppBackground()
+
+            shell
 
             if transactionVM.pendingDelete != nil {
                 // Bottom snackbar, above the tab bar: the top of the screen
