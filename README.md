@@ -64,6 +64,7 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 
 ## Documentation
 
+- [Design](docs/design.md) — the full model: entities, money layers, feature contracts, caching, sync, and the gap list.
 - [Ledger rules](docs/ledger-rules.md) — which row counts as spend, income, claim or adjustment, and where it shows up.
 - [Data export and restore](docs/data-portability.md) — JSON backup format, import rules, CSV columns.
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
