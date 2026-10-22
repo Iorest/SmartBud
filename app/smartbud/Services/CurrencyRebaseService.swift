@@ -51,6 +51,19 @@ enum CurrencyRebaseService {
 
         let transactions = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         for transaction in transactions {
+            // An account without a currency is denominated in the base
+            // currency (the app falls back to it), and a transaction without
+            // an account is shown in the base too. Their `amount` is therefore
+            // an old-base number as well: converting only `baseAmount` would
+            // leave the row and the account balance in the old scale while
+            // every total moved to the new one.
+            let amountsAreInBase = (transaction.account?.currencyCode ?? "").isEmpty
+            if amountsAreInBase {
+                let converted = Money.cents(transaction.amount * factor)
+                transaction.amount = Money.double(converted)
+                transaction.baseAmount = Money.double(converted)
+                continue
+            }
             // Rows written before multi-currency support have no `baseAmount`;
             // their `amount` was already in the old base, so materialise it.
             let source = transaction.baseAmount ?? transaction.amount

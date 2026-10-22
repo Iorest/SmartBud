@@ -34,6 +34,11 @@ struct ContentView: View {
     @AppStorage(AppDefaultsKey.appLanguage, store: .appGroup) var appLanguage: String = ""
     @AppStorage("colourScheme", store: .appGroup) var colourScheme: Int = 0
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// Compact layouts have no room for the persistent banner (the floating tab
+    /// bar owns the bottom edge), so the degraded store is announced once.
+    @State private var showFallbackNotice = false
+
     var body: some View {
         @Bindable var contentVM = contentVM
 
@@ -72,6 +77,18 @@ struct ContentView: View {
                 appLockVM.appLockValidation()
             }
             contentVM.bootstrap()
+            #if DEBUG
+            // QA hook: the degraded store is hard to reproduce once the App
+            // Group exists, so it can be forced for screenshots/UI tests.
+            let forcedFallback = ProcessInfo.processInfo.environment["FORCE_FALLBACK"] == "1"
+            #else
+            let forcedFallback = false
+            #endif
+            #if os(iOS)
+            if dataRepo.isInFallbackMode || forcedFallback, horizontalSizeClass != .regular {
+                showFallbackNotice = true
+            }
+            #endif
             // Verify Pro entitlement + load SK2 products on launch so the
             // first time the user opens the Pro screen it's already
             // correct (no "Not Pro" flash on a valid subscriber, no
@@ -82,6 +99,12 @@ struct ContentView: View {
             // the 3rd, 10th, and 25th transaction rather than here, so
             // the user is asked *after* they have something to rate.
             ReviewRequester.recordAppLaunch()
+        }
+        .alert(String.appLocalized(SettingsKey.bannerFallbackTitle),
+               isPresented: $showFallbackNotice) {
+            Button(String.appLocalized("OK"), role: .cancel) {}
+        } message: {
+            Text(String.appLocalized(SettingsKey.bannerFallbackBody))
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -103,7 +126,9 @@ struct ContentView: View {
 /// iCloud, or a corrupted store). Lives outside `ContentView` so the Mac
 /// layout can place it inside the detail column instead of over the sidebar.
 struct FallbackSyncBanner: View {
-    var body: some View {
+    var body: some View { fullBanner }
+
+    private var fullBanner: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "icloud.slash.fill")
                 .font(.body.weight(.semibold))

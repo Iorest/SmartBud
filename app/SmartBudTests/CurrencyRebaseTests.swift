@@ -103,6 +103,7 @@ struct CurrencyRebaseApplicationTests {
     @Test("Every stored amount is converted and the table is rebuilt")
     func convertsStoredAmounts() throws {
 
+        // No account → the amount is a base-currency number and must move.
         let modern = TransactionModel(baseAmount: 100, amount: 100, date: .now)
         let legacy = TransactionModel(amount: 50, date: .now)      // no baseAmount
         let budget = BudgetModel(amount: 1000)
@@ -121,8 +122,10 @@ struct CurrencyRebaseApplicationTests {
         let result = try CurrencyRebaseService.apply(plan, context: context)
 
         #expect(result.transactions == 2)
+        #expect(abs(modern.amount - 13.89) < 0.001)
         #expect(abs((modern.baseAmount ?? 0) - 13.89) < 0.001)
-        #expect(abs((legacy.baseAmount ?? 0) - 6.94) < 0.001)   // materialised
+        #expect(abs(legacy.amount - 6.94) < 0.001)                // converted too
+        #expect(abs((legacy.baseAmount ?? 0) - 6.94) < 0.001)     // materialised
         #expect(abs(budget.amount - 138.89) < 0.001)
         #expect(abs(mainBudget.amount - 277.78) < 0.001)
         #expect(abs(template.amount - 4.17) < 0.001)
@@ -131,5 +134,43 @@ struct CurrencyRebaseApplicationTests {
         #expect(rates.first { $0.code == "USD" } == nil)          // new base has no row
         #expect(rates.first { $0.code == "CNY" }?.rate == 0.138889)
         #expect(rates.first { $0.code == "EUR" }?.rate == 1.083333)
+    }
+
+    @Test("An account with its own currency keeps its amounts, only baseAmount moves")
+    func keepsForeignAccountAmounts() throws {
+        let account = AccountModel(name: "USD 账户", currencyCode: "USD", openingBalance: 0)
+        context.insert(account)
+        let local = TransactionModel(baseAmount: 720, amount: 100, date: .now)
+        local.account = account
+        context.insert(local)
+        try context.save()
+
+        // 1 SGD = 5.2271 CNY, so 100 USD (720 CNY) is about 137.73 SGD.
+        let plan = try CurrencyRebase.plan(
+            from: "CNY", to: "SGD", rates: ["SGD": 5.2271, "USD": 7.2]
+        ).get()
+        _ = try CurrencyRebaseService.apply(plan, context: context)
+
+        // 100 USD stays 100 USD; only its base value moves.
+        #expect(local.amount == 100)
+        #expect(abs((local.baseAmount ?? 0) - 137.74) < 0.02)
+    }
+
+    @Test("A transaction on a base-currency account moves its amount as well")
+    func convertsBaseCurrencyAccountAmounts() throws {
+        let account = AccountModel(name: "现金", currencyCode: "", openingBalance: 0)
+        context.insert(account)
+        let local = TransactionModel(baseAmount: 100, amount: 100, date: .now)
+        local.account = account
+        context.insert(local)
+        try context.save()
+
+        let plan = try CurrencyRebase.plan(
+            from: "CNY", to: "USD", rates: ["USD": 7.2]
+        ).get()
+        _ = try CurrencyRebaseService.apply(plan, context: context)
+
+        #expect(abs(local.amount - 13.89) < 0.001)
+        #expect(abs((local.baseAmount ?? 0) - 13.89) < 0.001)
     }
 }

@@ -228,8 +228,21 @@ extension HomeView {
     private var shell: some View {
         Group {
             if isWideLayout {
+                // Wide layouts have no bottom tab strip, so the inset belongs
+                // to the whole detail column.
                 splitShell
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        if isInFallbackMode {
+                            FallbackSyncBanner()
+                                .padding(.horizontal, 14)
+                                .padding(.bottom, 6)
+                        }
+                    }
             } else {
+                // Compact layouts announce the degraded store once, in
+                // ContentView. A persistent strip cannot coexist with the
+                // floating tab bar: a bottom inset pushed the bar off-screen
+                // and the tab-bar accessory blurs text.
                 tabShell
             }
         }
@@ -237,15 +250,6 @@ extension HomeView {
         // Light selection feedback when switching sections (HIG: every
         // interaction gets feedback).
         .sensoryFeedback(.selection, trigger: currentTab)
-        // Bottom inset rather than a top overlay: at the top the banner sat on
-        // top of the navigation bar (it covered 总资产 and the Accounts title).
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if isInFallbackMode {
-                FallbackSyncBanner()
-                    .padding(.horizontal, 14)
-                    .padding(.bottom, 6)
-            }
-        }
     }
 
     var body: some View {
