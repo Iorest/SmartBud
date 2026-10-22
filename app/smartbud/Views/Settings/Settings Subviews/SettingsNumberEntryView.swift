@@ -16,6 +16,10 @@ struct SettingsNumberEntryView: View {
     @AppStorage("continuousEntry", store: .appGroup)
     var continuousEntry: Bool = false
 
+    /// Shared with `HomeView`: open the entry form right after launch.
+    @AppStorage("launchIntoEntry", store: .appGroup)
+    var launchIntoEntry: Bool = false
+
     private let options = [
         String.appLocalized(SettingsKey.numberEntryType1),
         String.appLocalized(SettingsKey.numberEntryType2)
@@ -36,6 +40,14 @@ struct SettingsNumberEntryView: View {
             } footer: {
                 Text(String.appLocalized("Decimal entry adds a decimal key to the "
                      + "keypad; whole numbers only hides it."))
+            }
+
+            Section {
+                Toggle(String.appLocalized("Open a new entry on launch"),
+                       isOn: $launchIntoEntry)
+            } footer: {
+                Text(String.appLocalized(
+                    "Skips the ledger and drops you straight into the number pad when the app opens."))
             }
 
             Section {

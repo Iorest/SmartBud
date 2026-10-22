@@ -49,6 +49,8 @@ struct HomeView: View {
     @Query private var transactions: [TransactionModel]
     @AppStorage("confetti", store: .appGroup) private var confetti: Bool = false
     @AppStorage("firstTransactionViewLaunch", store: .appGroup) private var firstLaunch: Bool = true
+    /// "秒开": open the entry form straight after launch.
+    @AppStorage("launchIntoEntry", store: .appGroup) private var launchIntoEntry: Bool = false
 
     init(topEdge: CGFloat, isInFallbackMode: Bool = false) {
         self.topEdge = topEdge
@@ -334,6 +336,9 @@ extension HomeView {
                 addTransaction = true
             }
             #endif
+            if launchIntoEntry, !appLockVM.isAppLockEnabled {
+                addTransaction = true
+            }
             if appLockVM.isAppLockEnabled && fromURL1 {
                 Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(500))

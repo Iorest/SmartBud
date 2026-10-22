@@ -15448,6 +15448,50 @@
           }
         }
       }
+    },
+    "Open a new entry on launch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open a new entry on launch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启动时直接记账"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "啟動時直接記帳"
+          }
+        }
+      }
+    },
+    "Skips the ledger and drops you straight into the number pad when the app opens." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skips the ledger and drops you straight into the number pad when the app opens."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 App 时跳过记录列表，直接进入数字键盘记一笔。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 App 時跳過記錄列表，直接進入數字鍵盤記一筆。"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"
