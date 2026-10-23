@@ -248,6 +248,7 @@
 		E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */; };
 		E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */; };
 		E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */; };
+		E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */; };
 		E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
@@ -627,6 +628,7 @@
 		E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TransferFeeMigration.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/ReimbursementLedgerTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/TransferFeeTests.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/ImportRoundTripTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogPeriodTotals.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
@@ -782,6 +784,7 @@
 				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
 				E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */,
 				E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */,
+				E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */,
 				E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */,
 				E1A2B3C4000000000000F041 /* LocalizationCoverageTests.swift */,
 				E1A2B3C4000000000000F071 /* DataImporterTests.swift */,
@@ -1636,6 +1639,7 @@
 				E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */,
 				E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */,
+				E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */,
 				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,

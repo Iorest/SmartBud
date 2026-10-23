@@ -174,7 +174,7 @@ enum DataImporter {
               !backupBase.isEmpty else { return nil }
 
         let storeIsEmpty = isEmpty(context)
-        let localBase = (UserDefaults.appGroup.string(forKey: "currency") ?? "").uppercased()
+        let localBase = AppBaseCurrency.code.uppercased()
 
         if storeIsEmpty { return settings }
         if !localBase.isEmpty, localBase != backupBase {
