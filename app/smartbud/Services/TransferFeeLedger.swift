@@ -73,7 +73,13 @@ enum TransferFeeLedger {
             predicate: #Predicate { $0.income == false })
         let expense = (try? context.fetch(descriptor)) ?? []
 
-        if let existing = expense.first(where: { $0.name == name }) { return existing }
+        // Match on the name in the current language *or* on the icon/colour we
+        // create it with: switching the app language must not leave a second
+        // "Transfer Fee" category behind.
+        if let existing = expense.first(where: { $0.name == name })
+            ?? expense.first(where: { $0.wrappedEmoji == "🧾" && $0.colour.uppercased() == "#8E8E93" }) {
+            return existing
+        }
 
         let category = CategoryModel(
             name: name,

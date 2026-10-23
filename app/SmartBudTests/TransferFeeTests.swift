@@ -122,6 +122,23 @@ struct TransferFeeTests {
         #expect((try? context.fetch(FetchDescriptor<TransferModel>()))?.count == 1)
     }
 
+    @Test("Switching language does not create a second fee category")
+    func categorySurvivesLanguageChange() throws {
+        let first = makeTransfer().transfer
+        let row = try #require(TransferFeeLedger.recordFee(for: first, in: context))
+        let original = try #require(row.category)
+
+        // Simulate the app running in another language: the localised name no
+        // longer matches, but the icon/colour still identifies the category.
+        original.name = "Transfer Fee"
+        let again = TransferFeeLedger.feeCategory(in: context)
+
+        #expect(again?.id == original.id)
+        let count = (try context.fetch(FetchDescriptor<CategoryModel>()))
+            .filter { !$0.income }.count
+        #expect(count == 1)
+    }
+
     @Test("The fee reuses one category instead of creating a new one each time")
     func reusesCategory() {
         let first = makeTransfer().transfer
