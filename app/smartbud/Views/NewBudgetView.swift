@@ -71,12 +71,21 @@ struct BrandNewBudgetView: View {
 
         let average: Double
 
-        if budgetTimeFrame == .week {
+        // Use the same period maths as the rest of the app: a month that starts
+        // on the 15th runs 30/31 days, so a flat /30 makes the hint disagree
+        // with the budget's own date range.
+        let calendar = Calendar.current
+        switch budgetTimeFrame {
+        case .week:
             average = padVM.price / 7
-        } else if budgetTimeFrame == .month {
-            average = padVM.price / 30
-        } else {
-            average = padVM.price / 365
+        case .month:
+            let range = AppPeriod.monthRange(containing: .now,
+                                             startDay: firstDayOfMonth,
+                                             calendar: calendar)
+            average = padVM.price / Double(AppPeriod.dayCount(in: range, calendar: calendar))
+        default:
+            let range = AppPeriod.yearRange(containing: .now, calendar: calendar)
+            average = padVM.price / Double(AppPeriod.dayCount(in: range, calendar: calendar))
         }
 
         numberFormatter.maximumFractionDigits = 0
