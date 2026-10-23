@@ -42,11 +42,14 @@ extension TransactionView {
         // calculator-like surface, so give it one.
         .frame(minWidth: 520, idealWidth: 560, minHeight: 720)
         #else
-        // Only bleed into the container edges. Leaving the keyboard safe
-        // area active is what makes SwiftUI move the form above the system
-        // keyboard on its own.
+        // Bleed to the bottom only: the number pad should reach the home
+        // indicator. Ignoring the top edge as well pushed the header (the
+        // Cancel button and the expense/income picker) under the status bar,
+        // where the system swallows the touches and Cancel stopped working.
+        // The keyboard safe area stays active so SwiftUI lifts the form above
+        // the system keyboard on its own.
         .frame(maxHeight: .infinity)
-        .ignoresSafeArea(.container, edges: .all)
+        .ignoresSafeArea(.container, edges: .bottom)
         #endif
         // An alert rather than a confirmation dialog: this screen is a
         // full-screen cover with a fixed, keyboard-avoiding frame, where an
