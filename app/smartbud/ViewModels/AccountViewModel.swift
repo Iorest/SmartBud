@@ -129,12 +129,19 @@ final class AccountViewModel {
             destination: destination
         )
         repo.insert(transfer)
+        // The fee is real money out, so it becomes its own expense row instead
+        // of disappearing into the transfer.
+        TransferFeeLedger.recordFee(
+            for: transfer, in: repo.context,
+            baseAmount: CurrencyRateStore.shared.convertToBase(
+                fee, from: source.resolvedCurrencyCode))
         repo.save()
         load()
         return transfer
     }
 
     func deleteTransfer(_ transfer: TransferModel) {
+        TransferFeeLedger.deleteFeeRows(for: transfer, in: repo.context)
         repo.delete(transfer)
         repo.save()
         load()

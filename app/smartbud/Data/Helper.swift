@@ -44,6 +44,10 @@ final class TransactionModel {
     /// settles. The pair moves money back into the account without either
     /// side counting as spend or income.
     var reimbursementOf: UUID?
+    /// On the expense row that pays a transfer's fee: the id of the transfer.
+    /// The transfer itself carries no money for the fee — this row does — so
+    /// the fee can be categorised, budgeted and reported like any expense.
+    var transferFeeOf: UUID?
     /// A balance correction written by "调整余额". It moves the account
     /// balance but is neither income nor spend.
     var adjustment: Bool = false
@@ -61,6 +65,7 @@ final class TransactionModel {
         discount: Double = 0,
         reimbursable: Bool = false,
         reimbursementOf: UUID? = nil,
+        transferFeeOf: UUID? = nil,
         adjustment: Bool = false
     ) {
         self.id = UUID()
@@ -71,6 +76,7 @@ final class TransactionModel {
         self.discount = discount
         self.reimbursable = reimbursable
         self.reimbursementOf = reimbursementOf
+        self.transferFeeOf = transferFeeOf
         self.adjustment = adjustment
         self.income = income
         self.amount = amount
@@ -263,9 +269,10 @@ final class TransferModel {
     /// Amount arriving in the destination account, in its currency. `0` means
     /// same-currency transfer (legacy rows and same-currency transfers).
     var destinationAmount: Double = 0
-    /// Fee charged on top of `amount`, in the source account's currency. The
-    /// source loses `amount + fee`; the destination still receives
-    /// `receivedAmount`.
+    /// Fee charged on top of `amount`, in the source account's currency. Kept
+    /// for display only: the money is booked as an expense row linked through
+    /// `TransactionModel.transferFeeOf`, so the fee can be categorised and
+    /// counted in spend without being charged twice.
     var fee: Double = 0
     var date: Date = Date.now
     var note: String?
@@ -311,9 +318,9 @@ extension TransferModel {
         return destinationAmount / amount
     }
     /// What leaves the source account, fee included.
-    @Transient var outgoingTotal: Double {
-        amount + max(0, fee.isFinite ? fee : 0)
-    }
+    /// What leaves the sending account. The fee is a separate expense row, so
+    /// charging it here as well would deduct it twice.
+    @Transient var outgoingTotal: Double { amount }
 }
 
 // MARK: - Category Budget

@@ -209,6 +209,8 @@
 		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
 		E1A2B3C4000000000000F0A2 /* ReimbursementLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */; };
+		E1A2B3C4000000000000F0D2 /* TransferFeeLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */; };
+		E1A2B3C4000000000000F0E2 /* TransferFeeMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */; };
 		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */; };
 		E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
@@ -243,7 +245,9 @@
 		E1A2B3C4000000000000F064 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
 		E1A2B3C4000000000000F084 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
 		E1A2B3C4000000000000F0A4 /* ReimbursementLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */; };
+		E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */; };
 		E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */; };
+		E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */; };
 		E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
@@ -408,6 +412,8 @@
 		E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
 		E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
 		E1A2B3C4000000000000F0A3 /* ReimbursementLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */; };
+		E1A2B3C4000000000000F0D3 /* TransferFeeLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */; };
+		E1A2B3C4000000000000F0E3 /* TransferFeeMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */; };
 		E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */; };
 		E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
@@ -617,7 +623,10 @@
 		E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/DataImporter+Merger.swift"; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CurrencyRebaseService.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ReimbursementLedger.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TransferFeeLedger.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/TransferFeeMigration.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/ReimbursementLedgerTests.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/TransferFeeTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogPeriodTotals.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
@@ -772,6 +781,7 @@
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
 				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
 				E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */,
+				E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */,
 				E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */,
 				E1A2B3C4000000000000F041 /* LocalizationCoverageTests.swift */,
 				E1A2B3C4000000000000F071 /* DataImporterTests.swift */,
@@ -942,6 +952,8 @@
 				E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */,
 				E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */,
 				E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */,
+				E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */,
+				E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */,
 				E1A2B3C4000000000000A031 /* ExportSchema.swift */,
 				B0A0F0000000000000000133 /* LLMClient.swift */,
 				B1C2D3E4F5A60718293A4B01 /* LLMProvider.swift */,
@@ -1388,6 +1400,8 @@
 		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */,
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */,
 		E1A2B3C4000000000000F0A2 /* ReimbursementLedger.swift in Sources */,
+		E1A2B3C4000000000000F0D2 /* TransferFeeLedger.swift in Sources */,
+		E1A2B3C4000000000000F0E2 /* TransferFeeMigration.swift in Sources */,
 		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
@@ -1619,7 +1633,9 @@
 				E1A2B3C4000000000000F064 /* DataImporter+Merger.swift in Sources */,
 				E1A2B3C4000000000000F084 /* CurrencyRebaseService.swift in Sources */,
 				E1A2B3C4000000000000F0A4 /* ReimbursementLedger.swift in Sources */,
+				E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */,
+				E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */,
 				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,
@@ -1773,6 +1789,8 @@
 				E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */,
 				E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */,
 				E1A2B3C4000000000000F0A3 /* ReimbursementLedger.swift in Sources */,
+				E1A2B3C4000000000000F0D3 /* TransferFeeLedger.swift in Sources */,
+				E1A2B3C4000000000000F0E3 /* TransferFeeMigration.swift in Sources */,
 				E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,

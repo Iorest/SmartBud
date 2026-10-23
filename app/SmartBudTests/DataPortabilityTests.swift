@@ -90,10 +90,13 @@ struct TransactionClassificationTests {
         #expect(txn.signedBaseAmount == 50)
     }
 
-    @Test("A transfer fee is charged on top of the amount")
+    @Test("A transfer fee is booked as its own expense, not into the transfer")
     func transferFee() {
         let transfer = TransferModel(amount: 100, destinationAmount: 0, fee: 2.5)
-        #expect(transfer.outgoingTotal == 102.5)
+        // The fee row is charged separately, so folding it in again would
+        // deduct the same 2.50 twice.
+        #expect(transfer.outgoingTotal == 100)
+        #expect(transfer.fee == 2.5)
         #expect(transfer.receivedAmount == 100)
     }
 

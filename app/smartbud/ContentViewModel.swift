@@ -97,6 +97,10 @@ final class ContentViewModel {
         dataMigration1 = false
         dataMigration2 = false
 
+        // Transfers used to deduct their fee directly; the fee is an expense
+        // row now. Writing the missing rows keeps every balance unchanged.
+        TransferFeeLedger.migrate(in: DataRepository.shared.context)
+
         reconcileNotificationAuthorization()
     }
 

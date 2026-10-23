@@ -216,6 +216,9 @@ struct SettingsImportView: View {
                 // Every screen reads from the same store; refresh the ones
                 // that cache fetched rows so the imported data shows up
                 // without needing a relaunch.
+                // Older backups carry transfers whose fee has no expense row;
+                // write the missing rows so the imported balances add up.
+                TransferFeeLedger.migrate(in: DataRepository.shared.context)
                 AccountViewModel.shared.load()
                 CategoryViewModel.shared.load()
                 InsightsViewModel.shared.refreshAll()

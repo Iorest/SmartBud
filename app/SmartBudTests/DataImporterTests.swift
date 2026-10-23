@@ -211,7 +211,7 @@ struct DataImporterTests {
         let stored = try fixture.context.fetch(FetchDescriptor<TransferModel>()).first
         #expect(stored?.fee == 2.5)
         #expect(stored?.destinationAmount == 13.75)
-        #expect(stored?.outgoingTotal == 102.5)
+        #expect(stored?.outgoingTotal == 100)   // the fee is its own row
         #expect(stored?.receivedAmount == 13.75)
     }
 

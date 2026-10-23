@@ -124,6 +124,7 @@ struct BackupMerger {
                 discount: amount(dto.discount ?? 0),
                 reimbursable: dto.reimbursable ?? false,
                 reimbursementOf: dto.reimbursementOf,
+                transferFeeOf: dto.transferFeeOf,
                 adjustment: dto.adjustment ?? false
             )
             transaction.id = dto.id
