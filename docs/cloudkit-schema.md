@@ -30,6 +30,7 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 |---|---|---|
 | `TransactionModel` | `discount` | 录入时的优惠金额。`amount` 始终是实付净额，`discount` 只用于展示"原价" |
 | `TransactionModel` | `reimbursable` / `reimbursedAt` | 报销标记与收到回款的时间。标记为报销的支出不计入支出统计与预算 |
+| `TransactionModel` | `reimbursementOf`（UUID，可空） | 回款行指向原报销支出的 id。回款行 `income = true` 且不计入收入统计，核销时自动写入 |
 | `TransactionModel` | `adjustment` | 「余额调整」写入的更正行，只改账户余额，不进收支统计 |
 | `AccountModel` | `archived` | 归档账户：不在默认列表、不计入总资产，但历史记录照常可查 |
 | `TransferModel` | `fee` | 转账手续费，从转出账户额外扣除 |

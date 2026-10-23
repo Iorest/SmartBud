@@ -123,6 +123,7 @@ struct BackupMerger {
                 repeatCoefficient: dto.recurringCoefficient,
                 discount: amount(dto.discount ?? 0),
                 reimbursable: dto.reimbursable ?? false,
+                reimbursementOf: dto.reimbursementOf,
                 adjustment: dto.adjustment ?? false
             )
             transaction.id = dto.id

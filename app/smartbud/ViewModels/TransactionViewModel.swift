@@ -35,7 +35,7 @@ struct TemplateDefinition {
 @Observable
 final class TransactionViewModel {
     static let shared = TransactionViewModel()
-    private let repo = DataRepository.shared
+    let repo = DataRepository.shared
 
     // MARK: Transaction Creation
 
@@ -77,7 +77,14 @@ final class TransactionViewModel {
         // Only expenses can be claimed back; switching to income drops the flag.
         // Balance adjustments are corrections, never claims.
         txn.reimbursable = edit.reimbursable && !edit.income && !txn.adjustment
-        if !txn.reimbursable { txn.reimbursedAt = nil }
+        if !txn.reimbursable {
+            ReimbursementLedger.unsettle(txn, in: repo.context)
+        } else if txn.reimbursedAt != nil {
+            ReimbursementLedger.sync(txn, in: repo.context)
+        }
+        if txn.isReimbursementIncome {
+            ReimbursementLedger.syncClaim(from: txn, in: repo.context)
+        }
 
         let calendar = Calendar(identifier: .gregorian)
         txn.day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: edit.date) ?? Date.now
@@ -101,27 +108,6 @@ final class TransactionViewModel {
     func stopRecurring(_ txn: TransactionModel) {
         txn.recurringType = 0
         txn.onceRecurring = false
-        repo.save()
-    }
-
-    // MARK: Reimbursement
-
-    /// Turns the claim flag on/off. Only expenses can be claimed back, and
-    /// clearing the flag also clears the "paid back" date.
-    func setReimbursable(_ reimbursable: Bool, for txn: TransactionModel) {
-        let allowed = reimbursable && !txn.income && !txn.adjustment
-        guard txn.reimbursable != allowed else { return }
-        txn.reimbursable = allowed
-        if !allowed { txn.reimbursedAt = nil }
-        repo.save()
-    }
-
-    /// Records (or clears) the moment the money came back.
-    func setReimbursed(_ reimbursed: Bool, for txn: TransactionModel) {
-        guard txn.reimbursable else { return }
-        let newValue: Date? = reimbursed ? .now : nil
-        guard txn.reimbursedAt != newValue else { return }
-        txn.reimbursedAt = newValue
         repo.save()
     }
 
@@ -271,14 +257,20 @@ final class TransactionViewModel {
     }
 
     func delete(_ txn: TransactionModel) {
+        ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
         repo.delete(txn)
         repo.save()
     }
 
     /// Deletes several transactions with a single save (batch selection).
+    /// Claims take their repayment rows with them, and a repayment row puts
+    /// its claim back into the pending list.
     func delete(_ transactions: [TransactionModel]) {
         guard !transactions.isEmpty else { return }
-        for txn in transactions { repo.delete(txn) }
+        for txn in transactions {
+            ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+            repo.delete(txn)
+        }
         repo.save()
     }
 

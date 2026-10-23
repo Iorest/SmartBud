@@ -10,7 +10,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 | 从备份恢复 | 选择 JSON 备份，合并进本机 | — |
 | 清除数据 | 删除本机全部记录并尝试清空 iCloud 区域 | — |
 
-## JSON 备份格式（schemaVersion 4）
+## JSON 备份格式（schemaVersion 5）
 
 文件形状见 `smartbud/Services/ExportSchema.swift`，字段名就是磁盘上的契约，
 改名前要同时改导出和导入，并且**必须**升 `schemaVersion`。
@@ -19,7 +19,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 {
   "exportDate": "2026-10-22T05:00:00Z",
   "appVersion": "4.0",
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "transactions": [ ... ],
   "categories": [ ... ],
   "budgets": [ ... ],
@@ -37,6 +37,9 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   所以历史统计不会因为之后改汇率而漂移。
 - 关系用 id 表示：交易带 `categoryId` / `accountId`，转账带 `sourceId` / `destinationId`。
   为了兼容只存名字的旧文件，导入时会退回到 `categoryName` / `accountName`。
+- schema 5 新增 `reimbursementOf`（回款行指向原报销支出）。schema 4 的文件仍可导入，
+  但那时核销只写了日期、没有回款行，导入后那笔报销依然只有一半——不会自动补写，
+  因为无法判断用户当时是否已经把回款记成了普通收入。
 - schema 4 新增字段（`discount`、`reimbursable`、`reimbursedAt`、`adjustment`、
   `archived`、`destinationAmount`、`fee`）都是可选的；3.x 的文件缺这些键时按默认值导入。
 - 每个 `schemaVersion > 0` 的文件才算备份。缺少该键的 JSON 会被拒绝，避免误把别的文件

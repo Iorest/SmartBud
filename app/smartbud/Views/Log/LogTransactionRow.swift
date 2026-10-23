@@ -63,11 +63,13 @@ struct LogTransactionRow: View {
     /// their own instead of an empty swatch.
     private var tileEmoji: String {
         if transaction.adjustment { return "⚖️" }
+        if transaction.isReimbursementIncome { return "💸" }
         return transaction.category?.wrappedEmoji ?? ""
     }
 
     private var tileColour: String {
         if transaction.adjustment { return "#8E8E93" }
+        if transaction.isReimbursementIncome { return "#34C759" }
         return transaction.category?.wrappedColour ?? "#FFFFFF"
     }
 
@@ -83,7 +85,9 @@ struct LogTransactionRow: View {
         let pending = transaction.isPendingReimbursement
         let showsDiscount = discountText != nil
 
-        if transaction.adjustment || transaction.reimbursable || showsDiscount {
+        let isRepayment = transaction.isReimbursementIncome
+
+        if transaction.adjustment || transaction.reimbursable || isRepayment || showsDiscount {
             HStack(spacing: 4) {
                 if transaction.adjustment {
                     badge(String.appLocalized("Balance Adjustment"), tint: Color.SubtitleText)
@@ -91,6 +95,9 @@ struct LogTransactionRow: View {
                 if transaction.reimbursable {
                     badge(String.appLocalized(pending ? "Pending" : "Reimbursed"),
                           tint: pending ? Color.orange : Color.IncomeGreen)
+                }
+                if isRepayment {
+                    badge(String.appLocalized("Reimbursement"), tint: Color.IncomeGreen)
                 }
                 if let discountText {
                     badge(String.appFormatted("Discount %@", discountText),

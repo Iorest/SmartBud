@@ -40,6 +40,10 @@ final class TransactionModel {
     var reimbursable: Bool = false
     /// Set when the money actually came back.
     var reimbursedAt: Date?
+    /// On the income row that pays a claim back: the id of the expense it
+    /// settles. The pair moves money back into the account without either
+    /// side counting as spend or income.
+    var reimbursementOf: UUID?
     /// A balance correction written by "调整余额". It moves the account
     /// balance but is neither income nor spend.
     var adjustment: Bool = false
@@ -56,6 +60,7 @@ final class TransactionModel {
         repeatCoefficient: Int = 0,
         discount: Double = 0,
         reimbursable: Bool = false,
+        reimbursementOf: UUID? = nil,
         adjustment: Bool = false
     ) {
         self.id = UUID()
@@ -65,6 +70,7 @@ final class TransactionModel {
         self.baseAmount = baseAmount
         self.discount = discount
         self.reimbursable = reimbursable
+        self.reimbursementOf = reimbursementOf
         self.adjustment = adjustment
         self.income = income
         self.amount = amount
@@ -92,15 +98,23 @@ extension TransactionModel {
     /// Price before the discount, when one was recorded.
     @Transient var grossAmount: Double { amount + discount }
 
-    /// Still waiting for the money to come back.
-    @Transient var isPendingReimbursement: Bool { reimbursable && reimbursedAt == nil }
+    /// Still waiting for the money to come back. A repayment row carries the
+    /// same account but is income, so it never shows up as pending.
+    @Transient var isPendingReimbursement: Bool {
+        reimbursable && !income && reimbursedAt == nil
+    }
+
+    /// Income row that settles a claim. It puts the money back into the
+    /// account but is not new earnings — counting it would turn a neutral
+    /// claim into profit.
+    @Transient var isReimbursementIncome: Bool { reimbursementOf != nil }
 
     /// Counts towards "spent" in insights and budgets. Reimbursable rows are
     /// pass-through and balance adjustments are not spend at all.
     @Transient var countsAsSpend: Bool { !income && !adjustment && !reimbursable }
 
     /// Counts towards "earned" in insights.
-    @Transient var countsAsIncome: Bool { income && !adjustment }
+    @Transient var countsAsIncome: Bool { income && !adjustment && !isReimbursementIncome }
 
     /// A row that belongs in income/spend totals. Adjustments and
     /// reimbursable claims are pass-through money and stay out of both.
