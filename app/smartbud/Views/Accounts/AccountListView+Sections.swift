@@ -29,17 +29,14 @@ extension AccountListView {
         let outgoing = transfer.source?.resolvedCurrencyCode ?? currency
         let sent = Money.format(transfer.amount, currencyCode: outgoing,
                                 showsCents: showCents, locale: .appLocale)
-        let feeText = transfer.fee > 0
-            ? Money.format(transfer.fee, currencyCode: outgoing,
-                           showsCents: showCents, locale: .appLocale)
-            : nil
-        let sentWithFee = feeText.map { "\(sent) + \($0)" } ?? sent
-        guard transfer.destinationAmount > 0 else { return sentWithFee }
+        // The fee is its own expense row now, so folding it in here would show
+        // the same amount twice.
+        guard transfer.destinationAmount > 0 else { return sent }
 
         let incoming = transfer.destination?.resolvedCurrencyCode ?? currency
         let landed = Money.format(transfer.receivedAmount, currencyCode: incoming,
                                   showsCents: showCents, locale: .appLocale)
-        return "\(sentWithFee) → \(landed)"
+        return "\(sent) → \(landed)"
     }
 
     func kindLabel(_ account: AccountModel) -> String {

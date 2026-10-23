@@ -51,7 +51,7 @@ enum TransferFeeLedger {
             baseAmount: base,
             income: false,
             amount: transfer.fee,
-            date: transfer.date ?? .now,
+            date: transfer.date,
             transferFeeOf: transfer.id
         )
         context.insert(row)

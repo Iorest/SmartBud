@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "The fee is charged on top of the amount and recorded as its own expense, so it shows up in your spending." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fee is charged on top of the amount and recorded as its own expense, so it shows up in your spending."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手续费在转账金额之外收取，并会单独记一笔支出，计入你的支出统计。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手續費在轉帳金額之外收取，並會單獨記一筆支出，計入你的支出統計。"
+          }
+        }
+      }
+    },
     "Transfer Fee" : {
       "localizations" : {
         "en" : {

@@ -20,11 +20,17 @@ extension TransferFeeLedger {
     @discardableResult
     static func migrate(in context: ModelContext) -> Int {
         let transfers = (try? context.fetch(FetchDescriptor<TransferModel>())) ?? []
+        guard transfers.contains(where: { $0.fee > 0 }) else { return 0 }
+
+        // One pass over the existing fee rows instead of one fetch per
+        // transfer: the ledger can hold thousands of rows.
+        var recorded = Set(feeRows(in: context).compactMap(\.transferFeeOf))
         var created = 0
         for transfer in transfers where transfer.fee > 0 {
-            guard feeRow(for: transfer, in: context) == nil else { continue }
+            guard !recorded.contains(transfer.id) else { continue }
             recordFee(for: transfer, in: context,
                       baseAmount: convertedFee(transfer))
+            recorded.insert(transfer.id)
             created += 1
         }
         if created > 0 { try? context.save() }

@@ -93,8 +93,8 @@ struct TransferEditor: View {
                                 + "so later rate changes never rewrite it."))
                     } else {
                         Text(String.appLocalized(
-                            "The fee is charged on top of the amount, so the sending account "
-                                + "pays both."))
+                            "The fee is charged on top of the amount and recorded as its own "
+                                + "expense, so it shows up in your spending."))
                     }
                 }
 
