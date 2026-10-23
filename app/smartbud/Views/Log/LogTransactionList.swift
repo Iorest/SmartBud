@@ -120,6 +120,9 @@ struct LogTransactionList<Header: View>: View {
     var upcoming: [TransactionModel] = []
     /// Multi-select mode: rows show a selection circle instead of opening.
     var isSelecting: Bool = false
+    /// False when the filter itself names the month: the stepper above already
+    /// says "2026年10月", so repeating it as a section header reads like a bug.
+    var showsMonthHeader: Bool = true
     @Binding var selection: Set<UUID>
     var header: Header
 
@@ -136,6 +139,7 @@ struct LogTransactionList<Header: View>: View {
         future: Bool = false,
         upcoming: [TransactionModel] = [],
         isSelecting: Bool = false,
+        showsMonthHeader: Bool = true,
         selection: Binding<Set<UUID>>? = nil,
         @ViewBuilder header: () -> Header
     ) {
@@ -143,6 +147,7 @@ struct LogTransactionList<Header: View>: View {
         self.future = future
         self.upcoming = upcoming
         self.isSelecting = isSelecting
+        self.showsMonthHeader = showsMonthHeader
         _selection = selection ?? .constant([])
         self.header = header()
     }
@@ -202,8 +207,10 @@ struct LogTransactionList<Header: View>: View {
                 Section {
                     monthRows(month)
                 } header: {
-                    Text(month.month, format: .dateTime.year().month(.wide))
-                        .font(.subheadline.weight(.semibold))
+                    if showsMonthHeader {
+                        Text(month.month, format: .dateTime.year().month(.wide))
+                            .font(.subheadline.weight(.semibold))
+                    }
                 }
             }
             #endif

@@ -42,11 +42,8 @@ final class InsightsViewModel {
 
     /// Gregorian calendar with the user's first-weekday preference applied.
     private var configuredCalendar: Calendar {
-        var cal = Calendar(identifier: .gregorian)
-        let defaults = UserDefaults.appGroup
-        cal.firstWeekday = defaults.integer(forKey: "firstWeekday")
-        cal.minimumDaysInFirstWeek = 4
-        return cal
+        AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
     }
 
     /// Month-start offset from Settings → Time Frames (1…28).

@@ -19,11 +19,13 @@ struct StepperButtonView: View {
         } label: {
             Image(systemName: left ? "chevron.left" : "chevron.right")
                 .font(.subheadline)
-                .foregroundStyle(Color.SubtitleText)
+                // Enabled arrows were the same grey as disabled ones; users
+                // could not tell whether there was another week/month to see.
+                .foregroundStyle(disabled ? Color.SubtitleText : Color.PrimaryText)
                 .padding(8)
                 .background(Circle().fill(.clear))
                 .systemChip(in: Circle(), interactive: !disabled)
-                .opacity(disabled ? 0.3 : 1)
+                .opacity(disabled ? 0.35 : 1)
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())
         }

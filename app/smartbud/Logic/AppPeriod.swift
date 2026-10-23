@@ -95,6 +95,10 @@ enum AppPeriod {
         var calendar = Calendar(identifier: .gregorian)
         calendar.firstWeekday = firstWeekday > 0 ? firstWeekday : 1
         calendar.minimumDaysInFirstWeek = 4
+        // Without this the short weekday/month symbols come back in English
+        // even when the app is running in Chinese (the chart axis read
+        // "S M T W T F S").
+        calendar.locale = Locale.appLocale
         return calendar
     }
 }

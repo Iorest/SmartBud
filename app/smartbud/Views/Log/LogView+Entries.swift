@@ -49,4 +49,50 @@ extension LogView {
         let amount = String(format: "%.2f", transaction.amount)
         return amount.contains(query)
     }
+
+    @ViewBuilder
+    var stepperBar: some View {
+        VStack(spacing: 2) {
+            Group {
+                switch filter {
+                case .category:
+                    CategoryStepperView(categoryFilter: $categoryFilter)
+                case .day:
+                    DateStepperView(date: $dateFilter)
+                case .week:
+                    WeekStepperView(showingDate: $weekFilter)
+                case .month:
+                    MonthStepperView(showingDate: $monthFilter)
+                case .type:
+                    IncomeFilterToggleView(income: $income)
+                default:
+                    EmptyView()
+                }
+            }
+
+            if showsPeriodTotals {
+                LogPeriodTotals(entries: visibleTransactions,
+                                currency: currency,
+                                showCents: showCents)
+            }
+        }
+        .padding(.horizontal, SBSpace.medium)
+        .padding(.vertical, SBSpace.extraSmall)
+        .background(.bar)
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
+    }
+
+    /// The header card (with its own period menu) is only shown for "all".
+    /// Without this line a filtered list had no totals at all, so "how much
+    /// did I spend that week" was unanswerable on the screen showing the week.
+    var showsPeriodTotals: Bool {
+        switch filter {
+        case .day, .week, .month, .category:
+            return !visibleTransactions.isEmpty
+        default:
+            return false
+        }
+    }
 }

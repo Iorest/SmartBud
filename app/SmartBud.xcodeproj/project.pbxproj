@@ -207,6 +207,7 @@
 		E1A2B3C4000000000000F052 /* DataRefreshCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */; };
 		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
+		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */; };
 		E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A001 /* DataImporter.swift */; };
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
@@ -401,6 +402,7 @@
 		E1A2B3C4000000000000F053 /* DataRefreshCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */; };
 		E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */; };
 		E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */; };
+		E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */; };
 		E1A2B3C4000000000000A013 /* SettingsImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A011 /* SettingsImportView.swift */; };
 		C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10300000000000000000001 /* HomeView+DeepLink.swift */; };
 		D0C0FFEED0C0FFEE0000000000000195 /* SettingsExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000040 /* SettingsExportView.swift */; };
@@ -607,6 +609,7 @@
 		E1A2B3C4000000000000F051 /* DataRefreshCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/DataRefreshCenter.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/DataImporter+Merger.swift"; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CurrencyRebaseService.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogPeriodTotals.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F001 /* AppPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AppPeriod.swift; sourceTree = SOURCE_ROOT; };
@@ -1131,6 +1134,7 @@
 				C10200000000000000000001 /* DataExporter+CSV.swift */,
 				C10400000000000000000001 /* AccountListView+Sections.swift */,
 				C10500000000000000000001 /* LogTransactionList+Rows.swift */,
+				E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */,
 				C10600000000000000000001 /* InsightsView+Pending.swift */,
 				C10700000000000000000001 /* PendingReimbursementSheet.swift */,
 			);
@@ -1370,6 +1374,7 @@
 		E1A2B3C4000000000000F052 /* DataRefreshCenter.swift in Sources */,
 		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */,
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */,
+		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
 		E1A2B3C4000000000000F002 /* AppPeriod.swift in Sources */,
@@ -1750,6 +1755,7 @@
 				E1A2B3C4000000000000F053 /* DataRefreshCenter.swift in Sources */,
 				E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */,
 				E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */,
+				E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
 				E1A2B3C4000000000000F003 /* AppPeriod.swift in Sources */,

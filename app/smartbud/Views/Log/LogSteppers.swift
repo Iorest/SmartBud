@@ -210,61 +210,48 @@ struct DateStepperView: View {
 struct WeekStepperView: View {
     @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
 
-    @Query private var transactionsReversed: [TransactionModel]
-
     @Binding var showingDate: Date
-    var endDate: Date {
-        if transactions.isEmpty {
-            return Date.now
-        } else {
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-            calendar.minimumDaysInFirstWeek = 4
 
-            let date = transactions[0].day ?? Date.now
+    /// Same bucket definition as the list filter, so the label and the rows
+    /// can never describe different weeks.
+    private var calendar: Calendar {
+        AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
+    }
 
-            let dateComponents = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: date)
+    private var currentStart: Date {
+        AppPeriod.weekRange(containing: .now, calendar: calendar).start
+    }
 
-            return calendar.date(from: dateComponents) ?? Date.now
+    private var oldestStart: Date? {
+        guard let oldest = transactions.first?.day else { return nil }
+        return AppPeriod.weekRange(containing: oldest, calendar: calendar).start
+    }
+
+    private var canGoBack: Bool {
+        showingDate > (oldestStart ?? currentStart)
+    }
+
+    private var canGoForward: Bool {
+        showingDate < currentStart
+    }
+
+    private var dateString: String {
+        let end = calendar.date(byAdding: .day, value: 6, to: showingDate) ?? showingDate
+        let style = Date.FormatStyle(locale: .appLocale).month(.abbreviated).day()
+        guard calendar.component(.year, from: showingDate)
+                == calendar.component(.year, from: .now) else {
+            let full = Date.FormatStyle(locale: .appLocale).year().month(.abbreviated).day()
+            return showingDate.formatted(full) + " – " + end.formatted(full)
         }
-    }
-
-    @State var startDate = Date.now
-
-    var dateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
-
-        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
-
-        let endComponents = DateComponents(day: 7, second: -1)
-        let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
-
-        return dateFormatter.string(from: showingDate) + " - " + dateFormatter.string(from: endWeekDate)
-    }
-
-    var accessibilityDateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
-
-        dateFormatter.setLocalizedDateFormatFromTemplate("MMMd")
-
-        let endComponents = DateComponents(day: 7, second: -1)
-        let endWeekDate = Calendar.current.date(byAdding: endComponents, to: showingDate) ?? Date.now
-
-        return String.appFormatted(
-            "showing transactions from %@ to %@",
-            dateFormatter.string(from: showingDate),
-            dateFormatter.string(from: endWeekDate)
-        )
+        return showingDate.formatted(style) + " – " + end.formatted(style)
     }
 
     var body: some View {
         HStack {
-            StepperButtonView(left: true, disabled: showingDate == endDate) {
-                if showingDate > endDate {
-                    showingDate = Calendar.current.date(byAdding: .day, value: -7, to: showingDate) ?? Date.now
-                }
+            StepperButtonView(left: true, disabled: !canGoBack) {
+                showingDate = calendar.date(byAdding: .day, value: -7, to: showingDate)
+                    ?? showingDate
             }
             .accessibilityLabel(Text(String.appLocalized("previous week")))
 
@@ -272,41 +259,21 @@ struct WeekStepperView: View {
 
             Text(dateString)
                 .font(.headline)
-                .accessibilityLabel(accessibilityDateString)
+                .accessibilityLabel(dateString)
 
             Spacer()
 
-            StepperButtonView(left: false, disabled: showingDate == startDate) {
-                if showingDate < startDate {
-                    showingDate = Calendar.current.date(byAdding: .day, value: 7, to: showingDate) ?? Date.now
-                }
+            StepperButtonView(left: false, disabled: !canGoForward) {
+                showingDate = calendar.date(byAdding: .day, value: 7, to: showingDate)
+                    ?? showingDate
             }
             .accessibilityLabel(Text(String.appLocalized("next week")))
         }
         .frame(maxWidth: .infinity)
-        .onAppear {
-            var calendar = Calendar(identifier: .gregorian)
-
-            calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-            calendar.minimumDaysInFirstWeek = 4
-
-            let date = transactionsReversed.first?.day ?? Date.now
-
-            let dateComponents = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: date)
-
-            startDate = calendar.date(from: dateComponents) ?? Date.now
-
-            showingDate = startDate
-        }
+        .onAppear { showingDate = currentStart }
     }
 
     init(showingDate: Binding<Date>) {
         self._showingDate = showingDate
-        let now = Date.now
-        let future = Date.distantFuture
-        _transactionsReversed = Query(
-            filter: #Predicate<TransactionModel> { ($0.date ?? future) < now },
-            sort: [SortDescriptor(\TransactionModel.day, order: .reverse)]
-        )
     }
 }

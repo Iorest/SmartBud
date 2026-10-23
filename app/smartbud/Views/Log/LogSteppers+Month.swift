@@ -9,40 +9,43 @@ import SwiftUI
 struct MonthStepperView: View {
     @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
 
-    @Query private var transactionsReversed: [TransactionModel]
-
     @Binding var showingDate: Date
-    var endDate: Date {
-        if transactions.isEmpty {
-            return Date.now
-        } else {
-            let calendar = Calendar(identifier: .gregorian)
 
-            let date = transactions[0].day ?? Date.now
-
-            let dateComponents = calendar.dateComponents([.month, .year], from: date)
-
-            return calendar.date(from: dateComponents) ?? Date.now
-        }
+    /// Month buckets honour Settings → Time Frames → Start of Month, exactly
+    /// like Insights and the widgets do.
+    private var calendar: Calendar {
+        AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
     }
 
-    @State var startDate = Date.now
+    private var startDay: Int {
+        UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
+    }
 
-    var dateString: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
+    private var currentStart: Date {
+        AppPeriod.monthStart(containing: .now, startDay: startDay, calendar: calendar)
+    }
 
-        dateFormatter.dateFormat = "MMM yyyy"
+    private var oldestStart: Date? {
+        guard let oldest = transactions.first?.day else { return nil }
+        return AppPeriod.monthStart(containing: oldest, startDay: startDay, calendar: calendar)
+    }
 
-        return dateFormatter.string(from: showingDate)
+    private var canGoBack: Bool { showingDate > (oldestStart ?? currentStart) }
+    private var canGoForward: Bool { showingDate < currentStart }
+
+    /// "2026年10月" / "October 2026" — `MMM yyyy` produced "10月 2026" in
+    /// Chinese, which reads as a month that happens to be followed by a number.
+    private var dateString: String {
+        showingDate.formatted(
+            Date.FormatStyle(locale: .appLocale).year().month(.wide))
     }
 
     var body: some View {
         HStack {
-            StepperButtonView(left: true, disabled: showingDate == endDate) {
-                if showingDate > endDate {
-                    showingDate = Calendar.current.date(byAdding: .month, value: -1, to: showingDate) ?? Date.now
-                }
+            StepperButtonView(left: true, disabled: !canGoBack) {
+                showingDate = calendar.date(byAdding: .month, value: -1, to: showingDate)
+                    ?? showingDate
             }
             .accessibilityLabel(Text(String.appLocalized("previous month")))
 
@@ -54,35 +57,18 @@ struct MonthStepperView: View {
 
             Spacer()
 
-            StepperButtonView(left: false, disabled: showingDate == startDate) {
-                if showingDate < startDate {
-                    showingDate = Calendar.current.date(byAdding: .month, value: 1, to: showingDate) ?? Date.now
-                }
+            StepperButtonView(left: false, disabled: !canGoForward) {
+                showingDate = calendar.date(byAdding: .month, value: 1, to: showingDate)
+                    ?? showingDate
             }
             .accessibilityLabel(Text(String.appLocalized("next month")))
         }
         .frame(maxWidth: .infinity)
-        .onAppear {
-            let calendar = Calendar(identifier: .gregorian)
-
-            let date = transactionsReversed.first?.day ?? Date.now
-
-            let dateComponents = calendar.dateComponents([.month, .year], from: date)
-
-            startDate = calendar.date(from: dateComponents) ?? Date.now
-
-            showingDate = startDate
-        }
+        .onAppear { showingDate = currentStart }
     }
 
     init(showingDate: Binding<Date>) {
         self._showingDate = showingDate
-        let now = Date.now
-        let future = Date.distantFuture
-        _transactionsReversed = Query(
-            filter: #Predicate<TransactionModel> { ($0.date ?? future) < now },
-            sort: [SortDescriptor(\TransactionModel.day, order: .reverse)]
-        )
     }
 }
 

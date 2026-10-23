@@ -41,14 +41,26 @@ struct LogView: View {
     @State private var showBatchDelete = false
 
     @State var filter = FilterType.all
-    @State private var categoryFilter: CategoryModel?
-    @State private var dateFilter = Date.now
-    @State private var weekFilter = Date.now
-    @State private var monthFilter = Date.now
-    @State private var income = false
+    @State var categoryFilter: CategoryModel?
+    @State var dateFilter = Date.now
+    @State var weekFilter = Date.now
+    @State var monthFilter = Date.now
+    @State var income = false
 
     private var currencySymbol: String {
         Locale.appCurrencySymbol(forCurrencyCode: currency)
+    }
+
+    /// Calendar with the user's week/month start preferences. The list filter
+    /// and the stepper above it must use the same definition, otherwise the
+    /// header says "this week" and the rows belong to a different one.
+    private var periodCalendar: Calendar {
+        AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
+    }
+
+    private var monthStartDay: Int {
+        UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
     }
 
     // MARK: - Content
@@ -154,6 +166,7 @@ struct LogView: View {
                     future: filter == .upcoming,
                     upcoming: upcomingTransactions,
                     isSelecting: isSelecting,
+                    showsMonthHeader: filter != .month,
                     selection: $selectedIDs
                 ) {
                     if filter == .all && searchText.isEmpty {
@@ -260,14 +273,16 @@ struct LogView: View {
                 Calendar.current.isDate($0.wrappedDate, inSameDayAs: dateFilter)
             }
         case .week:
-            let interval = Calendar.current.dateInterval(of: .weekOfYear, for: weekFilter)
+            let range = AppPeriod.weekRange(containing: weekFilter, calendar: periodCalendar)
             items = pastTransactions.filter {
-                interval?.contains($0.wrappedDate) ?? false
+                $0.wrappedDate >= range.start && $0.wrappedDate < range.end
             }
         case .month:
-            let interval = Calendar.current.dateInterval(of: .month, for: monthFilter)
+            let range = AppPeriod.monthRange(containing: monthFilter,
+                                             startDay: monthStartDay,
+                                             calendar: periodCalendar)
             items = pastTransactions.filter {
-                interval?.contains($0.wrappedDate) ?? false
+                $0.wrappedDate >= range.start && $0.wrappedDate < range.end
             }
         case .all:
             items = pastTransactions
@@ -350,34 +365,5 @@ extension LogView {
         #else
         content
         #endif
-    }
-}
-
-extension LogView {
-
-    @ViewBuilder
-    private var stepperBar: some View {
-        Group {
-            switch filter {
-            case .category:
-                CategoryStepperView(categoryFilter: $categoryFilter)
-            case .day:
-                DateStepperView(date: $dateFilter)
-            case .week:
-                WeekStepperView(showingDate: $weekFilter)
-            case .month:
-                MonthStepperView(showingDate: $monthFilter)
-            case .type:
-                IncomeFilterToggleView(income: $income)
-            default:
-                EmptyView()
-            }
-        }
-        .padding(.horizontal, SBSpace.medium)
-        .padding(.vertical, SBSpace.extraSmall)
-        .background(.bar)
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
     }
 }
