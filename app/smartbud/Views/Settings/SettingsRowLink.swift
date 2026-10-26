@@ -32,3 +32,14 @@ extension SettingsView {
       }
     }
 }
+
+// MARK: - Presentations
+
+/// Presentations owned by Settings. One slot, because two `fullScreenCover`
+/// modifiers on the same view cancel each other out on iOS.
+enum SettingsSheet: String, Identifiable {
+    case importData
+    case pro
+
+    var id: String { rawValue }
+}

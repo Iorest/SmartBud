@@ -155,7 +155,10 @@ struct SettingsView: View {
 
   // popups
 
-  @State var showImportGuide = false
+  /// One presentation slot for the whole screen. Two stacked
+  /// `fullScreenCover` modifiers (import + the -openPro QA hook) cancel each
+  /// other out on iOS, so tapping "导入数据" did nothing at all.
+  @State private var activeSheet: SettingsSheet?
 
   @State var settingsVM = SettingsViewModel.shared
 
@@ -231,9 +234,13 @@ struct SettingsView: View {
             settingsLink(.templates, "square.on.square", 122, SettingsKey.rowTemplates, nil)
 
             Button {
-              showImportGuide = true
+              activeSheet = .importData
             } label: {
               SettingsRowView(icon: "square.and.arrow.down.fill", colour: 112, title: SettingsKey.rowImportData)
+                // Without this the hit area was just the icon/text: tapping
+                // the empty part of the row did nothing.
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
@@ -316,13 +323,16 @@ struct SettingsView: View {
         }
         .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
             // A presented cover would sit above the lock overlay.
-            if !unlocked { showImportGuide = false }
+            if !unlocked { activeSheet = nil }
         }
-        .fullScreenPresentation(isPresented: $showImportGuide) {
-          ImportDataView()
+        .fullScreenPresentation(item: $activeSheet) { sheet in
+          switch sheet {
+          case .importData: ImportDataView()
+          case .pro: NavigationStack { SettingsProView() }
+          }
         }
-        .fullScreenPresentation(isPresented: .constant(CommandLine.arguments.contains("-openPro"))) {
-          NavigationStack { SettingsProView() }
+        .onAppear {
+            if CommandLine.arguments.contains("-openPro") { activeSheet = .pro }
         }
       }
     }

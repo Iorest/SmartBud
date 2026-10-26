@@ -162,7 +162,8 @@ struct ImportDataView: View {
     ]
 
     let pointers = [
-        String.appLocalized("Ensure that the values in the 'Amount' column do not contain any currency symbols."),
+        String.appLocalized("Amounts may include currency symbols, thousands separators or parentheses; "
+             + "the number is read as-is."),
         String.appLocalized("All dates should be of a consistent, recognizable format. If no timestamps "
              + "are provided, the time of transaction will default to 12:00 am."),
         String.appLocalized("Fields containing commas are fine as long as they are wrapped in double quotes.")
