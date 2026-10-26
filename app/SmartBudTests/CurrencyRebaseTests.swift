@@ -156,6 +156,47 @@ struct CurrencyRebaseApplicationTests {
         #expect(abs((local.baseAmount ?? 0) - 137.74) < 0.02)
     }
 
+    @Test("Only an account that follows the base moves its opening balance")
+    func convertsOpeningBalances() throws {
+        let following = AccountModel(name: "现金", currencyCode: "", openingBalance: 1000)
+        let explicit = AccountModel(name: "USD 账户", currencyCode: "USD", openingBalance: 100)
+        context.insert(following)
+        context.insert(explicit)
+        try context.save()
+
+        let plan = try CurrencyRebase.plan(from: "CNY", to: "USD", rates: ["USD": 7.2]).get()
+        _ = try CurrencyRebaseService.apply(plan, context: context)
+
+        #expect(abs(following.openingBalance - 138.89) < 0.001)
+        #expect(explicit.openingBalance == 100)
+    }
+
+    @Test("A transfer converts each side only when that account follows the base")
+    func convertsTransferSides() throws {
+        let cash = AccountModel(name: "现金", currencyCode: "", openingBalance: 0)
+        let wallet = AccountModel(name: "零钱", currencyCode: "", openingBalance: 0)
+        let usd = AccountModel(name: "USD 账户", currencyCode: "USD", openingBalance: 0)
+        for account in [cash, wallet, usd] { context.insert(account) }
+
+        // 720 CNY left a base account and 100 USD landed in an explicit one.
+        let cross = TransferModel(amount: 720, destinationAmount: 100, fee: 7.2,
+                                  date: .now, source: cash, destination: usd)
+        // Same-currency transfer: both sides are base numbers.
+        let plain = TransferModel(amount: 100, destinationAmount: 0, fee: 0,
+                                  date: .now, source: cash, destination: wallet)
+        context.insert(cross)
+        context.insert(plain)
+        try context.save()
+
+        let plan = try CurrencyRebase.plan(from: "CNY", to: "USD", rates: ["USD": 7.2]).get()
+        _ = try CurrencyRebaseService.apply(plan, context: context)
+
+        #expect(abs(cross.amount - 100) < 0.001)          // source follows base
+        #expect(cross.destinationAmount == 100)            // USD side untouched
+        #expect(abs(cross.fee - 1) < 0.001)
+        #expect(abs(plain.amount - 13.89) < 0.001)
+    }
+
     @Test("A transaction on a base-currency account moves its amount as well")
     func convertsBaseCurrencyAccountAmounts() throws {
         let account = AccountModel(name: "现金", currencyCode: "", openingBalance: 0)

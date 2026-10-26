@@ -127,12 +127,19 @@ final class CurrencyRateStore {
             return .failure(.missingRate(code))
         case .success(let plan):
             let transactions = repo.fetch(TransactionModel.self).count
+            // Only the accounts and transfers that actually move: those whose
+            // side follows the base currency.
+            let accounts = repo.fetch(AccountModel.self)
+                .filter { $0.currencyCode.isEmpty && $0.openingBalance != 0 }.count
+            let transfers = repo.fetch(TransferModel.self).count
             let budgets = repo.fetch(BudgetModel.self).count
             let mainBudgets = repo.fetch(MainBudgetModel.self).count
             let templates = repo.fetch(TemplateTransactionModel.self).count
-            return .success(RebasePreview(oldBase: plan.oldBase, newBase: plan.newBase,
-                                          factor: plan.factor,
-                                          recordCount: transactions + budgets + mainBudgets + templates))
+            return .success(RebasePreview(
+                oldBase: plan.oldBase, newBase: plan.newBase,
+                factor: plan.factor,
+                recordCount: transactions + accounts + transfers
+                    + budgets + mainBudgets + templates))
         }
     }
 
