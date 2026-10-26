@@ -314,6 +314,10 @@ struct SettingsView: View {
           case .templates: TemplatesView()
           }
         }
+        .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
+            // A presented cover would sit above the lock overlay.
+            if !unlocked { showImportGuide = false }
+        }
         .fullScreenPresentation(isPresented: $showImportGuide) {
           ImportDataView()
         }

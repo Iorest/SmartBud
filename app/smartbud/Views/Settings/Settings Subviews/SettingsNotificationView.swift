@@ -168,6 +168,14 @@ struct SettingsNotificationsView: View {
 
 @MainActor
 func newNotification() {
+  // Re-entering this screen restores `customTime`, which fires the change
+  // handler; without this guard a reminder the user switched off was
+  // scheduled again while the toggle still read Off.
+  let enabled = UserDefaults.appGroup.object(forKey: "showNotifications") as? Bool ?? false
+  guard enabled else {
+    UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    return
+  }
   UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
   let content = UNMutableNotificationContent()

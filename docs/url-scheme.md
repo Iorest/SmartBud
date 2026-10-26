@@ -17,7 +17,7 @@ smartbud://add?amount=12.5&type=expense&category=餐饮&note=午饭
 | `category` | 否 | 分类名。先精确匹配（忽略大小写），再按包含匹配；匹配不到就记成无分类 |
 | `account` | 否 | 账户名或账户 UUID。匹配不到时用默认账户 |
 | `note` | 否 | 备注；留空时用分类名 |
-| `date` | 否 | `yyyy-MM-dd` 或完整 ISO 8601；默认现在 |
+| `date` | 否 | `yyyy-MM-dd`、完整 ISO 8601，或无时区的 `yyyy-MM-ddTHH:mm[:ss]`（按设备时区解释）；缺省为现在，给了但解析失败会回 `invalid_date` |
 | `reimbursable` | 否 | `1` / `true` 表示这是待报销支出 |
 | `discount` | 否 | 优惠金额，只作展示（`amount` 仍是你实际付的钱） |
 
@@ -25,11 +25,11 @@ smartbud://add?amount=12.5&type=expense&category=餐饮&note=午饭
 
 | URL | 行为 |
 |---|---|
-| `smartbud://search?q=咖啡` | 切到「记录」并聚焦搜索 |
+| `smartbud://search?q=咖啡` | 切到「记录」、聚焦搜索并把 `q` 填进搜索框 |
 | `smartbud://open?tab=insights` | 切到指定 Tab：`log` / `insights` / `budget` / `settings` |
 | `smartbud://insights` | 等价于 `open?tab=insights` |
 | `smartbud://budget` | 等价于 `open?tab=budget` |
-| `smartbud://newExpense` | 打开记账页（旧版快捷指令仍在用） |
+| `smartbud://newExpense` | 打开记账页（旧版快捷指令仍在用）；host 大小写不敏感 |
 
 ## 回调：x-callback-url
 
@@ -43,8 +43,10 @@ smartbud://add?amount=12.5&note=午饭
 ```
 
 - 成功：`...?id=<UUID>&amount=12.50&date=<ISO 8601>`
-- 失败：`...?error=invalid_amount`（金额缺失、为 0 或不是数字）
-  或 `...?error=app_locked`（App 密码锁未解锁，拒绝写入）
+- 失败：`...?error=invalid_amount`（金额缺失、为 0 或不是数字）、
+  `...?error=invalid_date`（日期无法解析）、
+  `...?error=save_failed`（写入失败，已回滚）、
+  `...?error=app_locked`（App 密码锁未解锁，拒绝写入）
 
 回调 URL 原有的查询参数会保留，SmartBud 只往后追加。
 

@@ -89,8 +89,11 @@ struct NewTransactionIntent: AppIntent {
             throw isExpense ? $expenseCategory.needsValueError() : $incomeCategory.needsValueError()
         }
 
-        // Same defaulting rule as the app and the URL scheme: a shortcut entry
-        // must land in an account, otherwise it never moves a balance.
+        // The intent can run with no UI (Siri, widget, cold start), so the
+        // cached account list is empty unless it is loaded here — the default
+        // account then came back nil and the entry moved no balance. The rate
+        // cache matters too: baseAmount is computed from it.
+        AccountViewModel.shared.load()
         let account = AccountViewModel.shared.defaultAccount(
             lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))
         let transaction = TransactionViewModel.shared.create(TransactionEdit(
@@ -196,7 +199,9 @@ struct ShortcutTransactionView: View {
         let numberFormatter = NumberFormatter()
         numberFormatter.locale = Locale.appLocale
         numberFormatter.numberStyle = .currency
-        numberFormatter.currencyCode = currency
+        // `amount` is in the account's currency; the base symbol made €120
+        // show as "¥120". Fall back to the base only for rows without one.
+        numberFormatter.currencyCode = transaction.account?.resolvedCurrencyCode ?? currency
 
         if showCents {
             numberFormatter.maximumFractionDigits = 2

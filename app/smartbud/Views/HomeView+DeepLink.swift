@@ -23,6 +23,16 @@ extension HomeView {
         addTransaction = true
     }
 
+    /// Closes every presentation owned by this screen. `AppLockView` lives in
+    /// the HomeView ZStack, but a `fullScreenCover` sits above it, so a form
+    /// left open when the app locks stayed interactive over the lock.
+    func closePresentedScreens() {
+        addTransaction = false
+        transactionManager.toEdit = nil
+        transactionManager.showPopup = false
+        transactionManager.toDelete = nil
+    }
+
     /// Handles the `add` and `open` routes. Returns `false` when the URL is
     /// not ours (or belongs to a route another view already owns, such as
     /// search focus), so the caller can fall through to the older handlers.
@@ -63,6 +73,11 @@ extension HomeView {
                          items: [URLQueryItem(name: "error", value: "invalid_amount")])
             return
         }
+        guard !request.dateIsInvalid else {
+            fireCallback(request.callbackError,
+                         items: [URLQueryItem(name: "error", value: "invalid_date")])
+            return
+        }
 
         categoryVM.load()
         accountVM.load()
@@ -88,6 +103,15 @@ extension HomeView {
             discount: request.discount,
             reimbursable: request.isReimbursable && !income
         ))
+
+        // `create` swallows the save result (the app shows a banner), but an
+        // automation asking over x-callback has to learn that nothing landed.
+        if DataRepository.shared.lastSaveError != nil {
+            DataRepository.shared.rollback()
+            fireCallback(request.callbackError,
+                         items: [URLQueryItem(name: "error", value: "save_failed")])
+            return
+        }
 
         // The insights screen keeps a snapshot of the totals, and no view
         // transition happens here to refresh it (unlike closing the entry

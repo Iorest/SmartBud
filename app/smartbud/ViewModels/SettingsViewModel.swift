@@ -13,6 +13,9 @@ final class SettingsViewModel {
     /// `DataRepository.wipeEverything()` for the full path.
     func wipeAllData() async -> DataRepository.WipeOutcome {
         let outcome = await repo.wipeEverything()
+        // Credentials live in the keychain, outside the store: without this
+        // the API key survived the wipe (and even an uninstall).
+        LLMConfig.clearStoredKey()
         // Everything that caches fetched rows has to forget them: the user
         // stays in the app after erasing, and a stale account or rate table
         // would keep showing (and converting with) deleted data. The rate

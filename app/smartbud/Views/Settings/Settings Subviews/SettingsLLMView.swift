@@ -155,6 +155,9 @@ struct SettingsLLMView: View {
            currentModel.isEmpty || currentModel == previous.defaultModel {
             model = option.defaultModel
         }
+        // A key belongs to the host it was issued for. Carrying it over sent
+        // an OpenAI key to whatever provider was picked next.
+        apiKey = ""
         status = .idle
     }
 

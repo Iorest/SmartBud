@@ -324,14 +324,20 @@ extension HomeView {
             if isAdding { transactionCountBeforeAdd = transactions.count }
         }
         .onOpenURL { url in
-            if url.host == "newExpense" {
+            // URL hosts are case-insensitive; `smartbud://newexpense` used to
+            // only switch tabs and never open the form.
+            if url.host?.lowercased() == "newexpense" {
                 requestNewTransaction()
             }
         }
         .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
-            guard unlocked, pendingAddAfterUnlock else { return }
-            pendingAddAfterUnlock = false
-            addTransaction = true
+            if unlocked {
+                guard pendingAddAfterUnlock else { return }
+                pendingAddAfterUnlock = false
+                addTransaction = true
+                return
+            }
+            closePresentedScreens()
         }
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }

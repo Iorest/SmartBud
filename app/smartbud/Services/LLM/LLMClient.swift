@@ -43,6 +43,13 @@ struct LLMConfig: Equatable {
         )
     }
 
+    /// Removes the stored API key. Used by "erase all data": the ledger and
+    /// the CloudKit zone were wiped, but the key used to survive an uninstall
+    /// and reappear in Settings.
+    static func clearStoredKey() {
+        KeychainStore.delete(forKey: apiKeyAccount)
+    }
+
     func save() {
         let defaults = UserDefaults.appGroup
         defaults.set(provider.rawValue, forKey: Self.providerKey)
@@ -99,6 +106,7 @@ struct LLMClient {
         case server(Int)
         case http(Int, String)
         case emptyResponse
+        case unexpectedResponse
         case timeout
         case network
 
@@ -120,6 +128,8 @@ struct LLMClient {
                 return "HTTP \(status): \(body.prefix(200))"
             case .emptyResponse:
                 return String.appLocalized("服务未返回内容。")
+            case .unexpectedResponse:
+                return String.appLocalized("服务返回的内容无法解析，请检查服务地址与模型名称。")
             case .timeout:
                 return String.appLocalized("连接超时，请检查网络或服务地址。")
             case .network:
@@ -151,13 +161,19 @@ struct LLMClient {
         }
 
         let content: String?
-        switch config.provider.dialect {
-        case .openAI:
-            content = try JSONDecoder().decode(OpenAIChatResponse.self, from: data)
-                .choices.first?.message.content
-        case .anthropic:
-            content = try JSONDecoder().decode(AnthropicMessageResponse.self, from: data)
-                .content.first { $0.type == "text" }?.text
+        do {
+            switch config.provider.dialect {
+            case .openAI:
+                content = try JSONDecoder().decode(OpenAIChatResponse.self, from: data)
+                    .choices.first?.message.content
+            case .anthropic:
+                content = try JSONDecoder().decode(AnthropicMessageResponse.self, from: data)
+                    .content.first { $0.type == "text" }?.text
+            }
+        } catch is DecodingError {
+            // A gateway login page or a provider-specific error body used to
+            // surface as the English toolchain message.
+            throw Failure.unexpectedResponse
         }
 
         guard let text = content?.trimmingCharacters(in: .whitespacesAndNewlines),

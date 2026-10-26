@@ -123,6 +123,12 @@ enum LLMProvider: String, CaseIterable, Identifiable, Sendable {
               scheme == "http" || scheme == "https" else {
             return nil
         }
+        // Plain HTTP is only acceptable on the machine itself. A remote
+        // endpoint would send the API key and the ledger summary in clear
+        // text, so reject it rather than letting ATS be the only guard.
+        if scheme == "http", !Self.isLocalHost(url.host) {
+            return nil
+        }
 
         let path = url.path.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         switch dialect {
@@ -135,6 +141,12 @@ enum LLMProvider: String, CaseIterable, Identifiable, Sendable {
             if path.hasSuffix("v1") { return url.appending(path: "messages") }
             return url.appending(path: "v1/messages")
         }
+    }
+
+    private static func isLocalHost(_ host: String?) -> Bool {
+        let value = host?.lowercased() ?? ""
+        return value == "localhost" || value == "127.0.0.1" || value == "::1"
+            || value.hasSuffix(".local")
     }
 
     func isConfigured(baseURL: String, model: String, apiKey: String) -> Bool {

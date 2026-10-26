@@ -123,8 +123,18 @@ struct DeepLinkRequest: Equatable {
         }
     }
 
-    var date: Date {
-        guard let raw = parameters["date"], !raw.isEmpty else { return .now }
+    var date: Date { parsedDate ?? .now }
+
+    /// True when a `date` was supplied but could not be read. Silently using
+    /// "now" would book the entry on the wrong day and still answer success.
+    var dateIsInvalid: Bool {
+        guard let raw = parameters["date"], !raw.isEmpty else { return false }
+        return parsedDate == nil
+    }
+
+    private var parsedDate: Date? {
+        guard let raw = parameters["date"], !raw.isEmpty else { return nil }
+
         let day = DateFormatter()
         day.locale = Locale(identifier: "en_US_POSIX")
         day.timeZone = .current
@@ -133,7 +143,18 @@ struct DeepLinkRequest: Equatable {
 
         let iso = ISO8601DateFormatter()
         iso.formatOptions = [.withInternetDateTime]
-        return iso.date(from: raw) ?? .now
+        if let parsed = iso.date(from: raw) { return parsed }
+
+        // Automations often omit the timezone; interpret that in the device's
+        // zone rather than failing.
+        let local = DateFormatter()
+        local.locale = Locale(identifier: "en_US_POSIX")
+        local.timeZone = .current
+        for format in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm"] {
+            local.dateFormat = format
+            if let parsed = local.date(from: raw) { return parsed }
+        }
+        return nil
     }
 
     /// The search query for `smartbud://search`.

@@ -40,6 +40,11 @@ struct SmartEntrySheet: View {
         }
         .padding(20)
         .appBackground()
+        .onDisappear {
+            // Closing the sheet mid-recording used to leave the audio session
+            // ducking other apps.
+            speech.cancelRecording()
+        }
         .onChange(of: photoItem) { _, item in
             guard let item else { return }
             Task { await parseImage(item) }

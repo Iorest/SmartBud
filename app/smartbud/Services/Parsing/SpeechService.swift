@@ -21,6 +21,11 @@ final class SpeechService {
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
     private var tapInstalled = false
+    /// Last partial transcription. Stopping used to cancel the task before the
+    /// final result arrived, so a normal "speak, tap stop" produced nothing.
+    private var lastTranscription = ""
+    private var completion: ((String) -> Void)?
+    private var finishTask: Task<Void, Never>?
 
     init() {
         // Follow the app language; fall back to English for other locales.
@@ -41,14 +46,19 @@ final class SpeechService {
                                         request: SFSpeechAudioBufferRecognitionRequest,
                                         completion: @escaping (String) -> Void) {
         task = recognizer.recognitionTask(with: request) { [weak self] result, error in
-            if let error {
-                self?.errorMessage = error.localizedDescription
-                self?.stopRecording()
-                return
-            }
-            if let result, result.isFinal {
-                completion(result.bestTranscription.formattedString)
-                self?.stopRecording()
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if let result {
+                    self.lastTranscription = result.bestTranscription.formattedString
+                }
+                if let error {
+                    self.errorMessage = error.localizedDescription
+                    self.deliver(self.lastTranscription)
+                    return
+                }
+                if result?.isFinal == true {
+                    self.deliver(self.lastTranscription)
+                }
             }
         }
     }
@@ -73,6 +83,8 @@ final class SpeechService {
 
     func startRecording(completion: @escaping (String) -> Void) {
         guard !audioEngine.isRunning else { return }
+        self.completion = completion
+        lastTranscription = ""
 
         #if os(macOS)
         // macOS has no AVAudioSession; ask for microphone access directly and
@@ -125,11 +137,54 @@ final class SpeechService {
         }
     }
 
+    /// Stops the microphone and gives the recognizer a moment to deliver its
+    /// final result; falls back to the last partial transcription.
     func stopRecording() {
         audioEngine.stop()
         removeAudioTap()
         request?.endAudio()
-        task?.cancel()
         isRecording = false
+
+        finishTask?.cancel()
+        finishTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(600))
+            guard let self, self.completion != nil else { return }
+            self.deliver(self.lastTranscription)
+        }
+    }
+
+    /// Stops everything without delivering text (the sheet was closed).
+    func cancelRecording() {
+        completion = nil
+        teardown()
+    }
+
+    /// Hands the text back exactly once and releases the audio session.
+    private func deliver(_ text: String) {
+        let handler = completion
+        completion = nil
+        teardown()
+        guard let handler else { return }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { handler(trimmed) }
+    }
+
+    /// Releases the microphone, the recognition task and the audio session.
+    /// The session used to stay active with `.record`, keeping other apps'
+    /// audio ducked after the sheet closed.
+    private func teardown() {
+        finishTask?.cancel()
+        finishTask = nil
+        audioEngine.stop()
+        removeAudioTap()
+        request?.endAudio()
+        request = nil
+        task?.cancel()
+        task = nil
+        isRecording = false
+        #if !os(macOS)
+        try? AVAudioSession.sharedInstance()
+            .setActive(false, options: .notifyOthersOnDeactivation)
+        #endif
     }
 }

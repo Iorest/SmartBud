@@ -130,13 +130,14 @@ class AppLockViewModel {
                 if success {
                     Task { @MainActor in
                         self.isAppUnLocked = true
+                        // A successful authentication clears any stale "Face
+                        // ID unavailable" hint from an earlier attempt.
+                        self.enrollmentError = false
                     }
-                } else if error != nil {
-                    Task { @MainActor in
-                        // Surface auth failure to the UI so the user
-                        // can see why unlock did not succeed.
-                        self.enrollmentError = true
-                    }
+                } else if let error = error as? LAError,
+                          error.code == .biometryNotEnrolled || error.code == .passcodeNotSet {
+                    // A cancelled prompt is not a configuration problem.
+                    Task { @MainActor in self.enrollmentError = true }
                 }
             }
         } else {

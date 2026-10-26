@@ -24,6 +24,7 @@ struct InsightsView: View {
     var onAdd: (() -> Void)?
 
     @Environment(InsightsViewModel.self) var insightsVM
+    @Environment(AppLockViewModel.self) private var appLockVM
 
     @AppStorage("currency", store: .appGroup)
     var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -99,6 +100,12 @@ struct InsightsView: View {
         .onChange(of: period) { _, newValue in
             insightsVM.setPeriod(newValue)
             insightsVM.refreshAll()
+        }
+        .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
+            // Sheets sit above the lock overlay; close them when the app locks.
+            guard !unlocked else { return }
+            showAIAnalysis = false
+            showPendingReimbursements = false
         }
         .sheet(isPresented: $showAIAnalysis) {
             InsightsAIAnalysisView()
