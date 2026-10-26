@@ -36,6 +36,10 @@ enum WidgetModelContainer {
             forSecurityApplicationGroupIdentifier: appGroupID
         ) != nil
 
+        // Must match the app's schema exactly. Opening a store with a subset
+        // of the models makes SwiftData treat the missing entities as deleted
+        // and drop their tables — the templates table was being truncated on
+        // every widget refresh.
         let schema = Schema([
             TransactionModel.self,
             CategoryModel.self,
@@ -43,7 +47,8 @@ enum WidgetModelContainer {
             TransferModel.self,
             CurrencyRate.self,
             BudgetModel.self,
-            MainBudgetModel.self
+            MainBudgetModel.self,
+            TemplateTransactionModel.self
         ])
 
         let configurations: [ModelConfiguration]
