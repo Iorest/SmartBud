@@ -92,6 +92,13 @@ final class ContentViewModel {
             NSUbiquitousKeyValueStore.default.set(currency, forKey: "currency")
         }
 
+        // The key used to stay absent until the user switched currency, so
+        // every reader that looked at the raw default (export, widgets,
+        // Shortcuts, the importer's currency check) saw nothing. Pin the
+        // effective code once — the device region may change later, but the
+        // currency the ledger was recorded in must not.
+        AppBaseCurrency.pin(in: defaults)
+
         // SwiftData doesn't need the CoreData-era migrations, but the
         // flags are still touched so older installs see the same default.
         dataMigration1 = false

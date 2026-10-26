@@ -170,9 +170,7 @@ struct TemplatesView: View {
     private func amountText(_ template: TemplateTransactionModel) -> String {
         LogGrouping.currency(
             template.amount,
-            code: UserDefaults.appGroup.string(forKey: "currency")
-                ?? Locale.current.currency?.identifier
-                ?? "USD",
+            code: AppBaseCurrency.code,
             showCents: UserDefaults.appGroup.object(forKey: "showCents") as? Bool ?? true,
             signed: false,
             income: template.income

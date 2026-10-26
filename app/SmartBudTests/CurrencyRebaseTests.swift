@@ -174,3 +174,76 @@ struct CurrencyRebaseApplicationTests {
         #expect(abs((local.baseAmount ?? 0) - 13.89) < 0.001)
     }
 }
+
+// MARK: - Base currency storage
+
+/// The base currency used to live only in the device locale: the key was
+/// written when the user switched currency, so a fresh install had nothing in
+/// `UserDefaults` and every raw read (export, widgets, importer check) saw an
+/// empty value. These tests pin the fallback, the one-time pin, and the export.
+@Suite("Base currency storage")
+struct BaseCurrencyStorageTests {
+
+    /// A private suite, so the test never reads or writes the app group.
+    private struct Scratch {
+        let name: String
+        let defaults: UserDefaults
+
+        init() {
+            name = "SmartBudTests.baseCurrency.\(UUID().uuidString)"
+            defaults = UserDefaults(suiteName: name)!
+        }
+
+        func cleanUp() { defaults.removePersistentDomain(forName: name) }
+    }
+
+    private var localeCode: String {
+        let device = Locale.current.currency?.identifier ?? ""
+        return device.isEmpty ? "USD" : device
+    }
+
+    @Test("An absent or blank key falls back to the device locale")
+    func fallsBackToLocale() {
+        let scratch = Scratch()
+        defer { scratch.cleanUp() }
+
+        #expect(AppBaseCurrency.code(in: scratch.defaults) == localeCode)
+        scratch.defaults.set("   ", forKey: AppBaseCurrency.storedKey)
+        #expect(AppBaseCurrency.code(in: scratch.defaults) == localeCode)
+    }
+
+    @Test("A stored code wins and is trimmed")
+    func storedCodeWins() {
+        let scratch = Scratch()
+        defer { scratch.cleanUp() }
+
+        scratch.defaults.set("  jpy ", forKey: AppBaseCurrency.storedKey)
+        #expect(AppBaseCurrency.code(in: scratch.defaults) == "jpy")
+    }
+
+    @Test("Pinning writes the effective code once and keeps a real choice")
+    func pinning() {
+        let scratch = Scratch()
+        defer { scratch.cleanUp() }
+
+        let pinned = AppBaseCurrency.pin(in: scratch.defaults)
+        #expect(pinned == localeCode)
+        #expect(scratch.defaults.string(forKey: AppBaseCurrency.storedKey) == pinned)
+
+        // A second launch must not rewrite a code the user chose.
+        scratch.defaults.set("JPY", forKey: AppBaseCurrency.storedKey)
+        #expect(AppBaseCurrency.pin(in: scratch.defaults) == "JPY")
+        #expect(scratch.defaults.string(forKey: AppBaseCurrency.storedKey) == "JPY")
+    }
+
+    @Test("A backup always names a base currency, even on a fresh install")
+    func exportNamesBaseCurrency() {
+        let scratch = Scratch()
+        defer { scratch.cleanUp() }
+
+        let settings = ExportSchema.SettingsDTO.current(defaults: scratch.defaults)
+
+        #expect(settings.baseCurrency == AppBaseCurrency.code(in: scratch.defaults))
+        #expect(!(settings.baseCurrency ?? "").isEmpty)
+    }
+}

@@ -91,6 +91,18 @@ enum ExportSchema {
         var baseCurrency: String?
         var firstDayOfMonth: Int?
         var firstWeekday: Int?
+
+        /// What the current device writes into a backup. `baseCurrency` must
+        /// never be empty: without it a restore cannot tell whether the frozen
+        /// amounts are in its own currency. A fresh install has no stored
+        /// choice, so it falls back to the same rule the app uses everywhere.
+        static func current(defaults: UserDefaults = .appGroup) -> SettingsDTO {
+            SettingsDTO(
+                baseCurrency: AppBaseCurrency.code(in: defaults),
+                firstDayOfMonth: defaults.object(forKey: "firstDayOfMonth") as? Int,
+                firstWeekday: defaults.object(forKey: "firstWeekday") as? Int
+            )
+        }
     }
 
     struct TransactionDTO: Codable {

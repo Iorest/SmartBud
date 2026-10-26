@@ -40,7 +40,7 @@ CategoryModel 1 ──< TransactionModel >── 1 AccountModel
 
 AccountModel 1 ──< TransferModel >── 1 AccountModel   (source / destination)
 
-CurrencyRate (code, rate, updatedAt)     基准货币 = AppStorage "currency"
+CurrencyRate (code, rate, updatedAt)     基准货币 = AppStorage "currency"（首次启动落盘）
 MainBudgetModel                          全局预算
 TemplateTransactionModel                 快捷记账模板
 ```
@@ -89,7 +89,10 @@ TemplateTransactionModel                 快捷记账模板
    - 账户有明确币种：`amount` 是该币种金额，只把 `baseAmount` 乘 r。
    汇率表按 `rate / rate[N]` 重整，新增旧基准币的行、删除新基准币的行。
 4. 整个过程一次提交，失败回滚；界面上说明"历史金额按当前汇率折算，之后不再变"。
-5. 因为基准币存在 iCloud KVS 里会被其他设备读到，切换必须走同一条转换流程——不能只改 AppStorage。
+5. 基准币是**设备本地**设置：`ContentViewModel.bootstrap()` 启动时把生效值写进 App Group 的
+   `currency`（`AppBaseCurrency.pin`），此后只有显式切换才改。iCloud KVS 只用来给全新安装播种，
+   不会被别的设备静默改写——否则那台设备的 `baseAmount` 会在没有折算的情况下被重新解读。
+   读取一律走 `AppBaseCurrency.code`（原始键 → 设备 locale 兜底），不要自己拼默认值。
 
 ## 4. 账目口径
 
@@ -213,7 +216,8 @@ TemplateTransactionModel                 快捷记账模板
 - 冲突：CloudKit 按字段最后写入者获胜；金额类字段不做合并，冲突时以时间戳较晚者为准（SwiftData 默认行为）。
 - 新字段/新实体必须先在 Development 建表，再 Deploy 到 Production，否则老客户端/生产环境同步失败。
 - 无 iCloud 账号或容器不可用时降级为本地库并横幅提示，功能不降级。
-- 基准货币通过 iCloud KVS 同步，因此"改基准币要重新折算"必须在所有设备上一致执行（见 3）。
+- 基准货币是设备本地设置（首次启动落盘，见 3），不随 iCloud 悄悄变化；切换只在当前设备折算当前库。
+- 因此两台设备可以各自用不同基准币：备份导入时按 `settings.baseCurrency` 校验，不一致就拒绝。
 
 ## 9. 交互与导航
 

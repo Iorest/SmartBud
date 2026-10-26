@@ -21,7 +21,7 @@ struct SettingsImportView: View {
     @State private var pendingSummary: DataImporter.Summary?
     @State private var showImportConfirmation = false
 
-    @AppStorage("currency", store: .appGroup) private var currency: String = ""
+    @AppStorage("currency", store: .appGroup) private var currency: String = AppBaseCurrency.code
     @AppStorage("firstDayOfMonth", store: .appGroup) private var firstDayOfMonth: Int = 1
     @AppStorage("firstWeekday", store: .appGroup) private var firstWeekday: Int = 1
     @State private var errorMessage: String?

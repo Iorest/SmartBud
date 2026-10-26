@@ -65,7 +65,10 @@ extension DataExporter {
                 formatter.string(from: txn.wrappedDate),
                 type,
                 amountField(txn.amount),
-                txn.account?.resolvedCurrencyCode ?? "",
+                // A row without an account is recorded in the base currency.
+                // Writing an empty cell here made the sheet look like the
+                // amount had no currency at all.
+                txn.account?.resolvedCurrencyCode ?? AppBaseCurrency.code,
                 amountField(txn.wrappedBaseAmount),
                 txn.category?.name ?? "",
                 txn.account?.name ?? "",
@@ -84,7 +87,7 @@ extension DataExporter {
                 formatter.string(from: transfer.wrappedDate),
                 "transfer",
                 amountField(transfer.amount),
-                transfer.source?.resolvedCurrencyCode ?? "",
+                transfer.source?.resolvedCurrencyCode ?? AppBaseCurrency.code,
                 "",
                 "",
                 "\(source) → \(destination)",

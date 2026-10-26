@@ -238,15 +238,7 @@ enum DataExporter {
             accounts: accounts,
             transfers: transfers,
             rates: rates,
-            settings: ExportSchema.SettingsDTO(
-                // `AppBaseCurrency.code` also covers the common case where the
-                // user never changed the currency: the key is absent and the
-                // value comes from the device locale. Reading the raw default
-                // exported nothing, so a restore could not check the currency.
-                baseCurrency: AppBaseCurrency.code,
-                firstDayOfMonth: UserDefaults.appGroup.object(forKey: "firstDayOfMonth") as? Int,
-                firstWeekday: UserDefaults.appGroup.object(forKey: "firstWeekday") as? Int
-            )
+            settings: ExportSchema.SettingsDTO.current()
         )
     }
 
