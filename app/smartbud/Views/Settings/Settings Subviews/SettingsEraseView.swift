@@ -23,7 +23,7 @@ struct SettingsEraseView: View {
   /// Result of the wipe. The alert lives here, not in `DeleteAllAlert`:
   /// that view dismisses itself as soon as the wipe finishes, taking any
   /// alert bound to its own state with it — the user never saw the outcome.
-  @State private var wipeResult: DataRepository.WipeOutcome?
+  @State private var wipeResult: WipeOutcome?
 
   var body: some View {
     VStack(spacing: 10) {
@@ -133,7 +133,7 @@ struct DeleteAllAlert: View {
   @State var settingsVM = SettingsViewModel.shared
   /// Handed back to the parent so the result can be shown after this cover
   /// closes.
-  var onFinish: (DataRepository.WipeOutcome) -> Void = { _ in }
+  var onFinish: (WipeOutcome) -> Void = { _ in }
 
   @AppStorage("bottomEdge", store: .appGroup)
   var bottomEdge: Double = 15

@@ -233,6 +233,9 @@ TemplateTransactionModel                 快捷记账模板
 - App Lock 通过 App Group 的 `appSessionUnlocked` 同步到 Intents：锁定期间快捷指令
   读写都被拒绝，而不是只挡住 UI。
 
+调试钩子（仅 DEBUG）：`-memoryStore` 强制内存模式，用来验收「本次修改不会保存」
+横幅与擦除拒绝；`-proEnforced` 关闭限免验收 Pro 闸门。
+
 ## 8. 多设备与同步
 
 - CloudKit 私有库 + App Group 共享容器；小组件只读同一容器。

@@ -11,7 +11,7 @@ final class SettingsViewModel {
     /// "Erase All Data" — wipes local records AND the CloudKit zone
     /// for App Store Guideline 5.1.1(v) compliance. See
     /// `DataRepository.wipeEverything()` for the full path.
-    func wipeAllData() async -> DataRepository.WipeOutcome {
+    func wipeAllData() async -> WipeOutcome {
         let outcome = await repo.wipeEverything()
         // Credentials live in the keychain, outside the store: without this
         // the API key survived the wipe (and even an uninstall).

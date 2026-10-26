@@ -64,8 +64,40 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
   （`ExchangeRateService`，Frankfurter 公开接口，无需密钥）。接口未收录的货币保留手动值。
 - 跨币种转账会把「转出金额」与「到账金额」都写进 `TransferModel`，汇率随记录保存，
   之后改汇率不会影响这笔转账。
-- 转账手续费记在 `TransferModel.fee`：转出账户扣 `amount + fee`，转入账户只收到 `receivedAmount`。
-- 归档账户与隐藏账户不同：隐藏只是从总资产里去掉，归档还会从默认列表移出（可在账户页展开查看）。
-  两种状态都不删除任何交易或转账。
+- 转账手续费的金额由一条独立支出行承担（`TransactionModel.transferFeeOf` 指向转账）；
+  `TransferModel.fee` 只用于展示。删掉手续费行会把 `fee` 归零，避免迁移逻辑再次补行。
+- 归档与隐藏账户都不删除交易或转账。归档、隐藏各有可展开分组可以恢复；
+  两者都不会作为新记账的默认账户，也不计入总资产。
 - 「余额调整」不修改 `openingBalance`，而是写一条 `adjustment = true` 的交易，
   这样历史可以追溯，也不会把期初金额改成看起来"对不上"的数字。
+
+## 上线前：Production 部署与新字段核对
+
+Development 环境只要在本机跑一遍写入就会自动建表；**Production 不会自动跟进**，必须手动 Deploy，
+否则 TestFlight/正式包在已登录 iCloud 的设备上会看不到新数据。
+
+1. 用 Debug 包在登录 iCloud 的真机上各做一次：新建账户、跨币种转账（带手续费）、
+   标记报销并核销、调整余额、归档账户、编辑预算、保存模板、切换一次基准货币。
+2. CloudKit Dashboard → Schema → **Deploy Schema Changes**，逐项核对：
+
+   | Record Type | 必须存在的字段 |
+   |---|---|
+   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment` |
+   | `CD_AccountModel` | `currencyCode`、`archived` |
+   | `CD_TransferModel` | `destinationAmount`、`fee` |
+   | `CD_CurrencyRate` | `code`、`rate`、`updatedAt` |
+   | `CD_TemplateTransactionModel` | 整个实体（小组件与主 App 共用 schema） |
+
+3. Deploy 后用 **TestFlight 包**（不是 Debug）在已登录 iCloud 的机器上记一笔，
+   Dashboard → Data → Records 应能看到记录。
+4. 多设备验证：
+   - 设备 A 记一笔 → 设备 B 前台停留 10 秒内应自动出现（`DataRefreshCenter` 监听远端变更）
+   - 设备 A 删除 → B 同步消失
+   - 两台设备同时改同一笔金额 → CloudKit 字段级最后写入者获胜，不合并
+   - 断网写入 → 恢复网络后自动上传，另一台设备可见
+5. 擦除数据后建议重启 App：CloudKit zone 被删除时 mirroring 仍持有旧 zone 元数据，
+   重启会重新建立 zone，避免之后的新记录导出失败。
+
+> macOS 目标没有 CloudKit entitlement（启用会因缺少容器在 PFCloudKit 内 SIGTRAP），
+> 因此 Mac 数据只保存在该 Mac 的 App Group 容器里，不参与多设备同步。
+>

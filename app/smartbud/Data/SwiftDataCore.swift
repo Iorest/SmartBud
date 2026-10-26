@@ -120,94 +120,85 @@ final class DataRepository {
         )
     }
 
+    #if DEBUG
+    /// QA hook: exercise the "nothing will be saved" path (banner copy, wipe
+    /// refusal) without corrupting a real store.
+    private static func forcedMemoryContainer() -> BootResult? {
+        guard ProcessInfo.processInfo.arguments.contains("-memoryStore"),
+              let memory = memoryContainer() else { return nil }
+        return BootResult(container: memory, reason: .storageCorrupted, mode: .memory)
+    }
+    #endif
+
     private struct BootResult {
         let container: ModelContainer
         let reason: FallbackReason?
         let mode: StorageMode
     }
 
-    /// Tries App Group + CloudKit, then a local store, then in-memory, so the
-    /// app still launches when the preferred store is unavailable.
+    /// Picks a store: App Group (+CloudKit on iOS), on-device, or memory.
+    ///
+    /// The important rule is what does *not* happen: when the App Group is
+    /// reachable but its store cannot be opened, no second store is created
+    /// anywhere else. Writes would never be merged back and the user would
+    /// believe their ledger came back while the real one sat untouched.
     private static func makeContainer() -> BootResult {
-        var container: ModelContainer!
-        var reason: FallbackReason?
-        var mode: StorageMode = .cloud
+        #if DEBUG
+        if let forced = forcedMemoryContainer() { return forced }
+        #endif
 
         let appGroupReachable = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: Self.appGroupID
         ) != nil
 
-        // 1. App Group + CloudKit (production path).
-        if appGroupReachable {
-            #if os(macOS)
-            // The macOS target has no iCloud entitlements yet. Configuring
-            // CloudKit without them traps inside PFCloudKitContainerProvider
-            // (SIGTRAP) on a background queue. Use the App Group store
-            // locally until the mac build is team-signed with
-            // com.apple.developer.icloud-container-identifiers.
-            let cloudConfig: ModelConfiguration? = nil
-            #else
-            let cloudConfig: ModelConfiguration? = ModelConfiguration(
+        if appGroupReachable, let booted = appGroupContainer() {
+            return booted
+        }
+        if !appGroupReachable, let local = Self.localContainer() {
+            return BootResult(container: local, reason: .appGroupUnavailable, mode: .device)
+        }
+        if let memoryOnly = Self.memoryContainer() {
+            return BootResult(container: memoryOnly, reason: .storageCorrupted, mode: .memory)
+        }
+        // Even the in-memory init can fail when the schema itself cannot be
+        // loaded; at that point there is no legitimate boot path left.
+        fatalError("DataRepository: every ModelContainer init attempt failed")
+    }
+
+    /// App Group store, with CloudKit where the platform supports it.
+    /// `nil` means the shared store could not be opened at all.
+    private static func appGroupContainer() -> BootResult? {
+        #if os(macOS)
+        // The macOS target has no iCloud entitlements yet. Configuring
+        // CloudKit without them traps inside PFCloudKitContainerProvider on a
+        // background queue, so the Mac uses the shared store locally.
+        let cloudConfig: ModelConfiguration? = nil
+        #else
+        let cloudConfig: ModelConfiguration? = ModelConfiguration(
+            Self.storeName,
+            groupContainer: .identifier(Self.appGroupID),
+            cloudKitDatabase: .private(Self.cloudContainerID)
+        )
+        #endif
+
+        if let cloudConfig,
+           let cloud = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
+            return BootResult(container: cloud, reason: nil, mode: .cloud)
+        }
+        guard let fallback = try? ModelContainer(
+            for: Self.schema,
+            configurations: ModelConfiguration(
                 Self.storeName,
-                groupContainer: .identifier(Self.appGroupID),
-                cloudKitDatabase: .private(Self.cloudContainerID)
+                groupContainer: .identifier(Self.appGroupID)
             )
-            #endif
+        ) else { return nil }
 
-            if let cloudConfig,
-               let cloud = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
-                container = cloud
-                mode = .cloud
-            } else if let fallback = try? ModelContainer(
-                for: Self.schema,
-                configurations: ModelConfiguration(
-                    Self.storeName,
-                    groupContainer: .identifier(Self.appGroupID)
-                )
-            ) {
-                // App Group reachable but CloudKit isn't (no iCloud account,
-                // iCloud disabled, different Apple ID, or macOS where CloudKit
-                // is not wired up yet). The shared store is still the real
-                // one, so writes are kept and will sync once iCloud is back.
-                container = fallback
-                mode = .appGroup
-                if cloudConfig != nil { reason = .cloudKitUnavailable }
-            } else {
-                // App Group is reachable but its store cannot be opened. Do
-                // NOT silently create a second, unrelated store elsewhere:
-                // anything written there would never be merged back and the
-                // user would think their ledger "came back" while the real
-                // one sat untouched on disk. Session memory keeps the app
-                // usable without touching either store.
-                reason = .storageCorrupted
-            }
-        } else {
-            reason = .appGroupUnavailable
-        }
-
-        // 2. Without the App Group there is no shared store to protect, so an
-        // on-device store is legitimate (entitlement missing, previews).
-        if container == nil, !appGroupReachable, let local = Self.localContainer() {
-            container = local
-            mode = .device
-        }
-
-        // 3. In-memory only: data isn't persisted, but nothing is corrupted
-        // and no divergent store is created behind the shared one's back.
-        if container == nil, let memoryOnly = Self.memoryContainer() {
-            container = memoryOnly
-            mode = .memory
-            reason = .storageCorrupted
-        }
-
-        // Even the in-memory init can fail in truly degenerate cases
-        // (e.g. schema completely unloadable). At that point the device
-        // is in such a bad state that crashing is acceptable — the app
-        // has run out of legitimate boot paths.
-        guard let container else {
-            fatalError("DataRepository: every ModelContainer init attempt failed")
-        }
-        return BootResult(container: container, reason: reason, mode: mode)
+        // App Group reachable but CloudKit isn't (no iCloud account, iCloud
+        // disabled, different Apple ID, or macOS). The shared store is still
+        // the real one, so writes are kept and sync resumes later.
+        return BootResult(container: fallback,
+                          reason: cloudConfig == nil ? nil : .cloudKitUnavailable,
+                          mode: .appGroup)
     }
 
     // MARK: - Convenience accessors
@@ -294,25 +285,6 @@ final class DataRepository {
 
     /// Outcome of `wipeEverything()`. Tells the UI whether the local
     /// store and the iCloud zone were both cleared, or only one of them.
-    enum WipeOutcome {
-        /// Local store cleared and the CloudKit zone deleted (or already gone).
-        case complete
-        /// Local store cleared; iCloud deletion failed for a transient reason
-        /// (network, service unavailable). Re-running the wipe is required —
-        /// nothing removes the zone automatically later.
-        case iCloudRetryable
-        /// Local store cleared, but the signed-in Apple ID has no permission
-        /// to delete this zone: almost always a different Apple ID than the
-        /// one that owns the data.
-        case iCloudAccountMismatch
-        /// Local delete itself failed.
-        case localFailed
-        /// The local store could not be opened at all. Nothing was deleted on
-        /// purpose: without a readable local copy the user must not lose the
-        /// iCloud backup too.
-        case storageUnavailable
-    }
-
     /// Full "Erase All Data" flow for App Store Guideline 5.1.1(v):
     /// deletes every record locally, then attempts to delete the
     /// SwiftData-managed CloudKit record zone so the data is gone
@@ -350,22 +322,12 @@ final class DataRepository {
             WidgetCenter.shared.reloadAllTimelines()
             return .complete
         } catch let error as CKError {
-            switch error.code {
-            case .zoneNotFound, .unknownItem:
-                // Already gone: the desired end state.
-                WidgetCenter.shared.reloadAllTimelines()
-                return .complete
-            case .notAuthenticated, .permissionFailure:
-                return .iCloudAccountMismatch
-            default:
-                dataLogger.error(
-                    "CloudKit zone wipe failed: \(error.localizedDescription, privacy: .public)")
-                return .iCloudRetryable
-            }
+            return WipeClassifier.outcome(for: error)
         } catch {
             dataLogger.error(
                 "CloudKit zone wipe failed: \(error.localizedDescription, privacy: .public)")
             return .iCloudRetryable
         }
     }
+
 }
