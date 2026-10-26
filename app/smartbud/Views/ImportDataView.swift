@@ -5,6 +5,7 @@
 //  Created by Iorest on 21/8/23.
 //
 
+import CryptoKit
 import Foundation
 import SwiftData
 import SwiftUI
@@ -56,6 +57,11 @@ struct ImportDataView: View {
     @State var importing = false
 
     @State var data = ""
+    /// SHA-256 of the picked file. Importing the same file twice doubles the
+    /// ledger, and there is no way to tell the copies apart afterwards.
+    @State var pendingDigest: String?
+    @State private var showDuplicateWarning = false
+    @State var duplicateDate: Date?
     @State var rows = [[String]]()
     @State var numberOfRows: Int = 0
     @State var displayedColumns = [[String]]()
@@ -180,64 +186,8 @@ struct ImportDataView: View {
     var body: some View {
         VStack(spacing: 0) {
             if progress == 8 {
-                VStack(spacing: 15) {
-                    switch processingState {
-                    case .loading:
-                        ProgressView()
-                            .controlSize(.large)
-                            .scaleEffect(0.8)
-
-                        Text("Processing Import")
-                            .font(.title2.weight(.medium))
-
-                            .foregroundStyle(Color.SubtitleText)
-                    case .success:
-
-                        Image(systemName: "checkmark")
-                            .font(.title2.weight(.semibold))
-
-                            .foregroundStyle(Color.IncomeGreen)
-                            .frame(width: 35, height: 35)
-                            .background(Color.IncomeGreen.opacity(0.3), in: Circle())
-
-                        Text("Import Successful")
-                            .font(.title2.weight(.medium))
-
-                            .foregroundStyle(Color.IncomeGreen)
-                    case .error:
-                        Image(systemName: "x")
-                            .font(.title2.weight(.semibold))
-
-                            .foregroundStyle(Color.AlertRed)
-                            .frame(width: 35, height: 35)
-                            .background(Color.Alert.opacity(0.3), in: Circle())
-
-                        Text("Import Failed")
-                            .font(.title2.weight(.medium))
-
-                            .foregroundStyle(Color.PrimaryText)
-
-                        Text(errorMessage)
-                            .font(.subheadline.weight(.medium))
-
-                            .foregroundStyle(Color.SubtitleText)
-
-                        // A full-screen cover has no swipe-to-dismiss on
-                        // iOS; without these buttons a failed import trapped
-                        // the user until they killed the app.
-                        HStack(spacing: SBSpace.small) {
-                            Button(String.appLocalized("Back")) {
-                                withAnimation { progress = 7; processingState = .loading }
-                            }
-                            .buttonStyle(.bordered)
-
-                            Button(String.appLocalized("Close")) { dismiss() }
-                                .buttonStyle(.borderedProminent)
-                        }
-                        .padding(.top, SBSpace.small)
-                    }
-                }
-                .frame(maxHeight: .infinity)
+                processingView
+                    .frame(maxHeight: .infinity)
             } else {
                 topBar
 
@@ -283,14 +233,27 @@ struct ImportDataView: View {
                 defer { file.stopAccessingSecurityScopedResource() }
 
                 do {
-                    guard let message = decodeCSV(try Data(contentsOf: file)) else {
+                    let raw = try Data(contentsOf: file)
+                    guard let message = decodeCSV(raw) else {
                         showToast = true
                         toastMessage = String.appLocalized(
                             "This file's text encoding is not supported. Save it as a UTF-8 CSV and try again.")
                         return
                     }
 
+                    let digest = SHA256.hash(data: raw)
+                        .map { String(format: "%02x", $0) }
+                        .joined()
+                    pendingDigest = digest
                     data = message
+
+                    let history = UserDefaults.appGroup
+                        .dictionary(forKey: Self.importedFilesKey) as? [String: Date] ?? [:]
+                    if let importedAt = history[digest] {
+                        duplicateDate = importedAt
+                        showDuplicateWarning = true
+                        return
+                    }
                     processCSV()
                 } catch {
                     showToast = true
@@ -318,6 +281,18 @@ struct ImportDataView: View {
         .sheet(isPresented: $showingCategoryView) {
                 NewCategoryAlert(income: $income, bottomSpacers: false, budgetMode: false)
                     .presentationDetents([.medium, .large])
+        }
+        .alert(String.appLocalized("Import this file again?"),
+               isPresented: $showDuplicateWarning) {
+            Button(String.appLocalized("Import Anyway")) {
+                showDuplicateWarning = false
+                processCSV()
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) {
+                showDuplicateWarning = false
+            }
+        } message: {
+            Text(duplicateWarningMessage)
         }
         .animation(.easeOut(duration: 0.2), value: showToast)
         .onChange(of: showToast) { _, newValue in

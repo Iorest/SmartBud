@@ -139,6 +139,22 @@ extension ImportDataView {
             return
         }
 
+        // Remember this exact file so a second pick can warn instead of
+        // silently doubling the ledger.
+        if let pendingDigest {
+            var history = UserDefaults.appGroup
+                .dictionary(forKey: ImportDataView.importedFilesKey) as? [String: Date] ?? [:]
+            history[pendingDigest] = .now
+            // Keep the list bounded; only the recent files matter for the
+            // duplicate warning.
+            if history.count > 20 {
+                for key in history.sorted(by: { $0.value < $1.value }).prefix(history.count - 20).map(\.key) {
+                    history.removeValue(forKey: key)
+                }
+            }
+            UserDefaults.appGroup.set(history, forKey: ImportDataView.importedFilesKey)
+        }
+
         withAnimation {
             processingState = .success
             confettiNumber += 1

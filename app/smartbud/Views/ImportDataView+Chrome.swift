@@ -297,3 +297,73 @@ extension ImportDataView {
             }
     }
 }
+
+// MARK: - Processing state
+
+extension ImportDataView {
+    /// Digest → first import date for the last few files. One slot only
+    /// caught A→A but missed A→B→A.
+    static let importedFilesKey = "importedFileDigests"
+
+    var duplicateWarningMessage: String {
+        guard let duplicateDate else {
+            return String.appLocalized(
+                "This file was imported on this device before. Importing it again duplicates every row.")
+        }
+        let day = duplicateDate.formatted(
+            Date.FormatStyle(locale: .appLocale).year().month().day())
+        return String.appFormatted(
+            "This file was imported on %@. Importing it again duplicates every row.", day)
+    }
+
+    @ViewBuilder
+    var processingView: some View {
+        VStack(spacing: 15) {
+            switch processingState {
+            case .loading:
+                ProgressView()
+                    .controlSize(.large)
+                    .scaleEffect(0.8)
+
+                Text("Processing Import")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(Color.SubtitleText)
+            case .success:
+                Image(systemName: "checkmark")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(Color.IncomeGreen)
+                    .frame(width: 35, height: 35)
+                    .background(Color.IncomeGreen.opacity(0.3), in: Circle())
+
+                Text("Import Successful")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(Color.IncomeGreen)
+            case .error:
+                Image(systemName: "x")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(Color.AlertRed)
+                    .frame(width: 35, height: 35)
+                    .background(Color.Alert.opacity(0.3), in: Circle())
+
+                Text("Import Failed")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(Color.PrimaryText)
+
+                Text(errorMessage)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.SubtitleText)
+
+                HStack(spacing: SBSpace.small) {
+                    Button(String.appLocalized("Back")) {
+                        withAnimation { progress = 7; processingState = .loading }
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(String.appLocalized("Close")) { dismiss() }
+                        .buttonStyle(.borderedProminent)
+                }
+                .padding(.top, SBSpace.small)
+            }
+        }
+    }
+}
