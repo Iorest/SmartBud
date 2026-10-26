@@ -11,6 +11,10 @@ import SwiftUI
 struct SettingsAppearanceView: View {
     @AppStorage("colourScheme", store: .appGroup)
     var colourScheme: Int = 0
+    /// Lock Screen widgets are readable without unlocking, so amounts are
+    /// hidden there by default.
+    @AppStorage("hideLockWidgetAmounts", store: .appGroup)
+    var hideLockWidgetAmounts: Bool = true
 
     @Environment(\.dismiss) var dismiss
 
@@ -29,7 +33,16 @@ struct SettingsAppearanceView: View {
                 .labelsHidden()
                 #endif
             } footer: {
-                Text(String.appLocalized("Close and reload app for change to take effect."))
+                Text(String.appLocalized("Applied immediately."))
+            }
+
+            Section {
+                Toggle(isOn: $hideLockWidgetAmounts) {
+                    Text(String.appLocalized("Hide amounts on Lock Screen widgets"))
+                }
+            } footer: {
+                Text(String.appLocalized(
+                    "Lock Screen budget widgets show the spent percentage instead of amounts."))
             }
         }
         #if os(macOS)

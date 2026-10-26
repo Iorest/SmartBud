@@ -194,6 +194,9 @@ struct LockBudgetWidgetEntryView: View {
     }
 
     @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
+    /// Lock Screen widgets are visible without unlocking. Defaults to hiding
+    /// amounts; the spent percentage still tells the user where they stand.
+    @AppStorage("hideLockWidgetAmounts", store: .appGroup) var hideAmounts: Bool = true
 
     var body: some View {
         switch widgetFamily {
@@ -201,9 +204,14 @@ struct LockBudgetWidgetEntryView: View {
             if isPlaceholder {
                 Text(String.appLocalized("Select budget in widget options"))
             } else {
-                let amount = amountText(difference, showCents: showCents)
-                Text("\(entry.budget.emoji) \(currencySymbol)\(amount) \(subtitle)")
-                    .widgetURL(budgetDeepLink(entry.budget.name))
+                if hideAmounts {
+                    Text("\(entry.budget.emoji) \(percentString)")
+                        .widgetURL(budgetDeepLink(entry.budget.name))
+                } else {
+                    let amount = amountText(difference, showCents: showCents)
+                    Text("\(entry.budget.emoji) \(currencySymbol)\(amount) \(subtitle)")
+                        .widgetURL(budgetDeepLink(entry.budget.name))
+                }
             }
 
         case .accessoryCircular:
@@ -248,21 +256,31 @@ struct LockBudgetWidgetEntryView: View {
                         }
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
 
-                        let amount = amountText(difference, showCents: showCents)
-                        Text("\(currencySymbol)\(amount) \(subtitle) \(budgetType)")
-                            .font(.system(size: 14, weight: .regular, design: .rounded))
-                            .foregroundStyle(Color.SubtitleText)
+                        if hideAmounts {
+                            Text("\(percentString) \(budgetType)")
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                                .foregroundStyle(Color.SubtitleText)
+                        } else {
+                            let amount = amountText(difference, showCents: showCents)
+                            Text("\(currencySymbol)\(amount) \(subtitle) \(budgetType)")
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                                .foregroundStyle(Color.SubtitleText)
+                        }
 
                         Gauge(value: min(max(percent, 0), 1), in: 0 ... 1) {
                             Text(String.appLocalized("Percent Spent"))
                         } currentValueLabel: {
                             EmptyView()
                         } minimumValueLabel: {
-                            Text(amountText(entry.totalSpent, showCents: showCents))
-                                .font(.system(size: 10, weight: .regular, design: .rounded))
+                            if !hideAmounts {
+                                Text(amountText(entry.totalSpent, showCents: showCents))
+                                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                            }
                         } maximumValueLabel: {
-                            Text(amountText(entry.budget.budgetAmount, showCents: showCents))
-                                .font(.system(size: 10, weight: .regular, design: .rounded))
+                            if !hideAmounts {
+                                Text(amountText(entry.budget.budgetAmount, showCents: showCents))
+                                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                            }
                         }
                         .frame(height: 5)
                         .gaugeStyle(.accessoryLinear)

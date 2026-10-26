@@ -5077,19 +5077,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erasing also removes your data from iCloud. If you're not signed in, the next online sync will clear it on Apple's servers."
+            "value" : "Erasing also deletes the iCloud copy. If that fails — offline, or a different Apple ID — the app tells you and you can run Erase Data again."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此操作会同时从 iCloud 删除你的数据。如果当前未登录 iCloud，下次联网同步时数据会从 Apple 服务器上清除。"
+            "value" : "此操作会同时删除 iCloud 上的数据。若因离线或账号不符失败，App 会明确提示，可再次执行清除。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此操作會同時從 iCloud 刪除你的資料。如果目前未登入 iCloud，下次連線同步時資料會從 Apple 伺服器上清除。"
+            "value" : "此操作會同時刪除 iCloud 上的資料。若因離線或帳號不符失敗，App 會明確提示，可再次執行清除。"
           }
         }
       }
@@ -9197,13 +9197,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Local data erased, but iCloud wipe encountered an issue. The data on iCloud will be removed the next time this device is online."
+            "value" : "Local data erased, but the iCloud copy could not be removed. Run Erase Data again when you're online."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本地数据已清除，但 iCloud 清除遇到问题。数据将在本设备下次联网时从 iCloud 移除。"
+            "value" : "本地数据已清除，但 iCloud 备份未能删除。请联网后重新执行「清除数据」。"
           }
         },
         "zh-Hant" : {
@@ -17502,6 +17502,118 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "資料仍儲存在本機的共享儲存中，iCloud 恢復後會自動同步。"
+          }
+        }
+      }
+    }
+,
+    "Undo Import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo Import"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销本次导入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復原本次匯入"
+          }
+        }
+      }
+    },
+    "第 %d 行是负数金额，不能链接到收入分类。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line %d is a negative amount and cannot be linked to an income category."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %d 行是负数金额，不能链接到收入分类。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %d 行是負數金額，不能連結到收入分類。"
+          }
+        }
+      }
+    }
+,
+    "Applied immediately." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied immediately."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即生效。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即生效。"
+          }
+        }
+      }
+    },
+    "Hide amounts on Lock Screen widgets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide amounts on Lock Screen widgets"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "锁屏小组件隐藏金额"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鎖屏小工具隱藏金額"
+          }
+        }
+      }
+    },
+    "Lock Screen budget widgets show the spent percentage instead of amounts." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Screen budget widgets show the spent percentage instead of amounts."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "锁屏上的预算小组件只显示已用百分比，不显示金额。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鎖屏上的預算小工具只顯示已用百分比，不顯示金額。"
           }
         }
       }

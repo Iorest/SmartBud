@@ -60,6 +60,8 @@ struct ImportDataView: View {
     /// SHA-256 of the picked file. Importing the same file twice doubles the
     /// ledger, and there is no way to tell the copies apart afterwards.
     @State var pendingDigest: String?
+    /// Rows written by this import, so the success screen can offer Undo.
+    @State var importedIDs: [UUID] = []
     @State private var showDuplicateWarning = false
     @State var duplicateDate: Date?
     @State var rows = [[String]]()
@@ -303,14 +305,8 @@ struct ImportDataView: View {
                 }
             }
         }
-        .onChange(of: processingState) { _, newValue in
-            if newValue == .success {
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(1500))
-                    dismiss()
-                }
-            }
-        }
+        // Success no longer dismisses itself: the user gets an explicit
+        // Done / Undo, which is the only way back from a wrong file.
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: confettiNumber) { _, _ in showConfetti = true }
         .sensoryFeedback(.impact(weight: .light), trigger: lightHaptic)

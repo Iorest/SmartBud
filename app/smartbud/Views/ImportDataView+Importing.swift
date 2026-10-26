@@ -20,6 +20,9 @@ private struct ImportDraft {
     let category: CategoryModel
     let amount: Double
     let date: Date
+    /// Sign wins over the linked category: a negative row is money out even
+    /// when the value was mapped to an income category.
+    let income: Bool
 }
 
 extension ImportDataView {
@@ -128,7 +131,7 @@ extension ImportDataView {
         }
 
         let account = accounts.first { $0.id == importAccountID }
-        write(drafts, to: account)
+        importedIDs = write(drafts, to: account)
 
         guard DataRepository.shared.save() else {
             // Drop the staged rows so a later save can't commit half an import.
@@ -164,7 +167,8 @@ extension ImportDataView {
     /// Writes the validated rows. Without an account they never move a
     /// balance, so the ledger total and every account total disagreed;
     /// `baseAmount` has to be frozen at the account's currency too.
-    private func write(_ drafts: [ImportDraft], to account: AccountModel?) {
+    private func write(_ drafts: [ImportDraft], to account: AccountModel?) -> [UUID] {
+        var ids: [UUID] = []
         for draft in drafts {
             let baseAmount = account.map {
                 CurrencyRateStore.shared.convertToBase(
@@ -175,12 +179,14 @@ extension ImportDataView {
                 category: draft.category,
                 account: account,
                 baseAmount: baseAmount,
-                income: draft.category.income,
+                income: draft.income,
                 amount: draft.amount,
                 date: draft.date
             )
             DataRepository.shared.insert(txn)
+            ids.append(txn.id)
         }
+        return ids
     }
 
     /// Rejects an incomplete wizard before any parsing happens.
@@ -232,11 +238,18 @@ extension ImportDataView {
                 return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的金额无法解析。"), line)))
             }
 
+            let isNegative = transactionAmount < 0
+            if isNegative && rowCategory.income {
+                return .failure(ImportFailure(message: String(
+                    format: String.appLocalized("第 %d 行是负数金额，不能链接到收入分类。"), line)))
+            }
+
             drafts.append(ImportDraft(
                 note: row[indexes.note],
                 category: rowCategory,
                 amount: abs(transactionAmount),
-                date: transactionDate
+                date: transactionDate,
+                income: rowCategory.income && !isNegative
             ))
         }
         return .success(drafts)

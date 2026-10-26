@@ -338,6 +338,16 @@ extension ImportDataView {
                 Text("Import Successful")
                     .font(.title2.weight(.medium))
                     .foregroundStyle(Color.IncomeGreen)
+
+                if !importedIDs.isEmpty {
+                    HStack(spacing: SBSpace.small) {
+                        Button(String.appLocalized("Undo Import")) { undoImport() }
+                            .buttonStyle(.bordered)
+                        Button(String.appLocalized("Done")) { dismiss() }
+                            .buttonStyle(.borderedProminent)
+                    }
+                    .padding(.top, SBSpace.small)
+                }
             case .error:
                 Image(systemName: "x")
                     .font(.title2.weight(.semibold))
@@ -365,5 +375,19 @@ extension ImportDataView {
                 .padding(.top, SBSpace.small)
             }
         }
+    }
+}
+
+extension ImportDataView {
+    /// Removes exactly the rows this import wrote. CSV rows carry no
+    /// reimbursement/transfer links, so a plain batch delete is enough.
+    func undoImport() {
+        let ids = Set(importedIDs)
+        guard !ids.isEmpty else { dismiss(); return }
+        let rows = DataRepository.shared.fetch(TransactionModel.self)
+            .filter { ids.contains($0.id) }
+        TransactionViewModel.shared.delete(rows)
+        DataRefreshCenter.refreshAll()
+        dismiss()
     }
 }
