@@ -56,6 +56,8 @@ struct NewTransactionIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
+        guard !AppLockGate.isLocked else { throw AppLockError.locked }
+
         guard expenseCategory != nil || incomeCategory != nil else {
             throw income == .expense
                 ? $expenseCategory.needsValueError()
@@ -96,7 +98,7 @@ struct NewTransactionIntent: AppIntent {
         AccountViewModel.shared.load()
         let account = AccountViewModel.shared.defaultAccount(
             lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))
-        let transaction = TransactionViewModel.shared.create(TransactionEdit(
+        guard let transaction = TransactionViewModel.shared.create(TransactionEdit(
             note: note ?? "",
             category: category,
             account: account,
@@ -105,7 +107,9 @@ struct NewTransactionIntent: AppIntent {
             date: Date.now,
             repeatType: repeatType,
             repeatCoefficient: 1
-        ))
+        )) else {
+            throw TransactionIntentError.saveFailed
+        }
         let message: LocalizedStringResource = isExpense
             ? "Expense successfully logged."
             : "Income successfully logged."
@@ -258,5 +262,16 @@ struct ShortcutTransactionView: View {
         }
         .padding(.vertical, 20)
         .padding(.horizontal, 20)
+    }
+}
+
+/// Failures the Shortcuts action can report. The store rolls a failed write
+/// back, so claiming success would leave the shortcut's caller believing a
+/// row exists that does not.
+enum TransactionIntentError: LocalizedError {
+    case saveFailed
+
+    var errorDescription: String? {
+        String.appLocalized("无法保存更改，请稍后重试。")
     }
 }

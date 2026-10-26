@@ -22,15 +22,35 @@ final class DataRepository {
     /// once in `init` and never reassigned.
     private(set) var container: ModelContainer
 
+    /// Which store this launch is actually using. Recorded explicitly so the
+    /// UI can tell "no iCloud" apart from "nothing will be saved" — they need
+    /// very different warnings.
+    enum StorageMode: String, Equatable {
+        /// App Group + CloudKit: the production path.
+        case cloud
+        /// App Group, no CloudKit (macOS, or iCloud unavailable this launch).
+        case appGroup
+        /// On-device store outside the App Group (entitlement missing).
+        case device
+        /// In-memory only: nothing survives the session.
+        case memory
+    }
+
     /// Why the repository ended up in a degraded configuration, if any.
     /// `nil` means the production path (App Group + CloudKit) booted
     /// cleanly.
     private(set) var fallbackReason: FallbackReason?
 
+    private(set) var storageMode: StorageMode = .cloud
+
     /// `true` when the container is degraded (App-Group-only, local-only,
     /// or in-memory). The UI reads this to show a non-blocking banner
     /// letting the user know their data isn't syncing to iCloud.
     var isInFallbackMode: Bool { fallbackReason != nil }
+
+    /// Nothing written this session will reach disk. The banner has to say
+    /// that instead of promising the data will come back later.
+    var isEphemeral: Bool { storageMode == .memory }
 
     /// Last write failure, surfaced by the UI. Writes used to fail silently,
     /// which made every "saved" state a lie when the store was unhealthy.
@@ -76,6 +96,7 @@ final class DataRepository {
         built.container.mainContext.autosaveEnabled = false
         container = built.container
         fallbackReason = built.reason
+        storageMode = built.mode
     }
 
     /// Local-only store: works on simulators and devices without the App
@@ -102,6 +123,7 @@ final class DataRepository {
     private struct BootResult {
         let container: ModelContainer
         let reason: FallbackReason?
+        let mode: StorageMode
     }
 
     /// Tries App Group + CloudKit, then a local store, then in-memory, so the
@@ -109,11 +131,14 @@ final class DataRepository {
     private static func makeContainer() -> BootResult {
         var container: ModelContainer!
         var reason: FallbackReason?
+        var mode: StorageMode = .cloud
+
+        let appGroupReachable = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Self.appGroupID
+        ) != nil
 
         // 1. App Group + CloudKit (production path).
-        if FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: Self.appGroupID
-        ) != nil {
+        if appGroupReachable {
             #if os(macOS)
             // The macOS target has no iCloud entitlements yet. Configuring
             // CloudKit without them traps inside PFCloudKitContainerProvider
@@ -132,6 +157,7 @@ final class DataRepository {
             if let cloudConfig,
                let cloud = try? ModelContainer(for: Self.schema, configurations: cloudConfig) {
                 container = cloud
+                mode = .cloud
             } else if let fallback = try? ModelContainer(
                 for: Self.schema,
                 configurations: ModelConfiguration(
@@ -139,28 +165,38 @@ final class DataRepository {
                     groupContainer: .identifier(Self.appGroupID)
                 )
             ) {
-                // App Group reachable but CloudKit isn't (no iCloud
-                // account, iCloud disabled, different Apple ID, or macOS
-                // where CloudKit is not wired up yet).
+                // App Group reachable but CloudKit isn't (no iCloud account,
+                // iCloud disabled, different Apple ID, or macOS where CloudKit
+                // is not wired up yet). The shared store is still the real
+                // one, so writes are kept and will sync once iCloud is back.
                 container = fallback
-                // macOS deliberately has no CloudKit configuration, so a
-                // working App Group store there is not a degraded state; only
-                // report a fallback when a CloudKit config was actually tried.
+                mode = .appGroup
                 if cloudConfig != nil { reason = .cloudKitUnavailable }
             } else {
-                reason = .cloudKitUnavailable
+                // App Group is reachable but its store cannot be opened. Do
+                // NOT silently create a second, unrelated store elsewhere:
+                // anything written there would never be merged back and the
+                // user would think their ledger "came back" while the real
+                // one sat untouched on disk. Session memory keeps the app
+                // usable without touching either store.
+                reason = .storageCorrupted
             }
         } else {
             reason = .appGroupUnavailable
         }
 
-        // 2. Local-only on-device store, then 3. an in-memory store.
-        if container == nil, let local = Self.localContainer() {
+        // 2. Without the App Group there is no shared store to protect, so an
+        // on-device store is legitimate (entitlement missing, previews).
+        if container == nil, !appGroupReachable, let local = Self.localContainer() {
             container = local
-            if reason == nil { reason = .appGroupUnavailable }
+            mode = .device
         }
+
+        // 3. In-memory only: data isn't persisted, but nothing is corrupted
+        // and no divergent store is created behind the shared one's back.
         if container == nil, let memoryOnly = Self.memoryContainer() {
             container = memoryOnly
+            mode = .memory
             reason = .storageCorrupted
         }
 
@@ -171,7 +207,7 @@ final class DataRepository {
         guard let container else {
             fatalError("DataRepository: every ModelContainer init attempt failed")
         }
-        return BootResult(container: container, reason: reason)
+        return BootResult(container: container, reason: reason, mode: mode)
     }
 
     // MARK: - Convenience accessors
@@ -192,6 +228,11 @@ final class DataRepository {
             WidgetCenter.shared.reloadAllTimelines()
             return true
         } catch {
+            // Leave the context exactly as it was on disk. Keeping the failed
+            // inserts around made the UI show rows that would vanish on the
+            // next launch, and the next successful save would commit them in
+            // an order nobody could reason about.
+            context.rollback()
             lastSaveError = String.appLocalized("无法保存更改，请稍后重试。")
             dataLogger.error("SwiftData save failed: \(error.localizedDescription, privacy: .public)")
             return false
@@ -254,16 +295,22 @@ final class DataRepository {
     /// Outcome of `wipeEverything()`. Tells the UI whether the local
     /// store and the iCloud zone were both cleared, or only one of them.
     enum WipeOutcome {
-        /// Local store cleared and the CloudKit zone deleted.
+        /// Local store cleared and the CloudKit zone deleted (or already gone).
         case complete
-        /// Local store cleared; iCloud zone deletion failed (e.g. no
-        /// iCloud account, network down, or signed into a different
-        /// Apple ID). The next sync will remove the records on
-        /// iCloud as long as the user is signed in to the same Apple ID
-        /// that owns the container.
-        case partial
-        /// Local delete itself failed. Should not happen in practice.
+        /// Local store cleared; iCloud deletion failed for a transient reason
+        /// (network, service unavailable). Re-running the wipe is required —
+        /// nothing removes the zone automatically later.
+        case iCloudRetryable
+        /// Local store cleared, but the signed-in Apple ID has no permission
+        /// to delete this zone: almost always a different Apple ID than the
+        /// one that owns the data.
+        case iCloudAccountMismatch
+        /// Local delete itself failed.
         case localFailed
+        /// The local store could not be opened at all. Nothing was deleted on
+        /// purpose: without a readable local copy the user must not lose the
+        /// iCloud backup too.
+        case storageUnavailable
     }
 
     /// Full "Erase All Data" flow for App Store Guideline 5.1.1(v):
@@ -277,6 +324,10 @@ final class DataRepository {
     /// own scheduler and the local deletes are confined to the
     /// main-actor `context` we already own.
     func wipeEverything() async -> WipeOutcome {
+        // A memory-only session means the real store never opened. Deleting
+        // the iCloud zone now would destroy the only copy the user has.
+        guard storageMode != .memory else { return .storageUnavailable }
+
         // 1. Local delete. If the save fails, abort — wiping iCloud when
         //    the local store is in an unknown state is worse than
         //    failing the whole flow.
@@ -298,12 +349,23 @@ final class DataRepository {
                 .deleteRecordZone(withID: zoneID)
             WidgetCenter.shared.reloadAllTimelines()
             return .complete
+        } catch let error as CKError {
+            switch error.code {
+            case .zoneNotFound, .unknownItem:
+                // Already gone: the desired end state.
+                WidgetCenter.shared.reloadAllTimelines()
+                return .complete
+            case .notAuthenticated, .permissionFailure:
+                return .iCloudAccountMismatch
+            default:
+                dataLogger.error(
+                    "CloudKit zone wipe failed: \(error.localizedDescription, privacy: .public)")
+                return .iCloudRetryable
+            }
         } catch {
-            // Zone didn't exist (already cleared, or this device never
-            // synced) OR the user is signed out. Either way the local
-            // store is now empty; the iCloud side will follow once
-            // sync resumes. Treat as partial success.
-            return .partial
+            dataLogger.error(
+                "CloudKit zone wipe failed: \(error.localizedDescription, privacy: .public)")
+            return .iCloudRetryable
         }
     }
 }

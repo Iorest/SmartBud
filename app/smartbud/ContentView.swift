@@ -100,17 +100,17 @@ struct ContentView: View {
             // the user is asked *after* they have something to rate.
             ReviewRequester.recordAppLaunch()
         }
-        .alert(String.appLocalized(SettingsKey.bannerFallbackTitle),
+        .alert(String.appLocalized(StorageBanner.titleKey(dataRepo.storageMode)),
                isPresented: $showFallbackNotice) {
             Button(String.appLocalized("OK"), role: .cancel) {}
         } message: {
-            Text(String.appLocalized(SettingsKey.bannerFallbackBody))
+            Text(String.appLocalized(StorageBanner.bodyKey(dataRepo.storageMode)))
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background, .inactive:
                 if appLockVM.isAppLockEnabled {
-                    appLockVM.isAppUnLocked = false
+                    appLockVM.lock()
                 }
             case .active:
                 contentVM.handleSceneBecameActive()
@@ -126,18 +126,22 @@ struct ContentView: View {
 /// iCloud, or a corrupted store). Lives outside `ContentView` so the Mac
 /// layout can place it inside the detail column instead of over the sidebar.
 struct FallbackSyncBanner: View {
+    /// A memory-only session is a much stronger warning than "no iCloud":
+    /// nothing written now will survive the app being closed.
+    private var repo: DataRepository { DataRepository.shared }
+
     var body: some View { fullBanner }
 
     private var fullBanner: some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "icloud.slash.fill")
+            Image(systemName: repo.isEphemeral ? "externaldrive.badge.xmark" : "icloud.slash.fill")
                 .font(.body.weight(.semibold))
                 .foregroundStyle(.white)
             VStack(alignment: .leading, spacing: 2) {
-                Text(String.appLocalized(SettingsKey.bannerFallbackTitle))
+                Text(String.appLocalized(StorageBanner.titleKey(repo.storageMode)))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white)
-                Text(String.appLocalized(SettingsKey.bannerFallbackBody))
+                Text(String.appLocalized(StorageBanner.bodyKey(repo.storageMode)))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
@@ -150,5 +154,25 @@ struct FallbackSyncBanner: View {
                 .fill(Theme.Brand.warning.opacity(0.92))
         )
         .transition(.move(edge: .top).combined(with: .opacity))
+    }
+}
+
+/// Banner copy per storage mode. Three very different situations used to
+/// share one message that promised the data would sync later.
+enum StorageBanner {
+    static func titleKey(_ mode: DataRepository.StorageMode) -> String {
+        switch mode {
+        case .memory: return SettingsKey.bannerEphemeralTitle
+        case .device: return SettingsKey.bannerDeviceTitle
+        case .cloud, .appGroup: return SettingsKey.bannerFallbackTitle
+        }
+    }
+
+    static func bodyKey(_ mode: DataRepository.StorageMode) -> String {
+        switch mode {
+        case .memory: return SettingsKey.bannerEphemeralBody
+        case .device: return SettingsKey.bannerDeviceBody
+        case .cloud, .appGroup: return SettingsKey.bannerFallbackBody
+        }
     }
 }

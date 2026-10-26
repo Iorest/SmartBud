@@ -39,8 +39,11 @@ final class TransactionViewModel {
 
     // MARK: Transaction Creation
 
+    /// Returns `nil` when the store refused the write. The row is rolled back
+    /// by `DataRepository.save()`, so callers must not dismiss the form or
+    /// report success in that case.
     @discardableResult
-    func create(_ edit: TransactionEdit) -> TransactionModel {
+    func create(_ edit: TransactionEdit) -> TransactionModel? {
         let txn = TransactionModel(note: edit.note, category: edit.category,
                                    account: edit.account,
                                    baseAmount: CurrencyRateStore.shared.convertToBase(
@@ -52,7 +55,7 @@ final class TransactionViewModel {
                                    reimbursable: edit.reimbursable)
         repo.insert(txn)
         if edit.repeatType > 0 { processRecurring(txn) }
-        repo.save()
+        guard repo.save() else { return nil }
         // Fire-in-app review prompt at the 3rd, 10th, and 25th
         // transaction. Apple's StoreKit caps the prompt itself at
         // 3x/year; `ReviewRequester` adds a per-version dedup so
@@ -64,7 +67,10 @@ final class TransactionViewModel {
 
     /// Edits an existing transaction in place. Computes `day` / `month` derived fields
     /// from `date` and re-processes recurring transactions if `repeatType > 0`.
-    func update(_ txn: TransactionModel, with edit: TransactionEdit) {
+    /// Returns `false` when the store refused the write; the context has
+    /// already been rolled back, so the caller must keep the form open.
+    @discardableResult
+    func update(_ txn: TransactionModel, with edit: TransactionEdit) -> Bool {
         txn.note = edit.note
         txn.category = edit.category
         txn.account = edit.account
@@ -101,7 +107,7 @@ final class TransactionViewModel {
             txn.recurringType = edit.repeatType
             txn.recurringCoefficient = edit.repeatCoefficient
         }
-        repo.save()
+        return repo.save()
     }
 
     /// Marks a transaction as no longer recurring (idempotent).
@@ -162,18 +168,23 @@ final class TransactionViewModel {
         repo.fetchOne(TemplateTransactionModel.self, predicate: #Predicate { $0.order == order })
     }
 
-    /// Logs a template as a real entry. Returns `false` when the template lost
-    /// its category (the category was deleted), so the caller can say so
-    /// instead of showing "Logged" for a row that was never written.
-    @discardableResult
-    func applyTemplate(_ order: Int) -> Bool {
-        guard let tmpl = getTemplate(order), let cat = tmpl.category else { return false }
+    /// Logs a template as a real entry. The caller needs to tell "category
+    /// was deleted" apart from "the store refused the write": they need
+    /// different messages, and both used to look like success.
+    enum ApplyTemplateResult {
+        case success
+        case missingCategory
+        case saveFailed
+    }
+
+    func applyTemplate(_ order: Int) -> ApplyTemplateResult {
+        guard let tmpl = getTemplate(order), let cat = tmpl.category else { return .missingCategory }
         // Templates carry no account of their own; without the default one the
         // entry would not move any balance and would be missing from the
         // account screens.
         let account = AccountViewModel.shared.defaultAccount(
             lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))
-        create(TransactionEdit(
+        let created = create(TransactionEdit(
             note: tmpl.wrappedNote,
             category: cat,
             account: account,
@@ -183,7 +194,7 @@ final class TransactionViewModel {
             repeatType: tmpl.recurringType,
             repeatCoefficient: tmpl.recurringCoefficient
         ))
-        return true
+        return created == nil ? .saveFailed : .success
     }
 
     /// All templates ordered by `order` (used by the quick-add widget editor).

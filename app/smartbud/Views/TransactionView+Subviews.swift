@@ -189,3 +189,15 @@ extension TransactionView {
         }
     }
 }
+
+extension TransactionView {
+    /// Parses the discount alert's text into a non-negative amount.
+    func applyDiscount() {
+        let cleaned = discountInput
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: ",", with: ".")
+        let value = Double(cleaned) ?? 0
+        discount = value.isFinite ? max(0, min(value, Money.maxAmount)) : 0
+        discountInput = ""
+    }
+}

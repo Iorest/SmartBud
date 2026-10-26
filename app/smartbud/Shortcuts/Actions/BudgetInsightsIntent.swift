@@ -30,6 +30,8 @@ struct BudgetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some ReturnsValue<Double> & ShowsSnippetView & ProvidesDialog {
+        guard !AppLockGate.isLocked else { throw AppLockError.locked }
+
         if type == .category && budget == nil {
             throw $budget.needsValueError()
         }

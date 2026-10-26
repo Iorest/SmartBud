@@ -19,6 +19,7 @@ struct TemplatesView: View {
     @State private var pendingDelete: TemplateTransactionModel?
     @State private var loggedTemplateID: UUID?
     @State private var showMissingCategory = false
+    @State private var saveFailed = false
 
     var body: some View {
         List {
@@ -49,6 +50,9 @@ struct TemplatesView: View {
             Button(String.appLocalized("alert.ok"), role: .cancel) {}
         } message: {
             Text(String.appLocalized("Select a category"))
+        }
+        .alert(String.appLocalized("无法保存更改，请稍后重试。"), isPresented: $saveFailed) {
+            Button(String.appLocalized("alert.ok"), role: .cancel) {}
         }
         .navigationTitle(String.appLocalized("Templates"))
         #if os(iOS)
@@ -145,8 +149,14 @@ struct TemplatesView: View {
 
     private func templateRow(_ template: TemplateTransactionModel) -> some View {
         Button {
-            guard transactionVM.applyTemplate(template.order) else {
+            switch transactionVM.applyTemplate(template.order) {
+            case .success:
+                break
+            case .missingCategory:
                 showMissingCategory = true
+                return
+            case .saveFailed:
+                saveFailed = true
                 return
             }
             withAnimation { loggedTemplateID = template.id }

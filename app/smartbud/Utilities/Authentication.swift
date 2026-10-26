@@ -29,6 +29,9 @@ class AppLockViewModel {
     init() {
         migrateLegacyAppLockKey()
         getAppLockState()
+        // A cold launch while the lock is enabled is locked until Face ID /
+        // passcode succeeds; intents read this flag too.
+        AppLockGate.setUnlocked(!isAppLockEnabled)
     }
 
     /// One-time migration: App Lock used to be stored in
@@ -45,17 +48,27 @@ class AppLockViewModel {
     func enableAppLock() {
         UserDefaults.appGroup.set(true, forKey: Self.appLockKey)
         isAppLockEnabled = true
+        AppLockGate.setUnlocked(true)
     }
 
     // To disable the AppLock in UserDefaults
     func disableAppLock() {
         UserDefaults.appGroup.set(false, forKey: Self.appLockKey)
         isAppLockEnabled = false
+        AppLockGate.setUnlocked(true)
     }
 
     // To Publish the AppLock state
     func getAppLockState() {
         isAppLockEnabled = UserDefaults.appGroup.bool(forKey: Self.appLockKey)
+        if !isAppLockEnabled { AppLockGate.setUnlocked(true) }
+    }
+
+    /// Re-locks the app: called on background/inactive so a returning session
+    /// must authenticate again, and so intents are refused meanwhile.
+    func lock() {
+        isAppUnLocked = false
+        AppLockGate.setUnlocked(false)
     }
 
     /// Whether the device can authenticate the user at all — Face ID/Touch ID
@@ -130,6 +143,7 @@ class AppLockViewModel {
                 if success {
                     Task { @MainActor in
                         self.isAppUnLocked = true
+                        AppLockGate.setUnlocked(true)
                         // A successful authentication clears any stale "Face
                         // ID unavailable" hint from an earlier attempt.
                         self.enrollmentError = false

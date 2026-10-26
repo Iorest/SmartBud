@@ -233,7 +233,7 @@ struct TransactionView: View {
             return
         }
 
-        transactionVM.create(TransactionEdit(
+        let created = transactionVM.create(TransactionEdit(
             note: note.trimmingCharacters(in: .whitespacesAndNewlines) == ""
                 ? (category?.wrappedName ?? "") : note.trimmingCharacters(in: .whitespaces),
             category: category,
@@ -246,6 +246,16 @@ struct TransactionView: View {
             discount: discount,
             reimbursable: reimbursable && !income
         ))
+        guard created != nil else {
+            // The store rolled the insert back; keep the form so nothing the
+            // user typed is lost and the failure is visible.
+            errorHaptic &+= 1
+            toastImage = "exclamationmark.triangle"
+            toastTitle = String.appLocalized("无法保存更改，请稍后重试。")
+            showToast = true
+            isSubmitting = false
+            return
+        }
 
         // Reset pad state (price / decimal / haptic trigger) for the next
         // entry. The pad's submit button also clears the VM via `vm.submit()`,
@@ -266,7 +276,7 @@ struct TransactionView: View {
             finalNote = trimmedNote
         }
 
-        transactionVM.update(transaction, with: TransactionEdit(
+        let saved = transactionVM.update(transaction, with: TransactionEdit(
             note: finalNote,
             category: category,
             account: account,
@@ -278,18 +288,15 @@ struct TransactionView: View {
             discount: discount,
             reimbursable: reimbursable && !income
         ))
-
+        guard saved else {
+            errorHaptic &+= 1
+            toastImage = "exclamationmark.triangle"
+            toastTitle = String.appLocalized("无法保存更改，请稍后重试。")
+            showToast = true
+            isSubmitting = false
+            return
+        }
         dismiss()
-    }
-
-    /// Parses the discount alert's text into a non-negative amount.
-    func applyDiscount() {
-        let cleaned = discountInput
-            .trimmingCharacters(in: .whitespaces)
-            .replacingOccurrences(of: ",", with: ".")
-        let value = Double(cleaned) ?? 0
-        discount = value.isFinite ? max(0, min(value, Money.maxAmount)) : 0
-        discountInput = ""
     }
 
     /// Closes the form, or keeps it open in continuous-entry mode.

@@ -30,6 +30,8 @@
 		E1A2B3C4000000000000F022 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
 		E1A2B3C4000000000000C061 /* ProAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C060 /* ProAccess.swift */; };
+		E1A2B3C4000000000000C081 /* AppLockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C080 /* AppLockGate.swift */; };
+		E1A2B3C4000000000000C082 /* AppLockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C080 /* AppLockGate.swift */; };
 		E1A2B3C4000000000000C067 /* ProUpsell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C066 /* ProUpsell.swift */; };
 		E1A2B3C4000000000000C071 /* SubscriptionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C070 /* SubscriptionError.swift */; };
 		E1A2B3C4000000000000C072 /* SubscriptionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C070 /* SubscriptionError.swift */; };
@@ -650,6 +652,7 @@
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C060 /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/ProAccess.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000C080 /* AppLockGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppLockGate.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C066 /* ProUpsell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/ProUpsell.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C070 /* SubscriptionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/SubscriptionError.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C064 /* ProAccessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProAccessTests.swift; sourceTree = "<group>"; };
@@ -911,6 +914,7 @@
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
+				E1A2B3C4000000000000C080 /* AppLockGate.swift */,
 				E1A2B3C4000000000000C066 /* ProUpsell.swift */,
 				E1A2B3C4000000000000C070 /* SubscriptionError.swift */,
 				E1A2B3C4000000000000C050 /* ImportAmount.swift */,
@@ -1439,6 +1443,7 @@
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
 		E1A2B3C4000000000000C061 /* ProAccess.swift in Sources */,
+		E1A2B3C4000000000000C081 /* AppLockGate.swift in Sources */,
 		E1A2B3C4000000000000C067 /* ProUpsell.swift in Sources */,
 		E1A2B3C4000000000000C071 /* SubscriptionError.swift in Sources */,
 		E1A2B3C4000000000000C051 /* ImportAmount.swift in Sources */,
@@ -1841,6 +1846,7 @@
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
 				E1A2B3C4000000000000C062 /* ProAccess.swift in Sources */,
+				E1A2B3C4000000000000C082 /* AppLockGate.swift in Sources */,
 				E1A2B3C4000000000000C068 /* ProUpsell.swift in Sources */,
 				E1A2B3C4000000000000C072 /* SubscriptionError.swift in Sources */,
 				E1A2B3C4000000000000C052 /* ImportAmount.swift in Sources */,

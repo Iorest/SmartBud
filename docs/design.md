@@ -210,6 +210,29 @@ TemplateTransactionModel                 快捷记账模板
 - 远端同步没有观察者（`NSPersistentStoreRemoteChange` 未监听），另一台设备的修改要等下一次 `onAppear` 才可见。
 - 建议：在 App 层加一个 `DataChangeCenter`，监听远端变更 + 回到前台 + 本地保存，统一刷新上表。
 
+## 7.1 存储异常与数据保护
+
+启动时记录 `StorageMode`，四种情况对应四种处理，绝不"看起来恢复了、其实写进了另一个库"：
+
+| 模式 | 场景 | 行为 | 提示 |
+|---|---|---|---|
+| `cloud` | App Group + CloudKit | 正常运行 | 无 |
+| `appGroup` | App Group 可用、CloudKit 不可用（macOS/未登录） | 写共享库，恢复后同步 | 离线横幅 |
+| `device` | App Group 完全不可达（缺少 entitlement） | 写设备本地库 | 「仅保存在本机」横幅 |
+| `memory` | App Group 可用但库打不开（损坏/迁移失败） | **不创建旁路库、不写盘**，仅内存 | 「本次修改不会保存」 |
+
+关键约束：
+
+- App Group 可达但 store 打不开时，不发生任何磁盘写入；原库保持原样等待恢复/升级，
+  避免"新数据写进临时库、永远不合并"的假恢复。
+- `DataRepository.save()` 失败即 `context.rollback()`，并让写入口返回失败：记账/编辑
+  不关闭表单、模板不显示「已记账」、深链回 `save_failed`、快捷指令抛错。
+- 清除数据按结果分类：`complete` / `iCloudRetryable`（需重新执行，不会自动删除）/
+  `iCloudAccountMismatch`（换了 Apple ID）/ `localFailed` / `storageUnavailable`
+  （本地库打不开时拒绝删除 iCloud，避免毁掉唯一副本）。成功后提示重启以重置同步。
+- App Lock 通过 App Group 的 `appSessionUnlocked` 同步到 Intents：锁定期间快捷指令
+  读写都被拒绝，而不是只挡住 UI。
+
 ## 8. 多设备与同步
 
 - CloudKit 私有库 + App Group 共享容器；小组件只读同一容器。

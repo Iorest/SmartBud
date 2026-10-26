@@ -67,6 +67,9 @@ enum SettingsKey {
     static let eraseSuccess = "settings.erase.success"
     static let erasePartial = "settings.erase.partial"
     static let eraseFailure = "settings.erase.failure"
+    static let eraseRetry = "settings.erase.retry"
+    static let eraseAccount = "settings.erase.account"
+    static let eraseUnavailable = "settings.erase.unavailable"
 
     // MARK: - Export data (GDPR Article 20)
 
@@ -99,6 +102,10 @@ enum SettingsKey {
 
     static let bannerFallbackTitle = "settings.banner.fallbackTitle"
     static let bannerFallbackBody = "settings.banner.fallbackBody"
+    static let bannerEphemeralTitle = "settings.banner.ephemeralTitle"
+    static let bannerEphemeralBody = "settings.banner.ephemeralBody"
+    static let bannerDeviceTitle = "settings.banner.deviceTitle"
+    static let bannerDeviceBody = "settings.banner.deviceBody"
 
     // MARK: - Row titles (General)
 

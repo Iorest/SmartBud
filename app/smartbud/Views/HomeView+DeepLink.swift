@@ -91,7 +91,7 @@ extension HomeView {
         let account = resolveAccount(request.accountHint)
         let note = request.note.isEmpty ? (category?.wrappedName ?? "") : request.note
 
-        let transaction = transactionVM.create(TransactionEdit(
+        guard let transaction = transactionVM.create(TransactionEdit(
             note: note,
             category: category,
             account: account,
@@ -102,12 +102,9 @@ extension HomeView {
             repeatCoefficient: 0,
             discount: request.discount,
             reimbursable: request.isReimbursable && !income
-        ))
-
-        // `create` swallows the save result (the app shows a banner), but an
-        // automation asking over x-callback has to learn that nothing landed.
-        if DataRepository.shared.lastSaveError != nil {
-            DataRepository.shared.rollback()
+        )) else {
+            // The store refused the write and rolled the row back; an
+            // automation asking over x-callback must not be told it landed.
             fireCallback(request.callbackError,
                          items: [URLQueryItem(name: "error", value: "save_failed")])
             return

@@ -9221,19 +9221,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All data has been erased from this device and from iCloud."
+            "value" : "All data has been erased from this device and from iCloud. Restart the app to finish resetting sync."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有数据已从本设备和 iCloud 中清除。"
+            "value" : "所有数据已从本设备和 iCloud 中清除。请重新启动 App 以完成同步重置。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有資料已從本裝置和 iCloud 中清除。"
+            "value" : "所有資料已從本裝置和 iCloud 中清除。請重新啟動 App 以完成同步重設。"
           }
         }
       }
@@ -17167,6 +17167,273 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自訂每日提醒的時間。"
+          }
+        }
+      }
+    }
+,
+    "settings.erase.retry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your local data was erased, but the iCloud copy could not be removed. Check your connection and run Erase Data again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地数据已清除，但 iCloud 备份未能删除。请检查网络后重新执行「清除数据」。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本機資料已清除，但 iCloud 備份未能刪除。請檢查網路後重新執行「清除資料」。"
+          }
+        }
+      }
+    },
+    "settings.erase.account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your local data was erased, but this Apple ID cannot delete the iCloud backup. Sign in with the Apple ID that owns the data, then run Erase Data again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地数据已清除，但当前 Apple ID 无权删除 iCloud 备份。请用数据所属的 Apple ID 登录后重新执行「清除数据」。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本機資料已清除，但目前的 Apple ID 無權刪除 iCloud 備份。請以資料所屬的 Apple ID 登入後重新執行「清除資料」。"
+          }
+        }
+      }
+    },
+    "settings.erase.unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The local database could not be opened, so nothing was erased — deleting the iCloud backup now could destroy your only copy. Restart the app or restore from a backup."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地数据库无法打开，已停止清除，以免误删 iCloud 备份。请重启 App 或从备份恢复。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本機資料庫無法開啟，已停止清除，以免誤刪 iCloud 備份。請重新啟動 App 或從備份還原。"
+          }
+        }
+      }
+    },
+    "settings.banner.ephemeralTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes won't be saved"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本次修改不会保存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本次修改不會儲存"
+          }
+        }
+      }
+    },
+    "settings.banner.ephemeralBody" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The local database could not be opened. To avoid overwriting it, this session keeps data in memory only; it disappears when the app closes. Restart the app, or import a backup once storage works again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地数据库无法打开。为避免覆盖原数据，本次启动只把数据放在内存里，关闭 App 后不会保留。请重启 App，或在存储恢复后导入备份。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本機資料庫無法開啟。為避免覆蓋原有資料，本次啟動只把資料放在記憶體中，關閉 App 後不會保留。請重新啟動 App，或在儲存恢復後匯入備份。"
+          }
+        }
+      }
+    },
+    "settings.banner.deviceTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only on this device"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅保存在本机"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅儲存在本機"
+          }
+        }
+      }
+    },
+    "settings.banner.deviceBody" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared app storage isn't available, so new data stays on this device and does not sync to iCloud."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共享存储不可用，新数据只保存在本机，不会同步到 iCloud。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共享儲存不可用，新資料只儲存在本機，不會同步到 iCloud。"
+          }
+        }
+      }
+    }
+,
+    "请先解锁 SmartBud，再使用快捷指令。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock SmartBud before using this shortcut."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先解锁 SmartBud，再使用快捷指令。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先解鎖 SmartBud，再使用快捷指令。"
+          }
+        }
+      }
+    }
+,
+    "Import this file again?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import this file again?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再次导入这个文件？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再次匯入這個檔案？"
+          }
+        }
+      }
+    },
+    "Import Anyway" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Anyway"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然导入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然匯入"
+          }
+        }
+      }
+    },
+    "This file was imported on this device before. Importing it again duplicates every row." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file was imported on this device before. Importing it again duplicates every row."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个文件之前已经在本机导入过。再次导入会让每一行都重复一份。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個檔案之前已經在本機匯入過。再次匯入會讓每一行都重複一份。"
+          }
+        }
+      }
+    },
+    "This file was imported on %@. Importing it again duplicates every row." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file was imported on %@. Importing it again duplicates every row."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个文件在 %@ 已导入过。再次导入会让每一行都重复一份。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個檔案在 %@ 已匯入過。再次匯入會讓每一行都重複一份。"
           }
         }
       }

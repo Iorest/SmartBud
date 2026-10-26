@@ -102,9 +102,9 @@ struct SettingsEraseView: View {
 
   private var wipeResultTitle: String {
     switch wipeResult {
-    case .complete, .partial:
+    case .complete, .iCloudRetryable, .iCloudAccountMismatch:
       String.appLocalized(SettingsKey.eraseTitle)
-    case .localFailed, .none:
+    case .localFailed, .storageUnavailable, .none:
       String.appLocalized(SettingsKey.proErrorTitle)
     }
   }
@@ -113,10 +113,14 @@ struct SettingsEraseView: View {
     switch wipeResult {
     case .complete:
       String.appLocalized(SettingsKey.eraseSuccess)
-    case .partial:
-      String.appLocalized(SettingsKey.erasePartial)
+    case .iCloudRetryable:
+      String.appLocalized(SettingsKey.eraseRetry)
+    case .iCloudAccountMismatch:
+      String.appLocalized(SettingsKey.eraseAccount)
     case .localFailed:
       String.appLocalized(SettingsKey.eraseFailure)
+    case .storageUnavailable:
+      String.appLocalized(SettingsKey.eraseUnavailable)
     case .none:
       ""
     }

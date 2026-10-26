@@ -50,6 +50,8 @@ struct GetInsightsIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some ReturnsValue<Double> & ShowsSnippetView & ProvidesDialog {
+        guard !AppLockGate.isLocked else { throw AppLockError.locked }
+
         let categories: [CategoryModel]
         let optionalIncome: Bool?
         let typeInt: Int
