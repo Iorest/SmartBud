@@ -201,8 +201,11 @@ struct SettingsLLMView: View {
 
     private var saveButton: some View {
         Button {
-            currentConfig.save()
-            status = .saved
+            if currentConfig.save() {
+                status = .saved
+            } else {
+                status = .failure(String.appLocalized("API Key 无法写入钥匙串，请重试。"))
+            }
         } label: {
             Text(String.appLocalized("保存"))
                 .font(.body.weight(.semibold))

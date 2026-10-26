@@ -50,7 +50,8 @@ struct LLMConfig: Equatable {
         KeychainStore.delete(forKey: apiKeyAccount)
     }
 
-    func save() {
+    @discardableResult
+    func save() -> Bool {
         let defaults = UserDefaults.appGroup
         defaults.set(provider.rawValue, forKey: Self.providerKey)
         defaults.set(baseURL.trimmingCharacters(in: .whitespacesAndNewlines), forKey: Self.baseURLKey)
@@ -58,9 +59,9 @@ struct LLMConfig: Equatable {
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         if key.isEmpty {
             KeychainStore.delete(forKey: Self.apiKeyAccount)
-        } else {
-            KeychainStore.set(key, forKey: Self.apiKeyAccount)
+            return true
         }
+        return KeychainStore.set(key, forKey: Self.apiKeyAccount)
     }
 
     var isConfigured: Bool {
