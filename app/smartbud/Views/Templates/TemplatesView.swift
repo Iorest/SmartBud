@@ -18,6 +18,7 @@ struct TemplatesView: View {
     @State private var editingTemplate: TemplateTransactionModel?
     @State private var pendingDelete: TemplateTransactionModel?
     @State private var loggedTemplateID: UUID?
+    @State private var showMissingCategory = false
 
     var body: some View {
         List {
@@ -43,6 +44,11 @@ struct TemplatesView: View {
                     Text(String.appLocalized("Tap a template to log it instantly. Swipe a row to edit or delete it."))
                 }
             }
+        }
+        .alert(String.appLocalized("Missing Category"), isPresented: $showMissingCategory) {
+            Button(String.appLocalized("alert.ok"), role: .cancel) {}
+        } message: {
+            Text(String.appLocalized("Select a category"))
         }
         .navigationTitle(String.appLocalized("Templates"))
         #if os(iOS)
@@ -139,7 +145,10 @@ struct TemplatesView: View {
 
     private func templateRow(_ template: TemplateTransactionModel) -> some View {
         Button {
-            transactionVM.applyTemplate(template.order)
+            guard transactionVM.applyTemplate(template.order) else {
+                showMissingCategory = true
+                return
+            }
             withAnimation { loggedTemplateID = template.id }
             Task { @MainActor in
                 try? await Task.sleep(for: .seconds(1.5))

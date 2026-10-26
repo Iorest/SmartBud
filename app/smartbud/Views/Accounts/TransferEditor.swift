@@ -16,6 +16,9 @@ struct TransferEditor: View {
     @State private var amount = ""
     @State private var destinationAmount = ""
     @State private var fee = ""
+    /// Last value written by `suggestDestinationAmount`, so a manual edit is
+    /// never overwritten by the next keystroke in the amount field.
+    @State private var lastSuggestedDestination = ""
     @State private var date = Date.now
     @State private var note = ""
 
@@ -45,6 +48,15 @@ struct TransferEditor: View {
 
     private var sourceCurrency: String { source?.resolvedCurrencyCode ?? currency }
     private var destinationCurrency: String { destination?.resolvedCurrencyCode ?? currency }
+
+    /// Whether both currencies have a stored rate. Without one the app used
+    /// to pre-fill the received amount at 1:1, which is a made-up exchange
+    /// rate the user could save by accident.
+    private var hasRate: Bool {
+        guard isCrossCurrency else { return true }
+        return !rateStore.needsRate(for: sourceCurrency)
+            && !rateStore.needsRate(for: destinationCurrency)
+    }
 
     private var canSave: Bool {
         guard let source, let destination else { return false }
@@ -79,9 +91,11 @@ struct TransferEditor: View {
                         amountRow(titleKey: "Amount Received",
                                   text: $destinationAmount, code: destinationCurrency)
 
-                        Text(rateHint)
-                            .font(.footnote)
-                            .foregroundStyle(Color.SubtitleText)
+                        if let rateHint {
+                            Text(rateHint)
+                                .font(.footnote)
+                                .foregroundStyle(Color.SubtitleText)
+                        }
                     }
 
                     DatePicker(String.appLocalized("Date"), selection: $date, displayedComponents: .date)
@@ -135,15 +149,29 @@ struct TransferEditor: View {
     }
 
     /// Pre-fills the received amount from the stored rates when the two
-    /// accounts use different currencies. The user can overwrite it with what
-    /// the bank actually credited.
+    /// accounts use different currencies. Never overwrites a number the user
+    /// typed, and never invents a 1:1 rate when one is missing.
     private func suggestDestinationAmount() {
-        guard isCrossCurrency, parsedAmount > 0 else { return }
+        guard isCrossCurrency, parsedAmount > 0, hasRate else {
+            if isCrossCurrency && !hasRate {
+                destinationAmount = ""
+                lastSuggestedDestination = ""
+            }
+            return
+        }
+        let current = destinationAmount
+        guard current.isEmpty || current == lastSuggestedDestination else { return }
+
         let converted = parsedAmount * rateStore.rate(from: sourceCurrency, to: destinationCurrency)
-        destinationAmount = String(format: "%.2f", (converted * 100).rounded() / 100)
+        let formatted = String(format: "%.2f", (converted * 100).rounded() / 100)
+        destinationAmount = formatted
+        lastSuggestedDestination = formatted
     }
 
-    private var rateHint: String {
+    /// Nil when there is no stored rate: showing "1 USD = 1.0000 CNY" was a
+    /// fabricated rate.
+    private var rateHint: String? {
+        guard hasRate else { return nil }
         let rate = rateStore.rate(from: sourceCurrency, to: destinationCurrency)
         return String.appFormatted("1 %@ = %@ %@",
                                    sourceCurrency,

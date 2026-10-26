@@ -146,13 +146,10 @@ final class ContentViewModel {
             guard let self else { return }
             switch settings.authorizationStatus {
             case .authorized:
-                Task { @MainActor in
-                    if !self.showNotifications && !self.notificationsEnabled {
-                        self.showNotifications = true
-                        self.notificationsEnabled = true
-                        newNotification()
-                    }
-                }
+                // Permission is not consent: re-granting it in the system
+                // settings used to switch the daily reminder back on by
+                // itself. Only the user's own toggle schedules one.
+                break
             case .denied:
                 Task { @MainActor in
                     self.notificationsEnabled = false

@@ -35,21 +35,24 @@ final class CategoryViewModel {
     /// Starter categories for a fresh install. Without these the picker has
     /// nothing to choose from and a first transaction cannot be categorised.
     private struct StarterCategory {
-        let name: String
+        /// Localisation key, not a name: with the names hardcoded in Chinese
+        /// an English or Traditional-Chinese install got eight Simplified
+        /// categories that could never be translated.
+        let nameKey: String
         let emoji: String
         let colour: String
         let income: Bool
     }
 
     private static let starterCategories: [StarterCategory] = [
-        StarterCategory(name: "餐饮", emoji: "🍔", colour: "#EC7A58", income: false),
-        StarterCategory(name: "交通", emoji: "🚆", colour: "#279AF4", income: false),
-        StarterCategory(name: "购物", emoji: "🛍️", colour: "#C56AF7", income: false),
-        StarterCategory(name: "居住", emoji: "🏠", colour: "#6E7BF1", income: false),
-        StarterCategory(name: "娱乐", emoji: "🎮", colour: "#F3BF56", income: false),
-        StarterCategory(name: "医疗", emoji: "💊", colour: "#ED80A2", income: false),
-        StarterCategory(name: "工资", emoji: "💼", colour: "#4DBF73", income: true),
-        StarterCategory(name: "理财", emoji: "📈", colour: "#408CF2", income: true)
+        StarterCategory(nameKey: "Food", emoji: "🍔", colour: "#EC7A58", income: false),
+        StarterCategory(nameKey: "Transport", emoji: "🚆", colour: "#279AF4", income: false),
+        StarterCategory(nameKey: "Shopping", emoji: "🛍️", colour: "#C56AF7", income: false),
+        StarterCategory(nameKey: "Housing", emoji: "🏠", colour: "#6E7BF1", income: false),
+        StarterCategory(nameKey: "Entertainment", emoji: "🎮", colour: "#F3BF56", income: false),
+        StarterCategory(nameKey: "Healthcare", emoji: "💊", colour: "#ED80A2", income: false),
+        StarterCategory(nameKey: "Paycheck", emoji: "💼", colour: "#4DBF73", income: true),
+        StarterCategory(nameKey: "Investment", emoji: "📈", colour: "#408CF2", income: true)
     ]
 
     /// Adds any starter category the user does not already have. Existing
@@ -57,10 +60,11 @@ final class CategoryViewModel {
     func seedStarterCategories() {
         load()
         for starter in Self.starterCategories {
+            let name = String.appLocalized(starter.nameKey)
             let pool = starter.income ? incomeCategories : expenseCategories
-            guard !pool.contains(where: { $0.name == starter.name }) else { continue }
+            guard !pool.contains(where: { sameName($0.wrappedName, name) }) else { continue }
             let cat = CategoryModel(
-                name: starter.name,
+                name: name,
                 emoji: starter.emoji,
                 colour: starter.colour,
                 income: starter.income,
@@ -157,6 +161,11 @@ final class CategoryViewModel {
         return validation(among: categories, emoji: emoji, name: trimmedName)
     }
 
+    /// Two names that differ only in case or diacritics are the same label.
+    private func sameName(_ lhs: String, _ rhs: String) -> Bool {
+        lhs.compare(rhs, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+    }
+
     private func missingFieldError(name: String, emoji: String) -> CategoryError? {
         if name.isEmpty && emoji.isEmpty { return .incomplete }
         if name.isEmpty { return .missingName }
@@ -168,7 +177,9 @@ final class CategoryViewModel {
                             emoji: String,
                             name: String) -> CategoryValidation {
         let emojiTaken = categories.contains { $0.wrappedEmoji == emoji }
-        let nameTaken = categories.contains { $0.wrappedName == name }
+        // "food" and "Food" are the same category to the user; comparing
+        // case-sensitively let a duplicate through.
+        let nameTaken = categories.contains { sameName($0.wrappedName, name) }
 
         if emojiTaken && nameTaken { return CategoryValidation(error: .duplicate, order: 0) }
         if emojiTaken { return CategoryValidation(error: .duplicateEmoji, order: 0) }

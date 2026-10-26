@@ -46,7 +46,11 @@ final class NumberPadViewModel {
     /// a successful submit. Pure UI concern; doesn't affect any state.
     var submitTrigger: Int = 0
 
-    private let hapticType: Int
+    /// Mirrors the `haptics` UserDefaults flag. A `var` so the views can keep
+    /// it in step with Settings; it used to be fixed at 1, which made the
+    /// setting a no-op for the pad (still buzzing on "None", never stronger
+    /// on "Excessive").
+    var hapticType: Int
 
     /// Upper bound for a single amount, kept so the display stays legible.
     private static let maxAmount = Decimal(100_000_000)

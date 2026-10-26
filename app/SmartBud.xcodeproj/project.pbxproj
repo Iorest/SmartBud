@@ -107,6 +107,8 @@
 		5327D2D7287C6B5F00F76ADF /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2CE287C6B5E00F76ADF /* TransactionView.swift */; };
 		5327D2D8287C6B5F00F76ADF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2CF287C6B5E00F76ADF /* SettingsView.swift */; };
 		5327D2D9287C6B5F00F76ADF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D0287C6B5E00F76ADF /* HomeView.swift */; };
+		E1A2B3C4000000000000C031 /* HomeView+Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C030 /* HomeView+Sidebar.swift */; };
+		E1A2B3C4000000000000C032 /* HomeView+Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C030 /* HomeView+Sidebar.swift */; };
 		5327D2DB287C6B5F00F76ADF /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D2287C6B5E00F76ADF /* LogView.swift */; };
 		5327D2DC287C6B5F00F76ADF /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D3287C6B5E00F76ADF /* BudgetView.swift */; };
 		5327D2DD287C6B5F00F76ADF /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5327D2D4287C6B5E00F76ADF /* InsightsView.swift */; };
@@ -452,6 +454,8 @@
 		E1A2B3C400000000000002B2 /* TransactionDateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002B0 /* TransactionDateRow.swift */; };
 		E1A2B3C400000000000002A1 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
+		E1A2B3C4000000000000C010 /* ExpenseTextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000201 /* ExpenseTextParser.swift */; };
+		E1A2B3C4000000000000C011 /* AlipayWechatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000203 /* AlipayWechatParser.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
 		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
@@ -527,6 +531,7 @@
 		E1A2B3C40000000000000503 /* TransactionView+Body.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionView+Body.swift"; sourceTree = "<group>"; };
 		5327D2CF287C6B5E00F76ADF /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5327D2D0287C6B5E00F76ADF /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000C030 /* HomeView+Sidebar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeView+Sidebar.swift"; sourceTree = "<group>"; };
 		E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeView+DeleteConfirmation.swift"; sourceTree = "<group>"; };
 		5327D2D2287C6B5E00F76ADF /* LogView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		5327D2D3287C6B5E00F76ADF /* BudgetView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
@@ -1027,6 +1032,7 @@
 				E1A2B3C400000000000002F0 /* ImportDataView+Steps.swift */,
 				E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */,
 				5327D2D0287C6B5E00F76ADF /* HomeView.swift */,
+				E1A2B3C4000000000000C030 /* HomeView+Sidebar.swift */,
 				E1A2B3C40000000000000701 /* HomeView+DeleteConfirmation.swift */,
 				5327D2D2287C6B5E00F76ADF /* LogView.swift */,
 				536CC385293106180081E401 /* LineGraph.swift */,
@@ -1422,6 +1428,7 @@
 		E1A2B3C4000000000000A012 /* SettingsImportView.swift in Sources */,
 				53D6BDCA2AF73B7A00F5728E /* SettingsAppIconView.swift in Sources */,
 				5327D2D9287C6B5F00F76ADF /* HomeView.swift in Sources */,
+				E1A2B3C4000000000000C031 /* HomeView+Sidebar.swift in Sources */,
 				53D6BDCC2AF73BC800F5728E /* SettingsCurrencyView.swift in Sources */,
 				D1550AA12D26000000000002 /* SystemTheme.swift in Sources */,
 				B0A0F00000000000000000E2 /* Theme.swift in Sources */,
@@ -1653,6 +1660,8 @@
 				E1A2B3C40000000000000273 /* TransactionSnapshot.swift in Sources */,
 				E1A2B3C40000000000000275 /* UndoRestoresRecurrenceTests.swift in Sources */,
 				E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */,
+				E1A2B3C4000000000000C010 /* ExpenseTextParser.swift in Sources */,
+				E1A2B3C4000000000000C011 /* AlipayWechatParser.swift in Sources */,
 				E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */,
 				E1A2B3C40000000000000276 /* Helper.swift in Sources */,
 				C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */,
@@ -1684,6 +1693,7 @@
 				D0C0FFEE0000000000000107 /* SwiftDataCore.swift in Sources */,
 				D0C0FFEE000000000000010A /* SettingsAppIconView.swift in Sources */,
 				D0C0FFEE000000000000010B /* HomeView.swift in Sources */,
+				E1A2B3C4000000000000C032 /* HomeView+Sidebar.swift in Sources */,
 				D0C0FFEE000000000000010C /* SettingsCurrencyView.swift in Sources */,
 				D0C0FFEE0000000000000110 /* SystemTheme.swift in Sources */,
 				D0C0FFEE0000000000000111 /* Theme.swift in Sources */,

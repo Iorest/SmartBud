@@ -216,6 +216,11 @@ struct SettingsImportView: View {
                 // Every screen reads from the same store; refresh the ones
                 // that cache fetched rows so the imported data shows up
                 // without needing a relaunch.
+                // The fee row's base amount converts with the *imported*
+                // rates, so the rate cache has to catch up before the repair
+                // runs; otherwise a missing rate falls back to 1:1 and the
+                // fee is frozen at the wrong scale.
+                CurrencyRateStore.shared.load()
                 // Older backups carry transfers whose fee has no expense row;
                 // write the missing rows so the imported balances add up.
                 TransferFeeLedger.migrate(in: DataRepository.shared.context)

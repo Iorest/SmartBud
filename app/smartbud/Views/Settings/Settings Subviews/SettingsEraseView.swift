@@ -20,6 +20,10 @@ struct SettingsEraseView: View {
   @Environment(\.dismiss) var dismiss
 
   @State var showAlert = false
+  /// Result of the wipe. The alert lives here, not in `DeleteAllAlert`:
+  /// that view dismisses itself as soon as the wipe finishes, taking any
+  /// alert bound to its own state with it — the user never saw the outcome.
+  @State private var wipeResult: DataRepository.WipeOutcome?
 
   var body: some View {
     VStack(spacing: 10) {
@@ -81,7 +85,40 @@ struct SettingsEraseView: View {
     }
     .modifier(SettingsSubviewModifier())
     .fullScreenPresentation(isPresented: $showAlert) {
-      DeleteAllAlert()
+      DeleteAllAlert { outcome in wipeResult = outcome }
+    }
+    .alert(
+      wipeResultTitle,
+      isPresented: Binding(
+        get: { wipeResult != nil },
+        set: { if !$0 { wipeResult = nil } }
+      )
+    ) {
+      Button(String.appLocalized("alert.ok"), role: .cancel) { wipeResult = nil }
+    } message: {
+      Text(wipeResultBody)
+    }
+  }
+
+  private var wipeResultTitle: String {
+    switch wipeResult {
+    case .complete, .partial:
+      String.appLocalized(SettingsKey.eraseTitle)
+    case .localFailed, .none:
+      String.appLocalized(SettingsKey.proErrorTitle)
+    }
+  }
+
+  private var wipeResultBody: String {
+    switch wipeResult {
+    case .complete:
+      String.appLocalized(SettingsKey.eraseSuccess)
+    case .partial:
+      String.appLocalized(SettingsKey.erasePartial)
+    case .localFailed:
+      String.appLocalized(SettingsKey.eraseFailure)
+    case .none:
+      ""
     }
   }
 }
@@ -90,6 +127,9 @@ struct DeleteAllAlert: View {
   @Environment(\.dismiss) var dismiss
   @Environment(\.colorScheme) var systemColorScheme
   @State var settingsVM = SettingsViewModel.shared
+  /// Handed back to the parent so the result can be shown after this cover
+  /// closes.
+  var onFinish: (DataRepository.WipeOutcome) -> Void = { _ in }
 
   @AppStorage("bottomEdge", store: .appGroup)
   var bottomEdge: Double = 15
@@ -99,7 +139,6 @@ struct DeleteAllAlert: View {
   @State private var showEraseConfirmation = false
   @State private var heavyHaptic = 0
   @State private var isWiping = false
-  @State private var wipeResult: DataRepository.WipeOutcome?
 
   private func performWipe() {
     guard !isWiping else { return }
@@ -107,8 +146,8 @@ struct DeleteAllAlert: View {
     isWiping = true
     Task { @MainActor in
       let outcome = await settingsVM.wipeAllData()
-      wipeResult = outcome
       isWiping = false
+      onFinish(outcome)
       dismiss()
     }
   }
@@ -210,40 +249,5 @@ struct DeleteAllAlert: View {
     }
     .ignoresSafeArea(.all)
     .background(BackgroundBlurView())
-    .alert(
-      wipeResultTitle,
-      isPresented: Binding(
-        get: { wipeResult != nil },
-        set: { if !$0 { wipeResult = nil } }
-      ),
-      actions: {
-        Button(String.appLocalized("alert.ok"), role: .cancel) {
-          wipeResult = nil
-        }
-      },
-      message: { Text(wipeResultBody) }
-    )
-  }
-
-  private var wipeResultTitle: String {
-    switch wipeResult {
-    case .complete, .partial:
-      String.appLocalized(SettingsKey.eraseTitle)
-    case .localFailed, .none:
-      String.appLocalized(SettingsKey.proErrorTitle)
-    }
-  }
-
-  private var wipeResultBody: String {
-    switch wipeResult {
-    case .complete:
-      String.appLocalized(SettingsKey.eraseSuccess)
-    case .partial:
-      String.appLocalized(SettingsKey.erasePartial)
-    case .localFailed:
-      String.appLocalized(SettingsKey.eraseFailure)
-    case .none:
-      ""
-    }
   }
 }

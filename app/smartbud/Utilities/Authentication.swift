@@ -58,27 +58,24 @@ class AppLockViewModel {
         isAppLockEnabled = UserDefaults.appGroup.bool(forKey: Self.appLockKey)
     }
 
-    // Checking if the device is having BioMetric hardware and enrolled
-    func checkIfBioMetricAvailable() -> Bool {
+    /// Whether the device can authenticate the user at all — Face ID/Touch ID
+    /// *or* the device passcode. Checking biometrics only meant a lockout (or
+    /// a temporarily disabled Face ID) reported "unavailable" and the app sent
+    /// the user to Settings without ever offering the passcode, leaving them
+    /// with no way to unlock or turn the lock off.
+    func canAuthenticate() -> Bool {
         var error: NSError?
         let laContext = LAContext()
-
-        let isBiometricAvailable = laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
-
-        // Surface biometric-unavailable errors via the existing
-        // `enrollmentError` flag so the UI can show a recovery hint.
-        // Do not log here: the error is a user-actionable state, not
-        // a developer diagnostic.
-        enrollmentError = !isBiometricAvailable || error != nil
-
-        return isBiometricAvailable
+        let available = laContext.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+        enrollmentError = !available || error != nil
+        return available
     }
 
     // This method used to change the AppLock state.
     // If user is going to enable the AppLock then 'appLockState' should be 'true' and vice versa
     func appLockStateChange(appLockState: Bool) {
         let laContext = LAContext()
-        if checkIfBioMetricAvailable() {
+        if canAuthenticate() {
             var reason = ""
             if appLockState {
                 reason = "Provice Touch ID/Face ID to enable App Lock"
@@ -127,7 +124,7 @@ class AppLockViewModel {
     // This method will call on every launch of the app if user has enabled AppLock
     func appLockValidation() {
         let laContext = LAContext()
-        if checkIfBioMetricAvailable() {
+        if canAuthenticate() {
             let reason = "Enable App Lock"
             laContext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
                 if success {

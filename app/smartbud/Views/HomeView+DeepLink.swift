@@ -12,6 +12,17 @@ import SwiftUI
 
 extension HomeView {
 
+    /// Opens the entry sheet, but never above the privacy lock. A request that
+    /// arrives while locked is remembered and replayed after unlocking, so a
+    /// widget tap is not silently dropped.
+    func requestNewTransaction() {
+        if appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked {
+            pendingAddAfterUnlock = true
+            return
+        }
+        addTransaction = true
+    }
+
     /// Handles the `add` and `open` routes. Returns `false` when the URL is
     /// not ours (or belongs to a route another view already owns, such as
     /// search focus), so the caller can fall through to the older handlers.
@@ -36,8 +47,13 @@ extension HomeView {
                          items: [URLQueryItem(name: "opened", value: request.tab ?? "")])
             return true
         case .search:
+            // Read-only, so it is allowed while locked. Carry the query and
+            // ask the log screen to focus, instead of just switching tabs and
+            // leaving the field empty.
             currentTab = "Log"
-            return false
+            launchSearchQuery = request.searchQuery
+            launchSearch.toggle()
+            return true
         }
     }
 

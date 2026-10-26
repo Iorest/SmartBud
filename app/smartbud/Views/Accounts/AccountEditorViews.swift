@@ -218,6 +218,13 @@ struct AccountPickerSheet: View {
     @AppStorage("currency", store: .appGroup) private var currency: String =
         Locale.current.currency?.identifier ?? "USD"
 
+    private func balanceText(for account: AccountModel) -> String {
+        let code = account.resolvedCurrencyCode
+        let amount = Money.format(accountVM.balance(for: account),
+                                  currencyCode: code, locale: .appLocale)
+        return code == currency ? amount : "\(amount) · \(code)"
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -244,8 +251,11 @@ struct AccountPickerSheet: View {
                             Text(account.wrappedEmoji.isEmpty ? "💳" : account.wrappedEmoji)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(account.wrappedName)
-                                Text(Money.format(accountVM.balance(for: account),
-                                                  currencyCode: currency, locale: .appLocale))
+                                // The row used the base symbol for every
+                                // account, so a USD account with 100 showed
+                                // "¥100". Use the account's own currency and
+                                // name it when it differs from the base.
+                                Text(balanceText(for: account))
                                     .font(.caption)
                                     .foregroundStyle(Color.SubtitleText)
                             }

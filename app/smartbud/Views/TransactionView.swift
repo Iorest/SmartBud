@@ -141,6 +141,8 @@ struct TransactionView: View {
     @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
     @AppStorage("numberEntryType", store: .appGroup)
     var numberEntryType: Int = 1
+    @AppStorage("haptics", store: .appGroup)
+    var hapticType: Int = 1
 
     /// `currency` is declared at the top of the struct (line ~45) and re-read
     /// here. We just need the `currencySymbol` derived from the existing
@@ -199,28 +201,18 @@ struct TransactionView: View {
 
     }
 
-    /// Fills the form from a smart-entry parse result. Nothing is saved here —
-    /// the user still submits the form themselves.
-    func applyParsed(_ parsed: ParsedExpense) {
-        income = parsed.isIncome
-        padVM.price = Money.double(parsed.amount)
-        if note.isEmpty, let merchant = parsed.merchant {
-            note = merchant
-        }
-        let pool = parsed.isIncome ? categoryVM.incomeCategories : categoryVM.expenseCategories
-        if let match = ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool) {
-            category = match
-        }
-    }
-
     func submit() {
         // A fast double tap on the checkmark used to create two rows.
         guard !isSubmitting else { return }
         isSubmitting = true
 
         let amount = padVM.price
+        // Adjustment rows and repayment rows are defined by having no
+        // category; requiring one made them uneditable.
+        let categoryOptional = toEdit?.adjustment == true || toEdit?.reimbursementOf != nil
         if let validationError = TransactionValidation.error(
-            amount: amount, hasCategory: category != nil
+            amount: amount, hasCategory: category != nil,
+            requiresCategory: !categoryOptional
         ) {
             toastImage = validationError.systemImage
             toastTitle = String.appLocalized(validationError.toastTitleKey)

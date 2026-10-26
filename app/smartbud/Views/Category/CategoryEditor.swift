@@ -80,7 +80,10 @@ struct CategoryEditor: View {
         }
 
         successHaptic &+= 1
-        let trimmedName = newName.trimmingCharacters(in: .whitespaces).capitalized
+        // Keep what the user typed: `.capitalized` turned "iPhone 保护壳"
+        // into "Iphone 保护壳" and made a second "food" look different from
+        // the stored "Food".
+        let trimmedName = newName.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let editing {
             let colour = editing.income ? editing.colour : selectedColour

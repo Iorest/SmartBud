@@ -174,7 +174,14 @@ private enum ConversionScope {
     @MainActor
     static var needsConversion: Bool {
         let repo = DataRepository.shared
-        return !repo.fetch(TransactionModel.self).isEmpty
+        // Accounts whose opening balance is a base-currency number, and the
+        // transfers between them, move too. Missing them here skipped the
+        // conversion entirely and left those amounts on the old scale.
+        let baseAccounts = repo.fetch(AccountModel.self)
+            .contains { $0.currencyCode.isEmpty && $0.openingBalance != 0 }
+        return baseAccounts
+            || !repo.fetch(TransactionModel.self).isEmpty
+            || !repo.fetch(TransferModel.self).isEmpty
             || !repo.fetch(BudgetModel.self).isEmpty
             || !repo.fetch(MainBudgetModel.self).isEmpty
             || !repo.fetch(TemplateTransactionModel.self).isEmpty

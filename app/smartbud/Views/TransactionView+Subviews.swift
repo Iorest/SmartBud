@@ -168,3 +168,24 @@ extension TransactionView {
         .sensoryFeedback(.success, trigger: successHaptic)
     }
 }
+
+// MARK: - Smart entry
+
+extension TransactionView {
+    /// Fills the form from a smart-entry parse result. Nothing is saved here —
+    /// the user still submits the form themselves.
+    func applyParsed(_ parsed: ParsedExpense) {
+        income = parsed.isIncome
+        // Parsed amounts come from OCR/text and never went through the pad's
+        // own cap, so a stray long number could enter a 9-digit amount.
+        let cap = Decimal(Money.maxAmount)
+        padVM.price = Money.double(parsed.amount > cap ? cap : parsed.amount)
+        if note.isEmpty, let merchant = parsed.merchant {
+            note = merchant
+        }
+        let pool = parsed.isIncome ? categoryVM.incomeCategories : categoryVM.expenseCategories
+        if let match = ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool) {
+            category = match
+        }
+    }
+}

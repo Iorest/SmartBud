@@ -42,13 +42,17 @@ struct HomeView: View {
 
     @State var launchAdd: Bool = false
     @State var launchSearch: Bool = false
+    @State var launchSearchQuery: String?
+    /// "New expense" arrived while the privacy lock was up; replay it after
+    /// the unlock instead of dropping it.
+    @State var pendingAddAfterUnlock = false
 
     @State var counter = 0
     @State private var showConfetti = false
     var isInFallbackMode: Bool = false
 
     // Floating add button (replaces the custom tab bar's centre button).
-    @State private var addTransaction = false
+    @State var addTransaction = false
     @State private var transactionCountBeforeAdd = 0
     @Query private var transactions: [TransactionModel]
     @AppStorage("confetti", store: .appGroup) private var confetti: Bool = false
@@ -68,20 +72,6 @@ struct HomeView: View {
         }
         #endif
     }
-
-    /// Sidebar entries for the wide layout. `id` matches the tab tags.
-    struct SidebarSection: Identifiable {
-        let id: String
-        let titleKey: String
-        let symbol: String
-    }
-
-    static let sections: [SidebarSection] = [
-        SidebarSection(id: "Log", titleKey: "Log", symbol: "list.bullet"),
-        SidebarSection(id: "Insights", titleKey: "Insights", symbol: "chart.bar.fill"),
-        SidebarSection(id: "Budget", titleKey: "Budget", symbol: "chart.pie.fill"),
-        SidebarSection(id: "Settings", titleKey: "Settings", symbol: "gearshape.fill")
-    ]
 
     /// Wide layouts (Mac, iPad in regular width) use a real sidebar instead of
     /// the compact tab strip. The detail column keeps an 860pt reading width.
@@ -125,6 +115,7 @@ struct HomeView: View {
                 SettingsView()
             default:
                 LogView(launchSearch: launchSearch,
+                        launchSearchQuery: launchSearchQuery,
                         onAdd: { addTransaction = true })
             }
         }
@@ -181,6 +172,7 @@ extension HomeView {
     private var tabShell: some View {
         TabView(selection: $currentTab) {
                 LogView(launchSearch: launchSearch,
+                        launchSearchQuery: launchSearchQuery,
                         onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
@@ -324,7 +316,7 @@ extension HomeView {
             TransactionView(toEdit: nil)
         })
         .onChange(of: launchAdd) { _, _ in
-            addTransaction = true
+            requestNewTransaction()
         }
         .onChange(of: addTransaction) { _, isAdding in
             // Snapshot the count when the entry sheet opens so the confetti
@@ -333,8 +325,13 @@ extension HomeView {
         }
         .onOpenURL { url in
             if url.host == "newExpense" {
-                addTransaction = true
+                requestNewTransaction()
             }
+        }
+        .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
+            guard unlocked, pendingAddAfterUnlock else { return }
+            pendingAddAfterUnlock = false
+            addTransaction = true
         }
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }
@@ -386,7 +383,7 @@ extension HomeView {
                 currentTab = "Budget"
             }
         }
-        .focusedSceneValue(\.newTransaction, { addTransaction = true })
+        .focusedSceneValue(\.newTransaction, { requestNewTransaction() })
         .focusedSceneValue(\.selectTab, { tab in currentTab = tab })
     }
 }

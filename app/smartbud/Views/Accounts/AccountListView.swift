@@ -23,6 +23,7 @@ struct AccountListView: View {
     @State var toDelete: AccountModel?
     @State var transferToDelete: TransferModel?
     @State var showArchived = false
+    @State var showHidden = false
     @State var adjusting: AccountModel?
     @State var adjustmentInput = ""
     @State var archivingAccount: AccountModel?
@@ -50,6 +51,10 @@ struct AccountListView: View {
                     ForEach(accountVM.visibleAccounts) { account in
                         row(account)
                     }
+                }
+
+                if !accountVM.hiddenAccounts.isEmpty {
+                    hiddenSection
                 }
 
                 if !accountVM.archivedAccounts.isEmpty {
@@ -182,6 +187,32 @@ struct AccountListView: View {
             "“%@” still holds %@. Archived accounts are left out of the total balance "
                 + "and out of the account picker. Transfer the money out first if it is still in use.",
             account.wrappedName, balance)
+    }
+
+    /// Hidden accounts are out of the daily list and the total, but the flag
+    /// must be reversible: without this section there was no row left to tap.
+    var hiddenSection: some View {
+        Section {
+            if showHidden {
+                ForEach(accountVM.hiddenAccounts) { account in
+                    row(account)
+                }
+            }
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) { showHidden.toggle() }
+            } label: {
+                Text(showHidden
+                     ? String.appLocalized("Hide Hidden Accounts")
+                     : String.appFormatted("Show Hidden Accounts (%lld)",
+                                           accountVM.hiddenAccounts.count))
+            }
+        } header: {
+            Text(String.appLocalized("Hidden"))
+        } footer: {
+            Text(String.appLocalized(
+                "Hidden accounts keep their data but are left out of the list and the total."))
+        }
     }
 
     /// Archived accounts drop out of the daily list and the total but keep
