@@ -133,7 +133,12 @@ struct InsightsAIAnalysisView: View {
             currency: insightsVM.currency,
             totalIncome: insightsVM.formattedCurrency(insightsVM.periodTotalIncome),
             totalSpent: insightsVM.formattedCurrency(insightsVM.periodTotalSpent),
-            net: insightsVM.formattedCurrency(insightsVM.periodTotalNet, sign: true),
+            // `periodTotalNet` is an absolute value; the sign lives in
+            // `periodNetPositive`. Passing the magnitude lost the minus and
+            // told the model a spending month ended in surplus.
+            net: insightsVM.formattedCurrency(
+                insightsVM.periodNetPositive ? insightsVM.periodTotalNet : -insightsVM.periodTotalNet,
+                sign: true),
             topCategories: Array(categoryTotals),
             pendingReimbursement: insightsVM.pendingReimbursementTotal > 0
                 ? insightsVM.formattedCurrency(insightsVM.pendingReimbursementTotal)

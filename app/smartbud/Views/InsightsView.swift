@@ -220,7 +220,9 @@ struct InsightsView: View {
     private var barChartSection: some View {
         BarGraph(
             data: insightsVM.barChartData,
-            average: insightsVM.periodAverage,
+            // Bars are spend, so the reference line has to be spend per day
+            // too. `periodAverage` is the net average shown above.
+            average: insightsVM.periodAverageSpend,
             income: false,
             period: period
         )

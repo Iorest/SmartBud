@@ -126,6 +126,9 @@ extension BrandNewBudgetView {
         .onChange(of: numberEntryType) { _, new in
             padVM.numberEntryType = new
         }
+        .onChange(of: hapticType) { _, new in
+            padVM.hapticType = new
+        }
         .onChange(of: showToast) { _, newValue in
             if newValue {
                 Task { @MainActor in
@@ -164,10 +167,17 @@ extension BrandNewBudgetView {
     /// Saves an in-place edit. Returns `false` when this is a new budget.
     func saveExistingBudget(amount: Double, startDate: Date, budgetType: Int) -> Bool {
         if let edited = toEditBudget {
-            if let category = selectedCategory ?? edited.category {
-                budgetVM.update(edited, amount: amount, startDate: startDate,
-                                type: budgetType, category: category)
+            // A budget without a category (legacy row) can only be saved once
+            // one is picked. Silently closing here looked like a save but
+            // dropped the amount the user just typed.
+            guard let category = selectedCategory ?? edited.category else {
+                errorHaptic &+= 1
+                showToast = true
+                toastMessage = String.appLocalized("Missing Category")
+                return true
             }
+            budgetVM.update(edited, amount: amount, startDate: startDate,
+                            type: budgetType, category: category)
             padVM.submit()
             dismiss()
             return true

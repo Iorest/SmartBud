@@ -260,7 +260,11 @@ struct LogTransactionList<Header: View>: View {
 
     private var flatRows: [FlatRow] {
         months.flatMap { month in
-            [FlatRow.month(month.month)] + month.days.flatMap { day in
+            // The month filter's stepper already names the month; repeating it
+            // as a section header read like a duplicate (iOS suppressed it,
+            // macOS did not).
+            let header: [FlatRow] = showsMonthHeader ? [.month(month.month)] : []
+            return header + month.days.flatMap { day in
                 [FlatRow.day(day)] + day.entries.map { FlatRow.entry($0) }
             }
         }

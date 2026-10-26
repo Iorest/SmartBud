@@ -86,15 +86,15 @@ struct SingleBudgetView: View {
         return "\(Int(round(Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
-    var targetPercent: Double {
+    /// Share of the period still ahead, measured from the *current* period's
+    /// start (the stored one only rolls when the budget screen opens).
+    var remainingFraction: Double {
         let calendar = Calendar.current
-
-        let components1 = calendar.dateComponents([.day], from: budget.wrappedDate, to: budget.endDate)
-        let numberOfDays = components1.day ?? 0
-
-        let components2 = calendar.dateComponents([.day], from: budget.wrappedDate, to: Date.now)
-        let numberOfDaysPast = (components2.day ?? 0) + 1
-
+        let start = BudgetRollover.roll(startDate: budget.wrappedDate,
+                                        type: budget.type) ?? budget.wrappedDate
+        let end = BudgetPeriod.endDate(from: start, type: budget.type)
+        let numberOfDays = calendar.dateComponents([.day], from: start, to: end).day ?? 0
+        let numberOfDaysPast = (calendar.dateComponents([.day], from: start, to: .now).day ?? 0) + 1
         guard numberOfDays > 0 else { return 0 }
         return Double(numberOfDays - numberOfDaysPast) / Double(numberOfDays)
     }
@@ -312,12 +312,18 @@ extension SingleBudgetView {
                             .frame(maxWidth: .infinity)
                         .overlay(alignment: .topLeading) {
                             if budget
-                                .type != 1 && totalSpent < budgetAmount && targetPercent > 0 && targetPercent < 0.95 {
+                                .type != 1 && totalSpent < budgetAmount
+                                    && remainingFraction > 0.05 && remainingFraction < 0.95 {
+                                // The marker shows how much of the budget
+                                // *should* be spent by now, so it moves right
+                                // as the period elapses. Drawing the remaining
+                                // fraction put it at 93% on day two.
+                                let elapsed = 1 - remainingFraction
                                 RoundedTriangle(cornerRadius: 1.3)
-                                    .fill((targetPercent * budgetAmount) <= (budgetAmount - totalSpent) ? Color
-                                        .DarkBackground : Color.AlertRed)
+                                    .fill((remainingFraction * budgetAmount) <= (budgetAmount - totalSpent)
+                                          ? Color.DarkBackground : Color.AlertRed)
                                     .frame(width: 14, height: 6.5)
-                                    .offset(x: (targetPercent * proxy.size.width) - 7, y: -3.5)
+                                    .offset(x: (elapsed * proxy.size.width) - 7, y: -3.5)
                             }
                         }
                     }

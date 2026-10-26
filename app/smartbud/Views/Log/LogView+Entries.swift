@@ -11,6 +11,27 @@ import SwiftUI
 
 extension LogView {
 
+    /// Calendar with the user's week/month start preferences. The list filter
+    /// and the stepper above it must use the same definition, otherwise the
+    /// header says "this week" and the rows belong to a different one.
+    var periodCalendar: Calendar {
+        AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
+    }
+
+    var monthStartDay: Int {
+        UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
+    }
+
+    /// Applies a search deep link that arrived before this tab existed (there
+    /// is no `onChange` to catch it in that case).
+    func applyPendingSearch() {
+        guard let query = launchSearchQuery, !query.isEmpty, searchText.isEmpty else { return }
+        filter = .all
+        searchText = query
+        searchPresented = true
+    }
+
     /// Ledger rows: transactions plus transfers. Transfers only belong in the
     /// unfiltered view — a category or date filter has no meaning for them.
     var visibleEntries: [LogEntry] {

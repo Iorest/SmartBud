@@ -43,30 +43,18 @@ struct FilteredCategoryDayBudgetView: View {
         .scrollContentBackground(.hidden)
         .onAppear {
             DispatchQueue.main.async {
-                var holding = 0.0
-                transactions.forEach { transaction in
-
-                    holding += transaction.wrappedAmount
-                }
-
-                totalSpent = holding
+                totalSpent = transactions.reduce(0) { $0 + $1.wrappedBaseAmount }
             }
         }
         .onChange(of: date) { _, _ in
             DispatchQueue.main.async {
-                var holding = 0.0
-                transactions.forEach { transaction in
-
-                    holding += transaction.wrappedAmount
-                }
-
-                totalSpent = holding
+                totalSpent = transactions.reduce(0) { $0 + $1.wrappedBaseAmount }
             }
         }
         // The ledger can change while this view stays alive (add from the
         // detail screen); recompute instead of showing a stale header.
-        .onChange(of: transactions.map(\.amount)) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedAmount }
+        .onChange(of: transactions.map(\.wrappedBaseAmount)) { _, _ in
+            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
         }
         .frame(maxHeight: .infinity)
     }
@@ -119,7 +107,9 @@ struct FilteredBudgetView: View {
     }
 
     private func dayTotal(_ dayTransactions: [TransactionModel]) -> Double {
-        dayTransactions.reduce(0.0) { $0 + ($1.income ? $1.amount : -$1.amount) }
+        // Cross-account totals are read in the base currency, the same as the
+        // budget card and the insights screen.
+        dayTransactions.reduce(0.0) { $0 + ($1.income ? $1.wrappedBaseAmount : -$1.wrappedBaseAmount) }
     }
 
     private func dayTotalString(_ total: Double) -> String {
@@ -185,45 +175,37 @@ struct FilteredBudgetView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .onAppear {
-            totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
+            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
         }
         .onChange(of: date) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
+            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
         }
-        .onChange(of: transactions.map(\.amount)) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.amount }
+        .onChange(of: transactions.map(\.wrappedBaseAmount)) { _, _ in
+            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
         }
     }
 
+    /// `type` arrives as `budget.type - 1` (1 = week, 2 = month, 3 = year);
+    /// day budgets use `FilteredCategoryDayBudgetView` instead.
     init(category: CategoryModel? = nil, startDate: Date, totalSpent: Binding<Double>, type: Int) {
         date = startDate
 
-        var calendar = Calendar(identifier: .gregorian)
+        let calendar = AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
 
-        calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-        calendar.minimumDaysInFirstWeek = 4
-
-        let endDate: Date
-
-        if type == 1 {
-            if calendar.isDate(startDate, equalTo: Date.now, toGranularity: .weekOfYear) {
-                endDate = Date.now
-            } else {
-                endDate = calendar.date(byAdding: .day, value: 7, to: startDate) ?? Date.now
-            }
-        } else if type == 2 {
-            if calendar.isDate(startDate, equalTo: Date.now, toGranularity: .month) {
-                endDate = Date.now
-            } else {
-                endDate = calendar.date(byAdding: .month, value: 1, to: startDate) ?? Date.now
-            }
-        } else {
-            if calendar.isDate(startDate, equalTo: Date.now, toGranularity: .year) {
-                endDate = Date.now
-            } else {
-                endDate = calendar.date(byAdding: .year, value: 1, to: startDate) ?? Date.now
-            }
+        // The full period that starts at `startDate`, clipped to now. The old
+        // code compared the start with today using the wrong granularity
+        // (week/month/year shifted by one) and fell back to a date-only end,
+        // so a current period either included planned rows or stopped early.
+        let component: Calendar.Component
+        let step: Int
+        switch type {
+        case 1: component = .day; step = 7
+        case 2: component = .month; step = 1
+        default: component = .year; step = 1
         }
+        let periodEnd = calendar.date(byAdding: component, value: step, to: startDate) ?? .now
+        let endDate = min(periodEnd, .now)
 
         let past = Date.distantPast
         let future = Date.distantFuture

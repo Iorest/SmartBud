@@ -55,6 +55,7 @@ struct BrandNewBudgetView: View {
     // stage 5
 
     @AppStorage("numberEntryType", store: .appGroup) var numberEntryType: Int = 1
+    @AppStorage("haptics", store: .appGroup) var hapticType: Int = 1
 
     @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
@@ -132,6 +133,13 @@ struct BrandNewBudgetView: View {
     }
 
     @ViewBuilder
+    /// Categories the picker offers: no budget yet, plus the category this
+    /// editor is editing (it already owns one, and hiding it would blank the
+    /// selection and make the original category impossible to re-pick).
+    private var selectableCategories: [CategoryModel] {
+        categories.filter { $0.budget == nil || $0.budget?.id == toEditBudget?.id }
+    }
+
     var budgetDetails: some View {
         Form {
             Section {
@@ -145,7 +153,7 @@ struct BrandNewBudgetView: View {
 
             if categoryBudget {
                 Section(String.appLocalized("Category")) {
-                    if categories.isEmpty {
+                    if selectableCategories.isEmpty {
                         Button {
                             showingCategoryView = true
                         } label: {
@@ -154,7 +162,7 @@ struct BrandNewBudgetView: View {
                     } else {
                         Picker(String.appLocalized("Select a category"), selection: $selectedCategory) {
                             Text(String.appLocalized("Select")).tag(CategoryModel?.none)
-                            ForEach(categories) { category in
+                            ForEach(selectableCategories) { category in
                                 Text("\(category.wrappedEmoji) \(category.wrappedName)")
                                     .tag(Optional(category))
                             }
@@ -313,8 +321,12 @@ struct BrandNewBudgetView: View {
         self.toEditBudget = toEditBudget
         self.toEditMainBudget = toEditMainBudget
 
+        // Fetch every expense category; the picker filters out the ones that
+        // already have a budget, except the one being edited (that category
+        // always owns a budget, so a `budget == nil` predicate hid the
+        // current selection and left the row blank).
         _categories = Query(
-            filter: #Predicate<CategoryModel> { $0.budget == nil && $0.income == false },
+            filter: #Predicate<CategoryModel> { $0.income == false },
             sort: [SortDescriptor(\.order)]
         )
     }

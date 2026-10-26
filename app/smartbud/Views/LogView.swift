@@ -28,11 +28,14 @@ struct LogView: View {
     @AppStorage("showUpcomingTransactionsWhenUpcoming", store: .appGroup) var showSoon: Bool = false
 
     var launchSearch: Bool
+    /// Query carried by `smartbud://search?q=…`. Applied when it arrives, so a
+    /// deep link does not just focus an empty field.
+    var launchSearchQuery: String?
     /// Invoked by the empty state's primary button ("Add Entry").
     var onAdd: () -> Void = {}
 
     @State var searchText = ""
-    @State private var searchPresented = false
+    @State var searchPresented = false
     @State private var navBarText = ""
 
     // Batch selection
@@ -49,18 +52,6 @@ struct LogView: View {
 
     private var currencySymbol: String {
         Locale.appCurrencySymbol(forCurrencyCode: currency)
-    }
-
-    /// Calendar with the user's week/month start preferences. The list filter
-    /// and the stepper above it must use the same definition, otherwise the
-    /// header says "this week" and the rows belong to a different one.
-    private var periodCalendar: Calendar {
-        AppPeriod.configuredCalendar(
-            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
-    }
-
-    private var monthStartDay: Int {
-        UserDefaults.appGroup.integer(forKey: "firstDayOfMonth")
     }
 
     // MARK: - Content
@@ -136,9 +127,20 @@ struct LogView: View {
         .onChange(of: launchSearch) { _, newValue in
             if newValue { searchPresented = true }
         }
+        .onChange(of: launchSearchQuery) { _, query in
+            guard let query, !query.isEmpty else { return }
+            filter = .all
+            searchText = query
+            searchPresented = true
+        }
         .focusedSceneValue(\.searchLog, { searchPresented = true })
         .onOpenURL { url in
-            if url.host == "search" { searchPresented = true }
+            guard let request = DeepLinkRequest(url: url), request.action == .search else { return }
+            if let query = request.searchQuery {
+                filter = .all
+                searchText = query
+            }
+            searchPresented = true
         }
         .onChange(of: scenePhase) { _, new in
             if new == .active,
@@ -147,6 +149,7 @@ struct LogView: View {
             }
         }
         .onAppear {
+            applyPendingSearch()
             categoryVM.load()
             if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
                 transactionVM.updateAllRecurring()
@@ -158,7 +161,9 @@ struct LogView: View {
 
     private var logList: some View {
         Group {
-            if visibleEntries.isEmpty {
+            // Upcoming rows live in their own section, not in `entries`, so an
+            // empty entry list is not an empty screen when they exist.
+            if visibleEntries.isEmpty && upcomingTransactions.isEmpty {
                 emptyResultView
             } else {
                 LogTransactionList(
@@ -231,7 +236,7 @@ struct LogView: View {
 
     private var upcomingTransactions: [TransactionModel] {
         let includeUpcoming = filter == .upcoming || (filter == .all && showUpcoming)
-        guard includeUpcoming, searchText.isEmpty else { return [] }
+        guard includeUpcoming else { return [] }
 
         let calendar = Calendar.current
         let horizon = calendar.date(byAdding: .weekOfYear, value: 2, to: calendar.startOfDay(for: .now))
@@ -240,6 +245,7 @@ struct LogView: View {
         return allTransactions
             .filter { transaction in
                 guard transaction.recurringType > 0 || transaction.wrappedDate > .now else { return false }
+                guard matchesSearch(transaction) else { return false }
                 guard showSoon else { return true }
                 return nextDate(for: transaction) < horizon
             }
@@ -288,7 +294,9 @@ struct LogView: View {
             items = pastTransactions
         }
 
-        if filter == .all, !searchText.isEmpty {
+        // Search narrows whatever filter is active; it used to apply only on
+        // "All", so typing in a week view left the rows untouched.
+        if !searchText.isEmpty {
             items = items.filter(matchesSearch)
         }
 
@@ -301,8 +309,11 @@ extension LogView {
 
     // MARK: - Batch selection
 
+    /// Resolve from the whole ledger, not the current filter: changing the
+    /// filter after selecting used to leave the confirmation counting rows
+    /// that the delete call could no longer see.
     private var selectedTransactions: [TransactionModel] {
-        visibleTransactions.filter { selectedIDs.contains($0.id) }
+        allTransactions.filter { selectedIDs.contains($0.id) }
     }
 
     private var selectionToggle: some View {

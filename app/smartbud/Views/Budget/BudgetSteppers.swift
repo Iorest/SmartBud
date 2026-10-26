@@ -81,7 +81,9 @@ struct BudgetStepperView: View {
                     } else if type == 3 {
                         date = Calendar.current.date(byAdding: .month, value: 1, to: date)!
                     } else if type == 4 {
-                        date = Calendar.current.date(byAdding: .year, value: -1, to: date)!
+                        // Forward, not back: the previous `-1` made the right
+                        // arrow walk further into the past and never return.
+                        date = Calendar.current.date(byAdding: .year, value: 1, to: date)!
                     }
                 }
             }
