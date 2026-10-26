@@ -33,6 +33,16 @@ struct TransactionValidationTests {
         #expect(TransactionValidation.error(amount: 12.5, hasCategory: true) == nil)
     }
 
+    @Test("A row that is valid without a category can be saved without one")
+    func categoryOptional() {
+        // Balance adjustments and reimbursement repayments have no category
+        // by design; requiring one made them impossible to edit.
+        #expect(TransactionValidation.error(amount: 12.5, hasCategory: false,
+                                            requiresCategory: false) == nil)
+        #expect(TransactionValidation.error(amount: 0, hasCategory: false,
+                                            requiresCategory: false) == .missingAmount)
+    }
+
     @Test("Only the category-related errors shake the field")
     func fieldHighlight() {
         #expect(TransactionValidationError.incompleteEntry.highlightsFields)

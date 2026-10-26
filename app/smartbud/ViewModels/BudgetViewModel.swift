@@ -105,34 +105,46 @@ final class BudgetViewModel {
         guard let categoryID = budget.category?.id else {
             return Money.double(Money.cents(budget.amount))
         }
+        // Derived on read: the stored start only rolls forward when the
+        // budget screen opens, but the same number is read by widgets,
+        // Shortcuts and the insights screen, which may run first.
+        let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type)
+            ?? budget.startDate
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
-            return date >= budget.startDate && date <= Date.now
+            return date >= start && date <= Date.now
                 && txn.countsAsSpend && txn.category?.id == categoryID
         }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
     func leftoverOverall(_ budget: MainBudgetModel) -> Double {
+        let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type)
+            ?? budget.startDate
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
-            return date >= budget.startDate && date <= Date.now && txn.countsAsSpend
+            return date >= start && date <= Date.now && txn.countsAsSpend
         }.map(\.wrappedBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
     func updateDates() {
+        var changed = false
         for budget in budgets {
-            if let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type) {
+            if let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type),
+               start != budget.startDate {
                 budget.startDate = start
+                changed = true
             }
         }
         for mainBudget in mainBudgets {
-            if let start = BudgetRollover.roll(startDate: mainBudget.startDate, type: mainBudget.type) {
+            if let start = BudgetRollover.roll(startDate: mainBudget.startDate, type: mainBudget.type),
+               start != mainBudget.startDate {
                 mainBudget.startDate = start
+                changed = true
             }
         }
-        repo.save()
+        if changed { repo.save() }
     }
 
     // MARK: Stateless queries (for App Intents / Shortcuts, which don't hold onto @Published state)

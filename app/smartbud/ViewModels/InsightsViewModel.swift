@@ -26,6 +26,10 @@ final class InsightsViewModel {
     var periodTotalIncome: Double = 0
     var periodTotalSpent: Double = 0
     var periodAverage: Double = 0
+    /// Spend per day/month for the bar chart's reference line. `periodAverage`
+    /// is the *net* average shown next to the net total, which is a different
+    /// number as soon as the period has income.
+    var periodAverageSpend: Double = 0
     var barChartData: [BarChartPoint] = []
     var categoryBreakdown: [PowerCategory] = []
     var todayTotal: Double = 0
@@ -83,9 +87,13 @@ final class InsightsViewModel {
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)
         let all = repo.fetch(TransactionModel.self)
+        // Future-dated rows are "upcoming": Log lists them separately, the
+        // budget ignores them, and the totals here must too — otherwise one
+        // planned expense changes this period's spend, share and average.
+        let now = Date.now
         let inPeriod = all.filter { txn in
             guard let date = txn.date else { return false }
-            return date >= periodStart && date < periodEnd
+            return date >= periodStart && date < periodEnd && date <= now
         }
         let spent = Money.sum(inPeriod.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
         let inc = Money.sum(inPeriod.filter(\.countsAsIncome).map(\.wrappedBaseAmount))
@@ -104,6 +112,7 @@ final class InsightsViewModel {
                                          calendar: configuredCalendar)
         }
         periodAverage = Money.double(abs(net) / Decimal(max(1, divisor)))
+        periodAverageSpend = Money.double(spent / Decimal(max(1, divisor)))
 
         periodDateRangeText = getDateRangeText(for: selectedPeriod)
 
@@ -129,6 +138,12 @@ final class InsightsViewModel {
         yesterdayTransactions = yesterdayTxns
         yesterdayTotal = Money.double(Money.sum(yesterdayTxns.map(\.signedBaseAmount)))
 
+        refreshPendingReimbursements(all)
+    }
+
+    /// Claims the user has paid for but not been paid back for. Kept out of
+    /// the period totals, so the insights sheet reads them from here.
+    private func refreshPendingReimbursements(_ all: [TransactionModel]) {
         pendingReimbursements = all
             .filter(\.isPendingReimbursement)
             .sorted { $0.wrappedDate > $1.wrappedDate }
@@ -165,8 +180,8 @@ final class InsightsViewModel {
             let sum = Money.sum(all
                 .filter(\.countsAsSpend)
                 .filter {
-                    if let date = $0.date { return date >= cursor && date < next }
-                    return false
+                    guard let date = $0.date else { return false }
+                    return date >= cursor && date < next && date <= .now
                 }
                 .map(\.wrappedBaseAmount))
 
@@ -198,7 +213,7 @@ final class InsightsViewModel {
         let (periodStart, periodEnd) = getPeriodDateRange(for: period)
         let txns = repo.fetch(TransactionModel.self).filter { txn in
             guard let date = txn.date, txn.countsAsSpend, let category = txn.category else { return false }
-            return date >= periodStart && date < periodEnd && !category.income
+            return date >= periodStart && date < periodEnd && date <= .now && !category.income
         }
         var amounts = [UUID: Decimal]()
         var categories = [UUID: CategoryModel]()

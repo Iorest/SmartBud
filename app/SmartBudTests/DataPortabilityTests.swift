@@ -35,6 +35,14 @@ struct CSVSupportTests {
         #expect(CSVSupport.field("a\nb") == "\"a\nb\"")
     }
 
+    @Test("A CRLF newline on its own also forces quoting")
+    func crlf() {
+        // "\r\n" is one Character in Swift, so `contains("\r")` and
+        // `contains("\n")` both answer false; the field used to be written
+        // unquoted and split the exported row.
+        #expect(CSVSupport.field("a\r\nb") == "\"a\r\nb\"")
+    }
+
     @Test("Rows join escaped fields")
     func row() {
         #expect(CSVSupport.row(["a", "b,c", "d"]) == "a,\"b,c\",d")

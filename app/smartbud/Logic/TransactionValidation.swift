@@ -41,10 +41,15 @@ enum TransactionValidationError: Equatable {
 }
 
 enum TransactionValidation {
-    static func error(amount: Double, hasCategory: Bool) -> TransactionValidationError? {
-        if amount == 0 && !hasCategory { return .incompleteEntry }
+    /// `requiresCategory` is false for rows that are valid without one: balance
+    /// adjustments and reimbursement repayments. They used to be impossible to
+    /// edit — the form demanded a category and saving a category onto them
+    /// breaks their identity.
+    static func error(amount: Double, hasCategory: Bool,
+                      requiresCategory: Bool = true) -> TransactionValidationError? {
+        if amount == 0 && !hasCategory && requiresCategory { return .incompleteEntry }
         if amount == 0 { return .missingAmount }
-        if !hasCategory { return .missingCategory }
+        if requiresCategory && !hasCategory { return .missingCategory }
         return nil
     }
 }

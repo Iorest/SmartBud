@@ -60,8 +60,10 @@ extension InsightsViewModel {
         var cursor = start
         for _ in 0..<periods {
             let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
-            let sum = Money.sum(all.filter { ($0.date ?? .distantPast) >= cursor && ($0.date ?? .distantPast) < next }
-                .map(\.signedBaseAmount))
+            let sum = Money.sum(all.filter {
+                let date = $0.date ?? .distantPast
+                return date >= cursor && date < next && date <= .now
+            }.map(\.signedBaseAmount))
             result.append(LineGraphDataPoint(date: cursor, amount: Money.double(sum)))
             cursor = next
         }

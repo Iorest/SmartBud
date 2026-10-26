@@ -13,8 +13,11 @@ enum CSVSupport {
     /// doubles any embedded quotes. Plain values stay unquoted so a
     /// hand-edited file stays readable.
     static func field(_ value: String) -> String {
+        // `contains("\r")` / `contains("\n")` miss CRLF: Swift treats "\r\n"
+        // as one Character, so a Windows newline inside a note slipped through
+        // unquoted and split the row in two.
         guard value.contains(",") || value.contains("\"")
-                || value.contains("\n") || value.contains("\r") else {
+                || value.contains(where: \.isNewline) else {
             return value
         }
         return "\"" + value.replacingOccurrences(of: "\"", with: "\"\"") + "\""
