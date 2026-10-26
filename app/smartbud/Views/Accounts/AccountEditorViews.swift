@@ -22,6 +22,12 @@ struct AccountEditor: View {
     @State private var colour = Theme.Palette.swatches.first ?? "#279AF4"
     @State private var kind: AccountKind = .cash
     @State private var currencyCode = ""
+    /// An account with an empty code follows the base currency. The picker
+    /// needs a concrete code to display, so remember the original shape and
+    /// write the empty code back — otherwise renaming the account would
+    /// silently freeze it to today's base and change how a later base switch
+    /// treats its amounts.
+    @State private var followsBaseCurrency = false
     @State private var openingBalance = ""
 
     @AppStorage("currency", store: .appGroup) private var baseCurrency: String =
@@ -141,12 +147,14 @@ struct AccountEditor: View {
         guard let account else {
             openingBalance = ""
             currencyCode = baseCurrency
+            followsBaseCurrency = false
             return
         }
         name = account.wrappedName
         emoji = account.wrappedEmoji
         colour = account.wrappedColour
         kind = AccountKind(rawValue: account.kind) ?? .cash
+        followsBaseCurrency = account.currencyCode.isEmpty
         currencyCode = account.currencyCode.isEmpty ? baseCurrency : account.currencyCode
         openingBalance = account.openingBalance == 0
             ? ""
@@ -159,7 +167,9 @@ struct AccountEditor: View {
         guard opening.isFinite else { return }
 
         let draft = AccountDraft(name: trimmedName, emoji: emoji, colour: colour,
-                                 kind: kind, currencyCode: currencyCode,
+                                 kind: kind,
+                                 currencyCode: followsBaseCurrency && currencyCode == baseCurrency
+                                     ? "" : currencyCode,
                                  openingBalance: opening)
         if let account {
             accountVM.update(account, with: draft)
