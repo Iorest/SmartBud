@@ -72,3 +72,34 @@ struct AlipayWechatParserTests {
         #expect(result.amount == 45)
     }
 }
+
+@Suite("Import amount")
+struct ImportAmountTests {
+
+    @Test("A plain number parses")
+    func plain() {
+        #expect(ImportAmount.parse("12.50") == 12.5)
+    }
+
+    @Test("Currency symbols, thousands separators and units are ignored")
+    func decorated() {
+        #expect(ImportAmount.parse("$1,200.00") == 1200)
+        #expect(ImportAmount.parse("12.50元") == 12.5)
+        #expect(ImportAmount.parse("1,200.50") == 1200.50)
+        #expect(ImportAmount.parse("USD 12.00") == 12)
+    }
+
+    @Test("Full-width digits and parentheses are understood")
+    func fullWidthAndNegative() {
+        #expect(ImportAmount.parse("１２．５０") == 12.5)
+        #expect(ImportAmount.parse("(1,200.00)") == -1200)
+    }
+
+    @Test("Non-numbers and values above the cap are refused")
+    func rejectsInvalid() {
+        #expect(ImportAmount.parse("") == nil)
+        #expect(ImportAmount.parse("lunch") == nil)
+        #expect(ImportAmount.parse("1e400") == nil)
+        #expect(ImportAmount.parse("999,999,999") == nil)
+    }
+}

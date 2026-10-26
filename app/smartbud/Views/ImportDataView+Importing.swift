@@ -24,23 +24,16 @@ private struct ImportDraft {
 
 extension ImportDataView {
 
-    func validateDoubles(strings: [String]) -> Bool {
-        for string in strings {
-            guard Double(string) != nil else { return false }
-        }
-        return true // All strings are valid doubles
+    /// Every row in the column has to parse — checking only the eight preview
+    /// rows let a bad row at line 9 fail the whole import after seven steps.
+    func validateAmounts(strings: [String]) -> Bool {
+        strings.allSatisfy { ImportAmount.parse($0) != nil }
     }
 
     func processCSV() {
         do {
             let table = try CSVTable(text: data)
             var parsedRows = table.rows
-
-            // Drop a text-only header row (no digits in any cell).
-            if let first = parsedRows.first,
-               first.allSatisfy({ !$0.containsDigits }) {
-                parsedRows.removeFirst()
-            }
 
             guard !parsedRows.isEmpty else {
                 showToast = true
@@ -50,6 +43,23 @@ extension ImportDataView {
 
             let maxColumnCount = parsedRows.map(\.count).max() ?? 0
             guard maxColumnCount > 3 else {
+                showToast = true
+                toastMessage = String.appLocalized("Invalid File")
+                return
+            }
+
+            // Payment-app exports start with a title/nickname/filter block and
+            // end with summary rows; those have fewer cells than the table.
+            // They used to become "data" rows and failed the import at step 8.
+            while let first = parsedRows.first,
+                  first.count < maxColumnCount || first.allSatisfy({ !$0.containsDigits }) {
+                parsedRows.removeFirst()
+            }
+            while let last = parsedRows.last, last.count < maxColumnCount {
+                parsedRows.removeLast()
+            }
+
+            guard !parsedRows.isEmpty else {
                 showToast = true
                 toastMessage = String.appLocalized("Invalid File")
                 return
@@ -93,7 +103,10 @@ extension ImportDataView {
             date: selectedColumns[2], amount: selectedColumns[3]
         )
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.appLocale
+        // Fixed locale, not the device's: in a Thai or Japanese locale the
+        // same pattern parses "2024-01-05" as a Buddhist/era year.
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = .current
         dateFormatter.dateFormat = dateFormatString
 
         let categoryDictionary: [String: CategoryModel] = Dictionary(
@@ -114,16 +127,8 @@ extension ImportDataView {
             return
         }
 
-        for draft in drafts {
-            let txn = TransactionModel(
-                note: draft.note,
-                category: draft.category,
-                income: draft.category.income,
-                amount: draft.amount,
-                date: draft.date
-            )
-            DataRepository.shared.insert(txn)
-        }
+        let account = accounts.first { $0.id == importAccountID }
+        write(drafts, to: account)
 
         guard DataRepository.shared.save() else {
             // Drop the staged rows so a later save can't commit half an import.
@@ -137,6 +142,28 @@ extension ImportDataView {
         withAnimation {
             processingState = .success
             confettiNumber += 1
+        }
+    }
+
+    /// Writes the validated rows. Without an account they never move a
+    /// balance, so the ledger total and every account total disagreed;
+    /// `baseAmount` has to be frozen at the account's currency too.
+    private func write(_ drafts: [ImportDraft], to account: AccountModel?) {
+        for draft in drafts {
+            let baseAmount = account.map {
+                CurrencyRateStore.shared.convertToBase(
+                    draft.amount, from: $0.resolvedCurrencyCode)
+            }
+            let txn = TransactionModel(
+                note: draft.note,
+                category: draft.category,
+                account: account,
+                baseAmount: baseAmount,
+                income: draft.category.income,
+                amount: draft.amount,
+                date: draft.date
+            )
+            DataRepository.shared.insert(txn)
         }
     }
 
@@ -184,11 +211,8 @@ extension ImportDataView {
             guard let rowCategory = categories[row[indexes.category]] else {
                 return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的分类未匹配。"), line)))
             }
-            // `Double("inf")` / `Double("1e400")` parse successfully and would
-            // reach Decimal maths as a non-finite value, so screen them here.
-            guard let transactionAmount = Double(row[indexes.amount]),
-                  transactionAmount.isFinite,
-                  abs(transactionAmount) <= Money.maxAmount else {
+            guard let transactionAmount = ImportAmount.parse(row[indexes.amount]),
+                  transactionAmount != 0 else {
                 return .failure(ImportFailure(message: String(format: String.appLocalized("第 %d 行的金额无法解析。"), line)))
             }
 
@@ -213,6 +237,8 @@ extension ImportDataView {
                            "dd/MM/yyyy HH:mm:ss"]
 
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = .current
 
         for dateFormat in dateFormats {
             dateFormatter.dateFormat = dateFormat

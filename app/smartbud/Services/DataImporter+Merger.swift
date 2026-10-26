@@ -88,15 +88,17 @@ struct BackupMerger {
                 summary.skipped += 1
                 continue
             }
-            if let rate = byCode[dto.code] {
-                rate.rate = min(dto.rate, 1_000_000)
-                rate.updatedAt = dto.updatedAt
-            } else {
-                let rate = CurrencyRate(code: dto.code, rate: min(dto.rate, 1_000_000))
-                rate.updatedAt = dto.updatedAt
-                context.insert(rate)
-                byCode[dto.code] = rate
+            if byCode[dto.code] != nil {
+                // Merge, never replace: the same rule the ledger rows follow.
+                // Overwriting today's rates with an old backup's silently
+                // changed every account balance and transfer suggestion.
+                summary.skipped += 1
+                continue
             }
+            let rate = CurrencyRate(code: dto.code, rate: min(dto.rate, 1_000_000))
+            rate.updatedAt = dto.updatedAt
+            context.insert(rate)
+            byCode[dto.code] = rate
             summary.rates += 1
         }
     }

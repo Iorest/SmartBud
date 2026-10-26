@@ -367,3 +367,31 @@ struct DataImporterTests {
         #expect(stored.first?.archived == true)
     }
 }
+
+@MainActor
+@Suite("Import rates")
+struct ImportRateMergeTests {
+    private let fixture: ImportFixture
+
+    init() throws { fixture = try ImportFixture() }
+
+    @Test("An imported backup adds missing rates but never replaces local ones")
+    func ratesMergeWithoutClobbering() throws {
+        fixture.context.insert(CurrencyRate(code: "USD", rate: 7.2))
+        try fixture.context.save()
+
+        let summary = try DataImporter.apply(
+            fixture.payload(rates: [
+                ExportSchema.RateDTO(code: "USD", rate: 6.0, updatedAt: .now),
+                ExportSchema.RateDTO(code: "EUR", rate: 7.8, updatedAt: .now)
+            ]),
+            context: fixture.context
+        )
+
+        let rates = try fixture.context.fetch(FetchDescriptor<CurrencyRate>())
+        #expect(rates.first { $0.code == "USD" }?.rate == 7.2)
+        #expect(rates.first { $0.code == "EUR" }?.rate == 7.8)
+        #expect(summary.rates == 1)
+        #expect(summary.skipped == 1)
+    }
+}

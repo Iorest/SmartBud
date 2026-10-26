@@ -29,6 +29,9 @@
 		E1A2B3C4000000000000F002 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		E1A2B3C4000000000000F022 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000A041 /* CSVSupport.swift */; };
+		E1A2B3C4000000000000C051 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
+		E1A2B3C4000000000000C052 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
+		E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
 		E1A2B3C40000000000000D02 /* AccountBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000D00 /* AccountBalance.swift */; };
 		E1A2B3C4000000000000F003 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		E1A2B3C4000000000000F023 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
@@ -638,6 +641,7 @@
 		E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogPeriodTotals.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000C050 /* ImportAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/ImportAmount.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F001 /* AppPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/AppPeriod.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F021 /* CurrencyRebase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CurrencyRebase.swift; sourceTree = SOURCE_ROOT; };
 		AAAA00000000000000000040 /* SettingsExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsExportView.swift; sourceTree = "<group>"; };
@@ -893,6 +897,7 @@
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
+				E1A2B3C4000000000000C050 /* ImportAmount.swift */,
 				E1A2B3C4000000000000F001 /* AppPeriod.swift */,
 				E1A2B3C4000000000000F021 /* CurrencyRebase.swift */,
 				E1A2B3C40000000000001007 /* SettingsRatesView.swift */,
@@ -1417,6 +1422,7 @@
 		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
+		E1A2B3C4000000000000C051 /* ImportAmount.swift in Sources */,
 		E1A2B3C4000000000000F002 /* AppPeriod.swift in Sources */,
 		E1A2B3C4000000000000F022 /* CurrencyRebase.swift in Sources */,
 		C10300000000000000000002 /* HomeView+DeepLink.swift in Sources */,
@@ -1678,6 +1684,7 @@
 				E1A2B3C40000000000001043 /* ExchangeRateService.swift in Sources */,
 				E1A2B3C4000000000000A062 /* DataImporter.swift in Sources */,
 				E1A2B3C4000000000000A044 /* CSVSupport.swift in Sources */,
+				E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */,
 				E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1812,6 +1819,7 @@
 				E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,
+				E1A2B3C4000000000000C052 /* ImportAmount.swift in Sources */,
 				E1A2B3C4000000000000F003 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F023 /* CurrencyRebase.swift in Sources */,
 				C10300000000000000000003 /* HomeView+DeepLink.swift in Sources */,

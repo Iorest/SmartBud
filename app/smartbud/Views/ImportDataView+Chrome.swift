@@ -9,6 +9,17 @@ import SwiftUI
 
 extension ImportDataView {
 
+    /// CSV from banks and payment apps is often GBK/GB18030 or UTF-16, not
+    /// UTF-8. Reporting "Invalid File" for those made the whole feature look
+    /// broken; try the encodings in order and only then give up.
+    func decodeCSV(_ data: Data) -> String? {
+        if let utf8 = String(data: data, encoding: .utf8) { return utf8 }
+        if let utf16 = String(data: data, encoding: .utf16) { return utf16 }
+        let gb18030 = CFStringConvertEncodingToNSStringEncoding(
+            CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue))
+        return String(data: data, encoding: String.Encoding(rawValue: gb18030))
+    }
+
     @ViewBuilder
     var topBar: some View {
             HStack {
@@ -214,9 +225,10 @@ extension ImportDataView {
                             }
 
                             if progress == 5 {
-                                let stringColumn = displayedColumns[selectedColumn]
-
-                                guard validateDoubles(strings: stringColumn) else {
+                                // Validate the whole column, not the eight
+                                // preview rows: a bad row at line 9 used to
+                                // fail the import after all seven steps.
+                                guard validateAmounts(strings: columns[selectedColumn]) else {
                                     showToast = true
                                     toastMessage = String.appLocalized("Invalid Column")
                                     return
@@ -241,6 +253,8 @@ extension ImportDataView {
                             // reset selected column
 
                             if progress == 5 {
+                                guard !isAdvancing else { return }
+                                isAdvancing = true
                                 let dateColumnIndex = selectedColumns[2]
                                 sampleDateString = displayedColumns[dateColumnIndex][0]
 
@@ -260,6 +274,7 @@ extension ImportDataView {
                                     withAnimation {
                                         progress += 1
                                     }
+                                    isAdvancing = false
                                 }
                             } else {
                                 progress += 1

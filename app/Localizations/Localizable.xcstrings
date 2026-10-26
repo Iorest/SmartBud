@@ -17013,6 +17013,74 @@
         }
       }
     }
+,
+    "Import into" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import into"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入到账户"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匯入至帳戶"
+          }
+        }
+      }
+    },
+    "This file's text encoding is not supported. Save it as a UTF-8 CSV and try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This file's text encoding is not supported. Save it as a UTF-8 CSV and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个文件的文字编码不受支持。请另存为 UTF-8 CSV 后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個文件的文字編碼不受支援。請另存為 UTF-8 CSV 後重試。"
+          }
+        }
+      }
+    }
+,
+    "服务返回的内容无法解析，请检查服务地址与模型名称。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The service returned something that could not be read. Check the service address and model name."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务返回的内容无法解析，请检查服务地址与模型名称。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服務回傳的內容無法解析，請檢查服務位址與模型名稱。"
+          }
+        }
+      }
+    }
   },
   "version" : "1.2"
 }

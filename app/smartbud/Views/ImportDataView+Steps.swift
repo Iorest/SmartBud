@@ -208,6 +208,10 @@ extension ImportDataView {
                 }
                 .onChange(of: dateFormatString) { _, newValue in
                     let dateFormatter = DateFormatter()
+                    // Same rule as the importer, otherwise the checkmark can
+                    // disagree with how the dates are actually read.
+                    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                    dateFormatter.timeZone = .current
                     dateFormatter.dateFormat = newValue
 
                     if dateFormatter.date(from: sampleDateString) != nil {
@@ -223,6 +227,24 @@ extension ImportDataView {
     @ViewBuilder
     var stepSummary: some View {
             VStack(alignment: .leading, spacing: SBSpace.small) {
+                HStack {
+                    Text(String.appLocalized("Import into"))
+                        .font(.subheadline)
+                        .foregroundStyle(Color.SubtitleText)
+
+                    Spacer(minLength: SBSpace.small)
+
+                    Picker(String.appLocalized("Import into"), selection: $importAccountID) {
+                        Text(String.appLocalized("No Account")).tag(UUID?.none)
+                        ForEach(accounts) { account in
+                            Text("\(account.wrappedEmoji) \(account.wrappedName)")
+                                .tag(Optional(account.id))
+                        }
+                    }
+                    .labelsHidden()
+                }
+                .padding(.horizontal, SBSpace.medium)
+
                 Text(String
                     .appFormatted("%lld/^[%lld category](inflect: true) linked", numberOfLinkedCategories,
                         uniqueCategories.count))

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 #if canImport(UIKit)
 import UIKit
@@ -40,6 +41,16 @@ extension Sequence where Iterator.Element: Hashable {
 struct ImportDataView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(CategoryViewModel.self) var categoryVM
+
+    /// The wizard writes one batch, so one account. Rows used to be written
+    /// with no account at all: they counted in the totals but moved no
+    /// balance, and every account total disagreed with the ledger.
+    @Query(sort: [SortDescriptor(\AccountModel.order)]) var accounts: [AccountModel]
+    /// Picked by id: `AccountModel` is not `Hashable`, and the picker only
+    /// needs a stable selection.
+    @State var importAccountID: UUID?
+    /// Guards the 500 ms "continue" animation against a second tap.
+    @State var isAdvancing = false
 
     @State var exportSample = false
     @State var importing = false
@@ -209,6 +220,20 @@ struct ImportDataView: View {
                             .font(.subheadline.weight(.medium))
 
                             .foregroundStyle(Color.SubtitleText)
+
+                        // A full-screen cover has no swipe-to-dismiss on
+                        // iOS; without these buttons a failed import trapped
+                        // the user until they killed the app.
+                        HStack(spacing: SBSpace.small) {
+                            Button(String.appLocalized("Back")) {
+                                withAnimation { progress = 7; processingState = .loading }
+                            }
+                            .buttonStyle(.bordered)
+
+                            Button(String.appLocalized("Close")) { dismiss() }
+                                .buttonStyle(.borderedProminent)
+                        }
+                        .padding(.top, SBSpace.small)
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -237,6 +262,11 @@ struct ImportDataView: View {
         .appBackground()
         .onAppear {
             categoryVM.load()
+            AccountViewModel.shared.load()
+            if importAccountID == nil {
+                importAccountID = AccountViewModel.shared.defaultAccount(
+                    lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))?.id
+            }
         }
         .fileImporter(
             isPresented: $importing,
@@ -252,9 +282,10 @@ struct ImportDataView: View {
                 defer { file.stopAccessingSecurityScopedResource() }
 
                 do {
-                    guard let message = try String(data: Data(contentsOf: file), encoding: .utf8) else {
+                    guard let message = decodeCSV(try Data(contentsOf: file)) else {
                         showToast = true
-                        toastMessage = String.appLocalized("Invalid File")
+                        toastMessage = String.appLocalized(
+                            "This file's text encoding is not supported. Save it as a UTF-8 CSV and try again.")
                         return
                     }
 
