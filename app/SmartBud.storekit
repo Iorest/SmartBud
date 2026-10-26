@@ -1,0 +1,112 @@
+{
+  "identifier": "CF78324A-43E7-42E3-B7C8-247BBC5404E9",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "39.99",
+      "familyShareable": false,
+      "internalID": "B39348AD-4905-4B5F-BA7C-A23AC52FEA08",
+      "localizations": [
+        {
+          "description": "One-time purchase that unlocks SmartBud Pro forever.",
+          "displayName": "Lifetime",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.iorest.smartbud.pro.lifetime",
+      "referenceName": "Lifetime",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [
+    {
+      "id": "201BA2F7-044B-4E73-906E-7EF8A87E9AD3",
+      "localizations": [
+        {
+          "description": "SmartBud Pro",
+          "displayName": "SmartBud Pro",
+          "locale": "en_US"
+        }
+      ],
+      "name": "SmartBud Pro",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "2.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "5CBF8AC3-4E10-429F-9EAB-7A40E3C6527A",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Monthly subscription to SmartBud Pro.",
+              "displayName": "Monthly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.iorest.smartbud.pro.monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Monthly",
+          "subscriptionGroupID": "201BA2F7-044B-4E73-906E-7EF8A87E9AD3",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "12.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "32C00E33-E82B-422F-B6D2-2F1585CBF3F0",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Half-Yearly subscription to SmartBud Pro.",
+              "displayName": "Half-Yearly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.iorest.smartbud.pro.halfyearly",
+          "recurringSubscriptionPeriod": "P6M",
+          "referenceName": "Half-Yearly",
+          "subscriptionGroupID": "201BA2F7-044B-4E73-906E-7EF8A87E9AD3",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "19.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "36224738-083B-4B8E-AB63-31F9AF68AE97",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Yearly subscription to SmartBud Pro.",
+              "displayName": "Yearly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.iorest.smartbud.pro.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Yearly",
+          "subscriptionGroupID": "201BA2F7-044B-4E73-906E-7EF8A87E9AD3",
+          "type": "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
