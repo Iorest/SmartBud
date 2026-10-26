@@ -162,18 +162,28 @@ final class TransactionViewModel {
         repo.fetchOne(TemplateTransactionModel.self, predicate: #Predicate { $0.order == order })
     }
 
-    func applyTemplate(_ order: Int) {
-        guard let tmpl = getTemplate(order), let cat = tmpl.category else { return }
+    /// Logs a template as a real entry. Returns `false` when the template lost
+    /// its category (the category was deleted), so the caller can say so
+    /// instead of showing "Logged" for a row that was never written.
+    @discardableResult
+    func applyTemplate(_ order: Int) -> Bool {
+        guard let tmpl = getTemplate(order), let cat = tmpl.category else { return false }
+        // Templates carry no account of their own; without the default one the
+        // entry would not move any balance and would be missing from the
+        // account screens.
+        let account = AccountViewModel.shared.defaultAccount(
+            lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))
         create(TransactionEdit(
             note: tmpl.wrappedNote,
             category: cat,
-            account: nil,
+            account: account,
             income: tmpl.income,
             amount: tmpl.wrappedAmount,
             date: .now,
             repeatType: tmpl.recurringType,
             repeatCoefficient: tmpl.recurringCoefficient
         ))
+        return true
     }
 
     /// All templates ordered by `order` (used by the quick-add widget editor).
@@ -258,6 +268,7 @@ final class TransactionViewModel {
 
     func delete(_ txn: TransactionModel) {
         ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+        TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         repo.save()
     }
@@ -269,6 +280,7 @@ final class TransactionViewModel {
         guard !transactions.isEmpty else { return }
         for txn in transactions {
             ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+            TransferFeeLedger.detachFeeRow(txn, in: repo.context)
             repo.delete(txn)
         }
         repo.save()
@@ -294,6 +306,12 @@ final class TransactionViewModel {
                 // the pending list and count it as earned money at the same
                 // time. Balance adjustments are never claims either.
                 if category.income || txn.adjustment {
+                    // Clearing the claim without removing its repayment row
+                    // would leave the money on the account twice: once as this
+                    // row's new income and once as the untouched repayment.
+                    if txn.reimbursedAt != nil {
+                        ReimbursementLedger.unsettle(txn, in: repo.context)
+                    }
                     txn.reimbursable = false
                     txn.reimbursedAt = nil
                 }
@@ -324,6 +342,12 @@ final class TransactionViewModel {
         pendingDeleteTask?.cancel()
 
         let snapshot = TransactionSnapshot(txn)
+        // Same pairing rules as the immediate delete paths: a claim takes its
+        // repayment row with it, and deleting a repayment puts the claim back
+        // into the pending list. The rows are deleted but not saved, so
+        // `rollback()` still restores the pair as a whole.
+        ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+        TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         pendingDelete = PendingDelete(snapshot: snapshot)
 

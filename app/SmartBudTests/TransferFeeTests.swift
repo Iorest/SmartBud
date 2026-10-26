@@ -122,6 +122,28 @@ struct TransferFeeTests {
         #expect((try? context.fetch(FetchDescriptor<TransferModel>()))?.count == 1)
     }
 
+    @Test("Deleting the fee row clears the transfer's stored fee")
+    func detachClearsDisplayedFee() throws {
+        let setup = makeTransfer()
+        let row = try #require(TransferFeeLedger.recordFee(for: setup.transfer, in: context))
+
+        TransferFeeLedger.detachFeeRow(row, in: context)
+
+        // `migrate` rebuilds a row for every transfer whose `fee` is > 0, so
+        // this is what keeps a deleted charge from coming back on next launch.
+        #expect(setup.transfer.fee == 0)
+    }
+
+    @Test("An undo snapshot keeps the transfer link")
+    func snapshotKeepsTransferLink() throws {
+        let transfer = makeTransfer().transfer
+        let row = try #require(TransferFeeLedger.recordFee(for: transfer, in: context))
+
+        let restored = TransactionSnapshot(row).makeTransaction()
+
+        #expect(restored.transferFeeOf == transfer.id)
+    }
+
     @Test("Switching language does not create a second fee category")
     func categorySurvivesLanguageChange() throws {
         let first = makeTransfer().transfer

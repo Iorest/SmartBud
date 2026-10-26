@@ -65,9 +65,13 @@ enum ReimbursementLedger {
         row.account = claim.account
     }
 
-    /// The mirror image: editing the repayment row moves the claim with it, so
-    /// the pair can never drift apart (a 88 expense paid back by a 120 income
-    /// row would quietly create 32 of profit).
+    /// The mirror image: editing the repayment row moves the claim's amount
+    /// with it, so the pair can never drift apart (an 88 expense paid back by
+    /// a 120 income row would quietly create 32 of profit).
+    ///
+    /// The account is deliberately *not* copied: a refund may land on a
+    /// different card than the one that paid, and moving the claim would
+    /// rewrite which account the original purchase came from.
     static func syncClaim(from repayment: TransactionModel, in context: ModelContext) {
         guard let originalID = repayment.reimbursementOf else { return }
         let descriptor = FetchDescriptor<TransactionModel>(
@@ -75,7 +79,6 @@ enum ReimbursementLedger {
         guard let claim = (try? context.fetch(descriptor))?.first else { return }
         claim.amount = repayment.amount
         claim.baseAmount = repayment.wrappedBaseAmount
-        claim.account = repayment.account
     }
 
     /// Deletes the income row(s) belonging to `claim`.

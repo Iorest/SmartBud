@@ -65,6 +65,19 @@ enum TransferFeeLedger {
         }
     }
 
+    /// The expense row is the truth for a fee; `TransferModel.fee` is only
+    /// there to display it and seed a missing row. Zeroing it when the user
+    /// deletes the row is what stops `migrate` from re-creating a charge the
+    /// user deliberately removed on the next launch.
+    static func detachFeeRow(_ row: TransactionModel, in context: ModelContext) {
+        guard let transferID = row.transferFeeOf else { return }
+        let descriptor = FetchDescriptor<TransferModel>(
+            predicate: #Predicate { $0.id == transferID })
+        for transfer in (try? context.fetch(descriptor)) ?? [] {
+            transfer.fee = 0
+        }
+    }
+
     /// Finds (or creates) the "Transfer Fee" expense category, so the row shows
     /// up in the category breakdown instead of as an uncategorised expense.
     static func feeCategory(in context: ModelContext) -> CategoryModel? {

@@ -168,6 +168,38 @@ struct ReimbursementLedgerTests {
         #expect(txn.baseAmount == 120)
     }
 
+    @Test("An undo snapshot keeps the repayment link")
+    func snapshotKeepsRepaymentLink() throws {
+        let txn = claim()
+        let row = try #require(ReimbursementLedger.settle(txn, in: context))
+
+        let restored = TransactionSnapshot(row).makeTransaction()
+
+        // Without the link the restored row would count as ordinary income
+        // while the claim stays excluded from spend: the pair stops balancing.
+        #expect(restored.reimbursementOf == txn.id)
+        #expect(!restored.countsAsIncome)
+    }
+
+    @Test("Editing the repayment amount does not move the claim to another account")
+    func editingRepaymentKeepsClaimAccount() throws {
+        let first = AccountModel(name: "A", currencyCode: "CNY", openingBalance: 0)
+        let second = AccountModel(name: "B", currencyCode: "CNY", openingBalance: 0)
+        context.insert(first)
+        context.insert(second)
+
+        let txn = claim(amount: 88, account: first)
+        let row = try #require(ReimbursementLedger.settle(txn, in: context))
+
+        row.account = second
+        row.amount = 120
+        row.baseAmount = 120
+        ReimbursementLedger.syncClaim(from: row, in: context)
+
+        #expect(txn.amount == 120)
+        #expect(txn.account?.id == first.id)
+    }
+
     @Test("A repayment row is never offered as a claim")
     func repaymentCannotBeClaimed() throws {
         let txn = claim()

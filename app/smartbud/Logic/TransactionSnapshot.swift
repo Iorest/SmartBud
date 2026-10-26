@@ -28,6 +28,11 @@ struct TransactionSnapshot {
     let discount: Double
     let reimbursable: Bool
     let reimbursedAt: Date?
+    /// Links that decide how the row is counted: a repayment row is not
+    /// income and a fee row belongs to its transfer. Dropping them on restore
+    /// turned a neutral 88 back into 88 of earnings.
+    let reimbursementOf: UUID?
+    let transferFeeOf: UUID?
     let adjustment: Bool
 
     @MainActor
@@ -46,6 +51,8 @@ struct TransactionSnapshot {
         discount = txn.discount
         reimbursable = txn.reimbursable
         reimbursedAt = txn.reimbursedAt
+        reimbursementOf = txn.reimbursementOf
+        transferFeeOf = txn.transferFeeOf
         adjustment = txn.adjustment
     }
 
@@ -65,6 +72,8 @@ struct TransactionSnapshot {
             repeatCoefficient: repeatCoefficient,
             discount: discount,
             reimbursable: reimbursable,
+            reimbursementOf: reimbursementOf,
+            transferFeeOf: transferFeeOf,
             adjustment: adjustment
         )
         txn.id = id

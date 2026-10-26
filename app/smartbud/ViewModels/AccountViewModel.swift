@@ -75,6 +75,13 @@ final class AccountViewModel {
         accounts.filter(\.archived)
     }
 
+    /// Hidden accounts were previously unreachable: the row that could show
+    /// them again was itself filtered out. They get their own section so the
+    /// action is reversible.
+    var hiddenAccounts: [AccountModel] {
+        accounts.filter { $0.hidden && !$0.archived }
+    }
+
     /// Sum of every visible account, the number a "net worth" header shows.
     /// Sum of visible accounts converted to the app's base currency, so a
     /// mixed-currency list still yields one meaningful number.
@@ -182,8 +189,11 @@ final class AccountViewModel {
             txn.account = nil
         }
         // A transfer needs both ends to stay meaningful, so it goes with
-        // whichever account is deleted.
+        // whichever account is deleted. Its fee row is part of that transfer:
+        // leaving it behind would keep charging spend for a move that no
+        // longer exists and would orphan it from any account.
         for transfer in (account.outgoingTransfers ?? []) + (account.incomingTransfers ?? []) {
+            TransferFeeLedger.deleteFeeRows(for: transfer, in: repo.context)
             repo.delete(transfer)
         }
         repo.delete(account)
@@ -233,7 +243,7 @@ final class AccountViewModel {
     func defaultAccount(lastUsedID: String?) -> AccountModel? {
         if let lastUsedID,
            let match = accounts.first(where: { $0.id.uuidString == lastUsedID }),
-           !match.archived {
+           !match.archived, !match.hidden {
             return match
         }
         return visibleAccounts.first
