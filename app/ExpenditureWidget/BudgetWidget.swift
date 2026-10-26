@@ -92,7 +92,10 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
             return WidgetBudgetSnapshot(total: 0, percentage: 0, budget: budget)
         }
 
-        let budgetStartDate = budgetModel.startDate
+        // The stored start only rolls when the budget screen opens; derive
+        // the current period here so the widget never sums last week's rows.
+        let budgetStartDate = BudgetRollover.roll(startDate: budgetModel.startDate,
+                                                  type: budgetModel.type) ?? budgetModel.startDate
         let budgetCategory = budgetModel.category
         let now = Date.now
 
@@ -106,7 +109,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
                 && $0.category?.id == categoryID
         }
 
-        let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedAmount)))
+        let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,
@@ -120,15 +123,16 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let calendar = Calendar.current
 
         if budgetModel.type == 1 {
-            let components = calendar.dateComponents([.minute], from: budgetModel.startDate, to: now)
+            let components = calendar.dateComponents([.minute], from: budgetStartDate, to: now)
             percentageOfDays = Double(components.minute ?? 0) / 1440
         } else {
-            let components1 = calendar.dateComponents([.day], from: budgetModel.startDate, to: budgetModel.endDate)
+            let periodEnd = BudgetPeriod.endDate(from: budgetStartDate, type: budgetModel.type)
+            let components1 = calendar.dateComponents([.day], from: budgetStartDate, to: periodEnd)
             guard let numberOfDays = components1.day, numberOfDays > 0 else {
                 return WidgetBudgetSnapshot(total: holdingTotal, percentage: 0, budget: returnBudget)
             }
 
-            let components2 = calendar.dateComponents([.day], from: budgetModel.startDate, to: now)
+            let components2 = calendar.dateComponents([.day], from: budgetStartDate, to: now)
             let numberOfDaysPast = components2.day ?? 0
 
             percentageOfDays = Double(numberOfDaysPast) / Double(numberOfDays)

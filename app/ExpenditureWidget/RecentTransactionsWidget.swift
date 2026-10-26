@@ -74,14 +74,16 @@ struct Provider: AppIntentTimelineProvider {
         case .day:
             startDate = calendar.startOfDay(for: now)
         case .week:
-            var cal = calendar
-            cal.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-            cal.minimumDaysInFirstWeek = 4
-            let dateComponents = cal.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
-            startDate = cal.date(from: dateComponents)!
+            let cal = AppPeriod.configuredCalendar(
+                firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
+            startDate = AppPeriod.weekRange(containing: now, calendar: cal).start
         case .month:
-            let dateComponents = calendar.dateComponents([.month, .year], from: now)
-            startDate = calendar.date(from: dateComponents)!
+            // "This month" honours the user's payday-style start day; the
+            // insights and log screens use the same boundaries.
+            startDate = AppPeriod.monthStart(
+                containing: now,
+                startDay: UserDefaults.appGroup.integer(forKey: "firstDayOfMonth"),
+                calendar: calendar)
         case .year:
             let dateComponents = calendar.dateComponents([.year], from: now)
             startDate = calendar.date(from: dateComponents)!
@@ -97,13 +99,15 @@ struct Provider: AppIntentTimelineProvider {
 
         case .income:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
-            let filtered = allTxns.filter { $0.income && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            return Money.double(Money.sum(filtered.map(\.amount)))
+            // `income` alone includes reimbursement repayments, which the app
+            // deliberately keeps out of earnings.
+            let filtered = allTxns.filter { $0.countsAsIncome && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
+            return Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
 
         case .expense:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
             let filtered = allTxns.filter { $0.countsAsSpend && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            return Money.double(Money.sum(filtered.map(\.amount)))
+            return Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
 
         default:
             return 0
@@ -114,22 +118,21 @@ struct Provider: AppIntentTimelineProvider {
         let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
 
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.firstWeekday = UserDefaults.appGroup.integer(forKey: "firstWeekday")
-        calendar.minimumDaysInFirstWeek = 4
+        let calendar = AppPeriod.configuredCalendar(
+            firstWeekday: UserDefaults.appGroup.integer(forKey: "firstWeekday"))
 
         let startDate: Date
         switch type {
         case .day: startDate = calendar.startOfDay(for: now)
         case .week:
-            let components = calendar.dateComponents([.weekOfYear, .yearForWeekOfYear], from: now)
-            startDate = calendar.date(from: components)!
+            startDate = AppPeriod.weekRange(containing: now, calendar: calendar).start
         case .month:
-            let components = calendar.dateComponents([.month, .year], from: now)
-            startDate = calendar.date(from: components)!
+            startDate = AppPeriod.monthStart(
+                containing: now,
+                startDay: UserDefaults.appGroup.integer(forKey: "firstDayOfMonth"),
+                calendar: calendar)
         case .year:
-            let components = calendar.dateComponents([.year], from: now)
-            startDate = calendar.date(from: components)!
+            startDate = AppPeriod.yearRange(containing: now, calendar: calendar).start
         default: return []
         }
 
@@ -142,7 +145,7 @@ struct Provider: AppIntentTimelineProvider {
 
         return limited.map { txn in
             HoldingTransaction(colour: txn.wrappedColour, note: txn.wrappedNote,
-                               amount: txn.wrappedAmount, income: txn.income)
+                               amount: txn.wrappedBaseAmount, income: txn.income)
         }
     }
 }

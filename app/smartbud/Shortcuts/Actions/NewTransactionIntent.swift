@@ -89,10 +89,14 @@ struct NewTransactionIntent: AppIntent {
             throw isExpense ? $expenseCategory.needsValueError() : $incomeCategory.needsValueError()
         }
 
+        // Same defaulting rule as the app and the URL scheme: a shortcut entry
+        // must land in an account, otherwise it never moves a balance.
+        let account = AccountViewModel.shared.defaultAccount(
+            lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))
         let transaction = TransactionViewModel.shared.create(TransactionEdit(
             note: note ?? "",
             category: category,
-            account: nil,
+            account: account,
             income: !isExpense,
             amount: amount,
             date: Date.now,

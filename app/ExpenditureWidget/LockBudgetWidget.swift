@@ -99,7 +99,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
             return LockBudgetSnapshot(total: 0, timeLeft: "", budget: budget)
         }
 
-        let budgetStartDate = budgetModel.startDate
+        // The stored start only rolls when the budget screen opens; derive
+        // the current period here so the widget never sums last week's rows.
+        let budgetStartDate = BudgetRollover.roll(startDate: budgetModel.startDate,
+                                                  type: budgetModel.type) ?? budgetModel.startDate
         let budgetCategory = budgetModel.category
         let now = Date.now
         let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
@@ -111,7 +114,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
                 && $0.category?.id == categoryID
         }
 
-        let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.wrappedAmount)))
+        let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.wrappedBaseAmount)))
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,

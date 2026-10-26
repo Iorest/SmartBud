@@ -50,8 +50,15 @@ final class OCRService: @unchecked Sendable {
             allText += text + "\n"
             amounts.append(contentsOf: extractAmounts(from: text))
         }
+        // Keep the order Vision returned (top to bottom): `Set` shuffled it,
+        // so the pre-filled amount was an arbitrary number from the receipt
+        // (subtotal, unit price, change). Deduplicate stably instead.
+        var unique: [Decimal] = []
+        for amount in amounts where !unique.contains(amount) {
+            unique.append(amount)
+        }
         return OCRResult(
-            amounts: Array(Set(amounts)),
+            amounts: unique,
             merchant: extractMerchant(from: allText),
             allText: allText
         )
@@ -104,15 +111,13 @@ final class OCRService: @unchecked Sendable {
     }
 
     private static func extractAmounts(from text: String) -> [Decimal] {
+        // Labeled totals first, bare numbers last: the first amount is what
+        // the entry form pre-fills, and a receipt is full of unit prices.
         let patterns = [
-            "¥\\s*(\\d+\\.?\\d*)",
-            "(\\d+\\.\\d{2})",
-            "RMB\\s*(\\d+\\.?\\d*)",
-            "金额[:：]\\s*(\\d+\\.?\\d*)",
-            "实付[:：]\\s*(\\d+\\.?\\d*)",
-            "支付[:：]\\s*(\\d+\\.?\\d*)",
-            "总计[:：]\\s*(\\d+\\.?\\d*)",
-            "价格[:：]\\s*(\\d+\\.?\\d*)"
+            "(?:实付|合计|总计|金额|支付|价格)[:：]?\\s*[¥￥]?\\s*(\\d[\\d,]*(?:\\.\\d{1,2})?)",
+            "[¥￥]\\s*(\\d[\\d,]*(?:\\.\\d{1,2})?)",
+            "RMB\\s*(\\d[\\d,]*(?:\\.\\d{1,2})?)",
+            "(\\d[\\d,]*\\.\\d{2})"
         ]
         var amounts: [Decimal] = []
         for pattern in patterns {
@@ -120,9 +125,10 @@ final class OCRService: @unchecked Sendable {
             let range = NSRange(text.startIndex..., in: text)
             for match in regex.matches(in: text, range: range) {
                 guard match.numberOfRanges > 1,
-                      let amountRange = Range(match.range(at: 1), in: text),
-                      let amount = Decimal(string: String(text[amountRange])),
-                      amount > 0, amount < 100_000 else { continue }
+                      let amountRange = Range(match.range(at: 1), in: text) else { continue }
+                let raw = String(text[amountRange]).replacingOccurrences(of: ",", with: "")
+                guard let amount = Decimal(string: raw),
+                      amount > 0, amount <= Decimal(Money.maxAmount) else { continue }
                 amounts.append(amount)
             }
         }

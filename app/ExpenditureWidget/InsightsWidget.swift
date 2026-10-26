@@ -173,7 +173,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             let next = calendar.date(byAdding: period.step, value: period.value, to: cursor) ?? cursor
             let bucket = transactions
                 .filter { $0.wrappedDate >= cursor && $0.wrappedDate < next }
-                .reduce(0.0) { $0 + $1.wrappedAmount }
+                .reduce(0.0) { $0 + $1.wrappedBaseAmount }
 
             total += bucket
             byDate[cursor] = bucket
@@ -194,7 +194,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
         return categories.compactMap { category in
             let amount = transactions
                 .filter { $0.category == category }
-                .reduce(0.0) { $0 + $1.wrappedAmount }
+                .reduce(0.0) { $0 + $1.wrappedBaseAmount }
             guard amount != 0 else { return nil }
             return HoldingCategory(colour: category.wrappedColour,
                                    name: category.wrappedName,

@@ -30,15 +30,17 @@ struct AlipayWechatParser {
         "微信支付", "零钱", "微信转账", "收款方备注", "当前状态", "支付凭证", "转账说明"
     ]
 
+    /// Labeled amounts first: a receipt also prints "余额 ¥1,234.56" above the
+    /// real total, and matching the bare symbol first reported the balance as
+    /// the payment. Thousands separators are part of the number.
     private static let amountPatterns = [
-        #"¥\s*(\d+\.?\d{0,2})"#,
-        #"￥\s*(\d+\.?\d{0,2})"#,
-        #"实付\s*[:：]?\s*(?:¥|￥)?\s*(\d+\.?\d{0,2})"#,
-        #"支付金额\s*[:：]?\s*(?:¥|￥)?\s*(\d+\.?\d{0,2})"#,
-        #"金额\s*[:：]?\s*(?:¥|￥)?\s*(\d+\.?\d{0,2})"#,
-        #"支付\s*[:：]?\s*(?:¥|￥)?\s*(\d+\.?\d{0,2})"#,
-        #"收款金额\s*[:：]?\s*(?:¥|￥)?\s*(\d+\.?\d{0,2})"#
+        #"(?:实付|支付金额|付款金额|收款金额|金额|支付|总计|合计)\s*[:：]?\s*(?:¥|￥|RMB)?\s*(\d[\d,]*(?:\.\d{1,2})?)"#,
+        #"(?:¥|￥)\s*(\d[\d,]*(?:\.\d{1,2})?)"#
     ]
+
+    /// A line about the wallet balance, a coupon or a discount is not the
+    /// amount the user paid.
+    private static let ignoredAmountWords = ["余额", "优惠", "立减", "红包", "折扣"]
 
     private static let merchantPatterns = [
         #"收款方\s*[:：]?\s*(.+?)(?:\s|$)"#,
@@ -72,14 +74,19 @@ struct AlipayWechatParser {
     }
 
     private func extractAmount(from text: String) -> Decimal? {
+        let lines = text.components(separatedBy: .newlines)
         for pattern in Self.amountPatterns {
             guard let regex = try? NSRegularExpression(pattern: pattern) else { continue }
-            let range = NSRange(text.startIndex..., in: text)
-            if let match = regex.firstMatch(in: text, range: range),
-               match.range(at: 1).location != NSNotFound,
-               let swiftRange = Range(match.range(at: 1), in: text),
-               let value = Decimal(string: String(text[swiftRange])), value > 0 {
-                return value
+            for line in lines {
+                if Self.ignoredAmountWords.contains(where: { line.contains($0) }) { continue }
+                let range = NSRange(line.startIndex..., in: line)
+                guard let match = regex.firstMatch(in: line, range: range),
+                      match.range(at: 1).location != NSNotFound,
+                      let swiftRange = Range(match.range(at: 1), in: line) else { continue }
+                let raw = String(line[swiftRange]).replacingOccurrences(of: ",", with: "")
+                if let value = Decimal(string: raw), value > 0, value <= Decimal(Money.maxAmount) {
+                    return value
+                }
             }
         }
         return nil

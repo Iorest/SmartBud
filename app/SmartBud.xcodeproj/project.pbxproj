@@ -456,6 +456,7 @@
 		E1A2B3C400000000000002A3 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C4000000000000C010 /* ExpenseTextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000201 /* ExpenseTextParser.swift */; };
 		E1A2B3C4000000000000C011 /* AlipayWechatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F0000000000000000203 /* AlipayWechatParser.swift */; };
+		E1A2B3C4000000000000C021 /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C020 /* ParsingTests.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
 		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
@@ -650,6 +651,7 @@
 		C10600000000000000000001 /* InsightsView+Pending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/InsightsView+Pending.swift"; sourceTree = SOURCE_ROOT; };
 		C10700000000000000000001 /* PendingReimbursementSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Insights/PendingReimbursementSheet.swift; sourceTree = SOURCE_ROOT; };
 		B0A0F00000000000000000A1 /* BudgetLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogic.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000C020 /* ParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingTests.swift; sourceTree = "<group>"; };
 		B0A0F00000000000000000B1 /* BudgetLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetLogicTests.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPortabilityTests.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000F011 /* AppPeriodTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPeriodTests.swift; sourceTree = "<group>"; };
@@ -784,6 +786,7 @@
 			isa = PBXGroup;
 			children = (
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
+				E1A2B3C4000000000000C020 /* ParsingTests.swift */,
 				E1A2B3C4000000000000B111 /* DeepLinkTests.swift */,
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
 				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
@@ -1662,6 +1665,7 @@
 				E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */,
 				E1A2B3C4000000000000C010 /* ExpenseTextParser.swift in Sources */,
 				E1A2B3C4000000000000C011 /* AlipayWechatParser.swift in Sources */,
+				E1A2B3C4000000000000C021 /* ParsingTests.swift in Sources */,
 				E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */,
 				E1A2B3C40000000000000276 /* Helper.swift in Sources */,
 				C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */,
