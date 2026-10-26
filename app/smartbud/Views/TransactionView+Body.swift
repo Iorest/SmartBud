@@ -357,3 +357,29 @@ extension TransactionView {
     }
 
 }
+
+// MARK: - Draft detection
+
+extension TransactionView {
+    /// True when closing would throw away work. New entries count once any
+    /// field is filled; edits count only once a field actually changed, so
+    /// opening and closing an existing transaction never nags.
+    var hasDraft: Bool {
+        if let toEdit {
+            return padVM.price != toEdit.wrappedAmount
+                || note != toEdit.wrappedNote
+                || category?.id != toEdit.category?.id
+                || income != toEdit.income
+                || date != toEdit.wrappedDate
+                || discount != toEdit.discount
+                || reimbursable != toEdit.reimbursable
+        }
+        // A category alone is not a draft: continuous-entry keeps the last
+        // category selected, so requiring it made every Cancel ask "discard?"
+        // even with an empty amount and note.
+        return padVM.price > 0
+            || !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || discount > 0
+            || reimbursable
+    }
+}

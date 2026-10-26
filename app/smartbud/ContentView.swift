@@ -164,7 +164,7 @@ enum StorageBanner {
         switch mode {
         case .memory: return SettingsKey.bannerEphemeralTitle
         case .device: return SettingsKey.bannerDeviceTitle
-        case .cloud, .appGroup: return SettingsKey.bannerFallbackTitle
+        case .cloud, .appGroup: return SettingsKey.bannerCloudTitle
         }
     }
 
@@ -172,7 +172,7 @@ enum StorageBanner {
         switch mode {
         case .memory: return SettingsKey.bannerEphemeralBody
         case .device: return SettingsKey.bannerDeviceBody
-        case .cloud, .appGroup: return SettingsKey.bannerFallbackBody
+        case .cloud, .appGroup: return SettingsKey.bannerCloudBody
         }
     }
 }

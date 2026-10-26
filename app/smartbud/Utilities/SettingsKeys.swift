@@ -106,6 +106,8 @@ enum SettingsKey {
     static let bannerEphemeralBody = "settings.banner.ephemeralBody"
     static let bannerDeviceTitle = "settings.banner.deviceTitle"
     static let bannerDeviceBody = "settings.banner.deviceBody"
+    static let bannerCloudTitle = "settings.banner.cloudTitle"
+    static let bannerCloudBody = "settings.banner.cloudBody"
 
     // MARK: - Row titles (General)
 

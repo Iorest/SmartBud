@@ -24,22 +24,6 @@ struct TransactionView: View {
     /// Non-empty draft → Cancel asks before discarding (HIG error tolerance).
     @State var showDiscardConfirmation = false
 
-    /// True when closing would throw away work. New entries count once any
-    /// field is filled; edits count only once a field actually changed, so
-    /// opening and closing an existing transaction never nags.
-    var hasDraft: Bool {
-        if let toEdit {
-            return padVM.price != toEdit.wrappedAmount
-                || note != toEdit.wrappedNote
-                || category?.id != toEdit.category?.id
-                || income != toEdit.income
-                || date != toEdit.wrappedDate
-                || discount != toEdit.discount
-                || reimbursable != toEdit.reimbursable
-        }
-        return padVM.price > 0 || !note.isEmpty || category != nil
-            || discount > 0 || reimbursable
-    }
     @State var repeatType = 0
     @State var repeatCoefficient = 1
     @State var income = false

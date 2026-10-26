@@ -17461,6 +17461,51 @@
         }
       }
     }
+,
+    "settings.banner.cloudTitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud unavailable"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 暂不可用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 暫時無法使用"
+          }
+        }
+      }
+    },
+    "settings.banner.cloudBody" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data is still saved on this device and will sync when iCloud is available again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据仍保存在本机的共享存储中，iCloud 恢复后会自动同步。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "資料仍儲存在本機的共享儲存中，iCloud 恢復後會自動同步。"
+          }
+        }
+      }
+    }
   },
   "version" : "1.2"
 }
