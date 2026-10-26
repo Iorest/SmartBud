@@ -75,10 +75,11 @@ extension InsightsViewModel {
     /// Start of the period for LogView's timeframe control, respecting the user's
     /// configured first-weekday/first-day-of-month. `nil` means "all time" (no lower bound).
     private func logViewPeriodStart(type: Int) -> Date? {
-        var calendar = Calendar(identifier: .gregorian)
         let defaults = UserDefaults.appGroup
-        calendar.firstWeekday = defaults.integer(forKey: "firstWeekday")
-        calendar.minimumDaysInFirstWeek = 4
+        // A missing key used to leave `firstWeekday` at 0, which is not a valid
+        // weekday; the shared helper clamps it and applies the app language.
+        let calendar = AppPeriod.configuredCalendar(
+            firstWeekday: defaults.integer(forKey: "firstWeekday"))
         switch type {
         case 1:
             return calendar.startOfDay(for: .now)
@@ -271,10 +272,11 @@ extension InsightsViewModel {
     /// Day/month count from the start of the current period to today, used by
     /// `LineGraph` for its x-axis labels. Mirrors the legacy view's `range` Int.
     private func logViewRangeCount(timeframe: Int) -> Int {
-        var calendar = Calendar(identifier: .gregorian)
         let defaults = UserDefaults.appGroup
-        calendar.firstWeekday = defaults.integer(forKey: "firstWeekday")
-        calendar.minimumDaysInFirstWeek = 4
+        // A missing key used to leave `firstWeekday` at 0, which is not a valid
+        // weekday; the shared helper clamps it and applies the app language.
+        let calendar = AppPeriod.configuredCalendar(
+            firstWeekday: defaults.integer(forKey: "firstWeekday"))
         switch timeframe {
         case 3:
             let startDay = defaults.integer(forKey: "firstDayOfMonth")

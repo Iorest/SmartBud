@@ -74,8 +74,11 @@ final class InsightsViewModel {
     /// Also refreshes today / yesterday transaction lists.
     func refreshAll() {
         let defaults = UserDefaults.appGroup
-        showCents = defaults.bool(forKey: "showCents")
-        currency = defaults.string(forKey: "currency") ?? Locale.current.currency?.identifier ?? "USD"
+        // Missing keys have to fall back the same way `@AppStorage` does:
+        // `bool(forKey:)` answers false for an absent key, which silently hid
+        // the cents on the today/yesterday lists.
+        showCents = defaults.object(forKey: "showCents") as? Bool ?? true
+        currency = AppBaseCurrency.code(in: defaults)
         currencySymbol = Locale.appCurrencySymbol(forCurrencyCode: currency)
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)
