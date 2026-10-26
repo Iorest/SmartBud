@@ -216,6 +216,8 @@ TemplateTransactionModel                 快捷记账模板
 - 冲突：CloudKit 按字段最后写入者获胜；金额类字段不做合并，冲突时以时间戳较晚者为准（SwiftData 默认行为）。
 - 新字段/新实体必须先在 Development 建表，再 Deploy 到 Production，否则老客户端/生产环境同步失败。
 - 无 iCloud 账号或容器不可用时降级为本地库并横幅提示，功能不降级。
+- 通知权限 ≠ 用户同意：系统权限恢复只影响可投递性，不会自动打开提醒开关。
+- 导入后先刷新汇率缓存，再补写旧备份缺失的手续费行，否则手续费按 1:1 冻结。
 - 基准货币是设备本地设置（首次启动落盘，见 3），不随 iCloud 悄悄变化；切换只在当前设备折算当前库。
 - 因此两台设备可以各自用不同基准币：备份导入时按 `settings.baseCurrency` 校验，不一致就拒绝。
 
@@ -226,6 +228,10 @@ TemplateTransactionModel                 快捷记账模板
 - 记账页是全屏计算器式布局；键盘避让由系统 safa area 负责；`dynamicType` 上限 accessibility1（Apple 计算器式例外，已注释）。
 - 破坏性操作：交易用 6 秒撤销条；账户/分类/清空/导入用 alert 说明后果。
 - 空态：`SBEmptyState`（`ContentUnavailableView`）+ 一个明确动作。
+- 流水搜索叠加当前筛选（不是只对"全部"生效）；UPCOMING 是独立分区，空态判断同时看两边。
+- 账户的隐藏与归档都有可展开分组，任何隐藏操作都必须能撤回；默认账户排除两者。
+- App Lock 期间所有「新建」入口（悬浮按钮、`⌘N`、`smartbud://newExpense`）排队，
+  解锁后重放；解锁允许设备密码，避免生物识别锁定后无路可走。
 - 无障碍：所有图标按钮有 `accessibilityLabel`；金额行 `accessibilityElement(children: .combine)`。
 - 本地化：`String.appLocalized` + String Catalog（en / zh-Hans / zh-Hant），新增文案必须同时补三语。
 
