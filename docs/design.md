@@ -259,6 +259,10 @@ TemplateTransactionModel                 快捷记账模板
 - App Lock 期间所有「新建」入口（悬浮按钮、`⌘N`、`smartbud://newExpense`）排队，
   解锁后重放；解锁允许设备密码，避免生物识别锁定后无路可走。
 - 无障碍：所有图标按钮有 `accessibilityLabel`；金额行 `accessibilityElement(children: .combine)`。
+- 动态字体：Log / 记账 / 设置 / 预算在 `accessibility-extra-large` 下实测无截断；
+  记账页按计算器布局把字号上限压在 accessibility1。
+- RTL：App 只支持 en / zh-Hans / zh-Hant 三种 LTR 语言，界面不提供 RTL 布局；
+  若以后加入阿拉伯语等 RTL 语言，需要重新过一遍图表、金额符号与返回箭头方向。
 - 本地化：`String.appLocalized` + String Catalog（en / zh-Hans / zh-Hant），新增文案必须同时补三语。
 
 ## 9.1 Pro 功能与闸门

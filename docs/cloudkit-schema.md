@@ -100,4 +100,6 @@ Development 环境只要在本机跑一遍写入就会自动建表；**Productio
 
 > macOS 目标没有 CloudKit entitlement（启用会因缺少容器在 PFCloudKit 内 SIGTRAP），
 > 因此 Mac 数据只保存在该 Mac 的 App Group 容器里，不参与多设备同步。
+> 加入 App Group 之前的 Mac 构建把库放在应用沙盒的 Application Support 下，
+> 切换后不会自动迁移；如需保留旧数据，先在旧构建导出 JSON，再在新构建导入。
 >
