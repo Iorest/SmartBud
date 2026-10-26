@@ -219,9 +219,9 @@ struct SettingsImportView: View {
                 // Older backups carry transfers whose fee has no expense row;
                 // write the missing rows so the imported balances add up.
                 TransferFeeLedger.migrate(in: DataRepository.shared.context)
-                AccountViewModel.shared.load()
-                CategoryViewModel.shared.load()
-                InsightsViewModel.shared.refreshAll()
+                // One list for every cache — rates and budgets included, which
+                // the old ad-hoc calls here missed until the next screen visit.
+                DataRefreshCenter.refreshAll()
                 // The import saves the context directly (one transaction for
                 // the whole file), which bypasses the repository's own
                 // timeline reload.

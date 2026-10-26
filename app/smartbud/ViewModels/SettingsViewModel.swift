@@ -15,17 +15,10 @@ final class SettingsViewModel {
         let outcome = await repo.wipeEverything()
         // Everything that caches fetched rows has to forget them: the user
         // stays in the app after erasing, and a stale account or rate table
-        // would keep showing (and converting with) deleted data.
-        accountReload()
+        // would keep showing (and converting with) deleted data. The rate
+        // table was missing from this list before, so it outlived the wipe.
+        DataRefreshCenter.refreshAll()
         return outcome
-    }
-
-    /// Pulled out so the erase flow reads as one action.
-    private func accountReload() {
-        AccountViewModel.shared.load()
-        CategoryViewModel.shared.load()
-        BudgetViewModel.shared.load()
-        InsightsViewModel.shared.refreshAll()
     }
 
     // MARK: - In-app language

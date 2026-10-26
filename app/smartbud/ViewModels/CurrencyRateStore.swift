@@ -163,10 +163,9 @@ final class CurrencyRateStore {
 
     /// Everything that cached converted numbers has to start over.
     private func applyRebaseRefresh() {
-        load()
-        AccountViewModel.shared.load()
-        BudgetViewModel.shared.load()
-        InsightsViewModel.shared.refreshAll()
+        // Same list the importer, CloudKit sync and erase use; keeping a local
+        // copy here is how a cache gets forgotten.
+        DataRefreshCenter.refreshAll()
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
