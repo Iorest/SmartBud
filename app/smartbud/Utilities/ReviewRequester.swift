@@ -80,16 +80,13 @@ enum ReviewRequester {
         // handles its own throttling; skip the in-app nudge there.
         return
         #else
-        // The system sheet needs a foreground scene to anchor to.
-        // Prefer the active one; fall back to the first connected
-        // scene (covers the "cold launch" case where the scene
-        // exists but isn't yet `.foregroundActive`).
+        // Only ask from a foreground scene. Falling back to the first
+        // connected scene meant a Shortcut creating the third transaction
+        // while the app was in the background "asked" (a no-op) and still
+        // stamped the version, so this version never asked again.
         guard let scene = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first(where: { $0.activationState == .foregroundActive })
-            ?? UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene })
-                .first
         else { return }
 
         // `AppStore.requestReview(in:)` is the iOS 18+ replacement

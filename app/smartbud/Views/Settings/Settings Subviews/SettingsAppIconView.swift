@@ -67,8 +67,10 @@ struct SettingsAppIconView: View {
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { index in
           Button {
-            // The default icon stays free; the rest are a Pro perk.
+            // The default icon stays free, and re-tapping the icon that is
+            // already active is not a purchase. The rest are a Pro perk.
             if options[index].actualFileName != "AppIcon",
+               options[index].actualFileName != activeIcon,
                !subscription.isUnlocked(.customAppIcons) {
               showProUpsell = true
               return

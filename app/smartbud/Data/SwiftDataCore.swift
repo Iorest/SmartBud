@@ -143,11 +143,10 @@ final class DataRepository {
                 // account, iCloud disabled, different Apple ID, or macOS
                 // where CloudKit is not wired up yet).
                 container = fallback
-                #if os(macOS)
-                reason = .cloudKitUnavailable
-                #else
+                // macOS deliberately has no CloudKit configuration, so a
+                // working App Group store there is not a degraded state; only
+                // report a fallback when a CloudKit config was actually tried.
                 if cloudConfig != nil { reason = .cloudKitUnavailable }
-                #endif
             } else {
                 reason = .cloudKitUnavailable
             }

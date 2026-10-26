@@ -12,6 +12,9 @@
 import CloudKit
 import CoreData
 import Foundation
+import OSLog
+
+private let syncLogger = Logger(subsystem: "com.iorest.smartbud", category: "sync")
 
 @MainActor
 enum DataRefreshCenter {
@@ -43,7 +46,14 @@ enum DataRefreshCenter {
         ) { note in
             guard let event = note.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey]
                     as? NSPersistentCloudKitContainer.Event,
-                  event.endDate != nil, event.succeeded else { return }
+                  event.endDate != nil else { return }
+            guard event.succeeded else {
+                // A failed import used to be dropped entirely: the app looked
+                // in sync while another device's changes never arrived.
+                syncLogger.error(
+                    "CloudKit sync failed: \(event.error?.localizedDescription ?? "unknown", privacy: .public)")
+                return
+            }
             scheduleRefresh()
         })
     }
