@@ -2395,13 +2395,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A bright aqua background with a glowing yellow tie on a light bag."
+            "value" : "明亮的水青底色，浅色袋身配发光的黄色领带。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A bright aqua background with a glowing yellow tie on a light bag."
+            "value" : "明亮的水青底色，淺色袋身配發光的黃色領帶。"
           }
         }
       },
@@ -2442,13 +2442,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A deeper violet bag with a soft amber tie on indigo."
+            "value" : "更深的紫罗兰袋身，靛蓝底色上配柔和的琥珀色领带。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A deeper violet bag with a soft amber tie on indigo."
+            "value" : "更深的紫羅蘭袋身，靛藍底色上配柔和的琥珀色領帶。"
           }
         }
       },
@@ -2466,13 +2466,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A soft sky background with a white bag and yellow tie."
+            "value" : "浅天蓝底色，白色袋身配黄色领带。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A soft sky background with a white bag and yellow tie."
+            "value" : "淺天藍底色，白色袋身配黃色領帶。"
           }
         }
       },
@@ -2490,13 +2490,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A teal-to-gold gradient backdrop with a deep teal bag."
+            "value" : "青绿到金色的渐变底色，配深青色袋身。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A teal-to-gold gradient backdrop with a deep teal bag."
+            "value" : "青綠到金色的漸變底色，配深青色袋身。"
           }
         }
       },
@@ -9946,19 +9946,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "By subscribing, you agree to our Terms of Use and Privacy Policy."
+            "value" : "By subscribing, you agree to our"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅即表示您同意我们的服务条款和隐私政策。"
+            "value" : "订阅即表示您同意我们的"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "訂閱即表示您同意我們的服務條款和隱私政策。"
+            "value" : "訂閱即表示您同意我們的"
           }
         }
       }
@@ -17100,6 +17100,73 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "金額可以帶貨幣符號、千分位或括號負數，系統會自動辨識數字。"
+          }
+        }
+      }
+    }
+,
+    "AI analysis of this period with concrete suggestions." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI analysis of this period with concrete suggestions."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 解读本期收支，给出具体建议。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 解讀本期收支，給出具體建議。"
+          }
+        }
+      }
+    },
+    "Six additional app icons." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Six additional app icons."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "六款额外应用图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "六款額外應用圖示。"
+          }
+        }
+      }
+    },
+    "Choose a custom time for the daily reminder." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a custom time for the daily reminder."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义每日提醒的时间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自訂每日提醒的時間。"
           }
         }
       }

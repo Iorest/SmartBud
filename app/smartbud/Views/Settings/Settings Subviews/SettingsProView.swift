@@ -46,15 +46,15 @@ struct SettingsProView: View {
         let subtitleKey: String
     }
 
+    // Keep this list to features that are actually gated by `ProAccess`;
+    // advertising more than the app enforces is a 3.1.1 problem.
     private var features: [ProFeature] = [
         ProFeature(icon: "chart.bar.xaxis", color: "103", titleKey: "Advanced Insights",
-                   subtitleKey: "Deeper breakdowns, custom date ranges, exportable charts"),
+                   subtitleKey: "AI analysis of this period with concrete suggestions."),
         ProFeature(icon: "paintpalette.fill", color: "100", titleKey: "Exclusive Themes",
-                   subtitleKey: "Additional app icons and accent colors"),
+                   subtitleKey: "Six additional app icons."),
         ProFeature(icon: "bell.badge.fill", color: "102", titleKey: "Smart Reminders",
-                   subtitleKey: "Customizable notification schedules and quiet hours"),
-        ProFeature(icon: "lock.shield.fill", color: "105", titleKey: "Priority Support",
-                   subtitleKey: "Direct access to the development team for help")
+                   subtitleKey: "Choose a custom time for the daily reminder.")
     ]
 
     // MARK: - Header

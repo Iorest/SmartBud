@@ -33,7 +33,9 @@ struct InsightsView: View {
     var showCents: Bool = true
 
     @State private var period: Int = 2  // 1=week, 2=month, 3=year (matches design)
-    @State private var showAIAnalysis = false
+    @State var showAIAnalysis = false
+    @State var subscription = SubscriptionManager.shared
+    @State var showProUpsell = false
     @State var showPendingReimbursements = false
     @Environment(\.dynamicTypeSize) var typeSize
 
@@ -106,6 +108,7 @@ struct InsightsView: View {
             guard !unlocked else { return }
             showAIAnalysis = false
             showPendingReimbursements = false
+            showProUpsell = false
         }
         .sheet(isPresented: $showAIAnalysis) {
             InsightsAIAnalysisView()
@@ -115,6 +118,7 @@ struct InsightsView: View {
             PendingReimbursementSheet()
                 .environment(insightsVM)
         }
+        .proUpsell(isPresented: $showProUpsell)
     }
 
     // MARK: - Header
@@ -126,15 +130,6 @@ struct InsightsView: View {
             .padding(.horizontal, 30)
             .padding(.top, SBSpace.extraSmall)
             .padding(.bottom, SBSpace.medium)
-    }
-
-    private var aiButton: some View {
-        Button {
-            showAIAnalysis = true
-        } label: {
-            Label(String.appLocalized("AI"), systemImage: "sparkles")
-        }
-        .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
     }
 
     private var periodSegmented: some View {

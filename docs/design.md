@@ -235,6 +235,29 @@ TemplateTransactionModel                 快捷记账模板
 - 无障碍：所有图标按钮有 `accessibilityLabel`；金额行 `accessibilityElement(children: .combine)`。
 - 本地化：`String.appLocalized` + String Catalog（en / zh-Hans / zh-Hant），新增文案必须同时补三语。
 
+## 9.1 Pro 功能与闸门
+
+Pro 只拦三个有真实实现、且在付费墙上一一对应的能力：
+
+| 功能 | 闸门 | 免费部分 |
+|---|---|---|
+| AI 账单分析 | `ProFeature.aiAnalysis` | 其余统计、图表、分类占比 |
+| 额外应用图标（6 款） | `ProFeature.customAppIcons` | 默认图标、深/浅色主题 |
+| 自定义每日提醒时间 | `ProFeature.customReminderTime` | 早上 8 点 / 晚上 8 点提醒 |
+
+永久免费：记账、账户、转账、预算、基础统计、模板、小组件、通知开关、**导入导出与备份**、
+iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审核与合规同时质疑。
+
+- 判定唯一入口：`ProAccess.isUnlocked(_:promo:entitled:)`；`SubscriptionManager.isUnlocked`
+  传入 `isLimitedTimeFree` 与 `hasActualProEntitlement`。
+- 发布期限免：`isLimitedTimeFree` 默认 `true`，到点把它（App Group 的
+  `limitedTimeFree`）置 `false` 即生效，功能代码不需要改。
+- 验收：DEBUG 构建加启动参数 `-proEnforced` 可强制关闭限免，逐个点 AI / 图标 / 提醒
+  确认弹出 Pro 页且不会越过闸门写数据。
+- StoreKit：启动时起 `Transaction.updates` 常驻监听，verified 后 `finish()` 并刷新权益，
+  跨设备续订、退款、Ask to Buy 批准都不再需要重启。
+- 付费墙条目必须与 `ProAccess` 一一对应；不把没有拦截的功能写进付费清单（3.1.1）。
+
 ## 10. 版本与迁移
 
 - 导出格式 `ExportSchema.version`（当前 4）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。

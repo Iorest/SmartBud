@@ -23,6 +23,8 @@ struct SettingsNotificationsView: View {
   var option: Int = 1
 
   @State var customTime = Date.now
+  @State private var subscription = SubscriptionManager.shared
+  @State private var showProUpsell = false
 
   var center = UNUserNotificationCenter.current()
 
@@ -48,7 +50,15 @@ struct SettingsNotificationsView: View {
           Picker(String.appLocalized("Reminder time"), selection: $option) {
             Text(String.appLocalized("Every morning (8:00 AM)")).tag(1)
             Text(String.appLocalized("Every evening (8:00 PM)")).tag(2)
-            Text(String.appLocalized("Custom Time")).tag(3)
+            HStack(spacing: 4) {
+              Text(String.appLocalized("Custom Time"))
+              if !subscription.isUnlocked(.customReminderTime) {
+                Image(systemName: "lock.fill")
+                  .font(.caption2.weight(.semibold))
+                  .foregroundStyle(Color.SubtitleText)
+              }
+            }
+            .tag(3)
           }
           .pickerStyle(.inline)
           .labelsHidden()
@@ -89,6 +99,12 @@ struct SettingsNotificationsView: View {
       }
     }
     .onChange(of: option) { _, newValue in
+      if newValue == 3, !subscription.isUnlocked(.customReminderTime) {
+        // Morning/evening stay free; only the custom time is Pro.
+        option = 1
+        showProUpsell = true
+        return
+      }
       if newValue == 3 {
         storeCustomTime()
       }
@@ -111,6 +127,7 @@ struct SettingsNotificationsView: View {
       }
     }
     .padding(.horizontal, SBSpace.medium)
+    .proUpsell(isPresented: $showProUpsell)
     .navigationTitle(String.appLocalized("Notifications"))
     #if os(iOS)
     .navigationBarTitleDisplayMode(.inline)

@@ -26,6 +26,8 @@ struct SettingsAppIconView: View {
   // us a chance to phrase the prompt in the in-app language, which
   // the system alert cannot do.
   @State private var pendingIcon: AppIconBundle?
+  @State private var subscription = SubscriptionManager.shared
+  @State private var showProUpsell = false
 
   let options: [AppIconBundle] = [
     AppIconBundle(
@@ -65,6 +67,12 @@ struct SettingsAppIconView: View {
       VStack(spacing: 0) {
         ForEach(options.indices, id: \.self) { index in
           Button {
+            // The default icon stays free; the rest are a Pro perk.
+            if options[index].actualFileName != "AppIcon",
+               !subscription.isUnlocked(.customAppIcons) {
+              showProUpsell = true
+              return
+            }
             // Don't mutate `activeIcon` yet — the `.onChange` below
             // would immediately fire `setAlternateIconName` and the
             // SpringBoard alert. Stage the choice in `pendingIcon`
@@ -80,9 +88,18 @@ struct SettingsAppIconView: View {
                 .accessibilityHidden(true)
 
               VStack(alignment: .leading, spacing: 3) {
-                Text(options[index].displayName)
-                  .font(.body)
-                  .foregroundStyle(Color.PrimaryText)
+                HStack(spacing: 4) {
+                  Text(options[index].displayName)
+                    .font(.body)
+                    .foregroundStyle(Color.PrimaryText)
+
+                  if options[index].actualFileName != "AppIcon",
+                     !subscription.isUnlocked(.customAppIcons) {
+                    Image(systemName: "lock.fill")
+                      .font(.caption2.weight(.semibold))
+                      .foregroundStyle(Color.SubtitleText)
+                  }
+                }
 
                 Text(options[index].displaySubtitle)
                   .font(.caption)
@@ -125,6 +142,7 @@ struct SettingsAppIconView: View {
     }
     .padding(.horizontal, SBSpace.medium)
     .padding(.top, SBSpace.extraSmall)
+    .proUpsell(isPresented: $showProUpsell)
     .navigationTitle(String.appLocalized("App Icon"))
     #if os(iOS)
     .navigationBarTitleDisplayMode(.inline)

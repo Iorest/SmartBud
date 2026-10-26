@@ -105,3 +105,21 @@ struct InsightsTransactionRow: View {
             TemplateTransactionModel.self
         ], inMemory: true)
 }
+
+// MARK: - Toolbar
+
+extension InsightsView {
+    var aiButton: some View {
+        Button {
+            if subscription.isUnlocked(.aiAnalysis) {
+                showAIAnalysis = true
+            } else {
+                showProUpsell = true
+            }
+        } label: {
+            Label(String.appLocalized("AI"),
+                  systemImage: subscription.isUnlocked(.aiAnalysis) ? "sparkles" : "lock.fill")
+        }
+        .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
+    }
+}
