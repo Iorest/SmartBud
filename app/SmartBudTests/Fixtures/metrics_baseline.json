@@ -1,0 +1,17 @@
+{
+  "measured_at": "pending-first-ci-run",
+  "sample": {
+    "text": 600,
+    "receipts": 200
+  },
+  "floors": {
+    "text_amount": 0.94,
+    "text_direction": 0.93,
+    "text_category": 0.45,
+    "text_end_to_end": 0.42,
+    "receipt_amount": 0.65
+  },
+  "targets": {
+    "text_amount": 0.995
+  }
+}
