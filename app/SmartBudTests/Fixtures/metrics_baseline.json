@@ -1,15 +1,15 @@
 {
-  "measured_at": "pending-first-ci-run",
+  "measured_at": "2026-10-30",
   "sample": {
     "text": 600,
     "receipts": 200
   },
   "floors": {
-    "text_amount": 0.94,
-    "text_direction": 0.93,
-    "text_category": 0.45,
-    "text_end_to_end": 0.42,
-    "receipt_amount": 0.65
+    "text_amount": 0.885,
+    "text_direction": 0.8767,
+    "text_category": 0.445,
+    "text_end_to_end": 0.4,
+    "receipt_amount": 0.7
   },
   "targets": {
     "text_amount": 0.995

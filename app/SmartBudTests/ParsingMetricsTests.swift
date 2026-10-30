@@ -148,6 +148,8 @@ struct ParsingMetricsTests {
             if amountOK && directionOK && categoryOK {
                 textEndToEndHits += 1
             }
+            // TEMP DIAG
+            print("DIAG \(entry.id)|\(entry.text)|\(expectedAmount)|\(amountText(parsed))|\(bucket ?? "-")|\(parsed?.categoryHint ?? "-")")
         }
 
         var receiptAmountHits = 0
