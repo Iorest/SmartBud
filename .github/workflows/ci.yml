@@ -30,7 +30,7 @@ jobs:
       LOG_FILE: xcodebuild-test.log
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Select Xcode 26
         run: |
@@ -53,7 +53,7 @@ jobs:
       # No Swift packages today; the step activates once a Package.resolved lands.
       - name: Cache Swift Package dependencies
         if: hashFiles('**/Package.resolved') != ''
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload test artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: TestResults
           path: |

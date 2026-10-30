@@ -55,7 +55,7 @@ xcodebuild test \
 ```
 
 现有用例在 `app/SmartBudTests/`，用的是 swift-testing（`@Test`），当前 196 个。
-跑完日志里会有 `Test run with 196 tests passed`。要看具体哪一条失败，把结果包存下来：
+跑完日志里会有 `Test run with 196 tests in 32 suites passed`。要看具体哪一条失败，把结果包存下来：
 
 ```bash
 xcodebuild test \
