@@ -77,6 +77,51 @@ jobs:
           xctest=$(grep -E "Executed [0-9]+ test" "$LOG_FILE" | tail -1 || true)
           echo "### ${swift_testing:-${xctest:-test count line not found}}" >> "$GITHUB_STEP_SUMMARY"
 
+      # Runs even when the metrics test fails, so a red run still shows which
+      # number moved. The line is emitted by ParsingMetricsTests; see docs/ai-eval.md.
+      - name: Parsing metrics
+        if: always()
+        run: |
+          line=$(grep -o 'METRICS .*' "$LOG_FILE" | head -1 || true)
+          detail=$(grep -o 'METRICS_DETAIL .*' "$LOG_FILE" | head -1 || true)
+          {
+            echo "### Parsing metrics"
+            echo
+            if [ -z "$line" ]; then
+              echo "测试日志里没有 METRICS 行：解析指标测试没跑到（先看上面的编译/测试失败）。"
+              exit 0
+            fi
+            if [ -n "$detail" ]; then
+              echo "\`${detail#METRICS_DETAIL }\`"
+              echo
+            fi
+            echo "| 指标 | 当前 | 门槛（不得低于） |"
+            echo "| --- | --- | --- |"
+            for pair in ${line#METRICS }; do
+              key=${pair%%=*}
+              value=${pair#*=}
+              current=${value%%/*}
+              floor=${value#*/}
+              case "$key" in
+                text_amount) label="金额准确率（文本）" ;;
+                text_direction) label="方向准确率（文本）" ;;
+                text_category) label="分类 top-1（文本）" ;;
+                text_end_to_end) label="端到端一次通过率（文本）" ;;
+                receipt_amount) label="金额准确率（小票）" ;;
+                target_amount) label="金额准确率目标" ;;
+                status) label="门槛结论" ;;
+                *) label="$key" ;;
+              esac
+              if [ "$key" = "status" ]; then
+                echo "| $label | $current | — |"
+              elif [ "$key" = "target_amount" ]; then
+                echo "| $label | ${current}% | — |"
+              else
+                echo "| $label | ${current}% | ${floor}% |"
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload test artifacts
         if: failure()
         uses: actions/upload-artifact@v7

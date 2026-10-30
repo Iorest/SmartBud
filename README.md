@@ -70,6 +70,7 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
 - [Engineering and verification](docs/engineering.md) — how to clone, build, run the 196 tests, and what CI does.
+- [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
 
 ## Licence
 
