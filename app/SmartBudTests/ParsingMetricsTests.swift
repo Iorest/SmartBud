@@ -148,17 +148,6 @@ struct ParsingMetricsTests {
             if amountOK && directionOK && categoryOK {
                 textEndToEndHits += 1
             }
-            // TEMP DIAG
-            if parsed == nil {
-                let number = #"(\d[\d,]*(?:\.\d+)?)"#
-                let legacy = entry.text.range(of: number, options: .regularExpression).map { String(entry.text[$0]) }
-                let ns = try? NSRegularExpression(pattern: number)
-                let nsMatch = ns?.firstMatch(in: entry.text, range: NSRange(entry.text.startIndex..., in: entry.text))
-                let nsText = nsMatch
-                    .flatMap { Range($0.range, in: entry.text) }
-                    .map { String(entry.text[$0]) }
-                print("DIAG4 \(entry.id)|len=\(entry.text.count)|legacyRange=\(legacy ?? "nil")|nsRange=\(nsText ?? "nil")")
-            }
         }
 
         var receiptAmountHits = 0

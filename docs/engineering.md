@@ -93,3 +93,9 @@ open TestResults.xcresult
 
 失败时先看 job summary 里的测试计数行，再下 artifact 里的 `xcodebuild-test.log`
 找第一条 `error:` / `failed`；`.xcresult` 里有逐条用例的截图和日志。
+
+## 解析指标
+
+job summary 里另有一段 "Parsing metrics"，是 `ParsingMetricsTests` 在 800 条语料上算出的
+金额 / 方向 / 分类 / 一次通过率，带各自门槛；这一段在测试失败时也会输出。
+指标定义、当前基线、门槛规则和语料更新方法见 [ai-eval.md](ai-eval.md)。
