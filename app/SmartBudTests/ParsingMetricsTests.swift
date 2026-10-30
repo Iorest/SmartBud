@@ -150,9 +150,20 @@ struct ParsingMetricsTests {
             }
             // TEMP DIAG
             if parsed == nil {
-                let extract = ExpenseTextParser.extractAmount(from: entry.text)
-                let scalars = entry.text.unicodeScalars.map { String($0.value) }.joined(separator: " ")
-                print("DIAG2 \(entry.id)|extract=\(extract.map { "\($0)" } ?? "nil")|count=\(entry.text.count)|\(scalars)")
+                let number = #"(\d[\d,]*(?:\.\d+)?)"#
+                let stripped = entry.text
+                    .replacingOccurrences(of: #"\d{4}[-/年]\d{1,2}[-/月]\d{1,2}日?"#,
+                                          with: " ", options: .regularExpression)
+                    .replacingOccurrences(of: #"\d{1,2}月\d{1,2}[日号]"#,
+                                          with: " ", options: .regularExpression)
+                    .replacingOccurrences(of: #"\d{1,2}[:：]\d{2}"#,
+                                          with: " ", options: .regularExpression)
+                    .replacingOccurrences(of: #"\d+\s*(个|人|件|份|杯|次|张|斤|克|公斤|公里|km|g|kg)"#,
+                                          with: " ", options: .regularExpression)
+                let rawRange = entry.text.range(of: number, options: .regularExpression).map { String(entry.text[$0]) }
+                let strippedRange = stripped.range(of: number, options: .regularExpression).map { String(stripped[$0]) }
+                let decimal = rawRange.flatMap { raw in Decimal(string: raw).map { "\($0)" } } ?? "nil"
+                print("DIAG3 \(entry.id)|stripped=「\(stripped)」|raw=\(rawRange ?? "nil")|decimal=\(decimal)|strippedRange=\(strippedRange ?? "nil")")
             }
         }
 
