@@ -32,7 +32,7 @@
 ## 当前基线
 
 2026-10-30，`main`（`85127e8`）+ 本指标测试，CI run
-<https://github.com/Iorest/SmartBud/actions/runs/41052279291>：
+<https://github.com/Iorest/SmartBud/actions/runs/41052863196>：
 
 | 指标 | 实测 | 门槛（不得低于） | 与 99.5% 目标的差 |
 | --- | --- | --- | --- |
@@ -130,8 +130,8 @@ CI 的 `Parsing metrics` step（`if: always()`）把 `METRICS` 行转成 job sum
 
 | 状态 | run | 结果 |
 | --- | --- | --- |
-| 绿（基线） | <https://github.com/Iorest/SmartBud/actions/runs/41052279291> | 88.50% / 门槛 88.50%，pass |
-| 红（改错一条语料的金额） | [待补] | 金额准确率低于门槛，fail |
-| 绿（还原） | [待补] | 恢复 pass |
+| 绿（基线） | <https://github.com/Iorest/SmartBud/actions/runs/41052863196> | 88.50% / 门槛 88.50%，pass |
+| 红（把 `text-0001` 的期望金额 15 改成 16） | <https://github.com/Iorest/SmartBud/actions/runs/41053085880> | 88.33% < 88.50%，fail |
+| 绿（还原那条语料） | <https://github.com/Iorest/SmartBud/actions/runs/41053718423> | 恢复 pass |
 
 红的那次失败信息里直接给出 `text-0xxx 「…」期望 X 实得 Y`，不用翻日志找是哪个 case。
