@@ -50,7 +50,9 @@ jobs:
           sudo xcode-select -s "$chosen"
           xcodebuild -version
 
+      # No Swift packages today; the step activates once a Package.resolved lands.
       - name: Cache Swift Package dependencies
+        if: hashFiles('**/Package.resolved') != ''
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
