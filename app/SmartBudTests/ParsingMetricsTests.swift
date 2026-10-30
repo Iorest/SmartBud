@@ -66,10 +66,37 @@ struct ParsingMetricsTests {
         let targets: Targets
     }
 
+    /// The ten buckets the rule parser can emit, in the order the app seeds
+    /// them, so `resolveCategory` resolves each hint to its own bucket.
     private static let bucketNames = [
         "餐饮", "交通", "购物", "咖啡", "娱乐",
         "通讯", "教育", "医疗", "工资", "奖金"
     ]
+
+    /// One in-memory store per test, held for the whole test: releasing the
+    /// container resets its context and the categories stop being readable.
+    @MainActor
+    private struct Store {
+        let container: ModelContainer
+        let categories: [CategoryModel]
+
+        init(bucketNames: [String]) throws {
+            container = try ModelContainer(
+                for: TransactionModel.self,
+                CategoryModel.self,
+                BudgetModel.self,
+                MainBudgetModel.self,
+                TemplateTransactionModel.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            )
+            categories = bucketNames.enumerated().map { index, name in
+                CategoryModel(name: name, order: index)
+            }
+            for category in categories {
+                container.mainContext.insert(category)
+            }
+        }
+    }
 
     // MARK: - Test
 
@@ -78,7 +105,8 @@ struct ParsingMetricsTests {
         let textCases = try load([TextCase].self, from: "corpus_text.json")
         let receiptCases = try load([ReceiptCase].self, from: "corpus_receipts.json")
         let baseline = try load(Baseline.self, from: "metrics_baseline.json")
-        let categories = try makeCategories()
+        let store = try Store(bucketNames: Self.bucketNames)
+        let categories = store.categories
 
         var textAmountHits = 0
         var textDirectionHits = 0
@@ -209,27 +237,6 @@ struct ParsingMetricsTests {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(type, from: data)
-    }
-
-    /// The ten buckets the rule parser can emit, in the order the app seeds
-    /// them, so `resolveCategory` resolves each hint to its own bucket.
-    private func makeCategories() throws -> [CategoryModel] {
-        let container = try ModelContainer(
-            for: TransactionModel.self,
-            CategoryModel.self,
-            BudgetModel.self,
-            MainBudgetModel.self,
-            TemplateTransactionModel.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        let context = container.mainContext
-        let categories = Self.bucketNames.enumerated().map { index, name in
-            CategoryModel(name: name, order: index)
-        }
-        for category in categories {
-            context.insert(category)
-        }
-        return categories
     }
 
     private func amountText(_ parsed: ParsedExpense?) -> String {
