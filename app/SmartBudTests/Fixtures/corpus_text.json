@@ -1,0 +1,6002 @@
+[
+  {
+    "id": "text-0001",
+    "text": "早饭15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "口头省略"
+  },
+  {
+    "id": "text-0002",
+    "text": "满100减20 买了件卫衣实付80",
+    "amount": 80.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": "优惠前 100，实付 80"
+  },
+  {
+    "id": "text-0003",
+    "text": "原价120 优惠券20 实付100 火锅",
+    "amount": 100.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "优惠前 120，实付 100"
+  },
+  {
+    "id": "text-0004",
+    "text": "10月25日 午饭 35",
+    "amount": 35.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "日期 10月25日 不是金额"
+  },
+  {
+    "id": "text-0005",
+    "text": "打车 3 个人 88",
+    "amount": 88.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": "3 是人数，不是金额"
+  },
+  {
+    "id": "text-0006",
+    "text": "2杯咖啡 实付35.50元",
+    "amount": 35.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": "2 是杯数，实付 35.50"
+  },
+  {
+    "id": "text-0007",
+    "text": "午饭35，AA后我付17.5",
+    "amount": 17.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "AA 后实付"
+  },
+  {
+    "id": "text-0008",
+    "text": "退款 昨天外卖 28",
+    "amount": 28.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "外卖退款，记为收入"
+  },
+  {
+    "id": "text-0009",
+    "text": "报销 高铁票 553",
+    "amount": 553.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "交通",
+    "merchant": null,
+    "note": "报销到账，记为收入"
+  },
+  {
+    "id": "text-0010",
+    "text": "大概35 晚饭",
+    "amount": 35.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "口头约数"
+  },
+  {
+    "id": "text-0011",
+    "text": "差不多200 买鞋",
+    "amount": 200.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": "口头约数"
+  },
+  {
+    "id": "text-0012",
+    "text": "午饭 35 元 微信支付",
+    "amount": 35.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0013",
+    "text": "地铁 4 块",
+    "amount": 4.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0014",
+    "text": "话费充值 50 元",
+    "amount": 50.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0015",
+    "text": "本月工资 18000 到账",
+    "amount": 18000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0016",
+    "text": "年终奖 30000",
+    "amount": 30000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0017",
+    "text": "滴滴 打车 23.5 元",
+    "amount": 23.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0018",
+    "text": "早餐 8.5 豆浆油条",
+    "amount": 8.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0019",
+    "text": "夜宵烧烤 76",
+    "amount": 76.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0020",
+    "text": "电影票两张 90",
+    "amount": 90.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": "两张共 90"
+  },
+  {
+    "id": "text-0021",
+    "text": "KTV 三小时 180",
+    "amount": 180.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": "三小时不是金额"
+  },
+  {
+    "id": "text-0022",
+    "text": "健身房月卡 299",
+    "amount": 299.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0023",
+    "text": "宽带续费 1080 一年",
+    "amount": 1080.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": "一年是时长"
+  },
+  {
+    "id": "text-0024",
+    "text": "体检套餐 899",
+    "amount": 899.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0025",
+    "text": "感冒药 26.8 药店",
+    "amount": 26.8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0026",
+    "text": "考研资料 158 当当",
+    "amount": 158.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0027",
+    "text": "课程退款 299",
+    "amount": 299.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "教育",
+    "merchant": null,
+    "note": "课程退款，记为收入"
+  },
+  {
+    "id": "text-0028",
+    "text": "公司发季度奖 5000",
+    "amount": 5000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0029",
+    "text": "中午食堂 12",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0030",
+    "text": "拼车 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0031",
+    "text": "奶茶 18 两杯",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": "两杯共 18"
+  },
+  {
+    "id": "text-0032",
+    "text": "满50减10 咖啡 40",
+    "amount": 40.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": "优惠前 50，实付 40"
+  },
+  {
+    "id": "text-0033",
+    "text": "高速费 45 ETC",
+    "amount": 45.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0034",
+    "text": "停车 2小时 10块",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": "2 小时是时长"
+  },
+  {
+    "id": "text-0035",
+    "text": "买菜 63.5 盒马",
+    "amount": 63.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0036",
+    "text": "充话费 100 送20",
+    "amount": 100.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": "充值 100，赠送 20 不计入"
+  },
+  {
+    "id": "text-0037",
+    "text": "买书 89 当当",
+    "amount": 89.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0038",
+    "text": "电影 45 猫眼",
+    "amount": 45.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0039",
+    "text": "健身房私教课 600 一节",
+    "amount": 600.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": "一节 600"
+  },
+  {
+    "id": "text-0040",
+    "text": "给妈妈买药 88",
+    "amount": 88.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0041",
+    "text": "10.25 午饭 35",
+    "amount": 35.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "10.25 是日期，不是金额"
+  },
+  {
+    "id": "text-0042",
+    "text": "25号 打车 32",
+    "amount": 32.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": "25 号是日期"
+  },
+  {
+    "id": "text-0043",
+    "text": "支付宝 早饭 12",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0044",
+    "text": "微信支付 水果 28.6",
+    "amount": 28.6,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0045",
+    "text": "20块 煎饼果子",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0046",
+    "text": "一杯美式 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0047",
+    "text": "工资到账 15600.32",
+    "amount": 15600.32,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0048",
+    "text": "项目奖金 8000 到账",
+    "amount": 8000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0049",
+    "text": "上月话费 58.5",
+    "amount": 58.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0050",
+    "text": "打车去机场 120",
+    "amount": 120.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0051",
+    "text": "95元黄焖鸡",
+    "amount": 95.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0052",
+    "text": "夜宵 8 元 现金",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0053",
+    "text": "在老乡鸡花了8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0054",
+    "text": "微信支付 肯德基全家桶 10元",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0055",
+    "text": "早饭 9元",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0056",
+    "text": "在街角小馆消费8元",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0057",
+    "text": "麻辣烫 46 元 现金",
+    "amount": 46,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0058",
+    "text": "老乡鸡 86元",
+    "amount": 86,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0059",
+    "text": "牛肉面，实付11元",
+    "amount": 11,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0060",
+    "text": "支付宝付款给街角小馆 8",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0061",
+    "text": "在老乡鸡消费8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0062",
+    "text": "公司食堂，12.98 元",
+    "amount": 12.98,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0063",
+    "text": "微信支付给海底捞 8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "海底捞",
+    "note": null
+  },
+  {
+    "id": "text-0064",
+    "text": "微信支付给麦当劳 8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0065",
+    "text": "午饭 19",
+    "amount": 19.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0066",
+    "text": "肯德基全家桶花了8.06",
+    "amount": 8.06,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0067",
+    "text": "街角小馆，107元",
+    "amount": 107.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0068",
+    "text": "海底捞28",
+    "amount": 28.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "海底捞",
+    "note": null
+  },
+  {
+    "id": "text-0069",
+    "text": "在海底捞消费18元",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "海底捞",
+    "note": null
+  },
+  {
+    "id": "text-0070",
+    "text": "在老乡鸡花了26",
+    "amount": 26.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0071",
+    "text": "昨天便利店便当13块",
+    "amount": 13,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0072",
+    "text": "肯德基消费10元",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0073",
+    "text": "微信支付给老乡鸡 69.67",
+    "amount": 69.67,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0074",
+    "text": "在街角小馆花了12",
+    "amount": 12,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0075",
+    "text": "夜宵花了66.96",
+    "amount": 66.96,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0076",
+    "text": "便利店便当 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0077",
+    "text": "饿了么点餐 144元",
+    "amount": 144.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0078",
+    "text": "麦当劳套餐一共60",
+    "amount": 60,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0079",
+    "text": "在饿了么花了34",
+    "amount": 34.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0080",
+    "text": "公司食堂一共10",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0081",
+    "text": "黄焖鸡 10.63",
+    "amount": 10.63,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0082",
+    "text": "微信支付 肯德基全家桶 127元",
+    "amount": 127.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0083",
+    "text": "兰州拉面，10.81 元",
+    "amount": 10.81,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0084",
+    "text": "饿了么 128元",
+    "amount": 128.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0085",
+    "text": "在老乡鸡花了16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0086",
+    "text": "午饭 11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0087",
+    "text": "美团账单125.32元",
+    "amount": 125.32,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "美团",
+    "note": null
+  },
+  {
+    "id": "text-0088",
+    "text": "饿了么，8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0089",
+    "text": "刷支付宝 楼下面馆 11",
+    "amount": 11,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0090",
+    "text": "在老乡鸡消费177元",
+    "amount": 177.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0091",
+    "text": "街角小馆：8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0092",
+    "text": "盖浇饭，46 元",
+    "amount": 46.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0093",
+    "text": "火锅花了188",
+    "amount": 188.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0094",
+    "text": "微信支付给街角小馆 8.23",
+    "amount": 8.23,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0095",
+    "text": "牛肉面，实付8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0096",
+    "text": "在街角小馆消费75元",
+    "amount": 75,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0097",
+    "text": "9月28日 肯德基全家桶 194",
+    "amount": 194.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0098",
+    "text": "今天早上酸菜鱼9.68块",
+    "amount": 9.68,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0099",
+    "text": "午饭：39",
+    "amount": 39.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0100",
+    "text": "午饭，8.01 元",
+    "amount": 8.01,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0101",
+    "text": "老乡鸡账单25元",
+    "amount": 25.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0102",
+    "text": "火锅 8.26元",
+    "amount": 8.26,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0103",
+    "text": "老乡鸡账单8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0104",
+    "text": "9元饿了么点餐",
+    "amount": 9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0105",
+    "text": "刷支付宝 麻辣烫 13",
+    "amount": 13,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0106",
+    "text": "在老乡鸡消费18元",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0107",
+    "text": "海底捞 13元",
+    "amount": 13.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "海底捞",
+    "note": null
+  },
+  {
+    "id": "text-0108",
+    "text": "支付宝付款给饿了么 22",
+    "amount": 22.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0109",
+    "text": "在街角小馆花了55",
+    "amount": 55.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0110",
+    "text": "10月18日 麦当劳套餐 15.9",
+    "amount": 15.9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0111",
+    "text": "刷支付宝 兰州拉面 8",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0112",
+    "text": "公司食堂，实付29元",
+    "amount": 29,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0113",
+    "text": "老乡鸡消费12元",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0114",
+    "text": "今天便利店便当12",
+    "amount": 12,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0115",
+    "text": "便利店便当41.12",
+    "amount": 41.12,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0116",
+    "text": "沙县小吃 8 元 现金",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0117",
+    "text": "在肯德基花了8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0118",
+    "text": "前天早饭136块",
+    "amount": 136,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0119",
+    "text": "老乡鸡账单12元",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0120",
+    "text": "刷支付宝 饿了么点餐 10",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0121",
+    "text": "火锅 18",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0122",
+    "text": "饿了么点餐，实付20元",
+    "amount": 20,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0123",
+    "text": "10/12火锅，17块",
+    "amount": 17.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0124",
+    "text": "公司食堂，62 元",
+    "amount": 62,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0125",
+    "text": "麦当劳 64元",
+    "amount": 64.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0126",
+    "text": "老乡鸡消费23元",
+    "amount": 23.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0127",
+    "text": "街角小馆 11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0128",
+    "text": "美团 10.43元",
+    "amount": 10.43,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "美团",
+    "note": null
+  },
+  {
+    "id": "text-0129",
+    "text": "小笼包一共73",
+    "amount": 73.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0130",
+    "text": "10/25 火锅 130.85",
+    "amount": 130.85,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0131",
+    "text": "支付宝支付 烧烤 ¥18",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0132",
+    "text": "楼下面馆，实付11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0133",
+    "text": "夜宵 8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0134",
+    "text": "10月5号 午饭 11",
+    "amount": 11,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0135",
+    "text": "64元外卖",
+    "amount": 64.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0136",
+    "text": "街角小馆一共10.91",
+    "amount": 10.91,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0137",
+    "text": "53元小笼包",
+    "amount": 53,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0138",
+    "text": "午饭 19.78 元 现金",
+    "amount": 19.78,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0139",
+    "text": "街角小馆账单8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0140",
+    "text": "10月3日早餐，12块",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0141",
+    "text": "在老乡鸡花了16.29",
+    "amount": 16.29,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0142",
+    "text": "8元小笼包",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0143",
+    "text": "刷支付宝 老乡鸡 8",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0144",
+    "text": "在海底捞花了26",
+    "amount": 26.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "海底捞",
+    "note": null
+  },
+  {
+    "id": "text-0145",
+    "text": "今天老乡鸡123",
+    "amount": 123.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0146",
+    "text": "支付宝支付 酸菜鱼 ¥38",
+    "amount": 38.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0147",
+    "text": "支付宝付款给饿了么 10",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0148",
+    "text": "支付宝支付 麦当劳套餐 ¥9",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0149",
+    "text": "在麦当劳消费29元",
+    "amount": 29.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0150",
+    "text": "饿了么点餐 192.8",
+    "amount": 192.8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0151",
+    "text": "微信支付给麦当劳 48",
+    "amount": 48.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0152",
+    "text": "今天肯德基全家桶16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "肯德基",
+    "note": null
+  },
+  {
+    "id": "text-0153",
+    "text": "今天老乡鸡86",
+    "amount": 86,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0154",
+    "text": "早餐 18元",
+    "amount": 18,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0155",
+    "text": "麻辣烫，实付32元",
+    "amount": 32.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0156",
+    "text": "老乡鸡，130元",
+    "amount": 130,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0157",
+    "text": "在麦当劳消费15元",
+    "amount": 15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "麦当劳",
+    "note": null
+  },
+  {
+    "id": "text-0158",
+    "text": "在高德打车消费9元",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0159",
+    "text": "前天高德打车274块",
+    "amount": 274,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0160",
+    "text": "12306，5.19元",
+    "amount": 5.19,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0161",
+    "text": "网约车花了16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0162",
+    "text": "中国石化账单41元",
+    "amount": 41.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0163",
+    "text": "滴滴，2元",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0164",
+    "text": "12306 3.35元",
+    "amount": 3.35,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0165",
+    "text": "停车费17",
+    "amount": 17.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0166",
+    "text": "高德打车消费3元",
+    "amount": 3,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0167",
+    "text": "滴滴，16.95元",
+    "amount": 16.95,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0168",
+    "text": "网约车 772 元 现金",
+    "amount": 772,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0169",
+    "text": "城市停车消费77元",
+    "amount": 77.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0170",
+    "text": "今天机票31",
+    "amount": 31.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0171",
+    "text": "携程机票一共16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "携程",
+    "note": null
+  },
+  {
+    "id": "text-0172",
+    "text": "中国石化消费2元",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0173",
+    "text": "刷支付宝 公交 348",
+    "amount": 348.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0174",
+    "text": "2元网约车",
+    "amount": 2,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0175",
+    "text": "在城市停车消费28.98元",
+    "amount": 28.98,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0176",
+    "text": "滴滴 6元",
+    "amount": 6.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0177",
+    "text": "刷支付宝 共享单车 3",
+    "amount": 3.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0178",
+    "text": "在滴滴消费2元",
+    "amount": 2,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0179",
+    "text": "过路费一共8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0180",
+    "text": "中石化加油3",
+    "amount": 3.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0181",
+    "text": "微信支付给高德打车 3.91",
+    "amount": 3.91,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0182",
+    "text": "昨天公交91.62块",
+    "amount": 91.62,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0183",
+    "text": "刷支付宝 地铁 49",
+    "amount": 49,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0184",
+    "text": "中石化加油，3 元",
+    "amount": 3,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0185",
+    "text": "城市停车消费2.02元",
+    "amount": 2.02,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0186",
+    "text": "微信支付 中石化加油 812元",
+    "amount": 812.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0187",
+    "text": "地铁花了7",
+    "amount": 7.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0188",
+    "text": "微信支付 高速费 46元",
+    "amount": 46.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0189",
+    "text": "高铁票，实付169元",
+    "amount": 169.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0190",
+    "text": "高铁票花了242",
+    "amount": 242.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0191",
+    "text": "微信支付给高德打车 2",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0192",
+    "text": "12306购票花了81",
+    "amount": 81.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0193",
+    "text": "12306购票：2",
+    "amount": 2,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0194",
+    "text": "城市停车账单2.38元",
+    "amount": 2.38,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0195",
+    "text": "滴滴消费2元",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0196",
+    "text": "地铁一共24",
+    "amount": 24.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0197",
+    "text": "在滴滴花了6",
+    "amount": 6.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0198",
+    "text": "昨天机票2块",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0199",
+    "text": "携程机票，270 元",
+    "amount": 270,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "携程",
+    "note": null
+  },
+  {
+    "id": "text-0200",
+    "text": "微信支付给城市停车 97",
+    "amount": 97,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0201",
+    "text": "在12306消费16.86元",
+    "amount": 16.86,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0202",
+    "text": "网约车327",
+    "amount": 327.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0203",
+    "text": "滴滴账单12元",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0204",
+    "text": "机票，实付8元",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0205",
+    "text": "在滴滴消费3元",
+    "amount": 3,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0206",
+    "text": "机票一共2",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0207",
+    "text": "打车 3.64",
+    "amount": 3.64,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0208",
+    "text": "公交4.15",
+    "amount": 4.15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0209",
+    "text": "网约车：3",
+    "amount": 3,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0210",
+    "text": "中国石化账单2.22元",
+    "amount": 2.22,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0211",
+    "text": "机票 4.59元",
+    "amount": 4.59,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0212",
+    "text": "中石化加油，9 元",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "中国石化",
+    "note": null
+  },
+  {
+    "id": "text-0213",
+    "text": "12306购票 115 元 现金",
+    "amount": 115.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0214",
+    "text": "高速费 25元",
+    "amount": 25,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0215",
+    "text": "携程 11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "携程",
+    "note": null
+  },
+  {
+    "id": "text-0216",
+    "text": "在12306消费3元",
+    "amount": 3.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0217",
+    "text": "携程机票花了242",
+    "amount": 242.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "携程",
+    "note": null
+  },
+  {
+    "id": "text-0218",
+    "text": "携程机票3.93",
+    "amount": 3.93,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "携程",
+    "note": null
+  },
+  {
+    "id": "text-0219",
+    "text": "滴滴打车花了30",
+    "amount": 30,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0220",
+    "text": "地铁 17元",
+    "amount": 17,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0221",
+    "text": "微信支付给滴滴 667",
+    "amount": 667.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "滴滴",
+    "note": null
+  },
+  {
+    "id": "text-0222",
+    "text": "城市停车消费2元",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0223",
+    "text": "10/12 打车 3",
+    "amount": 3,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0224",
+    "text": "今天超市采购24",
+    "amount": 24.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0225",
+    "text": "10月18日山姆采购，1016块",
+    "amount": 1016.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0226",
+    "text": "在拼多多消费18元",
+    "amount": 18,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0227",
+    "text": "在淘宝消费1836元",
+    "amount": 1836.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "淘宝",
+    "note": null
+  },
+  {
+    "id": "text-0228",
+    "text": "支付宝付款给盒马 562",
+    "amount": 562.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0229",
+    "text": "拼多多下单 558元",
+    "amount": 558.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0230",
+    "text": "支付宝付款给盒马 16",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0231",
+    "text": "拼多多下单花了248",
+    "amount": 248.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0232",
+    "text": "在拼多多消费1081元",
+    "amount": 1081,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0233",
+    "text": "今天菜市场买菜486",
+    "amount": 486.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0234",
+    "text": "山姆 340元",
+    "amount": 340.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0235",
+    "text": "拼多多下单15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0236",
+    "text": "名创优品31",
+    "amount": 31.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "名创优品",
+    "note": null
+  },
+  {
+    "id": "text-0237",
+    "text": "菜市场买菜一共16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0238",
+    "text": "10/12沃尔玛日用品，105块",
+    "amount": 105.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "沃尔玛",
+    "note": null
+  },
+  {
+    "id": "text-0239",
+    "text": "10月3日永辉超市，24块",
+    "amount": 24,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0240",
+    "text": "山姆，15元",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0241",
+    "text": "微信支付给京东 990.38",
+    "amount": 990.38,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0242",
+    "text": "支付宝付款给永辉超市 29",
+    "amount": 29,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0243",
+    "text": "支付宝付款给优衣库 368",
+    "amount": 368.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "优衣库",
+    "note": null
+  },
+  {
+    "id": "text-0244",
+    "text": "京东购物：21.28",
+    "amount": 21.28,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0245",
+    "text": "京东，25元",
+    "amount": 25,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0246",
+    "text": "微信支付给永辉超市 17",
+    "amount": 17.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0247",
+    "text": "化妆品 16元",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0248",
+    "text": "支付宝支付 日用品 ¥38",
+    "amount": 38.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0249",
+    "text": "山姆采购：128",
+    "amount": 128.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0250",
+    "text": "山姆采购花了148",
+    "amount": 148,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0251",
+    "text": "盒马，16元",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0252",
+    "text": "在山姆花了16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0253",
+    "text": "菜市场买菜24",
+    "amount": 24.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0254",
+    "text": "优衣库，19元",
+    "amount": 19.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "优衣库",
+    "note": null
+  },
+  {
+    "id": "text-0255",
+    "text": "京东购物59.21",
+    "amount": 59.21,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0256",
+    "text": "名创优品 222",
+    "amount": 222.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "名创优品",
+    "note": null
+  },
+  {
+    "id": "text-0257",
+    "text": "9月30日 零食 17",
+    "amount": 17,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0258",
+    "text": "菜市场买菜，194 元",
+    "amount": 194.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0259",
+    "text": "支付宝支付 京东购物 ¥31",
+    "amount": 31.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0260",
+    "text": "支付宝付款给永辉超市 522",
+    "amount": 522.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0261",
+    "text": "支付宝支付 纸巾 ¥37",
+    "amount": 37.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0262",
+    "text": "纸巾花了17",
+    "amount": 17,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0263",
+    "text": "优衣库一共26",
+    "amount": 26.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "优衣库",
+    "note": null
+  },
+  {
+    "id": "text-0264",
+    "text": "上周五零食128块",
+    "amount": 128.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0265",
+    "text": "淘宝 15元",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "淘宝",
+    "note": null
+  },
+  {
+    "id": "text-0266",
+    "text": "山姆采购16",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0267",
+    "text": "化妆品花了15",
+    "amount": 15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0268",
+    "text": "在永辉超市花了210.92",
+    "amount": 210.92,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0269",
+    "text": "今天纸巾54",
+    "amount": 54,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0270",
+    "text": "永辉超市：60",
+    "amount": 60,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0271",
+    "text": "山姆，547元",
+    "amount": 547.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0272",
+    "text": "刷支付宝 京东购物 15",
+    "amount": 15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0273",
+    "text": "10月3日 永辉超市 163",
+    "amount": 163.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0274",
+    "text": "10/25拼多多下单，19块",
+    "amount": 19,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0275",
+    "text": "微信支付给沃尔玛 246",
+    "amount": 246.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "沃尔玛",
+    "note": null
+  },
+  {
+    "id": "text-0276",
+    "text": "10/25沃尔玛日用品，1409块",
+    "amount": 1409.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "沃尔玛",
+    "note": null
+  },
+  {
+    "id": "text-0277",
+    "text": "10月12日 衣服 1347",
+    "amount": 1347.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0278",
+    "text": "永辉超市 23元",
+    "amount": 23,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "永辉超市",
+    "note": null
+  },
+  {
+    "id": "text-0279",
+    "text": "10月18日京东购物，24.99块",
+    "amount": 24.99,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0280",
+    "text": "超市采购：60",
+    "amount": 60,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0281",
+    "text": "今天早上盒马买菜16块",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0282",
+    "text": "充电宝花了63",
+    "amount": 63.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0283",
+    "text": "10月18日充电宝，24块",
+    "amount": 24,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0284",
+    "text": "沃尔玛消费972.37元",
+    "amount": 972.37,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "沃尔玛",
+    "note": null
+  },
+  {
+    "id": "text-0285",
+    "text": "纸巾 392.72",
+    "amount": 392.72,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0286",
+    "text": "今天洗发水89",
+    "amount": 89.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0287",
+    "text": "京东 1848元",
+    "amount": 1848.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0288",
+    "text": "衣服：32",
+    "amount": 32.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0289",
+    "text": "15元菜市场买菜",
+    "amount": 15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0290",
+    "text": "拼多多 18元",
+    "amount": 18.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0291",
+    "text": "盒马买菜 33元",
+    "amount": 33.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "盒马",
+    "note": null
+  },
+  {
+    "id": "text-0292",
+    "text": "微信支付 山姆采购 1178元",
+    "amount": 1178,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "山姆",
+    "note": null
+  },
+  {
+    "id": "text-0293",
+    "text": "前天充电宝16块",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0294",
+    "text": "10月3日 拼多多下单 1010",
+    "amount": 1010,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0295",
+    "text": "微信支付 生椰拿铁 9元",
+    "amount": 9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0296",
+    "text": "10月3日 瑞幸咖啡 36",
+    "amount": 36,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "瑞幸",
+    "note": null
+  },
+  {
+    "id": "text-0297",
+    "text": "支付宝付款给库迪 21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0298",
+    "text": "Manner，17元",
+    "amount": 17.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0299",
+    "text": "在星巴克消费9元",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "星巴克",
+    "note": null
+  },
+  {
+    "id": "text-0300",
+    "text": "支付宝付款给库迪 9.75",
+    "amount": 9.75,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0301",
+    "text": "Manner消费15.27元",
+    "amount": 15.27,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0302",
+    "text": "库迪咖啡花了58",
+    "amount": 58,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0303",
+    "text": "9.87元星巴克",
+    "amount": 9.87,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "星巴克",
+    "note": null
+  },
+  {
+    "id": "text-0304",
+    "text": "喜茶9.05",
+    "amount": 9.05,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0305",
+    "text": "微信支付 美式 54元",
+    "amount": 54,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0306",
+    "text": "支付宝支付 Manner咖啡 ¥12",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0307",
+    "text": "10月5号蜜雪冰城，26块",
+    "amount": 26.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "蜜雪冰城",
+    "note": null
+  },
+  {
+    "id": "text-0308",
+    "text": "在Manner消费10.08元",
+    "amount": 10.08,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0309",
+    "text": "Manner，55元",
+    "amount": 55.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0310",
+    "text": "Manner，12.53元",
+    "amount": 12.53,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0311",
+    "text": "茶百道：60",
+    "amount": 60.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0312",
+    "text": "Manner咖啡，实付10元",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0313",
+    "text": "支付宝付款给茶百道 21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0314",
+    "text": "喜茶56",
+    "amount": 56.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0315",
+    "text": "10月18日美式，15块",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0316",
+    "text": "Manner咖啡 11 元 现金",
+    "amount": 11,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0317",
+    "text": "前天库迪咖啡9块",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0318",
+    "text": "瑞幸 9.36元",
+    "amount": 9.36,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "瑞幸",
+    "note": null
+  },
+  {
+    "id": "text-0319",
+    "text": "下午茶 18.5",
+    "amount": 18.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0320",
+    "text": "瑞幸咖啡一共39",
+    "amount": 39,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "瑞幸",
+    "note": null
+  },
+  {
+    "id": "text-0321",
+    "text": "微信支付给茶百道 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0322",
+    "text": "星巴克消费53元",
+    "amount": 53,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "星巴克",
+    "note": null
+  },
+  {
+    "id": "text-0323",
+    "text": "瑞幸消费13元",
+    "amount": 13.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "瑞幸",
+    "note": null
+  },
+  {
+    "id": "text-0324",
+    "text": "9元拿铁",
+    "amount": 9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0325",
+    "text": "10月5号拿铁，17块",
+    "amount": 17,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0326",
+    "text": "喜茶一共9",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0327",
+    "text": "咖啡花了13",
+    "amount": 13.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0328",
+    "text": "两杯咖啡一共16",
+    "amount": 16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0329",
+    "text": "茶百道消费24元",
+    "amount": 24.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0330",
+    "text": "喜茶 20.15元",
+    "amount": 20.15,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0331",
+    "text": "Manner咖啡花了11",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0332",
+    "text": "拿铁 9",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0333",
+    "text": "支付宝付款给茶百道 64",
+    "amount": 64.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0334",
+    "text": "微信支付给库迪 20",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0335",
+    "text": "库迪，11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0336",
+    "text": "喜茶一共13.5",
+    "amount": 13.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0337",
+    "text": "库迪咖啡花了10",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "库迪",
+    "note": null
+  },
+  {
+    "id": "text-0338",
+    "text": "生椰拿铁 20 元 现金",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0339",
+    "text": "在Manner消费11元",
+    "amount": 11.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Manner",
+    "note": null
+  },
+  {
+    "id": "text-0340",
+    "text": "10.65元咖啡豆",
+    "amount": 10.65,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0341",
+    "text": "10元奶茶",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0342",
+    "text": "喜茶，实付19元",
+    "amount": 19.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "喜茶",
+    "note": null
+  },
+  {
+    "id": "text-0343",
+    "text": "瑞幸咖啡 12 元 现金",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "瑞幸",
+    "note": null
+  },
+  {
+    "id": "text-0344",
+    "text": "咖啡 31 元 现金",
+    "amount": 31,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0345",
+    "text": "10元拿铁",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0346",
+    "text": "10月18日 美式 67",
+    "amount": 67,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0347",
+    "text": "茶百道 27.61",
+    "amount": 27.61,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0348",
+    "text": "昨天晚上茶百道34块",
+    "amount": 34.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "茶百道",
+    "note": null
+  },
+  {
+    "id": "text-0349",
+    "text": "9月30日 奶茶 12.94",
+    "amount": 12.94,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0350",
+    "text": "拿铁：9.7",
+    "amount": 9.7,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0351",
+    "text": "网易云音乐会员花了38",
+    "amount": 38,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "网易云音乐",
+    "note": null
+  },
+  {
+    "id": "text-0352",
+    "text": "迪士尼门票 646",
+    "amount": 646,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0353",
+    "text": "微信支付给健身房 469",
+    "amount": 469.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0354",
+    "text": "支付宝付款给猫眼 20",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0355",
+    "text": "今天按摩26",
+    "amount": 26,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0356",
+    "text": "腾讯视频会员花了143",
+    "amount": 143.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0357",
+    "text": "昨天按摩260块",
+    "amount": 260,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0358",
+    "text": "迪士尼门票34",
+    "amount": 34.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0359",
+    "text": "支付宝支付 万达影城电影 ¥21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "万达影城",
+    "note": null
+  },
+  {
+    "id": "text-0360",
+    "text": "腾讯视频会员 612 元 现金",
+    "amount": 612.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0361",
+    "text": "在大麦网消费21元",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "大麦网",
+    "note": null
+  },
+  {
+    "id": "text-0362",
+    "text": "猫眼电影票：65",
+    "amount": 65.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0363",
+    "text": "今天猫眼电影票103",
+    "amount": 103,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0364",
+    "text": "10月18日按摩，33块",
+    "amount": 33.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0365",
+    "text": "腾讯视频会员一共30",
+    "amount": 30.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0366",
+    "text": "万达影城消费57元",
+    "amount": 57,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "万达影城",
+    "note": null
+  },
+  {
+    "id": "text-0367",
+    "text": "10月5号猫眼电影票，28块",
+    "amount": 28,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0368",
+    "text": "腾讯视频消费87元",
+    "amount": 87.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0369",
+    "text": "刷支付宝 游戏充值 26",
+    "amount": 26,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0370",
+    "text": "迪士尼门票，实付20元",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0371",
+    "text": "KTV 45 元 现金",
+    "amount": 45.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0372",
+    "text": "今天网易云音乐会员20",
+    "amount": 20,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "网易云音乐",
+    "note": null
+  },
+  {
+    "id": "text-0373",
+    "text": "腾讯视频会员 507 元 现金",
+    "amount": 507.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0374",
+    "text": "微信支付给健身房 50.22",
+    "amount": 50.22,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0375",
+    "text": "电影票21",
+    "amount": 21,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0376",
+    "text": "在健身房消费79元",
+    "amount": 79,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0377",
+    "text": "密室逃脱 244元",
+    "amount": 244.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0378",
+    "text": "10/12剧本杀，125.56块",
+    "amount": 125.56,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0379",
+    "text": "万达影城消费42元",
+    "amount": 42.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "万达影城",
+    "note": null
+  },
+  {
+    "id": "text-0380",
+    "text": "游泳：158",
+    "amount": 158.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0381",
+    "text": "在健身房花了261",
+    "amount": 261.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0382",
+    "text": "万达影城电影一共269",
+    "amount": 269.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "万达影城",
+    "note": null
+  },
+  {
+    "id": "text-0383",
+    "text": "万达影城电影花了56",
+    "amount": 56.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "万达影城",
+    "note": null
+  },
+  {
+    "id": "text-0384",
+    "text": "健身月卡39",
+    "amount": 39.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0385",
+    "text": "微信支付给大麦网 65.82",
+    "amount": 65.82,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "大麦网",
+    "note": null
+  },
+  {
+    "id": "text-0386",
+    "text": "KTV花了27.5",
+    "amount": 27.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0387",
+    "text": "演出票：22",
+    "amount": 22,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0388",
+    "text": "微信支付 猫眼电影票 46元",
+    "amount": 46.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "猫眼",
+    "note": null
+  },
+  {
+    "id": "text-0389",
+    "text": "今天密室逃脱40.98",
+    "amount": 40.98,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0390",
+    "text": "刷支付宝 KTV 20.45",
+    "amount": 20.45,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0391",
+    "text": "中国移动，23元",
+    "amount": 23.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0392",
+    "text": "中国电信账单20元",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国电信",
+    "note": null
+  },
+  {
+    "id": "text-0393",
+    "text": "刷支付宝 宽带费 157.93",
+    "amount": 157.93,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0394",
+    "text": "中国移动话费 232 元 现金",
+    "amount": 232.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0395",
+    "text": "中国移动话费，实付799元",
+    "amount": 799.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0396",
+    "text": "宽带费 1044.12元",
+    "amount": 1044.12,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0397",
+    "text": "在中国移动消费22.9元",
+    "amount": 22.9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0398",
+    "text": "在中国移动消费61元",
+    "amount": 61,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0399",
+    "text": "在中国联通消费60元",
+    "amount": 60.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国联通",
+    "note": null
+  },
+  {
+    "id": "text-0400",
+    "text": "119元话费",
+    "amount": 119,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0401",
+    "text": "中国电信消费21元",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国电信",
+    "note": null
+  },
+  {
+    "id": "text-0402",
+    "text": "中国移动话费 65 元 现金",
+    "amount": 65.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0403",
+    "text": "中国移动账单22元",
+    "amount": 22.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0404",
+    "text": "话费，21 元",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0405",
+    "text": "在中国联通消费732元",
+    "amount": 732.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国联通",
+    "note": null
+  },
+  {
+    "id": "text-0406",
+    "text": "微信支付 中国移动话费 29.51元",
+    "amount": 29.51,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": "中国移动",
+    "note": null
+  },
+  {
+    "id": "text-0407",
+    "text": "9月28日 新东方课程 21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "新东方",
+    "note": null
+  },
+  {
+    "id": "text-0408",
+    "text": "微信支付 考试报名费 41.73元",
+    "amount": 41.73,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0409",
+    "text": "在极客时间消费25元",
+    "amount": 25.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "极客时间",
+    "note": null
+  },
+  {
+    "id": "text-0410",
+    "text": "得到课程花了36",
+    "amount": 36.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "得到",
+    "note": null
+  },
+  {
+    "id": "text-0411",
+    "text": "微信支付 当当买书 20元",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0412",
+    "text": "买书一共128",
+    "amount": 128.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0413",
+    "text": "当当消费2482元",
+    "amount": 2482,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0414",
+    "text": "考试报名费一共200",
+    "amount": 200.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0415",
+    "text": "订阅专栏，实付54.65元",
+    "amount": 54.65,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0416",
+    "text": "微信支付给新东方 20",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "新东方",
+    "note": null
+  },
+  {
+    "id": "text-0417",
+    "text": "支付宝付款给学而思 111.16",
+    "amount": 111.16,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "学而思",
+    "note": null
+  },
+  {
+    "id": "text-0418",
+    "text": "极客时间账单81元",
+    "amount": 81,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "极客时间",
+    "note": null
+  },
+  {
+    "id": "text-0419",
+    "text": "当当买书一共20.06",
+    "amount": 20.06,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0420",
+    "text": "买书：82",
+    "amount": 82.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0421",
+    "text": "得到课程，实付276元",
+    "amount": 276.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "得到",
+    "note": null
+  },
+  {
+    "id": "text-0422",
+    "text": "今天早上当当买书70块",
+    "amount": 70.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0423",
+    "text": "网课 32元",
+    "amount": 32.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0424",
+    "text": "买书，1633 元",
+    "amount": 1633.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0425",
+    "text": "今天考试报名费23",
+    "amount": 23,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0426",
+    "text": "得到课程91",
+    "amount": 91.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "得到",
+    "note": null
+  },
+  {
+    "id": "text-0427",
+    "text": "培训费：849",
+    "amount": 849,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0428",
+    "text": "极客时间账单20元",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "极客时间",
+    "note": null
+  },
+  {
+    "id": "text-0429",
+    "text": "微信支付给大参林 14",
+    "amount": 14.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0430",
+    "text": "昨天晚上药店买药14块",
+    "amount": 14.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0431",
+    "text": "市一医院挂号，实付139元",
+    "amount": 139,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "市一医院",
+    "note": null
+  },
+  {
+    "id": "text-0432",
+    "text": "老百姓大药房账单918元",
+    "amount": 918,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "老百姓大药房",
+    "note": null
+  },
+  {
+    "id": "text-0433",
+    "text": "市一医院挂号674",
+    "amount": 674.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "市一医院",
+    "note": null
+  },
+  {
+    "id": "text-0434",
+    "text": "微信支付 社区卫生服务中心 34.34元",
+    "amount": 34.34,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "社区卫生服务中心",
+    "note": null
+  },
+  {
+    "id": "text-0435",
+    "text": "市一医院 10元",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "市一医院",
+    "note": null
+  },
+  {
+    "id": "text-0436",
+    "text": "社区卫生服务中心，23元",
+    "amount": 23,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "社区卫生服务中心",
+    "note": null
+  },
+  {
+    "id": "text-0437",
+    "text": "大参林账单446.62元",
+    "amount": 446.62,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0438",
+    "text": "微信支付给市一医院 10",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "市一医院",
+    "note": null
+  },
+  {
+    "id": "text-0439",
+    "text": "药店买药一共10",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0440",
+    "text": "支付宝付款给老百姓大药房 314.93",
+    "amount": 314.93,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "老百姓大药房",
+    "note": null
+  },
+  {
+    "id": "text-0441",
+    "text": "大参林消费17元",
+    "amount": 17,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0442",
+    "text": "10月12日 老百姓大药房 10",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "老百姓大药房",
+    "note": null
+  },
+  {
+    "id": "text-0443",
+    "text": "门诊 138元",
+    "amount": 138.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0444",
+    "text": "大参林，16元",
+    "amount": 16.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0445",
+    "text": "体检 11",
+    "amount": 11,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0446",
+    "text": "门诊花了98",
+    "amount": 98.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0447",
+    "text": "市一医院挂号 126元",
+    "amount": 126,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "市一医院",
+    "note": null
+  },
+  {
+    "id": "text-0448",
+    "text": "老百姓大药房账单10.74元",
+    "amount": 10.74,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "老百姓大药房",
+    "note": null
+  },
+  {
+    "id": "text-0449",
+    "text": "刷支付宝 门诊 10",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0450",
+    "text": "9月30日 感冒药 10",
+    "amount": 10,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0451",
+    "text": "工资到账13173",
+    "amount": 13173.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0452",
+    "text": "本月月薪27425",
+    "amount": 27425.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0453",
+    "text": "10/12发补发工资30236",
+    "amount": 30236.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0454",
+    "text": "补发工资13119",
+    "amount": 13119.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0455",
+    "text": "补发工资到账10565",
+    "amount": 10565.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0456",
+    "text": "公司发月薪 12366",
+    "amount": 12366.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0457",
+    "text": "10663的月薪",
+    "amount": 10663.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0458",
+    "text": "补发工资 12793 已到账",
+    "amount": 12793.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0459",
+    "text": "工资发了5089",
+    "amount": 5089.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0460",
+    "text": "工资 21072 已到账",
+    "amount": 21072.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0461",
+    "text": "本月补发工资27863",
+    "amount": 27863.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0462",
+    "text": "薪水 21518 已到账",
+    "amount": 21518.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0463",
+    "text": "本月补发工资15909",
+    "amount": 15909.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0464",
+    "text": "薪水发了6160",
+    "amount": 6160.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0465",
+    "text": "月薪 11220 已到账",
+    "amount": 11220.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0466",
+    "text": "10月18日发薪水7349",
+    "amount": 7349.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0467",
+    "text": "15527的薪水",
+    "amount": 15527.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0468",
+    "text": "月薪到账17514",
+    "amount": 17514.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0469",
+    "text": "补发工资7008",
+    "amount": 7008.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0470",
+    "text": "12795的工资",
+    "amount": 12795.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0471",
+    "text": "5189的补发工资",
+    "amount": 5189.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0472",
+    "text": "薪水17124",
+    "amount": 17124.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0473",
+    "text": "薪水发了9909",
+    "amount": 9909.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0474",
+    "text": "月薪发了10749",
+    "amount": 10749.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0475",
+    "text": "补发工资31788",
+    "amount": 31788.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0476",
+    "text": "薪水发了29030",
+    "amount": 29030.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0477",
+    "text": "本月工资22851",
+    "amount": 22851.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0478",
+    "text": "补发工资21093",
+    "amount": 21093.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0479",
+    "text": "全勤奖3630",
+    "amount": 3630.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0480",
+    "text": "11996的绩效奖金",
+    "amount": 11996.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0481",
+    "text": "年终奖14476",
+    "amount": 14476.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0482",
+    "text": "公司发项目奖金 5937",
+    "amount": 5937.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0483",
+    "text": "季度奖 19482 已到账",
+    "amount": 19482.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0484",
+    "text": "绩效奖金 19618 已到账",
+    "amount": 19618.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0485",
+    "text": "全勤奖19813",
+    "amount": 19813.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0486",
+    "text": "本月绩效奖金19192",
+    "amount": 19192.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0487",
+    "text": "公司发季度奖 5583",
+    "amount": 5583.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0488",
+    "text": "项目奖金到账8663",
+    "amount": 8663.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0489",
+    "text": "全勤奖9135",
+    "amount": 9135.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0490",
+    "text": "10/25发年终奖4813",
+    "amount": 4813.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0491",
+    "text": "年终奖17501",
+    "amount": 17501.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0492",
+    "text": "年终奖 12556 已到账",
+    "amount": 12556.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0493",
+    "text": "公司发项目奖金 8369",
+    "amount": 8369.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0494",
+    "text": "12560的年终奖",
+    "amount": 12560.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0495",
+    "text": "全勤奖发了6544",
+    "amount": 6544.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0496",
+    "text": "公司发年终奖 772",
+    "amount": 772.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0497",
+    "text": "绩效奖金到账2881",
+    "amount": 2881.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0498",
+    "text": "本月项目奖金19177",
+    "amount": 19177.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0499",
+    "text": "季度奖到账11888",
+    "amount": 11888.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0500",
+    "text": "本月绩效奖金6680",
+    "amount": 6680.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0501",
+    "text": "lunch 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0502",
+    "text": "coffee 4.5",
+    "amount": 4.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0503",
+    "text": "taxi 23",
+    "amount": 23.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0504",
+    "text": "monthly phone bill 58",
+    "amount": 58.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0505",
+    "text": "bought a book 12",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0506",
+    "text": "movie tickets 30",
+    "amount": 30.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0507",
+    "text": "salary 12000",
+    "amount": 12000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0508",
+    "text": "annual bonus 5000",
+    "amount": 5000.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0509",
+    "text": "groceries 76.4",
+    "amount": 76.4,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0510",
+    "text": "gym membership 300",
+    "amount": 300.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0511",
+    "text": "pharmacy 18.9",
+    "amount": 18.9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0512",
+    "text": "subway card top up 50",
+    "amount": 50.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0513",
+    "text": "team dinner 260",
+    "amount": 260.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "6 人团队聚餐，实付 260"
+  },
+  {
+    "id": "text-0514",
+    "text": "2 coffees 9",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": "2 是杯数"
+  },
+  {
+    "id": "text-0515",
+    "text": "refund for returned shoes 199",
+    "amount": 199.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "购物",
+    "merchant": null,
+    "note": "退货退款"
+  },
+  {
+    "id": "text-0516",
+    "text": "reimbursed taxi 45",
+    "amount": 45.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "交通",
+    "merchant": null,
+    "note": "报销到账"
+  },
+  {
+    "id": "text-0517",
+    "text": "$12 lunch",
+    "amount": 12.0,
+    "currency": "USD",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0518",
+    "text": "£8.5 coffee",
+    "amount": 8.5,
+    "currency": "GBP",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0519",
+    "text": "HK$120 dim sum",
+    "amount": 120.0,
+    "currency": "HKD",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0520",
+    "text": "lunch 35元",
+    "amount": 35.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": "中英混说"
+  },
+  {
+    "id": "text-0521",
+    "text": "dinner with client 480",
+    "amount": 480.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0522",
+    "text": "Uber to office 18.5",
+    "amount": 18.5,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "Uber",
+    "note": null
+  },
+  {
+    "id": "text-0523",
+    "text": "Starbucks latte 32",
+    "amount": 32.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "Starbucks",
+    "note": null
+  },
+  {
+    "id": "text-0524",
+    "text": "Amazon order 89.9",
+    "amount": 89.9,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "Amazon",
+    "note": null
+  },
+  {
+    "id": "text-0525",
+    "text": "McDonald's 25",
+    "amount": 25.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "McDonald's",
+    "note": null
+  },
+  {
+    "id": "text-0526",
+    "text": "just paid 9 for late night snack",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0527",
+    "text": "spent 11.61 on pizza",
+    "amount": 11.61,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0528",
+    "text": "hotpot, paid 130",
+    "amount": 130.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0529",
+    "text": "hotpot, paid 13",
+    "amount": 13.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0530",
+    "text": "ramen, paid 79",
+    "amount": 79,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0531",
+    "text": "饿了么, paid 14",
+    "amount": 14.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "饿了么",
+    "note": null
+  },
+  {
+    "id": "text-0532",
+    "text": "dumplings 55.56 yuan",
+    "amount": 55.56,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0533",
+    "text": "美团 charge 60",
+    "amount": 60.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "美团",
+    "note": null
+  },
+  {
+    "id": "text-0534",
+    "text": "lunch 8",
+    "amount": 8.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0535",
+    "text": "sandwich 23",
+    "amount": 23.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0536",
+    "text": "late night snack 50 cash",
+    "amount": 50.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0537",
+    "text": "pizza 9 yuan",
+    "amount": 9.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0538",
+    "text": "街角小馆 bill 69",
+    "amount": 69.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "街角小馆",
+    "note": null
+  },
+  {
+    "id": "text-0539",
+    "text": "paid 8 at 老乡鸡",
+    "amount": 8,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": "老乡鸡",
+    "note": null
+  },
+  {
+    "id": "text-0540",
+    "text": "sandwich 47 yuan",
+    "amount": 47.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0541",
+    "text": "dumplings 62 cash",
+    "amount": 62.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0542",
+    "text": "Oct 20 office canteen 44",
+    "amount": 44.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0543",
+    "text": "31 for ramen",
+    "amount": 31,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "餐饮",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0544",
+    "text": "gas 40 cash",
+    "amount": 40.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0545",
+    "text": "bike share 4 yuan",
+    "amount": 4.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0546",
+    "text": "138 for subway",
+    "amount": 138.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0547",
+    "text": "paid 6 at 高德打车",
+    "amount": 6,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "高德打车",
+    "note": null
+  },
+  {
+    "id": "text-0548",
+    "text": "paid 3 at 12306",
+    "amount": 3.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0549",
+    "text": "Oct 20 gas 2",
+    "amount": 2,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0550",
+    "text": "flight ticket, paid 68",
+    "amount": 68,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0551",
+    "text": "城市停车 bill 2",
+    "amount": 2.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "城市停车",
+    "note": null
+  },
+  {
+    "id": "text-0552",
+    "text": "12306, paid 4",
+    "amount": 4.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": "12306",
+    "note": null
+  },
+  {
+    "id": "text-0553",
+    "text": "Sep 28 taxi 38",
+    "amount": 38,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0554",
+    "text": "taxi 20 cash",
+    "amount": 20,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "交通",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0555",
+    "text": "Oct 12 shampoo 302",
+    "amount": 302.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0556",
+    "text": "just paid 96.44 for clothes",
+    "amount": 96.44,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0557",
+    "text": "just paid 123.04 for shampoo",
+    "amount": 123.04,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0558",
+    "text": "京东, paid 20",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "京东",
+    "note": null
+  },
+  {
+    "id": "text-0559",
+    "text": "new headphones 45 cash",
+    "amount": 45.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0560",
+    "text": "spent 15 on snacks",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0561",
+    "text": "snacks 357",
+    "amount": 357.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0562",
+    "text": "just paid 56 for clothes",
+    "amount": 56.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0563",
+    "text": "沃尔玛, paid 1508",
+    "amount": 1508.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "沃尔玛",
+    "note": null
+  },
+  {
+    "id": "text-0564",
+    "text": "just paid 15 for power bank",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0565",
+    "text": "new headphones cost me 324",
+    "amount": 324.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0566",
+    "text": "拼多多, paid 81.79",
+    "amount": 81.79,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "购物",
+    "merchant": "拼多多",
+    "note": null
+  },
+  {
+    "id": "text-0567",
+    "text": "coffee beans cost me 21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0568",
+    "text": "spent 50 on americano",
+    "amount": 50.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0569",
+    "text": "Sep 28 americano 28",
+    "amount": 28,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0570",
+    "text": "星巴克, paid 10",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": "星巴克",
+    "note": null
+  },
+  {
+    "id": "text-0571",
+    "text": "just paid 12 for afternoon coffee",
+    "amount": 12.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0572",
+    "text": "iced americano cost me 11.92",
+    "amount": 11.92,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0573",
+    "text": "bubble tea 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0574",
+    "text": "latte, paid 40",
+    "amount": 40.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "咖啡",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0575",
+    "text": "102 for movie ticket",
+    "amount": 102.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0576",
+    "text": "健身房 bill 24.37",
+    "amount": 24.37,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0577",
+    "text": "massage 385",
+    "amount": 385.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0578",
+    "text": "健身房 bill 416.54",
+    "amount": 416.54,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "健身房",
+    "note": null
+  },
+  {
+    "id": "text-0579",
+    "text": "massage cost me 20.53",
+    "amount": 20.53,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0580",
+    "text": "paid 122 at 腾讯视频",
+    "amount": 122.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": "腾讯视频",
+    "note": null
+  },
+  {
+    "id": "text-0581",
+    "text": "just paid 64 for escape room",
+    "amount": 64.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0582",
+    "text": "swimming 44",
+    "amount": 44.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "娱乐",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0583",
+    "text": "mobile top up 59 yuan",
+    "amount": 59.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0584",
+    "text": "spent 23.61 on mobile top up",
+    "amount": 23.61,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0585",
+    "text": "Sep 28 data plan 26",
+    "amount": 26,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0586",
+    "text": "data plan 778 yuan",
+    "amount": 778,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "通讯",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0587",
+    "text": "paid 207 at 当当",
+    "amount": 207.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": "当当",
+    "note": null
+  },
+  {
+    "id": "text-0588",
+    "text": "exam prep course, paid 21",
+    "amount": 21.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0589",
+    "text": "spent 20 on exam fee",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0590",
+    "text": "textbook, paid 20",
+    "amount": 20,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0591",
+    "text": "just paid 20 for exam fee",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "教育",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0592",
+    "text": "Oct 12 registration fee 15",
+    "amount": 15.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0593",
+    "text": "pharmacy purchase cost me 421",
+    "amount": 421.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0594",
+    "text": "paid 10 at 大参林",
+    "amount": 10.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0595",
+    "text": "paid 20 at 大参林",
+    "amount": 20.0,
+    "currency": "CNY",
+    "direction": "expense",
+    "category": "医疗",
+    "merchant": "大参林",
+    "note": null
+  },
+  {
+    "id": "text-0596",
+    "text": "this month's salary arrived 26858",
+    "amount": 26858.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0597",
+    "text": "this month's salary 5011 yuan",
+    "amount": 5011.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0598",
+    "text": "salary arrived 5825",
+    "amount": 5825,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "工资",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0599",
+    "text": "annual bonus 2628 yuan",
+    "amount": 2628.0,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  },
+  {
+    "id": "text-0600",
+    "text": "Oct 20 project bonus 5882.23",
+    "amount": 5882.23,
+    "currency": "CNY",
+    "direction": "income",
+    "category": "奖金",
+    "merchant": null,
+    "note": null
+  }
+]
