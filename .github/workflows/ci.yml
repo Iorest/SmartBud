@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test (iOS Simulator)
+    # The app targets iOS 26.0 and is kept in Xcode 26.6, so the job needs the iOS 26 SDK.
+    # macos-14 tops out at Xcode 16.2 and is retired on 2026-11-02; macos-15 ships Xcode 26.x.
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    env:
+      PROJECT: app/SmartBud.xcodeproj
+      SCHEME: SmartBud
+      DESTINATION: platform=iOS Simulator,name=iPhone 16
+      RESULT_BUNDLE: TestResults.xcresult
+      LOG_FILE: xcodebuild-test.log
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          chosen=""
+          for version in 26.6 26.5 26.4 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            candidate="/Applications/Xcode_${version}.app"
+            if [ -d "$candidate" ]; then
+              chosen="$candidate"
+              break
+            fi
+          done
+          if [ -z "$chosen" ]; then
+            echo "No Xcode 26 found on this image; the iOS 26 SDK is required." >&2
+            ls -d /Applications/Xcode*.app >&2
+            exit 1
+          fi
+          sudo xcode-select -s "$chosen"
+          xcodebuild -version
+
+      - name: Cache Swift Package dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -resultBundlePath "$RESULT_BUNDLE" \
+            2>&1 | tee "$LOG_FILE"
+
+      - name: Summarise test count
+        if: success()
+        run: |
+          swift_testing=$(grep -E "Test run with [0-9]+ test" "$LOG_FILE" | tail -1 || true)
+          xctest=$(grep -E "Executed [0-9]+ test" "$LOG_FILE" | tail -1 || true)
+          echo "### ${swift_testing:-${xctest:-test count line not found}}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: |
+            TestResults.xcresult
+            xcodebuild-test.log
+          if-no-files-found: warn
+          retention-days: 7
