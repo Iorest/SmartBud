@@ -33,6 +33,7 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 | `TransactionModel` | `reimbursementOf`（UUID，可空） | 回款行指向原报销支出的 id。回款行 `income = true` 且不计入收入统计，核销时自动写入 |
 | `TransactionModel` | `transferFeeOf`（UUID，可空） | 手续费行指向转账的 id。转账手续费现在是一条支出行，计入支出与预算 |
 | `TransactionModel` | `adjustment` | 「余额调整」写入的更正行，只改账户余额，不进收支统计 |
+| `TransactionModel` | `merchant` / `merchantKey`（可空） | 商户展示名与归一化分组键，由备注派生。无商户实体，两个字段随交易一起删除 |
 | `AccountModel` | `archived` | 归档账户：不在默认列表、不计入总资产，但历史记录照常可查 |
 | `TransferModel` | `fee` | 转账手续费，从转出账户额外扣除 |
 
@@ -82,7 +83,7 @@ Development 环境只要在本机跑一遍写入就会自动建表；**Productio
 
    | Record Type | 必须存在的字段 |
    |---|---|
-   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment` |
+   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey` |
    | `CD_AccountModel` | `currencyCode`、`archived` |
    | `CD_TransferModel` | `destinationAmount`、`fee` |
    | `CD_CurrencyRate` | `code`、`rate`、`updatedAt` |

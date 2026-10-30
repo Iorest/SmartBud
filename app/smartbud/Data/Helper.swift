@@ -51,6 +51,21 @@ final class TransactionModel {
     /// A balance correction written by "调整余额". It moves the account
     /// balance but is neither income nor spend.
     var adjustment: Bool = false
+    /// Merchant as the user sees it, derived from the note by
+    /// `MerchantNormalizer` ("美团-张亮麻辣烫" → "美团").
+    ///
+    /// No merchant entity exists: these two strings are the whole of the
+    /// merchant data. They die with the row (delete a transaction, or wipe the
+    /// store, and they are gone), and renaming a merchant means editing the
+    /// rows themselves — nothing else points at them. `nil` means "not
+    /// identified": rows written before this field existed, rows whose note
+    /// carries no name, and every row `merchantKey == nil` implies.
+    var merchant: String?
+    /// Grouping key for statistics: the normalised form of `merchant`
+    /// (half-width, lower-cased, platform prefix kept, store detail dropped).
+    /// Invariant: `merchantKey == nil` exactly when `merchant == nil`, so a
+    /// key is never guessed from an unknown name.
+    var merchantKey: String?
 
     init(
         note: String = "",
@@ -66,7 +81,9 @@ final class TransactionModel {
         reimbursable: Bool = false,
         reimbursementOf: UUID? = nil,
         transferFeeOf: UUID? = nil,
-        adjustment: Bool = false
+        adjustment: Bool = false,
+        merchant: String? = nil,
+        merchantKey: String? = nil
     ) {
         self.id = UUID()
         self.note = note
@@ -78,6 +95,8 @@ final class TransactionModel {
         self.reimbursementOf = reimbursementOf
         self.transferFeeOf = transferFeeOf
         self.adjustment = adjustment
+        self.merchant = merchant
+        self.merchantKey = merchantKey
         self.income = income
         self.amount = amount
         self.date = date

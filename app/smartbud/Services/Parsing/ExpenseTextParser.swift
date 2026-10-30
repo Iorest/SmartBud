@@ -155,13 +155,12 @@ enum ExpenseTextParser {
     }
 
     private static func extractMerchant(from text: String) -> String? {
-        let known = [
-            "星巴克", "瑞幸", "美团", "饿了么", "滴滴", "京东", "淘宝",
-            "天猫", "麦当劳", "肯德基", "盒马", "永辉", "沃尔玛",
-            "山姆", "拼多多", "小米", "华为", "苹果", "比亚迪",
-            "Starbucks", "McDonald's", "Uber", "Amazon"
-        ]
-        if let merchant = known.first(where: { text.localizedCaseInsensitiveContains($0) }) {
+        // One brand list for the whole app: the note parser and the merchant
+        // backfill must recognise the same shops, or the same receipt yields
+        // different merchants depending on which path read it.
+        if let merchant = MerchantNormalizer.knownBrands.first(where: {
+            text.localizedCaseInsensitiveContains($0)
+        }) {
             return merchant
         }
         return organizationNames(in: text).first

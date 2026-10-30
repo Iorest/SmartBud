@@ -174,6 +174,7 @@ extension ImportDataView {
                 CurrencyRateStore.shared.convertToBase(
                     draft.amount, from: $0.resolvedCurrencyCode)
             }
+            let merchant = MerchantNormalizer.derive(fromNote: draft.note)
             let txn = TransactionModel(
                 note: draft.note,
                 category: draft.category,
@@ -181,7 +182,9 @@ extension ImportDataView {
                 baseAmount: baseAmount,
                 income: draft.income,
                 amount: draft.amount,
-                date: draft.date
+                date: draft.date,
+                merchant: merchant?.name,
+                merchantKey: merchant?.key
             )
             DataRepository.shared.insert(txn)
             ids.append(txn.id)

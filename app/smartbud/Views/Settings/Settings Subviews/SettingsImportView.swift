@@ -224,6 +224,10 @@ struct SettingsImportView: View {
                 // Older backups carry transfers whose fee has no expense row;
                 // write the missing rows so the imported balances add up.
                 TransferFeeLedger.migrate(in: DataRepository.shared.context)
+                // The JSON contract carries no merchant field: the imported
+                // notes are the only source, so derive it the same way a
+                // launched legacy store does.
+                MerchantMigration.migrate(in: DataRepository.shared.context)
                 // One list for every cache — rates and budgets included, which
                 // the old ad-hoc calls here missed until the next screen visit.
                 DataRefreshCenter.refreshAll()

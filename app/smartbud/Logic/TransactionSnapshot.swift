@@ -34,6 +34,11 @@ struct TransactionSnapshot {
     let reimbursementOf: UUID?
     let transferFeeOf: UUID?
     let adjustment: Bool
+    /// Merchant is a projection of the note, but a restore has to bring back
+    /// exactly what was deleted — a note edited between delete and undo would
+    /// otherwise re-derive a different key.
+    let merchant: String?
+    let merchantKey: String?
 
     @MainActor
     init(_ txn: TransactionModel) {
@@ -54,6 +59,8 @@ struct TransactionSnapshot {
         reimbursementOf = txn.reimbursementOf
         transferFeeOf = txn.transferFeeOf
         adjustment = txn.adjustment
+        merchant = txn.merchant
+        merchantKey = txn.merchantKey
     }
 
     /// Rebuilds the row when `rollback()` could not bring the original object
@@ -74,7 +81,9 @@ struct TransactionSnapshot {
             reimbursable: reimbursable,
             reimbursementOf: reimbursementOf,
             transferFeeOf: transferFeeOf,
-            adjustment: adjustment
+            adjustment: adjustment,
+            merchant: merchant,
+            merchantKey: merchantKey
         )
         txn.id = id
         txn.onceRecurring = onceRecurring

@@ -44,6 +44,9 @@ final class TransactionViewModel {
     /// report success in that case.
     @discardableResult
     func create(_ edit: TransactionEdit) -> TransactionModel? {
+        // Derived once, here: the merchant is a projection of the note, not a
+        // second thing for the user to fill in.
+        let merchant = MerchantNormalizer.derive(fromNote: edit.note)
         let txn = TransactionModel(note: edit.note, category: edit.category,
                                    account: edit.account,
                                    baseAmount: CurrencyRateStore.shared.convertToBase(
@@ -52,7 +55,9 @@ final class TransactionViewModel {
                                    repeatType: edit.repeatType,
                                    repeatCoefficient: edit.repeatCoefficient,
                                    discount: edit.discount,
-                                   reimbursable: edit.reimbursable)
+                                   reimbursable: edit.reimbursable,
+                                   merchant: merchant?.name,
+                                   merchantKey: merchant?.key)
         repo.insert(txn)
         if edit.repeatType > 0 { processRecurring(txn) }
         guard repo.save() else { return nil }
@@ -72,6 +77,11 @@ final class TransactionViewModel {
     @discardableResult
     func update(_ txn: TransactionModel, with edit: TransactionEdit) -> Bool {
         txn.note = edit.note
+        // Re-derive whenever the note changes: the merchant is a projection of
+        // it. A balance adjustment names no merchant at all.
+        let merchant = txn.adjustment ? nil : MerchantNormalizer.derive(fromNote: edit.note)
+        txn.merchant = merchant?.name
+        txn.merchantKey = merchant?.key
         txn.category = edit.category
         txn.account = edit.account
         txn.amount = edit.amount
@@ -142,7 +152,8 @@ final class TransactionViewModel {
                 let new = TransactionModel(note: txn.note ?? "", category: txn.category,
                                            account: txn.account, baseAmount: txn.wrappedBaseAmount,
                                            income: txn.income, amount: txn.amount, date: cursor,
-                                           discount: txn.discount, reimbursable: txn.reimbursable)
+                                           discount: txn.discount, reimbursable: txn.reimbursable,
+                                           merchant: txn.merchant, merchantKey: txn.merchantKey)
                 repo.insert(new)
                 new.onceRecurring = true
                 cursor = next
@@ -154,7 +165,8 @@ final class TransactionViewModel {
                                        account: txn.account, baseAmount: txn.wrappedBaseAmount,
                                        income: txn.income, amount: txn.amount,
                                        date: txn.nextTransactionDate,
-                                       discount: txn.discount, reimbursable: txn.reimbursable)
+                                       discount: txn.discount, reimbursable: txn.reimbursable,
+                                       merchant: txn.merchant, merchantKey: txn.merchantKey)
             repo.insert(new)
             new.onceRecurring = true
             txn.recurringType = 0

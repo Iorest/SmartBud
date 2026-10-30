@@ -6,7 +6,8 @@
 //  with the redesigned layout that matches the GitHub reference "Good Ol'
 //  Charts" design: period picker chip, a single row combining the date range
 //  with the period average, income/expenses cards, `BarGraph`,
-//  `CategoryBreakdownView`, and today / yesterday transaction sections.
+//  `CategoryBreakdownView`, `MerchantBreakdownView`, and today / yesterday
+//  transaction sections.
 //  The legacy `Filtered*InsightsView` stubs are kept at the bottom because
 //  `LogView` still references them.
 //
@@ -73,6 +74,13 @@ struct InsightsView: View {
                             .padding(.bottom, 18)
                         categoryBreakdownSection
                             .padding(.bottom, 18)
+                        // Rendered only when there is merchant data, so the
+                        // section's bottom padding cannot leave a gap.
+                        if !insightsVM.merchantBreakdown.isEmpty {
+                            merchantBreakdownSection
+                                .padding(.horizontal, 30)
+                                .padding(.bottom, 18)
+                        }
                         if !insightsVM.todayTransactions.isEmpty {
                             todaySection
                         }
@@ -241,6 +249,16 @@ struct InsightsView: View {
             showCents: insightsVM.showCents
         )
         .padding(.horizontal, 30)
+    }
+
+    // MARK: - Merchant breakdown
+
+    private var merchantBreakdownSection: some View {
+        MerchantBreakdownView(
+            merchants: insightsVM.merchantBreakdown,
+            currencyCode: currency,
+            showCents: insightsVM.showCents
+        )
     }
 
     // MARK: - Today / Yesterday
