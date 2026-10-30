@@ -132,7 +132,6 @@ struct BrandNewBudgetView: View {
         return calendar.weekdaySymbols
     }
 
-    @ViewBuilder
     /// Categories the picker offers: no budget yet, plus the category this
     /// editor is editing (it already owns one, and hiding it would blank the
     /// selection and make the original category impossible to re-pick).
