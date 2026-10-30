@@ -149,7 +149,11 @@ struct ParsingMetricsTests {
                 textEndToEndHits += 1
             }
             // TEMP DIAG
-            print("DIAG \(entry.id)|\(entry.text)|\(expectedAmount)|\(amountText(parsed))|\(bucket ?? "-")|\(parsed?.categoryHint ?? "-")")
+            if parsed == nil {
+                let extract = ExpenseTextParser.extractAmount(from: entry.text)
+                let scalars = entry.text.unicodeScalars.map { String($0.value) }.joined(separator: " ")
+                print("DIAG2 \(entry.id)|extract=\(extract.map { "\($0)" } ?? "nil")|count=\(entry.text.count)|\(scalars)")
+            }
         }
 
         var receiptAmountHits = 0

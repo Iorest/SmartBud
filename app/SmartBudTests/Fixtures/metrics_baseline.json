@@ -6,7 +6,7 @@
   },
   "floors": {
     "text_amount": 0.885,
-    "text_direction": 0.8767,
+    "text_direction": 0.8766,
     "text_category": 0.445,
     "text_end_to_end": 0.4,
     "receipt_amount": 0.7
