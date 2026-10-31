@@ -24,6 +24,9 @@
 
 16 处文档错全部在本 PR 修掉，逐条 diff 摘要在 PR 描述里；“代码缺”的 3 项独立缺口见
 [建议任务](#建议任务代码缺口)，另有两项产品口径已有任务（TELE-32 / TELE-33），不重复开。
+附录另核对了 README 索引里的 `qa-checklist` / `privacypolicy` / `TERMS`（不计入 154 条）：
+`qa-checklist` 的 3 处自动化引用已修；隐私政策 5 处事实错误、条款 1 处不完整，
+属对外法务文本，留给 owner 确认后再改。
 
 ## 1. design.md
 
@@ -254,6 +257,7 @@
 
 - `icost-parity.md`：退款计划由“未建任务”改为 TELE-32。
 - `icost-parity.md`：第三方账单导入现状改为“通用 CSV 导入（手工映射列），微信/支付宝专用格式未做”。
+- `qa-checklist.md`：3 处 TELE-35 / “每天全量跑”的过期引用（见附录 A）。
 
 ## 建议任务（代码缺口）
 
@@ -267,7 +271,39 @@
 | T6 | 余额调整原因字段 | P2 | 需先定枚举与迁移方案 | `design.md` §6.4、会计基础 §7 都标注缺失；新增可选字段 + 迁移说明 |
 | T7 | 3 条新 E2E 接入可访问性审计 | P3 | 无 | `app/SmartBudUITests/SmartBudUITests.swift:271,287,324` 未调用 `assertAccessible`；接入或明确豁免理由 |
 
-## 相邻问题（不在本次 9 份文档范围内，未改）
+## 附录：README 索引内其余文档（不计入上表 154 条）
 
-- `docs/qa-checklist.md` 仍引用已取消的 TELE-35（“每天全量 UI 流程”），而 CI 只在 push/PR 触发；建议随下一次文档清理修正。
+### A. qa-checklist.md（内部文档，已修）
+
+| 文档主张 | 代码/平台事实 | 结论 | 处理 |
+|---|---|---|---|
+| “XCUITest（见 TELE-35 的 20 条流程）” | TELE-35 已取消；20 条流程拆在 TELE-36/37/38 | 文档错 | 已改：引用 TELE-36/37/38 |
+| “TELE-35 定义 20 条流程……CI 每次 PR 跑” | CI 每次 PR 只跑 TELE-24 的 8 条 smoke（`.github/workflows/ci.yml`）；20 条流程尚未全部落地 | 文档错 | 已改：写明当前覆盖与剩余任务 |
+| 回归频率“每天｜全量 UI 流程（TELE-35）” | 没有定时工作流；CI 只在 push / PR / 手动触发 | 文档错 | 已改：标注“尚无定时任务” |
+
+### B. privacypolicy.md（对外法务文本，未改，待 owner 确认）
+
+| 文档主张 | 代码事实 | 结论 | 建议 |
+|---|---|---|---|
+| §2 交易包含“optional photo” | `TransactionModel` 无图片字段（`Data/Helper.swift:18-68`），导出 schema 也没有；截图只用于 OCR，不落库 | 文档错 | 删除“optional photo” |
+| §2 设备数据清单只列交易/分类/预算/偏好 | 实际还有账户、转账、汇率、模板、商户字段；LLM 配置（含 API Key）存 Keychain（`Utilities/KeychainStore.swift:12`、`Services/LLM/LLMClient.swift:24-50`） | 文档错 | 补齐类别并说明 Keychain |
+| §3 “iCloud sync 是 end-to-end” | 数据在私有 CloudKit 数据库（`SmartBud.entitlements:5-10`），并非端到端加密；项目不运营服务器属实 | 文档错 | 改为“私有 CloudKit 数据库，仅你的 Apple ID 可访问” |
+| §4 只列 CloudKit / StoreKit / UserNotifications / LocalAuthentication | 还使用 Speech（`Services/Parsing/SpeechService.swift:19-45`，未设 `requiresOnDeviceRecognition`，识别可能经 Apple 服务）、Vision（端侧 OCR）、Frankfurter 汇率请求（`Services/ExchangeRateService.swift:15`）、用户自配的 LLM endpoint（`Views/InsightsAIAnalysisView.swift:123-145`，仅汇总数字） | 文档错 | 补“Apple 语音识别/端侧 OCR”与“网络请求”两节 |
+| §5 权限只列 Face ID 与 Photo Library Add | 工程还声明并使用麦克风与语音识别（`project.pbxproj:2210-2211`）；没有写相册的代码，截图走 `PhotosPicker` 读用户选中的一张（`Views/Transaction/SmartEntrySheet.swift:108`） | 文档错 | 换成麦克风 / 语音识别 / 相册选择器，删“保存截图到相册” |
+| §1/§4 无第三方分析、无崩溃 SDK | 仓库无 SPM 依赖、无分析 SDK | 一致 | — |
+| §7 导出 JSON、擦除本地 + CloudKit zone | `Views/Settings/.../SettingsExportView.swift`、`Data/SwiftDataCore.swift:298`、`Logic/WipeOutcome.swift:10-24` | 一致 | — |
+
+### C. TERMS.md（对外法务文本，未改，待 owner 确认）
+
+| 文档主张 | 代码事实 | 结论 | 建议 |
+|---|---|---|---|
+| §1 Pro 三项：AI 分析、6 款图标、自定义提醒时间 | `Utilities/ProAccess.swift:16-45` | 一致 | — |
+| §3a 管理订阅入口仅订阅用户可见、终身用户没有 | `Views/Settings/Settings Subviews/SettingsProView.swift:112-121`（终身用户只给恢复购买）、`SettingsProView+Sections.swift:64` | 一致 | — |
+| §3b 恢复购买 | `Services/SubscriptionManager.swift:353`（`AppStore.sync()`） | 一致 | — |
+| §5 源码 GPL v3 | `LICENSE`、README | 一致 | — |
+| §6 仅列 CloudKit / StoreKit / UserNotifications | 同上，未提语音识别与自配 LLM endpoint；属不完整而非错误 | 文档错（次要） | 与隐私政策同步补第三方/网络说明 |
+| 其余条款（退款、免责、管辖） | 法务表述，无法由代码判定 | 不适用 | — |
+
+## 相邻问题（未改）
+
 - 文档内联路径存在两种写法（`smartbud/...` 与 `Logic/...`），均能按 `app/` 前缀解析，但不如 `app/smartbud/...` 明确；本轮不做全量改写。
