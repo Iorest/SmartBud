@@ -81,6 +81,7 @@ For the command-line build and test commands, see [Engineering and verification]
 - [Data export and restore](docs/data-portability.md) — JSON backup format, import rules, CSV columns.
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
+- [QA and interaction checklist](docs/qa-checklist.md) — what the automated UI flows cover, and the manual list to run before a release.
 - [Engineering and verification](docs/engineering.md) — how to clone, build, run the 213 tests, and what CI does.
 - [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
 - [SmartBud Pro](docs/storekit.md) — product IDs, StoreKit testing, and App Store Connect setup.
