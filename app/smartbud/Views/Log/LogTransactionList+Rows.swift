@@ -75,6 +75,7 @@ extension LogTransactionList {
             LogTransactionRow(transaction: transaction, future: futureRow)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.logRow)
         .swipeActions(edge: .trailing, allowsFullSwipe: !stopsRecurring(transaction, future: futureRow)) {
             Button(role: .destructive) {
                 remove(transaction, future: futureRow)

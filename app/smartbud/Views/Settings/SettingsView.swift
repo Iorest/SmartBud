@@ -212,6 +212,7 @@ struct SettingsView: View {
               }
               .padding(.vertical, 2)
             }
+            .accessibilityIdentifier(AccessibilityID.settingsRow(SettingsRoute.pro.accessibilityKey))
           }
 
           Section(String.appLocalized(SettingsKey.sectionGeneral)) {

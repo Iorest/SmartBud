@@ -35,6 +35,10 @@ enum AccessibilityID {
     // MARK: - Log
 
     static let logAddButton = "sb.log.addButton"
+    /// Every ledger row shares this identifier (the row's own content is the
+    /// ledger data, not a stable anchor); rows are newest first, so a test
+    /// that just saved an entry drives the first one.
+    static let logRow = "sb.log.row"
     static let logUndoButton = "sb.log.undoButton"
     /// Swipe action on a ledger row; stages the delete so "Undo" can restore it.
     static let logRowDelete = "sb.log.row.delete"

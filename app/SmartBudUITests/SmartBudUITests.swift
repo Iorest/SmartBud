@@ -104,19 +104,30 @@ final class SmartBudUITests: XCTestCase {
         button.tap()
     }
 
-    /// Ledger rows are `XCUIElement.cells` whose labels aggregate the note,
-    /// time and amount, so the amount typed by the test is a stable anchor
-    /// for the row the test itself just created.
-    private func row(containing text: String, in app: XCUIApplication) -> XCUIElement {
-        app.cells.containing(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
+    /// The ledger row a test just created. Rows are ordered newest first and
+    /// share one identifier, so the first cell holding a row button is it. The
+    /// amount is asserted on the row's label afterwards — it is not the
+    /// locator, so a formatting change cannot silently point the test at a
+    /// different row.
+    private func newestRow(in app: XCUIApplication) -> XCUIElement {
+        app.cells.containing(.button, identifier: AccessibilityID.logRow).firstMatch
     }
 
-    /// Scrolls `target` into view. The Settings list is longer than a phone
-    /// screen and the import row sits in the Data section.
-    private func scroll(intoView target: XCUIElement, in app: XCUIApplication) {
-        for _ in 0..<6 where !(target.exists && target.isHittable) {
+    /// Scrolls until `identifier` is on screen and hittable. The Settings list
+    /// is taller than a phone screen and rows below the fold are not in the
+    /// hierarchy at all (the List is lazy), so `exists` is only meaningful
+    /// after scrolling.
+    private func scrollIntoView(
+        _ identifier: String,
+        in app: XCUIApplication,
+        maxSwipes: Int = 8
+    ) -> XCUIElement {
+        let target = element(app, identifier)
+        for _ in 0..<maxSwipes {
+            if target.exists && target.isHittable { return target }
             app.swipeUp()
         }
+        return target
     }
 
     private func waitUntilEnabled(_ target: XCUIElement, timeout: TimeInterval = 10) {
@@ -217,9 +228,11 @@ final class SmartBudUITests: XCTestCase {
         waitUntilEnabled(save)
         save.tap()
 
-        let created = row(containing: amount, in: app)
+        let created = newestRow(in: app)
         XCTAssertTrue(created.waitForExistence(timeout: 20),
                       "The new expense never showed up in the log.\n\(app.debugDescription)")
+        XCTAssertTrue(created.label.contains(amount),
+                      "The newest row is not the expense just saved: \"\(created.label)\"")
 
         // The row's trailing swipe action is the only delete path that stages
         // the delete, which is what raises the undo banner.
@@ -227,8 +240,12 @@ final class SmartBudUITests: XCTestCase {
 
         // The undo window is 6 s (TransactionViewModel.undoWindow).
         require(app, AccessibilityID.logUndoButton, timeout: 5).tap()
-        XCTAssertTrue(row(containing: amount, in: app).waitForExistence(timeout: 15),
+
+        let restored = newestRow(in: app)
+        XCTAssertTrue(restored.waitForExistence(timeout: 15),
                       "Undo did not restore the deleted row.\n\(app.debugDescription)")
+        XCTAssertTrue(restored.label.contains(amount),
+                      "The restored row is not the expense that was deleted: \"\(restored.label)\"")
 
         assertAccessible(app, screen: "log")
     }
@@ -289,8 +306,10 @@ final class SmartBudUITests: XCTestCase {
     func testImportPreviewThenCancel() throws {
         let app = launch()
         select(.settings, in: app)
-        let importRow = require(app, AccessibilityID.settingsImportData)
-        scroll(intoView: importRow, in: app)
+        let importRow = scrollIntoView(AccessibilityID.settingsImportData, in: app)
+        if !importRow.exists {
+            XCTFail("The import row never came into view.\n\(app.debugDescription)")
+        }
         importRow.tap()
 
         // `-importSample` already parsed the bundled CSV, so the wizard opens
