@@ -148,6 +148,7 @@ struct InsightsView: View {
         }
         .pickerStyle(.segmented)
         .labelsHidden()
+        .accessibilityIdentifier(AccessibilityID.insightsPeriodPicker)
     }
 
     // MARK: - Date range row

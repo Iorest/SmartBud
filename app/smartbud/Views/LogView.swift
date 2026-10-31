@@ -107,6 +107,7 @@ struct LogView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel(Text(String.appLocalized("Add New Transaction")))
+                .accessibilityIdentifier(AccessibilityID.logAddButton)
             }
         }
         .alert(

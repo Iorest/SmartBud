@@ -77,6 +77,7 @@ struct TransactionCategoryGrid: View {
                 categoryVM.seedStarterCategories()
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier(AccessibilityID.entrySeedCategories)
             .padding(.top, SBSpace.xxs)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -125,6 +126,7 @@ struct TransactionCategoryGrid: View {
         .buttonStyle(.plain)
         .accessibilityLabel(item.wrappedName)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier(AccessibilityID.entryCategoryTile)
     }
 
     private var actions: some View {

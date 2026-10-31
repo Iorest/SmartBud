@@ -67,7 +67,15 @@ final class ContentViewModel {
         }
 
         if firstLaunch {
+            #if DEBUG
+            // QA hook: `SmartBudUITests` launches with -skipIntro so every
+            // case starts on the ledger instead of the two-page welcome flow.
+            if !ProcessInfo.processInfo.arguments.contains("-skipIntro") {
+                showIntro = true
+            }
+            #else
             showIntro = true
+            #endif
             firstLaunch = false
             dataMigration1 = false
             dataMigration2 = false

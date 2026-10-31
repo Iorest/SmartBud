@@ -81,6 +81,7 @@ extension LogTransactionList {
             } label: {
                 Label(String.appLocalized("Delete"), systemImage: "trash")
             }
+            .accessibilityIdentifier(AccessibilityID.logRowDelete)
 
             Button {
                 transactionManager.toEdit = transaction

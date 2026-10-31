@@ -30,6 +30,7 @@ extension SettingsView {
           #endif
         }
       }
+      .accessibilityIdentifier(AccessibilityID.settingsRow(route.accessibilityKey))
     }
 }
 

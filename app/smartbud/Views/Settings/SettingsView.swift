@@ -41,6 +41,32 @@ enum SettingsRoute: Hashable {
     case accounts
     case templates
     case llm
+
+    /// Stable suffix for `AccessibilityID.settingsRow(_:)`. Derived from the
+    /// case name so adding a route and its row gives a UI test an anchor
+    /// without touching the row call site.
+    var accessibilityKey: String {
+        switch self {
+        case .pro: return "pro"
+        case .notifications: return "notifications"
+        case .currency: return "currency"
+        case .rates: return "rates"
+        case .weekStart: return "weekStart"
+        case .appearance: return "appearance"
+        case .appIcon: return "appIcon"
+        case .language: return "language"
+        case .upcoming: return "upcoming"
+        case .erase: return "erase"
+        case .export: return "export"
+        case .importBackup: return "importBackup"
+        case .haptics: return "haptics"
+        case .numberEntry: return "numberEntry"
+        case .categories: return "categories"
+        case .accounts: return "accounts"
+        case .templates: return "templates"
+        case .llm: return "llm"
+        }
+    }
 }
 
 struct SettingsView: View {
@@ -243,6 +269,7 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityID.settingsImportData)
 
             settingsLink(.importBackup, "arrow.clockwise.icloud.fill", 105, SettingsKey.rowImportBackup, nil)
             settingsLink(.export, "square.and.arrow.up.fill", 113, SettingsKey.rowExportData, nil)
