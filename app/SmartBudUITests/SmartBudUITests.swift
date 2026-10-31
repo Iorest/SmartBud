@@ -316,7 +316,7 @@ final class SmartBudUITests: XCTestCase {
 enum AccessibilityAuditPolicy {
     /// `nonisolated(unsafe)`: the array is never written after launch, and the
     /// XCTest type is not annotated Sendable, so Swift 6 cannot prove it.
-    nonisolated(unsafe) static let ignoredTypes: [XCUIApplication.AccessibilityAuditType] = [
+    nonisolated(unsafe) static let ignoredTypes: [XCUIAccessibilityAuditType] = [
         // Brand colours are not AA-verified yet; the theme tokens are shared
         // with the design work, not with this test-infrastructure issue.
         .contrast,
