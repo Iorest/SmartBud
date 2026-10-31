@@ -113,6 +113,24 @@ final class SmartBudUITests: XCTestCase {
         app.cells.containing(.button, identifier: AccessibilityID.logRow).firstMatch
     }
 
+    /// The row *cell* carries no label of its own; the row button inside it
+    /// aggregates the note, time and amount. Assertions read the button.
+    private func assertNewestRowAmount(
+        _ amount: String,
+        in app: XCUIApplication,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let button = app.buttons.matching(identifier: AccessibilityID.logRow).firstMatch
+        if !button.waitForExistence(timeout: 10) {
+            XCTFail("No ledger row button found.\n\(app.debugDescription)", file: file, line: line)
+            return
+        }
+        XCTAssertTrue(button.label.contains(amount),
+                      "The newest row is not the expected expense: \"\(button.label)\"",
+                      file: file, line: line)
+    }
+
     /// Scrolls until `identifier` is on screen and hittable. The Settings list
     /// is taller than a phone screen and rows below the fold are not in the
     /// hierarchy at all (the List is lazy), so `exists` is only meaningful
@@ -231,8 +249,7 @@ final class SmartBudUITests: XCTestCase {
         let created = newestRow(in: app)
         XCTAssertTrue(created.waitForExistence(timeout: 20),
                       "The new expense never showed up in the log.\n\(app.debugDescription)")
-        XCTAssertTrue(created.label.contains(amount),
-                      "The newest row is not the expense just saved: \"\(created.label)\"")
+        assertNewestRowAmount(amount, in: app)
 
         // The row's trailing swipe action is the only delete path that stages
         // the delete, which is what raises the undo banner.
@@ -244,8 +261,7 @@ final class SmartBudUITests: XCTestCase {
         let restored = newestRow(in: app)
         XCTAssertTrue(restored.waitForExistence(timeout: 15),
                       "Undo did not restore the deleted row.\n\(app.debugDescription)")
-        XCTAssertTrue(restored.label.contains(amount),
-                      "The restored row is not the expense that was deleted: \"\(restored.label)\"")
+        assertNewestRowAmount(amount, in: app)
 
         assertAccessible(app, screen: "log")
     }
