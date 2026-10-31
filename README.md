@@ -85,6 +85,7 @@ For the command-line build and test commands, see [Engineering and verification]
 - [Engineering and verification](docs/engineering.md) — how to clone, build, run the 213 tests, and what CI does.
 - [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
 - [SmartBud Pro](docs/storekit.md) — product IDs, StoreKit testing, and App Store Connect setup.
+- [Consistency audit](docs/consistency-audit.md) — every doc claim checked against the code, with evidence and the remaining gaps.
 - [Privacy policy](docs/privacypolicy.md) — what the app stores, where it lives, and which Apple services it uses.
 - [Terms of service](docs/TERMS.md) — subscription terms, acceptable use, and liability.
 
