@@ -15,6 +15,7 @@
 
 import XCTest
 
+@MainActor
 final class ImportExportUITests: SmartBudUITestCase {
 
     // MARK: - F12. Export → restore into a clean store → same numbers

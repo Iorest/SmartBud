@@ -13,6 +13,7 @@
 
 import XCTest
 
+@MainActor
 final class EntryFlowUITests: SmartBudUITestCase {
 
     // MARK: - A1. Add an expense and see it in the ledger and the stats

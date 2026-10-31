@@ -11,6 +11,7 @@
 
 import XCTest
 
+@MainActor
 final class ProGateUITests: SmartBudUITestCase {
 
     // MARK: - J17a. AI analysis

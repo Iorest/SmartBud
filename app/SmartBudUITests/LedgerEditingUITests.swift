@@ -10,6 +10,7 @@
 
 import XCTest
 
+@MainActor
 final class LedgerEditingUITests: SmartBudUITestCase {
 
     // MARK: - B5. Editing the amount moves the statistics with it

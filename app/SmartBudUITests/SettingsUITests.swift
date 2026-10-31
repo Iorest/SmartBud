@@ -14,6 +14,7 @@
 
 import XCTest
 
+@MainActor
 final class SettingsUITests: SmartBudUITestCase {
 
     // MARK: - L19a. Switching the language changes the UI copy

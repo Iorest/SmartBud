@@ -10,6 +10,7 @@
 
 import XCTest
 
+@MainActor
 final class SmartEntryUITests: SmartBudUITestCase {
 
     func testK18_smartEntryPreviewAndApply_fillsFormWithoutSaving() throws {

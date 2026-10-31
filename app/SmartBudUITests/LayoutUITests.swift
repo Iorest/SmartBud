@@ -15,10 +15,14 @@
 
 import XCTest
 
+@MainActor
 final class LayoutUITests: SmartBudUITestCase {
 
-    override func tearDown() {
-        XCUIDevice.shared.orientation = .portrait
+    /// `nonisolated` to match `XCTestCase`; the body needs the main actor
+    /// because `XCUIDevice` is isolated there, and XCTest runs teardown on the
+    /// main thread for UI tests.
+    nonisolated override func tearDown() {
+        MainActor.assumeIsolated { XCUIDevice.shared.orientation = .portrait }
         super.tearDown()
     }
 

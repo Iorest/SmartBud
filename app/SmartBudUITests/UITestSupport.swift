@@ -24,6 +24,7 @@
 
 import XCTest
 
+@MainActor
 class SmartBudUITestCase: XCTestCase {
 
     /// The app under test. Set by `launch(...)`; `tearDown` uses it to attach
@@ -35,16 +36,12 @@ class SmartBudUITestCase: XCTestCase {
     /// generous; every later wait is much tighter.
     private let launchTimeout: TimeInterval = 60
 
-    override func setUp() {
-        super.setUp()
-        continueAfterFailure = false
-    }
-
-    override func tearDown() {
-        attachFailureArtifacts()
-        app = nil
-        super.tearDown()
-    }
+    // No `setUp` / `tearDown` overrides: XCTest declares them `nonisolated`,
+    // and this class is `@MainActor` because the SDK marks the XCUIElement
+    // members isolated. `continueAfterFailure` is set in `launch()`, and the
+    // failure artifacts are attached at the point of failure by
+    // `attachDiagnostics(_:)` — XCTest also records its own screenshot for
+    // every failed UI test, so `.xcresult` carries both.
 
     // MARK: - Launch
 
@@ -75,6 +72,7 @@ class SmartBudUITestCase: XCTestCase {
         seed: Bool = true,
         environment: [String: String] = [:]
     ) -> XCUIApplication {
+        continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments = baseArguments + (seed ? ["-uiTestSeed"] : []) + extraArguments
         app.launchEnvironment = environment
@@ -132,6 +130,7 @@ class SmartBudUITestCase: XCTestCase {
     ) -> XCUIElement {
         let match = element(app, identifier)
         if !match.waitForExistence(timeout: timeout) {
+            attachDiagnostics(identifier)
             XCTFail("No element with identifier \"\(identifier)\".\n\(app.debugDescription)",
                     file: file, line: line)
         }
@@ -152,6 +151,7 @@ class SmartBudUITestCase: XCTestCase {
             predicate: NSPredicate(format: "exists == false"),
             object: element(app, identifier))
         if XCTWaiter().wait(for: [expectation], timeout: timeout) != .completed {
+            attachDiagnostics(identifier)
             XCTFail("\"\(identifier)\" never went away.\n\(app.debugDescription)",
                     file: file, line: line)
         }
@@ -168,6 +168,7 @@ class SmartBudUITestCase: XCTestCase {
         line: UInt = #line
     ) {
         if element(app, identifier).waitForExistence(timeout: timeout) {
+            attachDiagnostics(identifier)
             XCTFail("\"\(identifier)\" should not be on screen.\n\(app.debugDescription)",
                     file: file, line: line)
         }
@@ -289,6 +290,7 @@ class SmartBudUITestCase: XCTestCase {
             object: nil)
         let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
         if result != .completed {
+            attachDiagnostics("rowCount")
             XCTFail("The ledger never reached \(count) rows (currently \(rowCount(in: app))).\n\(app.debugDescription)",
                     file: file, line: line)
             return false
@@ -601,10 +603,10 @@ class SmartBudUITestCase: XCTestCase {
     /// the screens: the screenshot shows what was on screen, the element tree
     /// shows what XCUITest could see. Both are attached to the test, so they
     /// travel into `.xcresult` and the CI artifact.
-    private func attachFailureArtifacts() {
-        guard let app, testRun?.hasSucceeded == false else { return }
+    private func attachDiagnostics(_ reason: String) {
+        guard let app else { return }
         let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "failure-\(name)"
+        screenshot.name = "failure-\(name)" 
         screenshot.lifetime = .keepAlways
         add(screenshot)
 
