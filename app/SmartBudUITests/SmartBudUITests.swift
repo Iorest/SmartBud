@@ -505,12 +505,13 @@ final class SmartBudUITests: XCTestCase {
     private func waitForNewestRow(_ app: XCUIApplication, amount: String,
                                   timeout: TimeInterval = 20,
                                   file: StaticString = #filePath, line: UInt = #line) -> Bool {
-        let rows = logRows(app)
+        // A format predicate on the resolved element: XCTest re-evaluates it
+        // against the live snapshot, while a block predicate would run XCUITest
+        // queries off the main actor.
+        let firstRow = logRows(app).firstMatch
         let expectation = XCTNSPredicateExpectation(
-            predicate: NSPredicate { _, _ in
-                rows.firstMatch.exists && rows.firstMatch.label.contains(amount)
-            },
-            object: nil)
+            predicate: NSPredicate(format: "exists == true AND label CONTAINS %@", amount),
+            object: firstRow)
         if XCTWaiter().wait(for: [expectation], timeout: timeout) == .completed { return true }
         XCTFail("No newest row carrying \"\(amount)\" after \(Int(timeout)) s: "
                     + "\(ledgerSummary(app))\n\(app.debugDescription)", file: file, line: line)
@@ -822,8 +823,9 @@ final class SmartBudUITests: XCTestCase {
             titled.tap()
         }
 
-        // The first entry is in, and the form is still open on a cleared pad.
-        waitForNewestRow(app, amount: "5.00")
+        // The form is still open on a cleared pad. The ledger sits behind the
+        // full-screen form, so whether the first entry actually landed is
+        // checked once the second save closes the form.
         XCTAssertEqual(padAmount(app) ?? .nan, 0, accuracy: 0.001,
                        "The amount was not cleared after save-and-continue")
         XCTAssertEqual(require(app, AccessibilityID.entryCategoryButton).label, categoryLabel,
@@ -838,6 +840,9 @@ final class SmartBudUITests: XCTestCase {
         secondSave.tap()
         waitForNewestRow(app, amount: "3.00")
         assertNewestRowAmount("3.00", in: app)
+        let firstEntry = logRows(app).element(boundBy: 1)
+        XCTAssertTrue(firstEntry.exists && firstEntry.label.contains("5.00"),
+                      "The save-and-continue entry is missing from the ledger: \(ledgerSummary(app))")
     }
 
     // MARK: - A3. Zero, over-limit and missing category are refused
