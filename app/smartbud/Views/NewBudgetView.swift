@@ -147,6 +147,7 @@ struct BrandNewBudgetView: View {
                     Text(String.appLocalized("Category Budget")).tag(true)
                 }
                 .pickerStyle(.segmented)
+                .accessibilityIdentifier(AccessibilityID.budgetCreateTypePicker)
                 .disabled(editMode)
             }
 
@@ -167,6 +168,7 @@ struct BrandNewBudgetView: View {
                             }
                         }
                         .labelsHidden()
+                        .accessibilityIdentifier(AccessibilityID.budgetCreateCategoryPicker)
                     }
                 }
             }

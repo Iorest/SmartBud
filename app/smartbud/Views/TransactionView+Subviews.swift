@@ -144,6 +144,7 @@ extension TransactionView {
         }
         .alert(String.appLocalized("Discount"), isPresented: $showDiscountEditor) {
             TextField("0", text: $discountInput)
+                .accessibilityIdentifier(AccessibilityID.entryDiscountField)
                 #if os(iOS)
                 .keyboardType(.decimalPad)
                 #endif

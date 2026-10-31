@@ -145,6 +145,14 @@ final class DataRepository {
     private static func makeContainer() -> BootResult {
         #if DEBUG
         if let forced = forcedMemoryContainer() { return forced }
+        // QA hook: `SmartBudUITests` launches with `-uiTestStore` so every case
+        // starts from an empty ledger instead of whatever the previous case
+        // left in the App Group database. Reported as a healthy
+        // configuration — nothing can go wrong here, so the degraded-storage
+        // banner would only cover the screen under test.
+        if UITestFixture.isStoreRequested, let harness = memoryContainer() {
+            return BootResult(container: harness, reason: nil, mode: .appGroup)
+        }
         #endif
 
         let appGroupReachable = FileManager.default.containerURL(

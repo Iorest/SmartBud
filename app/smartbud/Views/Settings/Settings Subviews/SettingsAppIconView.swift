@@ -132,6 +132,7 @@ struct SettingsAppIconView: View {
           .accessibilityAddTraits(activeIcon == options[index].actualFileName
               ? [.isButton, .isSelected]
               : .isButton)
+          .accessibilityIdentifier(AccessibilityID.settingsAppIconRow(options[index].actualFileName))
         }
       }
       .padding(.horizontal, 15)

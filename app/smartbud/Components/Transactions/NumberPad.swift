@@ -212,7 +212,10 @@ struct NumberPad: View {
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
-        .accessibilityIdentifier("sb.entry.save.DELIBERATELY-BROKEN")
+        // The pad's checkmark is the save action on both screens that host it
+        // (entry form, budget amount page), so it carries the entry-save id
+        // rather than a pad-specific one.
+        .accessibilityIdentifier(AccessibilityID.entrySave)
         .contextMenu {
             Button {
                 submitAndContinue()
@@ -269,6 +272,7 @@ struct NumberPadTextView: View {
                     .font(.system(size: fontSize, weight: .regular))
                     .foregroundStyle(Color.PrimaryText)
                     .contentTransition(.numericText())
+                    .accessibilityIdentifier(AccessibilityID.entryAmount)
             }
             .minimumScaleFactor(0.5)
             .lineLimit(1)
@@ -295,6 +299,7 @@ struct NumberPadTextView: View {
         }
         .disabled(viewModel.price == 0 && !viewModel.isEditingDecimal)
         .accessibilityLabel(Text(String.appLocalized("Delete")))
+        .accessibilityIdentifier(AccessibilityID.padDelete)
     }
 }
 

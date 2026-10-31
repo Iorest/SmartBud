@@ -510,7 +510,20 @@
 		E1A2B3C40000000000000402 /* LogTransactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000400 /* LogTransactionList.swift */; };
 		E1A2B3C40000000000000501 /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000500 /* TemplatesView.swift */; };
 		E1A2B3C40000000000000502 /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000500 /* TemplatesView.swift */; };
+		AB120000000000000000A002 /* UITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000A001 /* UITestFixture.swift */; };
 		AB1200000000000000000008 /* SmartBudUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000007 /* SmartBudUITests.swift */; };
+		AB1200000000000000000201 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000101 /* UITestSupport.swift */; };
+		AB1200000000000000000202 /* EntryFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000102 /* EntryFlowUITests.swift */; };
+		AB1200000000000000000203 /* LedgerEditingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000103 /* LedgerEditingUITests.swift */; };
+		AB1200000000000000000204 /* AccountTransferUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000104 /* AccountTransferUITests.swift */; };
+		AB1200000000000000000205 /* BudgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000105 /* BudgetUITests.swift */; };
+		AB1200000000000000000206 /* ImportExportUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000106 /* ImportExportUITests.swift */; };
+		AB1200000000000000000207 /* DeepLinkLockUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000107 /* DeepLinkLockUITests.swift */; };
+		AB1200000000000000000208 /* ProGateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000108 /* ProGateUITests.swift */; };
+		AB1200000000000000000209 /* SmartEntryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000109 /* SmartEntryUITests.swift */; };
+		AB1200000000000000000210 /* SettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000110 /* SettingsUITests.swift */; };
+		AB1200000000000000000211 /* SearchFilterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000111 /* SearchFilterUITests.swift */; };
+		AB1200000000000000000212 /* LayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1200000000000000000112 /* LayoutUITests.swift */; };
 		AB120000000000000000000F /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
 		AB1200000000000000000010 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
 		AB1200000000000000000011 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
@@ -803,7 +816,20 @@
 		E1A2B3C40000000000000614 /* LogTransactionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Log/LogTransactionRow.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000500 /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Templates/TemplatesView.swift; sourceTree = "<group>"; };
 		AB1200000000000000000002 /* SmartBudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB120000000000000000A001 /* UITestFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/UITestFixture.swift; sourceTree = SOURCE_ROOT; };
 		AB1200000000000000000007 /* SmartBudUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000101 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
+		AB1200000000000000000102 /* EntryFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFlowUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000103 /* LedgerEditingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerEditingUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000104 /* AccountTransferUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountTransferUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000105 /* BudgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000106 /* ImportExportUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000107 /* DeepLinkLockUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkLockUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000108 /* ProGateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProGateUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000109 /* SmartEntryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartEntryUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000110 /* SettingsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000111 /* SearchFilterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterUITests.swift; sourceTree = "<group>"; };
+		AB1200000000000000000112 /* LayoutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutUITests.swift; sourceTree = "<group>"; };
 		AB120000000000000000000E /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AccessibilityID.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -887,6 +913,18 @@
 		AB1200000000000000000006 /* SmartBudUITests */ = {
 			isa = PBXGroup;
 			children = (
+				AB1200000000000000000101 /* UITestSupport.swift */,
+				AB1200000000000000000102 /* EntryFlowUITests.swift */,
+				AB1200000000000000000103 /* LedgerEditingUITests.swift */,
+				AB1200000000000000000104 /* AccountTransferUITests.swift */,
+				AB1200000000000000000105 /* BudgetUITests.swift */,
+				AB1200000000000000000106 /* ImportExportUITests.swift */,
+				AB1200000000000000000107 /* DeepLinkLockUITests.swift */,
+				AB1200000000000000000108 /* ProGateUITests.swift */,
+				AB1200000000000000000109 /* SmartEntryUITests.swift */,
+				AB1200000000000000000110 /* SettingsUITests.swift */,
+				AB1200000000000000000111 /* SearchFilterUITests.swift */,
+				AB1200000000000000000112 /* LayoutUITests.swift */,
 				AB1200000000000000000007 /* SmartBudUITests.swift */,
 			);
 			path = SmartBudUITests;
@@ -1719,6 +1757,7 @@
 				E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */,
 				E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */,
 				E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */,
+				AB120000000000000000A002 /* UITestFixture.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2032,6 +2071,18 @@
 			files = (
 				AB1200000000000000000008 /* SmartBudUITests.swift in Sources */,
 				AB120000000000000000000F /* AccessibilityID.swift in Sources */,
+				AB1200000000000000000201 /* UITestSupport.swift in Sources */,
+				AB1200000000000000000202 /* EntryFlowUITests.swift in Sources */,
+				AB1200000000000000000203 /* LedgerEditingUITests.swift in Sources */,
+				AB1200000000000000000204 /* AccountTransferUITests.swift in Sources */,
+				AB1200000000000000000205 /* BudgetUITests.swift in Sources */,
+				AB1200000000000000000206 /* ImportExportUITests.swift in Sources */,
+				AB1200000000000000000207 /* DeepLinkLockUITests.swift in Sources */,
+				AB1200000000000000000208 /* ProGateUITests.swift in Sources */,
+				AB1200000000000000000209 /* SmartEntryUITests.swift in Sources */,
+				AB1200000000000000000210 /* SettingsUITests.swift in Sources */,
+				AB1200000000000000000211 /* SearchFilterUITests.swift in Sources */,
+				AB1200000000000000000212 /* LayoutUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

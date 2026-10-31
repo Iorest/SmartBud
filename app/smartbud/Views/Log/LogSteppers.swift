@@ -145,6 +145,7 @@ struct IncomeFilterToggleView: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .accessibilityIdentifier(AccessibilityID.logTypeFilter)
             .frame(maxWidth: SBControlWidth.segment)
 
             Spacer(minLength: 0)

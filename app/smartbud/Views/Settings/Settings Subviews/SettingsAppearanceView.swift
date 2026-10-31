@@ -32,6 +32,7 @@ struct SettingsAppearanceView: View {
                 .pickerStyle(.inline)
                 .labelsHidden()
                 #endif
+                .accessibilityIdentifier(AccessibilityID.settingsAppearancePicker)
             } footer: {
                 Text(String.appLocalized("Applied immediately."))
             }

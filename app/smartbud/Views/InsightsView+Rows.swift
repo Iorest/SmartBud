@@ -12,6 +12,9 @@ struct InsightsDollarView: View {
     let showCents: Bool
     let net: Bool?
     let color: Color
+    /// Adds `sb.insights.*`, so a case reads the number instead of matching
+    /// the two separate `Text`s (symbol and amount) it is drawn from.
+    let identifier: String
 
     private var symbol: String {
         if let netPositive = net {
@@ -35,6 +38,8 @@ struct InsightsDollarView: View {
         }
         .lineLimit(1)
         .minimumScaleFactor(0.7)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(identifier)
     }
 }
 
@@ -121,5 +126,6 @@ extension InsightsView {
                   systemImage: subscription.isUnlocked(.aiAnalysis) ? "sparkles" : "lock.fill")
         }
         .accessibilityLabel(Text(String.appLocalized("AI 账单分析")))
+        .accessibilityIdentifier(AccessibilityID.insightsAIAnalysis)
     }
 }

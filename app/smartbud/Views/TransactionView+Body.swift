@@ -90,6 +90,7 @@ extension TransactionView {
                     deleteButtonIcon
                 }
                 .accessibilityLabel(String.appLocalized("delete transaction"))
+                .accessibilityIdentifier(AccessibilityID.entryEditDelete)
             }
 
             TransactionRepeatButton(
@@ -106,6 +107,7 @@ extension TransactionView {
         VStack {
             if showToast {
                 SBToast(title: toastTitle, systemImage: toastImage)
+                    .accessibilityIdentifier(AccessibilityID.entryToast)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
             } else {
                 Picker(String.appLocalized("Type"), selection: $income) {
@@ -114,6 +116,7 @@ extension TransactionView {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                .accessibilityIdentifier(AccessibilityID.entryTypePicker)
                 .frame(maxWidth: SBControlWidth.segment)
             }
         }
@@ -332,6 +335,7 @@ extension TransactionView {
             if !income {
                 TransactionOptionChip(
                     systemImage: "tag",
+                    identifier: AccessibilityID.entryDiscount,
                     title: discount > 0
                         ? Money.format(discount,
                                        currencyCode: account?.resolvedCurrencyCode ?? currency,
@@ -348,6 +352,7 @@ extension TransactionView {
             if !income {
                 TransactionOptionChip(
                     systemImage: reimbursable ? "checkmark.circle.fill" : "arrow.uturn.backward.circle",
+                    identifier: AccessibilityID.entryClaim,
                     title: String.appLocalized("Claim"),
                     isOn: reimbursable
                 ) {

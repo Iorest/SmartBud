@@ -166,7 +166,8 @@ struct InsightsView: View {
                     currencySymbol: insightsVM.currencySymbol,
                     showCents: insightsVM.showCents,
                     net: insightsVM.periodNetPositive,
-                    color: insightsVM.periodNetPositive ? Color.IncomeGreen : Color.AlertRed
+                    color: insightsVM.periodNetPositive ? Color.IncomeGreen : Color.AlertRed,
+                    identifier: AccessibilityID.insightsNetTotal
                 )
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -183,7 +184,8 @@ struct InsightsView: View {
                     currencySymbol: insightsVM.currencySymbol,
                     showCents: insightsVM.showCents,
                     net: nil,
-                    color: Color.PrimaryText
+                    color: Color.PrimaryText,
+                    identifier: AccessibilityID.insightsAverage
                 )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -215,14 +217,16 @@ struct InsightsView: View {
     private var incomeCard: some View {
         InsightsSummaryBlockView(
             income: true,
-            amountString: format(insightsVM.periodTotalIncome)
+            amountString: format(insightsVM.periodTotalIncome),
+            identifier: AccessibilityID.insightsIncomeCard
         )
     }
 
     private var expenseCard: some View {
         InsightsSummaryBlockView(
             income: false,
-            amountString: format(insightsVM.periodTotalSpent)
+            amountString: format(insightsVM.periodTotalSpent),
+            identifier: AccessibilityID.insightsExpenseCard
         )
     }
 

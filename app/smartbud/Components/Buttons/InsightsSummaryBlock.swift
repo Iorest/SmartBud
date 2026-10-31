@@ -10,6 +10,7 @@ import SwiftUI
 struct InsightsSummaryBlockView: View {
     let income: Bool
     let amountString: String
+    let identifier: String
 
     private var color: Color {
         income ? Color.IncomeGreen : Color.AlertRed
@@ -46,5 +47,6 @@ struct InsightsSummaryBlockView: View {
         .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title), \(amountString)")
+        .accessibilityIdentifier(identifier)
     }
 }

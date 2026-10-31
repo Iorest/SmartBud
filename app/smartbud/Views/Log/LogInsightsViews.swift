@@ -54,6 +54,7 @@ struct LogInsightsView: View {
             )
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilitySummary(data))
+            .accessibilityIdentifier(AccessibilityID.logSummary)
 
             if data.totalSpent != 0 && data.totalIncome != 0 && insightsType == 1 {
                 HStack(spacing: SBSpace.extraSmall) {

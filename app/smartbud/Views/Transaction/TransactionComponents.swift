@@ -16,6 +16,8 @@ struct TransactionOptionChip: View {
     let systemImage: String
     let title: String
     let isOn: Bool
+    /// Identifier of the chip; every use is driveable, so it is required.
+    let identifier: String
     var action: () -> Void
 
     var body: some View {
@@ -38,6 +40,7 @@ struct TransactionOptionChip: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isOn ? .isSelected : [])
+        .accessibilityIdentifier(identifier)
     }
 }
 
@@ -89,6 +92,7 @@ struct NoteView: View {
 
             ZStack(alignment: .leading) {
                 TextField("", text: $note)
+                    .accessibilityIdentifier(AccessibilityID.entryNote)
                     .onChange(of: note) { _, new in
                         if new.count > characterLimit {
                             note = String(new.prefix(characterLimit))

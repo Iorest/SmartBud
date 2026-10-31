@@ -36,6 +36,7 @@ struct SettingsNotificationsView: View {
             .font(.body)
         }
         .tint(.green)
+        .accessibilityIdentifier(AccessibilityID.settingsNotificationEnable)
         .padding(.vertical, 4)
       }
       .padding(.horizontal, SBSpace.medium)
@@ -62,6 +63,7 @@ struct SettingsNotificationsView: View {
           }
           .pickerStyle(.inline)
           .labelsHidden()
+          .accessibilityIdentifier(AccessibilityID.settingsNotificationOption)
 
           if option == 3 {
             Divider()
@@ -70,6 +72,7 @@ struct SettingsNotificationsView: View {
               selection: $customTime,
               displayedComponents: .hourAndMinute
             )
+            .accessibilityIdentifier(AccessibilityID.settingsNotificationCustomTime)
             .padding(.vertical, SBSpace.extraSmall)
           }
         }

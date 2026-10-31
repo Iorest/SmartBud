@@ -352,6 +352,7 @@ extension LogView {
                         systemImage: FilterType.imageDictionary[option] ?? "line.3.horizontal.decrease"
                     )
                     .tag(option)
+                        .accessibilityIdentifier(AccessibilityID.logFilterOption(option.rawValue))
                 }
             }
 
@@ -367,6 +368,7 @@ extension LogView {
                   : "line.3.horizontal.decrease.circle.fill")
         }
         .accessibilityLabel(Text(String.appLocalized("Filter")))
+        .accessibilityIdentifier(AccessibilityID.logFilter)
     }
 
     var body: some View {

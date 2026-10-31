@@ -87,6 +87,8 @@ struct HomeView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier(
+                        AccessibilityID.sidebarTab(section.id.lowercased()))
                     .listRowBackground(
                         currentTab == section.id
                             ? Color.accentColor.opacity(0.15)
@@ -350,6 +352,19 @@ extension HomeView {
             #if DEBUG
             if ProcessInfo.processInfo.environment["START_CREATE"] == "1" {
                 addTransaction = true
+            }
+            // QA hook: an XCUITest cannot type a URL into another app and tap
+            // the system's "Open in SmartBud?" prompt deterministically, so the
+            // URL comes in through the environment and is fed to the same two
+            // handlers the `.onOpenURL` chain uses — router first, then the
+            // `newexpense` shortcut.
+            if let raw = ProcessInfo.processInfo.environment["DEEPLINK_URL"],
+               let url = URL(string: raw) {
+                if url.host?.lowercased() == "newexpense" {
+                    requestNewTransaction()
+                } else {
+                    _ = handleDeepLink(url)
+                }
             }
             #endif
             if launchIntoEntry, !appLockVM.isAppLockEnabled {

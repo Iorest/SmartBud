@@ -55,6 +55,7 @@ struct AccountEditor: View {
                             }
 
                         TextField(String.appLocalized("Account name"), text: $name)
+                            .accessibilityIdentifier(AccessibilityID.accountName)
                     }
                 }
 
@@ -66,6 +67,7 @@ struct AccountEditor: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    .accessibilityIdentifier(AccessibilityID.accountKindPicker)
                 }
 
                 Section {
@@ -74,6 +76,7 @@ struct AccountEditor: View {
                             Text("\(currency.code) · \(currency.name)").tag(currency.code)
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.accountCurrencyPicker)
                 } footer: {
                     Text(String.appLocalized(
                         "Amounts in this account use this currency. Totals convert "
@@ -90,6 +93,7 @@ struct AccountEditor: View {
                             #endif
                             .multilineTextAlignment(.trailing)
                             .monospacedDigit()
+                            .accessibilityIdentifier(AccessibilityID.accountOpeningBalance)
                     }
                 } footer: {
                     Text(String.appLocalized(
@@ -110,9 +114,11 @@ struct AccountEditor: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String.appLocalized("Cancel")) { dismiss() }
+                        .accessibilityIdentifier(AccessibilityID.accountCancel)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String.appLocalized("Done")) { save() }
+                        .accessibilityIdentifier(AccessibilityID.accountSave)
                         .disabled(!canSave)
                 }
             }
@@ -206,6 +212,7 @@ struct TransactionAccountChip: View {
         .buttonStyle(.plain)
         .accessibilityLabel(Text(String.appFormatted("Account: %@",
             account?.wrappedName ?? String.appLocalized("None"))))
+        .accessibilityIdentifier(AccessibilityID.entryAccount)
     }
 }
 
@@ -266,6 +273,10 @@ struct AccountPickerSheet: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    // One identifier for every row; the row's own label carries
+                    // the account name, so a case picks by name, not by index.
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier(AccessibilityID.entryAccountRow)
                 }
             }
             .navigationTitle(String.appLocalized("Account"))

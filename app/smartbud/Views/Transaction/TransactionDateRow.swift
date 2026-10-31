@@ -35,6 +35,7 @@ struct TransactionDateRow: View {
         .buttonStyle(.plain)
         .accessibilityLabel(Text(String.appLocalized("Date") + ": "
             + TransactionDates.day(date) + " " + TransactionDates.time(date)))
+        .accessibilityIdentifier(AccessibilityID.entryDate)
     }
 
     private func row(withTime: Bool) -> some View {

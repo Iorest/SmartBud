@@ -29,6 +29,16 @@ class AppLockViewModel {
     init() {
         migrateLegacyAppLockKey()
         getAppLockState()
+        #if DEBUG
+        // QA hook: writes the same key the Settings toggle writes, so the rest
+        // of the launch takes the normal locked path. Has to happen here and
+        // not in `UITestFixture`: this object is built before `SmartBudApp`
+        // clears the defaults.
+        if UITestFixture.forcesAppLock {
+            UserDefaults.appGroup.set(true, forKey: Self.appLockKey)
+            isAppLockEnabled = true
+        }
+        #endif
         // A cold launch while the lock is enabled is locked until Face ID /
         // passcode succeeds; intents read this flag too.
         AppLockGate.setUnlocked(!isAppLockEnabled)
@@ -136,6 +146,20 @@ class AppLockViewModel {
 
     // This method will call on every launch of the app if user has enabled AppLock
     func appLockValidation() {
+        #if DEBUG
+        // QA hooks. Without a passcode the simulator can neither evaluate the
+        // policy nor fall back to one, so a forced lock is asserted as-is and
+        // an unlock attempt succeeds immediately instead of bouncing the app
+        // into Settings.
+        if UITestFixture.forcesAppLock {
+            if UITestFixture.unlocksWithoutPrompt {
+                isAppUnLocked = true
+                AppLockGate.setUnlocked(true)
+                enrollmentError = false
+            }
+            return
+        }
+        #endif
         let laContext = LAContext()
         if canAuthenticate() {
             let reason = "Enable App Lock"

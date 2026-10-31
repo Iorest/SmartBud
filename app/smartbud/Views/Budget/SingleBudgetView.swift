@@ -180,6 +180,8 @@ extension SingleBudgetView {
 
                         VStack(alignment: .trailing, spacing: -4) {
                             BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 1)
+                                .accessibilityElement(children: .combine)
+                                .accessibilityIdentifier(AccessibilityID.budgetRowRemaining)
 
                             Text("\(remainingStatus) \(budgetType)")
                                 .font(.caption2.weight(.medium))
@@ -189,6 +191,7 @@ extension SingleBudgetView {
                     .padding(10)
                     .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                     .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))
+                    .accessibilityIdentifier(AccessibilityID.budgetRow)
                     .contextMenu {
                         Button {
                             toEdit = budget
@@ -292,6 +295,8 @@ extension SingleBudgetView {
                             .foregroundStyle(Color.SubtitleText)
 
                         BudgetDollarView(amount: difference, red: totalSpent >= budgetAmount, scale: 2)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityIdentifier(AccessibilityID.budgetRowRemaining)
 
                         Spacer(minLength: 0)
                     }
@@ -333,6 +338,7 @@ extension SingleBudgetView {
                 .frame(maxWidth: .infinity)
                 .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
                 .contentShape(RoundedRectangle(cornerRadius: SBRadius.card))
+                .accessibilityIdentifier(AccessibilityID.budgetRow)
                 .contextMenu {
                     Button {
                         toEdit = budget

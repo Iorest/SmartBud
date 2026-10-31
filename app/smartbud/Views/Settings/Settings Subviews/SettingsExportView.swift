@@ -22,6 +22,10 @@ struct SettingsExportView: View {
     @State private var errorMessage: String?
     @State private var isPresentingShareSheet = false
     @State private var isPresentingError = false
+    /// DEBUG-only: record count of the file just written. Export deliberately
+    /// has no preview screen, so a test could otherwise only assert that the
+    /// share sheet came up.
+    @State private var exportedRecordCount: Int?
 
     var body: some View {
         VStack(spacing: 10) {
@@ -43,6 +47,15 @@ struct SettingsExportView: View {
                             .foregroundStyle(Color.SubtitleText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
+                    #if DEBUG
+                    if UITestFixture.isStoreRequested, let exportedRecordCount {
+                        Text(String.appFormatted("Exported %lld records.", exportedRecordCount))
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.SubtitleText)
+                            .accessibilityIdentifier(AccessibilityID.exportSummary)
+                    }
+                    #endif
 
                     if isExporting {
                         HStack(spacing: 8) {
@@ -110,6 +123,7 @@ struct SettingsExportView: View {
             .padding(.vertical, 12)
         }
         .buttonStyle(.borderedProminent)
+        .accessibilityIdentifier(AccessibilityID.exportJSONButton)
         .disabled(isExporting)
     }
 
@@ -141,7 +155,26 @@ struct SettingsExportView: View {
                 let url = try DataExporter.exportToFile()
                 exportedFileURL = url
                 isExporting = false
+                #if DEBUG
+                if UITestFixture.isStoreRequested {
+                    exportedRecordCount = Self.recordCount(of: url)
+                }
+                // QA hook: `SmartBudUITests` cannot steer the share sheet, so
+                // the file it would have shared is parked in the app container
+                // and imported by the next launch of the same case. The sheet
+                // itself is skipped: it is a system surface and it would cover
+                // the recorded count.
+                if UITestFixture.exportsToDocuments,
+                   let destination = UITestFixture.documentsBackupURL {
+                    try? FileManager.default.removeItem(at: destination)
+                    try? FileManager.default.copyItem(at: url, to: destination)
+                }
+                if !UITestFixture.exportsToDocuments {
+                    isPresentingShareSheet = true
+                }
+                #else
                 isPresentingShareSheet = true
+                #endif
             } catch let error as DataExporter.ExportError {
                 isExporting = false
                 if case .noData = error {
@@ -158,6 +191,14 @@ struct SettingsExportView: View {
                 isPresentingError = true
             }
         }
+    }
+
+    /// How many records the file carries, read back through the same decoder
+    /// the restore screen uses. Returns nil rather than a wrong number if the
+    /// file cannot be read — a test then fails on the missing line.
+    private static func recordCount(of url: URL) -> Int? {
+        guard let payload = try? DataImporter.decodeFile(at: url) else { return nil }
+        return DataImporter.preview(payload).imported
     }
 
     private func generateCSV() {

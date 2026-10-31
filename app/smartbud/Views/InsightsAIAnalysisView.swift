@@ -28,6 +28,7 @@ struct InsightsAIAnalysisView: View {
         }
         .padding(20)
         .appBackground()
+        .accessibilityIdentifier(AccessibilityID.aiScreen)
         .task { await analyze() }
     }
 
@@ -43,6 +44,7 @@ struct InsightsAIAnalysisView: View {
                     .foregroundStyle(Color.SubtitleText.opacity(0.7))
             }
             .accessibilityLabel(Text(String.appLocalized("关闭")))
+            .accessibilityIdentifier(AccessibilityID.aiClose)
         }
     }
 
@@ -67,6 +69,7 @@ struct InsightsAIAnalysisView: View {
                         .font(.subheadline)
                         .foregroundStyle(needsSetup ? Color.SubtitleText : Color.AlertRed)
                         .multilineTextAlignment(.center)
+                        .accessibilityIdentifier(AccessibilityID.aiMessage)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, 60)

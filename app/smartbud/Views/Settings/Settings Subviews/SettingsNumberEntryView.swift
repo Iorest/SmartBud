@@ -52,6 +52,7 @@ struct SettingsNumberEntryView: View {
 
             Section {
                 Toggle(String.appLocalized("Save and Continue"), isOn: $continuousEntry)
+                    .accessibilityIdentifier(AccessibilityID.settingsContinuousEntryToggle)
             } footer: {
                 Text(String.appLocalized(
                     "Keeps the form open after saving, with the category and date kept, "

@@ -226,6 +226,7 @@ struct SettingsView: View {
             )) {
               SettingsRowView(icon: "faceid", colour: 105, title: SettingsKey.rowAuthentication)
             }
+            .accessibilityIdentifier(AccessibilityID.settingsAppLockToggle)
 
             settingsLink(.weekStart, "calendar", 109, SettingsKey.rowTimeFrames, nil)
           }

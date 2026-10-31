@@ -42,6 +42,7 @@ struct AccountListView: View {
                         message: String.appLocalized(
                             "Add the cards and wallets you pay from to see where the money goes."),
                         actionTitle: String.appLocalized("New Account"),
+                        actionIdentifier: AccessibilityID.accountsAdd,
                         action: { showEditor = true }
                     )
                     .listRowSeparator(.hidden)
@@ -82,6 +83,7 @@ struct AccountListView: View {
                     Image(systemName: "arrow.left.arrow.right")
                 }
                 .accessibilityLabel(String.appLocalized("Transfer"))
+                .accessibilityIdentifier(AccessibilityID.accountsTransfer)
                 .disabled(accountVM.visibleAccounts.count < 2)
             }
 
@@ -92,6 +94,7 @@ struct AccountListView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel(String.appLocalized("New Account"))
+                .accessibilityIdentifier(AccessibilityID.accountsAdd)
             }
         }
         .onAppear { accountVM.load() }
@@ -207,6 +210,7 @@ struct AccountListView: View {
                      : String.appFormatted("Show Hidden Accounts (%lld)",
                                            accountVM.hiddenAccounts.count))
             }
+            .accessibilityIdentifier(AccessibilityID.accountsHiddenToggle)
         } header: {
             Text(String.appLocalized("Hidden"))
         } footer: {
@@ -233,6 +237,7 @@ struct AccountListView: View {
                      : String.appFormatted("Show Archived Accounts (%lld)",
                                            accountVM.archivedAccounts.count))
             }
+            .accessibilityIdentifier(AccessibilityID.accountsArchivedToggle)
         } header: {
             Text(String.appLocalized("Archived"))
         } footer: {

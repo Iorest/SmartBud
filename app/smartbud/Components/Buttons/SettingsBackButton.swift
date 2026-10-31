@@ -19,5 +19,6 @@ struct SettingsBackButton: View {
       .background(Circle().fill(.clear))
       .systemChip(in: Circle())
       .accessibilityLabel(String.appLocalized("Back"))
+      .accessibilityIdentifier(AccessibilityID.settingsBack)
   }
 }

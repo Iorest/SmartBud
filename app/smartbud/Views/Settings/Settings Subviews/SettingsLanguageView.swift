@@ -49,6 +49,7 @@ struct SettingsLanguageView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(appLanguage == code ? [.isButton, .isSelected] : .isButton)
+                    .accessibilityIdentifier(AccessibilityID.settingsLanguageRow(code))
                 }
             } footer: {
                 Text(String.appLocalized("Reopening the app is required for a language change to take effect."))

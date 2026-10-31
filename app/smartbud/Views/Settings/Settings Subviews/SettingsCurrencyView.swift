@@ -37,6 +37,7 @@ struct SettingsCurrencyView: View {
                 NavigationLink(value: SettingsRoute.rates) {
                     Label(String.appLocalized("Exchange Rates"), systemImage: "arrow.left.arrow.right")
                 }
+                .accessibilityIdentifier(AccessibilityID.settingsCurrencyRates)
             }
 
             Section {
@@ -108,6 +109,7 @@ struct SettingsCurrencyView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("\(currency.name) (\(currency.code))")
             .accessibilityAddTraits(currency.code == currencyCode ? [.isButton, .isSelected] : .isButton)
+            .accessibilityIdentifier(AccessibilityID.settingsCurrencyRow(currency.code))
         }
     }
 

@@ -85,6 +85,7 @@ struct SmartEntrySheet: View {
                     .foregroundStyle(Color.PrimaryText)
             }
             .accessibilityLabel(Text(String.appLocalized("解析")))
+            .accessibilityIdentifier(AccessibilityID.smartEntryParse)
             .disabled(text.trimmingCharacters(in: .whitespaces).isEmpty)
         }
     }
@@ -130,11 +131,13 @@ struct SmartEntrySheet: View {
                 Text(parsed.amount.formatted(.number.precision(.fractionLength(2))))
                     .font(.title3.weight(.bold))
                     .foregroundStyle(Color.PrimaryText)
+                    .accessibilityIdentifier(AccessibilityID.smartEntryPreviewAmount)
             }
             if let category = resolvedCategory(parsed) {
                 Text(category.fullName)
                     .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
+                    .accessibilityIdentifier(AccessibilityID.smartEntryPreviewCategory)
             }
             if let merchant = parsed.merchant {
                 Text(merchant)
@@ -151,10 +154,12 @@ struct SmartEntrySheet: View {
                     .padding(.vertical, 10)
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier(AccessibilityID.smartEntryApply)
             .padding(.top, 4)
         }
         .padding(14)
         .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+        .accessibilityIdentifier(AccessibilityID.smartEntryPreview)
     }
 
     // MARK: - Actions

@@ -38,6 +38,7 @@ struct AppLockView: View {
                         .stroke(Color.Outline)
                 }
             }
+            .accessibilityIdentifier(AccessibilityID.lockUnlockButton)
 
             if appLockVM.enrollmentError {
                 Text("Please re-enable Face ID access in the Settings app to unlock application.")
@@ -50,5 +51,6 @@ struct AppLockView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.PrimaryBackground.opacity(0.3))
         .background(.ultraThinMaterial)
+        .accessibilityIdentifier(AccessibilityID.lockScreen)
     }
 }

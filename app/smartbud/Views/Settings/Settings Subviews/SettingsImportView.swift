@@ -111,6 +111,18 @@ struct SettingsImportView: View {
 
     private var importButton: some View {
         Button {
+            #if DEBUG
+            // QA hook: the system file picker cannot be steered by XCUITest,
+            // so under `-importBackupFromDocuments` the button reads the file
+            // the export hook parked in the app container instead. Every step
+            // after the picker is the production path.
+            if UITestFixture.importsFromDocuments,
+               let url = UITestFixture.documentsBackupURL,
+               FileManager.default.fileExists(atPath: url.path) {
+                loadForPreview(from: url)
+                return
+            }
+            #endif
             isPresentingPicker = true
         } label: {
             HStack {
@@ -122,6 +134,7 @@ struct SettingsImportView: View {
             .padding(.vertical, 12)
         }
         .buttonStyle(.borderedProminent)
+        .accessibilityIdentifier(AccessibilityID.importBackupChooseFile)
         .disabled(isImporting)
     }
 
@@ -150,6 +163,7 @@ struct SettingsImportView: View {
         .background(Color.SecondaryBackground,
                     in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.importBackupResult)
     }
 
     /// A backup restores the currency its amounts were frozen in. Only applied

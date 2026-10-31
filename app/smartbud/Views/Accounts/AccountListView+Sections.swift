@@ -20,6 +20,7 @@ extension AccountListView {
             Text(Money.format(accountVM.totalBalance, currencyCode: currency,
                               showsCents: showCents, locale: .appLocale))
                 .font(.title3.weight(.semibold).monospacedDigit())
+                .accessibilityIdentifier(AccessibilityID.accountsTotal)
         }
         .padding(.vertical, SBSpace.xxs)
         .listRowSeparator(.hidden)
@@ -73,6 +74,8 @@ extension AccountListView {
                 .minimumScaleFactor(0.7)
         }
         .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.accountsTransferRow)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive) {
                 transferToDelete = transfer
@@ -112,6 +115,9 @@ extension AccountListView {
         }
         .padding(.vertical, 2)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier(AccessibilityID.accountsRow)
         .onTapGesture { editing = account }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             rowSwipeActions(for: account)
@@ -159,6 +165,7 @@ extension AccountListView {
             Label(String.appLocalized(account.archived ? "Unarchive" : "Archive"),
                   systemImage: account.archived ? "tray.and.arrow.up" : "archivebox")
         }
+        .accessibilityIdentifier(AccessibilityID.accountsRowArchive)
         .tint(.orange)
         Button {
             accountVM.setHidden(!account.hidden, for: account)
@@ -166,6 +173,7 @@ extension AccountListView {
             Label(String.appLocalized(account.hidden ? "Show" : "Hide"),
                   systemImage: account.hidden ? "eye" : "eye.slash")
         }
+        .accessibilityIdentifier(AccessibilityID.accountsRowHide)
         .tint(.gray)
     }
 }
