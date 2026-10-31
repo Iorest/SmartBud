@@ -301,6 +301,7 @@ struct NumberPadTextView: View {
         }
         .disabled(viewModel.price == 0 && !viewModel.isEditingDecimal)
         .accessibilityLabel(Text(String.appLocalized("Delete")))
+        .accessibilityIdentifier(AccessibilityID.entryAmountDelete)
     }
 }
 

@@ -86,6 +86,13 @@ struct SingleBudgetView: View {
         return "\(Int(round(Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
+    /// Machine-readable remainder for the E2E cases: a plain signed number, so
+    /// a case never has to reconstruct the sign from the "left" / "over" copy.
+    /// Negative means overspent. `difference` stays the visual magnitude.
+    var signedRemainingText: String {
+        String(format: "%.2f", budgetAmount - totalSpent)
+    }
+
     /// Share of the period still ahead, measured from the *current* period's
     /// start (the stored one only rolls when the budget screen opens).
     var remainingFraction: Double {
@@ -188,6 +195,7 @@ extension SingleBudgetView {
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier(
                             AccessibilityID.budgetRemaining(budget.wrappedName))
+                        .accessibilityValue(Text(signedRemainingText))
                     }
                     .padding(10)
                     .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
@@ -302,6 +310,7 @@ extension SingleBudgetView {
                     .accessibilityElement(children: .combine)
                     .accessibilityIdentifier(
                         AccessibilityID.budgetRemaining(budget.wrappedName))
+                    .accessibilityValue(Text(signedRemainingText))
 
                     Text(String.appFormatted("%@ • %@ spent", budgetType, percentString1))
                         .font(.footnote.weight(.medium))

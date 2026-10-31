@@ -78,6 +78,9 @@ enum AccessibilityID {
     static let entryDateButton = "sb.entry.dateButton"
     /// Long-press alternative on the checkmark.
     static let entrySaveAndContinue = "sb.entry.saveAndContinue"
+    /// The read-out's trailing delete, the only erase key in "cent-less" entry
+    /// mode (the pad's bottom-left key is the decimal point there).
+    static let entryAmountDelete = "sb.entry.amountDelete"
 
     // MARK: - Number pad
 

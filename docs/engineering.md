@@ -70,7 +70,7 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），5 条 smoke：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），8 条 smoke：
 
 | 用例 | 挡住什么 |
 |---|---|
@@ -79,6 +79,9 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），5 �
 | `testSmartEntryOpensAndCancels` | 智能记账弹层的开关，以及弹层关掉后表单还在 |
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
+| `testSaveStaysDisabledWithoutAmount` | 金额为 0 时勾号不可用，输入后变可用 |
+| `testEditingAmountUpdatesRow` | 点开账本行改金额后，行上的数字跟着变 |
+| `testCancelDiscardsDraft` | 有内容时取消要确认，且不落账 |
 
 外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
 余额、预算剩余、校验提示），并与动作前在同一 run 里读到的值比较——模拟器的 store 跨用例、
@@ -97,7 +100,21 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），5 �
 | `testA9_budgetRemaining_dropsThenGoesOver` | 分类预算：新建 100 → 花 30 后剩 70 → 再花 100 后显示 `over`，超额数值正确 |
 
 A9 重复跑时会复用上一轮建在同一分类上的预算（分类预算一个分类只允许一个），
-断言因此用带符号的剩余额差值；`over` 状态由状态词读回，符号由该词决定。
+断言因此用带符号的剩余额差值。剩余额的**符号**读的是 tile 的 `accessibilityValue`
+（`SingleBudgetView.signedRemainingText`，纯带符号数字，亏空为负），不靠解析
+「$30.00 over」这句文案：那个数字是无符号量值，解析它只能拼出符号、还会把 tile 上
+别的数字一起吃掉。
+
+### 输入金额：两种键盘模式
+
+`ContentViewModel.bootstrap` 把 `numberEntryType` 种成 2（「cent-less」）：键盘左下角是
+小数点，`12.50` 就是 `12` `.` `50`，读数显示 `12.50`。老的 1（「pre-dotted」）把每两位
+数字当分，同样的金额要敲 `1250`，而且没有小数点键。
+
+用例统一走 `enterAmount(_:_:)`：先按键盘上有没有小数点键判断当前模式，再按模式敲；
+清空走 `clearAmount(_:)`，模式 2 下用读数右侧的删除键（`sb.entry.amountDelete`），
+模式 1 下用键盘上的退格。用例里不要直接写死 `typeDigits("1250")`——那等于把模拟器当时的
+设置写进断言，换个模式就红。
 
 ```bash
 xcodebuild test \
@@ -108,8 +125,14 @@ xcodebuild test \
   -resultBundlePath UITestResults.xcresult
 ```
 
-不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里两个 job 分开跑，
-逻辑测试 job 显式加了 `-only-testing:SmartBudTests`。
+不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
+`-only-testing:SmartBudTests`。
+
+17 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成三个
+分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例）、
+`e2e 记账/编辑`（A1–A5）、`e2e 删除/转账/预算`（A6–A9）。**新增用例要同时加进
+`.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke 分片会把它一起跑掉。
+拆分的另一个约束是 10 分钟预算本身：单条用例再长出 60 秒以上，A6/A8 那个分片就要重新分。
 
 ### 元素怎么定位
 
@@ -139,9 +162,11 @@ xcodebuild test \
 
 ### 可访问性审计
 
-每条用例末尾都跑 `performAccessibilityAudit`，发现的问题全部打到日志里
+每条 **smoke** 用例末尾都跑 `performAccessibilityAudit`，发现的问题全部打到日志里
 （`AUDIT[屏幕] 类型 描述 [identifier]`），CI job summary 汇总最近 60 条，完整报告在
-`UITestResults.xcresult` / `xcodebuild-uitest.log` artifact 里。
+`UITestResults-<分片>.xcresult` / `xcodebuild-uitest.log` artifact 里。9 条交互 E2E 不跑审计：
+它们每条要多走 4–6 个界面，审计本身每次 3–8 秒，加进去就把 E2E 分片顶出 10 分钟预算；
+审计的覆盖面由 smoke 用例保证（账本、设置、导入、智能记账四个屏）。
 
 **当前会被显式忽略的类型**（`AccessibilityAuditPolicy.ignoredTypes`），每项都有归属：
 
@@ -175,10 +200,10 @@ xcodebuild test \
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test`（`-only-testing:SmartBudUITests`），两个都要绿 |
+| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的三个分片 job（见「UI 测试」一节），全部要绿 |
 | 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
 | 超时 | 逻辑测试 45 分钟，UI 测试 60 分钟 |
-| 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults.xcresult` + 日志，**每次**上传（审计报告在里面） |
+| 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults-<分片>.xcresult` + 日志，**每次**上传（审计报告与失败截图在里面） |
 
 没用 `macos-14`：该镜像最高只有 Xcode 16.2（没有 iOS 26 SDK），
 且 GitHub 在 2026-11-02 之后不再支持它。

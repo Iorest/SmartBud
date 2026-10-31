@@ -138,11 +138,51 @@ jobs:
           retention-days: 7
 
   ui-test:
-    name: UI smoke tests (XCUITest)
+    name: UI ${{ matrix.label }} (XCUITest)
     # Same image and Xcode selection as the logic-test job: the UI cases need
     # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
+    #
+    # Three shards rather than one job: a single simulator run of the whole
+    # suite takes ~14 minutes, which is past the 10-minute budget this
+    # project keeps for the UI gate. Each shard is its own job (they run
+    # concurrently) and each stays under it. A new case must be added to one
+    # of `tests` below — the smoke shard skips every E2E case by name.
     runs-on: macos-15
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: smoke
+            label: smoke
+            filter: skip
+            tests: >-
+              testA1_addExpense_updatesStats
+              testA2_continuousEntry_clearsAmountKeepsCategory
+              testA3_invalidInput_isRefusedWithMessage
+              testA4_discountClaimFutureDate_staysOutOfStats
+              testA5_editAmount_updatesStats_typeSwitchClearsCategory
+              testA6_deleteUndo_restoresFieldsAndBalance
+              testA7_sameCurrencyTransfer_movesBalancesOnly
+              testA8_crossCurrencyTransfer_feeOnlyInSpend
+              testA9_budgetRemaining_dropsThenGoesOver
+          - key: e2e-entry
+            label: e2e 记账/编辑
+            filter: only
+            tests: >-
+              testA1_addExpense_updatesStats
+              testA2_continuousEntry_clearsAmountKeepsCategory
+              testA3_invalidInput_isRefusedWithMessage
+              testA4_discountClaimFutureDate_staysOutOfStats
+              testA5_editAmount_updatesStats_typeSwitchClearsCategory
+          - key: e2e-ledger
+            label: e2e 删除/转账/预算
+            filter: only
+            tests: >-
+              testA6_deleteUndo_restoresFieldsAndBalance
+              testA7_sameCurrencyTransfer_movesBalancesOnly
+              testA8_crossCurrencyTransfer_feeOnlyInSpend
+              testA9_budgetRemaining_dropsThenGoesOver
 
     env:
       PROJECT: app/SmartBud.xcodeproj
@@ -177,15 +217,22 @@ jobs:
       - name: UI tests
         run: |
           set -o pipefail
+          filters=()
+          for test in ${{ matrix.tests }}; do
+            filters+=("-${FILTER}-testing:SmartBudUITests/${test}")
+          done
           xcodebuild test \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
             -only-testing:SmartBudUITests \
+            "${filters[@]}" \
             -testLanguage en \
             -testRegion US \
             -resultBundlePath "$RESULT_BUNDLE" \
             2>&1 | tee "$LOG_FILE"
+        env:
+          FILTER: ${{ matrix.filter }}
 
       - name: Summarise UI test results
         if: always()
@@ -214,7 +261,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: UITestResults
+          name: UITestResults-${{ matrix.key }}
           path: |
             UITestResults.xcresult
             xcodebuild-uitest.log
