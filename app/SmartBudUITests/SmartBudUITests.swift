@@ -728,7 +728,12 @@ final class SmartBudUITests: XCTestCase {
             if nextMonth.exists { nextMonth.tap() }
         }
         let day = String(calendar.component(.day, from: tomorrow))
-        let cell = picker.buttons[day].firstMatch
+        // UIKit's calendar cells are exposed with the day number as the whole
+        // label on some OS versions and as "Saturday, November 1" on others.
+        // Match either, on any element type, so the case does not pin one.
+        let cell = picker.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@ OR label ENDSWITH %@", day, " \(day)"))
+            .firstMatch
         if !cell.waitForExistence(timeout: 5) {
             XCTFail("Date picker day \(day) is not addressable.\n\(picker.debugDescription)",
                     file: file, line: line)
