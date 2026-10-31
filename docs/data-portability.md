@@ -27,9 +27,16 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   "templates": [ ... ],
   "accounts": [ ... ],
   "transfers": [ ... ],
-  "rates": [ ... ]
+  "rates": [ ... ],
+  "settings": {
+    "baseCurrency": "CNY",
+    "firstDayOfMonth": 1,
+    "firstWeekday": 1
+  }
 }
 ```
+
+`settings` 缺失时导入端按"旧备份"处理（不校验基准货币）；导出端总是写入它。
 
 约定：
 
@@ -83,7 +90,8 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 2. 有 id 的实体按 id 去重：本机已存在的记录直接跳过，所以**同一个文件导入两次是安全的**。
 3. 转账必须两端账户都能解析，否则整条跳过（避免出现一端为空的转账）。
 4. 总预算（`MainBudgetModel`）没有 id，按 `金额 + 起始日 + 周期` 三元组去重。
-5. 汇率按货币代码更新本机值（属于配置，不算"数据条数"）。
+5. 汇率只补本机没有的货币代码；本机已有该代码时保留本机值、不算"数据条数"
+   （用旧备份覆盖今天的汇率会悄悄改掉账户余额与转账建议）。
 6. 整个导入只在最后 `save()` 一次；失败会 `rollback()`，不会留下半份数据。
 7. `schemaVersion` 比当前版本新时直接拒绝：新格式可能换了金额或关系的存法，
    静默导入会把错数字写进账本。
@@ -95,15 +103,17 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 ## CSV 列
 
 ```
-date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbursed,fee
+date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbursed,fee,merchant,merchant_key
 ```
 
+- `merchant` / `merchant_key` 是追加在末尾的两列，已有列位置不变
 - `type`：`expense` / `income` / `adjustment` / `transfer`
 - `transfer` 行的 `account` 写成 `转出账户 → 转入账户`，`fee` 只在这一行有值
 - 日期是 `yyyy-MM-dd HH:mm:ss`（设备本地时区），金额固定两位小数
 - 按 RFC 4180 转义：含逗号、引号或换行的字段加引号，内部引号翻倍
 
-CSV 是单向的，没有导入实现 —— 需要能导回的场合请用 JSON。
+导出的 CSV 不是备份格式，没有"选它就能整份导回"的路径。CSV 导入向导面向银行/支付
+账单，需要在界面上手工映射列（见上一节）；要能原样导回请用 JSON。
 
 ## 导入之后
 

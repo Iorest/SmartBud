@@ -204,7 +204,7 @@ TemplateTransactionModel                 快捷记账模板
 
 ### 6.9 导入 / 导出 / 清除
 
-- 导出：JSON（完整、可导回，`schemaVersion` 4）+ CSV（单向，给人看）。CSV 末尾两列 `merchant` / `merchant_key` 是追加的，已有列位置不变。
+- 导出：JSON（完整、可导回，`schemaVersion` 6）+ CSV（单向，给人看）。CSV 末尾两列 `merchant` / `merchant_key` 是追加的，已有列位置不变。
 - 导入：按 id 合并、重复跳过、关系按 id 再按名字兜底、整份文件一次提交、失败回滚；拒绝更高版本、拒绝非备份、金额与汇率做防御性收敛。
 - 导入后必须刷新：账户、分类、预算、统计、小组件时间线。
 - 清除：本地全删（含账户/转账/汇率）+ 尝试删除 CloudKit zone，之后刷新所有缓存。
@@ -230,10 +230,10 @@ TemplateTransactionModel                 快捷记账模板
 | 汇率 | `CurrencyRateStore` | 汇率增删改、网络更新、导入、清除 |
 | 列表页 | `@Query`（LogView 等） | 自动 |
 
-设计要求：**任何写入路径都必须显式刷新受影响的缓存**，不能依赖"用户会切页面回来"。当前缺口：
-
-- 远端同步没有观察者（`NSPersistentStoreRemoteChange` 未监听），另一台设备的修改要等下一次 `onAppear` 才可见。
-- 建议：在 App 层加一个 `DataChangeCenter`，监听远端变更 + 回到前台 + 本地保存，统一刷新上表。
+设计要求：**任何写入路径都必须显式刷新受影响的缓存**，不能依赖"用户会切页面回来"。
+统一入口是 `DataRefreshCenter`（`Services/DataRefreshCenter.swift`）：它监听
+`NSPersistentStoreRemoteChange` 与 CloudKit 导入事件，回到前台、本地保存、导入、清除、
+切换基准币也都走 `refreshAll()`，覆盖上表全部缓存。新增写入路径仍然必须显式调用它。
 
 ## 7.1 存储异常与数据保护
 
@@ -332,7 +332,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 
 ## 10. 版本与迁移
 
-- 导出格式 `ExportSchema.version`（当前 4）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
+- 导出格式 `ExportSchema.version`（当前 6）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
 - App 内数据迁移：新字段一律带默认值，依赖 SwiftData 轻量迁移；不允许"改字段类型"。
 - 商户字段（`merchant` / `merchantKey`）是可选普通字段：轻量迁移后为 `nil`，由 `MerchantMigration` 在启动与导入后从备注回填，可重入。JSON 备份不携带这两个字段（避免为一个可推导值升 schemaVersion），恢复后同样靠回填补齐。
 - 废弃策略：字段先保留、停止写入，至少一个大版本后再删（CloudKit 上删字段同样要部署）。
@@ -350,8 +350,6 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 
 ## 12. 现状 vs 设计（差距与优先级）
 
-| 优先级 | 差距 | 现状 | 设计目标 |
-|---|---|---|---|
 | 优先级 | 差距 | 状态 |
 |---|---|---|
 | ~~P0~~ | 切换基准货币整体折算 | ✅ 已实现：`CurrencyRebase` 纯计算 + `CurrencyRateStore.rebase` 一次提交；缺汇率时拒绝并提示；基准币改为设备本地设置（不再从 iCloud KVS 静默改写） |
