@@ -1,11 +1,10 @@
 # SmartBud
 
-<p align="center">
-  <img src="./docs/assets/hero.png" width="451" style="max-width: 100%; height: auto;" />
-</p>
+[![CI](https://github.com/Iorest/SmartBud/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Iorest/SmartBud/actions/workflows/ci.yml)
 
-<!-- TODO: Replace `id1635280255` with SmartBud's App Store ID once SmartBud is published as a new listing. Current ID points to the legacy listing. -->
-SmartBud is a 100% free, open-source personal finance tracker built with iOS design guidelines in mind. [Download SmartBud on the App Store.](https://apps.apple.com/sg/app/id1635280255)
+SmartBud is an open-source personal finance tracker for iPhone, iPad and Mac. The core app is free; **SmartBud Pro** is an optional subscription or lifetime purchase. During the launch period every Pro feature is free for everyone.
+
+SmartBud does not have its own App Store listing yet, so build it from source (see [How to build](#how-to-build)).
 
 ## App Preview
 
@@ -25,42 +24,53 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 
 - Beautifully iOS-centric design, with simplicity at its core.
 - Insightful expenditure breakdowns over various time periods.
+- **Smart entry** — type a phrase, dictate it, or pick a receipt screenshot; SmartBud parses the amount, direction, merchant and category into a preview you confirm before saving.
+- **Advanced Insights (Pro)** — ask an AI model to analyse the period. You supply an OpenAI-compatible or Anthropic-compatible endpoint and keep the API key in the Keychain; only aggregate figures (totals, top categories, pending reimbursements) leave the device, never per-transaction detail.
 - Create budgets based on expense categories and stick to them.
 - Create recurring expenses with custom time frames.
 - Track accounts and transfers, including cross-currency moves with a per-transfer rate and fee.
 - Mark an expense as reimbursable: it stays in the ledger but out of your spending totals until it is paid back.
 - Restore everything from the JSON backup, or export a CSV for a spreadsheet.
 - Automate entries with `smartbud://` URLs and x-callback-url from Shortcuts or any launcher.
-- Sync your expenses, categories and budgets with other devices via iCloud.
+- Sync your expenses, categories and budgets across iPhone and iPad via iCloud.
 - Custom reminders to input your expenses.
 - Biometric authentication to protect your data.
 - Home screen quick actions make capturing new expenses a breeze.
 - A gorgeous night theme for dark mode fanatics.
 - Informative home and lock screen widgets keep you updated at a glance.
-- **SmartBud Pro** unlocks Batch Recognition, Advanced Insights, Exclusive Themes, Smart Reminders and Priority Support. Pick a monthly, half-yearly, or yearly auto-renewing subscription, or unlock everything forever with a one-time lifetime purchase. iCloud sync is available for free for all users.
+- **SmartBud Pro** unlocks Advanced Insights, Exclusive Themes (six additional app icons) and Smart Reminders (a custom time for the daily reminder). Pick a monthly, half-yearly, or yearly auto-renewing subscription, or unlock everything forever with a one-time lifetime purchase. iCloud sync is free for all users, and the launch period unlocks all three Pro features at no charge.
 
 ## How to help
 
-- Please feel free to raise [issues](https://github.com/iorest/smartbud/issues) for any inquiries, suggestions for improvements, or bugs you encounter.
+- Please feel free to raise [issues](https://github.com/Iorest/SmartBud/issues) for any inquiries, suggestions for improvements, or bugs you encounter.
 - You're welcome to fork the repository and propose changes through a pull request, although the decision to merge it rests with the project maintainers.
 - If you would like to discuss with the contributors, feel free to drop [Iorest](https://x.com/iorest) or [Jeffrey](https://x.com/jefcodes) a DM!
 
+## Requirements
+
+| Item | Requirement |
+|---|---|
+| Build host | macOS 15 or later |
+| Xcode | 26.x with the iOS 26 SDK (the project is kept in Xcode 26.6) |
+| App targets | iOS 26.0+, iPadOS 26.0+, macOS 26.0+ (the native `SmartBud-macOS` target) |
+| Languages | English, Simplified Chinese, Traditional Chinese; follows the system language by default and can be changed in Settings |
+| Dependencies | System frameworks only — there are no Swift Package dependencies |
+
 ## How to build
 
-### Required
+The repository is private, so ask a maintainer for access first. Clone and open the project:
 
-- Xcode
+```bash
+git clone git@github.com:Iorest/SmartBud.git
+cd SmartBud
+open app/SmartBud.xcodeproj
+```
 
-### Build Steps
+If SSH on port 22 is blocked, point GitHub at `ssh.github.com:443` in `~/.ssh/config`; see [Engineering and verification](docs/engineering.md).
 
-- Clone this project either via Xcode or terminal:
-  `git clone https://github.com/iorest/smartbud.git`
-- For branch selection use:
-  `--single-branch --branch [branchname]` after `clone`
-- After completion, open `SmartBud.xcodeproj` using Xcode.
-- Please let all dependecies update automatically but we would recommend to run
-  `File > Packages > Resolve Package Versions` to ensure, everything is updated.
+Select the `SmartBud` scheme and an iPhone simulator, then Run. The project has no Swift Package dependencies, so there is no *Resolve Package Versions* step.
 
+For the command-line build and test commands, see [Engineering and verification](docs/engineering.md).
 
 ## Documentation
 
@@ -69,8 +79,11 @@ SmartBud is a 100% free, open-source personal finance tracker built with iOS des
 - [Data export and restore](docs/data-portability.md) — JSON backup format, import rules, CSV columns.
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
-- [Engineering and verification](docs/engineering.md) — how to clone, build, run the 196 tests, and what CI does.
+- [Engineering and verification](docs/engineering.md) — how to clone, build, run the 213 tests, and what CI does.
 - [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
+- [SmartBud Pro](docs/storekit.md) — product IDs, StoreKit testing, and App Store Connect setup.
+- [Privacy policy](docs/privacypolicy.md) — what the app stores, where it lives, and which Apple services it uses.
+- [Terms of service](docs/TERMS.md) — subscription terms, acceptable use, and liability.
 
 ## Licence
 

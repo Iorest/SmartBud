@@ -6,7 +6,7 @@ These Terms of Service ("Terms") govern your use of SmartBud (the "App"), provid
 
 ## 1. The Service
 
-SmartBud is a personal finance tracker. The free version lets you record transactions, set budgets, organise them by category, and review your spending over time. The Pro tier ("SmartBud Pro") adds advanced insights, exclusive themes, customisable reminders, and priority support. Pro is available as a monthly, six-month, or yearly auto-renewing subscription, or as a one-time lifetime unlock — see section 3 for the difference.
+SmartBud is a personal finance tracker. The free version lets you record transactions, set budgets, organise them by category, and review your spending over time. The Pro tier ("SmartBud Pro") adds advanced insights (AI analysis with your own API key), exclusive themes (six additional app icons), and a custom time for the daily reminder. Pro is available as a monthly, six-month, or yearly auto-renewing subscription, or as a one-time lifetime unlock — see section 3 for the difference.
 
 During an introductory launch period, every user has full access to the Pro feature set at no charge ("Limited-Time Free"). The Limited-Time Free period ends on a date we will announce; after that, Pro features require an active subscription.
 
