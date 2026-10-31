@@ -149,8 +149,28 @@ xcodebuild test \
 **Linux 机器不能编译，也不能跑测试。** 这条约束是按实际运行写的：
 
 - 这台 Linux 运行机没有 `xcodebuild`、`simctl`、iOS SDK，`swift build` 也跑不了 iOS 目标；
-- 所有验证只能走 CI，不能声称「本地测试通过」；
-- 改代码时能做的静态检查只有读代码、`grep` 结构、检查 schema / 迁移版本号这类非编译验证。
+- 编译与运行验证只能走 CI，不能声称「本地测试通过」；
+- 不依赖 Xcode 的静态检查可以本地做：`python3 scripts/check_repo.py`（见下节），
+  再加读代码、`grep` 结构、检查 schema / 迁移版本号这类非编译验证。
+
+## 离线结构检查
+
+`scripts/check_repo.py` 只用 Python 3 标准库，不需要 Xcode、不需要模拟器，Linux 上也能跑，
+覆盖三类「编译前就能发现、不查就要等 CI 变红」的问题：
+
+| 检查 | 挡住什么 |
+|---|---|
+| `project.pbxproj` 引用 | 文件引用解析不到磁盘上的文件（历史事故：漏写 `smartbud/` 前缀）、磁盘上新增的 `.swift` 没登记进工程、sources 阶段指向不存在的 build file |
+| 可访问性 identifier | UI 测试查的 identifier 没有任何 app 源码声明、`AccessibilityID` 常量被改名、`DELIBERATELY-BROKEN` 这类占位值被误合入（历史事故） |
+| 文档链接 | `README.md` 与 `docs/*.md` 里指向不存在的相对路径 |
+
+```bash
+python3 scripts/check_repo.py          # 0 = 干净，1 = 有问题
+```
+
+CI 的 `test` job 第一步就跑它，结构问题几秒内失败，不会先烧掉一次 macOS 构建。
+它**不替代** `xcodebuild test`：编译错误、运行行为、UI 流程都查不出来。
+接入前用四种真实故障验证过它会报错：漏 `smartbud/` 前缀、占位 identifier、未登记文件、断链。
 
 ## CI
 
