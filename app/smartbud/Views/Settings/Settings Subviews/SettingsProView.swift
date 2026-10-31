@@ -62,12 +62,14 @@ struct SettingsProView: View {
     var headerBar: some View {
         HStack {
             Button { dismiss() } label: { SettingsBackButton() }
+                .accessibilityIdentifier(AccessibilityID.proBack)
             Spacer()
         }
         .overlay(alignment: .center) {
             Text(String.appLocalized(SettingsKey.proTitle))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.PrimaryText)
+                .accessibilityIdentifier(AccessibilityID.proTitle)
         }
         .padding(.bottom, 20)
     }
@@ -248,6 +250,7 @@ struct SettingsProView: View {
                 }
                 restorePurchasesButton
             }
+            .accessibilityIdentifier(AccessibilityID.proPurchaseSection)
         }
     }
 

@@ -86,6 +86,7 @@ extension SettingsProView {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
         }
+        .accessibilityIdentifier(AccessibilityID.proRestore)
     }
 }
 

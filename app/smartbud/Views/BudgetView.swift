@@ -23,6 +23,7 @@ struct BudgetView: View {
                 title: String.appLocalized("Budget Your Finances"),
                 message: String.appLocalized("Link budgets to categories and set appropriate expenditure goals"),
                 actionTitle: String.appLocalized("新建预算"),
+                actionIdentifier: AccessibilityID.budgetAddButton,
                 action: { showNewBudget = true }
             )
             .sheet(isPresented: $showNewBudget) {
@@ -127,6 +128,7 @@ struct ActualBudgetView: View {
                         Image(systemName: "plus")
                     }
                     .accessibilityLabel(String.appLocalized("New Budget"))
+                    .accessibilityIdentifier(AccessibilityID.budgetAddButton)
                 }
             }
             .navigationDestination(for: MainBudgetModel.self) { budget in

@@ -54,6 +54,7 @@ extension ImportDataView {
                             .padding(8)
                             .background(Color.SecondaryBackground, in: Circle())
                     }
+                    .accessibilityIdentifier(AccessibilityID.importClose)
                     .contentTransition(.symbolEffect(.replace.downUp.wholeSymbol))
 
                 Spacer()
@@ -178,6 +179,7 @@ extension ImportDataView {
                         )
                     }
                     .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
+                    .accessibilityIdentifier(AccessibilityID.importChooseFile)
 
                     Button {
                         exportSample = true
@@ -294,6 +296,7 @@ extension ImportDataView {
                         )
                 }
                 .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
+                .accessibilityIdentifier(AccessibilityID.importContinue)
             }
     }
 }

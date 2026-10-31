@@ -63,6 +63,7 @@ struct SmartEntrySheet: View {
                     .foregroundStyle(Color.SubtitleText.opacity(0.7))
             }
             .accessibilityLabel(Text(String.appLocalized("关闭")))
+            .accessibilityIdentifier(AccessibilityID.smartEntryClose)
         }
     }
 
@@ -76,6 +77,7 @@ struct SmartEntrySheet: View {
                 .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
                 .submitLabel(.done)
                 .onSubmit(parseText)
+                .accessibilityIdentifier(AccessibilityID.smartEntryField)
 
             Button(action: parseText) {
                 Image(systemName: "arrow.right.circle.fill")

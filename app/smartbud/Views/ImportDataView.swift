@@ -220,6 +220,19 @@ struct ImportDataView: View {
                 importAccountID = AccountViewModel.shared.defaultAccount(
                     lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))?.id
             }
+            #if DEBUG
+            // QA hook: drive the wizard from the bundled sample so the
+            // preview/back path is testable without the system file picker
+            // (`SmartBudUITests` launches with -importSample).
+            if progress == 1, rows.isEmpty,
+               ProcessInfo.processInfo.arguments.contains("-importSample"),
+               let url = Bundle.main.url(forResource: "sample", withExtension: "csv"),
+               let raw = try? Data(contentsOf: url),
+               let message = decodeCSV(raw) {
+                data = message
+                processCSV()
+            }
+            #endif
         }
         .fileImporter(
             isPresented: $importing,

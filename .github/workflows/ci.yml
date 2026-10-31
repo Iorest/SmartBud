@@ -60,6 +60,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
+      # The scheme also carries `SmartBudUITests`; this job stays the fast
+      # logic-test gate, the ui-test job below owns the simulator interaction
+      # cases.
       - name: Test
         run: |
           set -o pipefail
@@ -67,6 +70,7 @@ jobs:
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
+            -only-testing:SmartBudTests \
             -resultBundlePath "$RESULT_BUNDLE" \
             2>&1 | tee "$LOG_FILE"
 
@@ -130,5 +134,89 @@ jobs:
           path: |
             TestResults.xcresult
             xcodebuild-test.log
+          if-no-files-found: warn
+          retention-days: 7
+
+  ui-test:
+    name: UI smoke tests (XCUITest)
+    # Same image and Xcode selection as the logic-test job: the UI cases need
+    # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    env:
+      PROJECT: app/SmartBud.xcodeproj
+      SCHEME: SmartBud
+      DESTINATION: platform=iOS Simulator,name=iPhone 16
+      RESULT_BUNDLE: UITestResults.xcresult
+      LOG_FILE: xcodebuild-uitest.log
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode 26
+        run: |
+          chosen=""
+          for version in 26.6 26.5 26.4 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            candidate="/Applications/Xcode_${version}.app"
+            if [ -d "$candidate" ]; then
+              chosen="$candidate"
+              break
+            fi
+          done
+          if [ -z "$chosen" ]; then
+            echo "No Xcode 26 found on this image; the iOS 26 SDK is required." >&2
+            ls -d /Applications/Xcode*.app >&2
+            exit 1
+          fi
+          sudo xcode-select -s "$chosen"
+          xcodebuild -version
+
+      # Every case launches the app with -skipIntro / -importSample (DEBUG-only
+      # hooks) and queries accessibility identifiers from AccessibilityID.swift.
+      - name: UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -only-testing:SmartBudUITests \
+            -testLanguage en \
+            -testRegion US \
+            -resultBundlePath "$RESULT_BUNDLE" \
+            2>&1 | tee "$LOG_FILE"
+
+      - name: Summarise UI test results
+        if: always()
+        run: |
+          {
+            echo "### UI smoke tests"
+            echo
+            passed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' passed" "$LOG_FILE" || true)
+            failed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' failed" "$LOG_FILE" || true)
+            echo "passed: ${passed:-0} · failed: ${failed:-0}"
+            echo
+            echo "### Accessibility audit"
+            echo
+            if grep -q "AUDIT\[" "$LOG_FILE"; then
+              echo '```'
+              grep -o "AUDIT\[.*" "$LOG_FILE" | sort | uniq -c | sort -rn | head -60
+              echo '```'
+            else
+              echo "没有 AUDIT 行：审计没跑到，先看上面的编译/用例失败。"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Always, not only on failure: the audit report and the screenshots are
+      # the point of the job.
+      - name: Upload UI test artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: UITestResults
+          path: |
+            UITestResults.xcresult
+            xcodebuild-uitest.log
           if-no-files-found: warn
           retention-days: 7

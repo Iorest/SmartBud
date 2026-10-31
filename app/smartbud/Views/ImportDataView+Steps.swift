@@ -45,6 +45,7 @@ extension ImportDataView {
             VStack(spacing: 10) {
                 Text("Sampled Rows from Import CSV")
                     .font(.subheadline.weight(.semibold))
+                    .accessibilityIdentifier(AccessibilityID.importPreview)
 
                     .foregroundStyle(Color.SubtitleText)
 

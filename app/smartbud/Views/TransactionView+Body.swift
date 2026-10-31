@@ -77,6 +77,7 @@ extension TransactionView {
                     .contentShape(Rectangle())
             }
             .accessibilityLabel(Text(String.appLocalized("Cancel")))
+            .accessibilityIdentifier(AccessibilityID.entryCancel)
 
             Spacer()
 
@@ -137,6 +138,7 @@ extension TransactionView {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(String.appLocalized("智能记账")))
+        .accessibilityIdentifier(AccessibilityID.entrySmartEntry)
     }
 
     @ViewBuilder

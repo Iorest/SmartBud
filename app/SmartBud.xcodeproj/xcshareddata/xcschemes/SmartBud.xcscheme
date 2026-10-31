@@ -38,6 +38,17 @@
                ReferencedContainer = "container:SmartBud.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AB1200000000000000000001"
+               BuildableName = "SmartBudUITests.xctest"
+               BlueprintName = "SmartBudUITests"
+               ReferencedContainer = "container:SmartBud.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -133,6 +133,7 @@ struct NumberPad: View {
         .disabled(disabled)
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text("\(digit)"))
+        .accessibilityIdentifier(AccessibilityID.padDigit(digit))
     }
 
     @ViewBuilder
@@ -156,6 +157,7 @@ struct NumberPad: View {
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text(String.appLocalized("Delete")))
+        .accessibilityIdentifier(AccessibilityID.padBackspace)
     }
 
     @ViewBuilder
@@ -180,6 +182,7 @@ struct NumberPad: View {
         }
         .buttonStyle(NumPadButton())
         .accessibilityLabel(Text("Decimal point"))
+        .accessibilityIdentifier(AccessibilityID.padDecimal)
     }
 
     @ViewBuilder
@@ -209,6 +212,7 @@ struct NumberPad: View {
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
+        .accessibilityIdentifier("sb.entry.save.DELIBERATELY-BROKEN")
         .contextMenu {
             Button {
                 submitAndContinue()
