@@ -138,11 +138,15 @@ jobs:
           retention-days: 7
 
   ui-test:
-    name: UI smoke tests (XCUITest)
+    name: UI flow matrix (XCUITest, iPhone)
     # Same image and Xcode selection as the logic-test job: the UI cases need
     # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
+    #
+    # 15 minutes is the budget from TELE-35: the matrix is ~35 cases of one
+    # short flow each, and a case that needs a longer wait than the budget is a
+    # hang, not a slow test. Measured wall time is in the job summary.
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 15
 
     env:
       PROJECT: app/SmartBud.xcodeproj
@@ -195,7 +199,8 @@ jobs:
             echo
             passed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' passed" "$LOG_FILE" || true)
             failed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' failed" "$LOG_FILE" || true)
-            echo "passed: ${passed:-0} · failed: ${failed:-0}"
+            skipped=$(grep -c "Test Case '-\[SmartBudUITests .*\]' skipped" "$LOG_FILE" || true)
+            echo "passed: ${passed:-0} · failed: ${failed:-0} · skipped: ${skipped:-0}"
             echo
             echo "### Accessibility audit"
             echo
@@ -218,5 +223,109 @@ jobs:
           path: |
             UITestResults.xcresult
             xcodebuild-uitest.log
+          if-no-files-found: warn
+          retention-days: 7
+
+  ui-layout:
+    name: UI layout matrix (XCUITest, small phone + iPad)
+    # The layout cases from TELE-35 M20 need device classes the main UI job
+    # does not boot: a 667pt-tall phone for the "no scrolling" rule and an iPad
+    # for the NavigationSplitView shell. They run here, in parallel with the
+    # main job, so the whole UI budget stays under 15 minutes wall clock.
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    env:
+      PROJECT: app/SmartBud.xcodeproj
+      SCHEME: SmartBud
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode 26
+        run: |
+          chosen=""
+          for version in 26.6 26.5 26.4 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            candidate="/Applications/Xcode_${version}.app"
+            if [ -d "$candidate" ]; then
+              chosen="$candidate"
+              break
+            fi
+          done
+          if [ -z "$chosen" ]; then
+            echo "No Xcode 26 found on this image; the iOS 26 SDK is required." >&2
+            ls -d /Applications/Xcode*.app >&2
+            exit 1
+          fi
+          sudo xcode-select -s "$chosen"
+          xcodebuild -version
+
+      # Device names move between Xcode releases ("iPhone SE (3rd generation)"
+      # is gone on some images), so the destination is resolved by prefix and
+      # the job fails loudly when the image has no such device class.
+      - name: Resolve destinations
+        run: |
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json, os, subprocess, sys
+
+          data = json.loads(subprocess.check_output(
+              ["xcrun", "simctl", "list", "devices", "available", "-j"]))
+          devices = []
+          for runtime, entries in data.get("devices", {}).items():
+              if "iOS" not in runtime:
+                  continue
+              for entry in entries:
+                  devices.append(entry["name"])
+
+          def pick(prefix, label):
+              for name in devices:
+                  if name.startswith(prefix):
+                      return name
+              print(f"::error::No available simulator named like '{prefix}' for {label}. "
+                    f"Available: {sorted(set(devices))}", file=sys.stderr)
+              sys.exit(1)
+
+          print(f"SMALL_PHONE={pick('iPhone SE', 'the small-phone cases')}")
+          print(f"TABLET={pick('iPad', 'the split-view cases')}")
+          PY
+          echo "resolved: $SMALL_PHONE / $TABLET"
+
+      - name: Layout tests (small phone)
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,name=$SMALL_PHONE" \
+            -only-testing:SmartBudUITests/LayoutUITests/testM20_smallPhone_primaryPathVisibleWithoutScrolling \
+            -only-testing:SmartBudUITests/LayoutUITests/testM20_entryFormLandscape_primaryPathStillReachable \
+            -testLanguage en \
+            -testRegion US \
+            -resultBundlePath LayoutPhone.xcresult \
+            2>&1 | tee layout-phone.log
+
+      - name: Layout tests (iPad)
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,name=$TABLET" \
+            -only-testing:SmartBudUITests/LayoutUITests/testM20_ipadSplitView_navigatesBetweenSections \
+            -testLanguage en \
+            -testRegion US \
+            -resultBundlePath LayoutTablet.xcresult \
+            2>&1 | tee layout-tablet.log
+
+      - name: Upload layout artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: LayoutResults
+          path: |
+            LayoutPhone.xcresult
+            LayoutTablet.xcresult
+            layout-phone.log
+            layout-tablet.log
           if-no-files-found: warn
           retention-days: 7
