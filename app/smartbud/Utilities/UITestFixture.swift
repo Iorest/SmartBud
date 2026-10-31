@@ -59,6 +59,9 @@ enum UITestFixture {
 
     /// Every case starts from the same settings. Only the App Group domain is
     /// cleared; the simulator's own locale and language stay untouched.
+    /// `@MainActor` because the suite identifier lives on `DataRepository`,
+    /// which is main-actor isolated.
+    @MainActor
     static func resetDefaults() {
         UserDefaults(suiteName: DataRepository.appGroupID)?
             .removePersistentDomain(forName: DataRepository.appGroupID)

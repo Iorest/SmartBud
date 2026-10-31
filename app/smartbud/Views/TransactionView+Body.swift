@@ -335,13 +335,13 @@ extension TransactionView {
             if !income {
                 TransactionOptionChip(
                     systemImage: "tag",
-                    identifier: AccessibilityID.entryDiscount,
                     title: discount > 0
                         ? Money.format(discount,
                                        currencyCode: account?.resolvedCurrencyCode ?? currency,
                                        showsCents: false, locale: .appLocale)
                         : String.appLocalized("Discount"),
-                    isOn: discount > 0
+                    isOn: discount > 0,
+                    identifier: AccessibilityID.entryDiscount
                 ) {
                     hideKeyboard()
                     discountInput = discount > 0 ? String(format: "%.2f", discount) : ""
@@ -352,9 +352,9 @@ extension TransactionView {
             if !income {
                 TransactionOptionChip(
                     systemImage: reimbursable ? "checkmark.circle.fill" : "arrow.uturn.backward.circle",
-                    identifier: AccessibilityID.entryClaim,
                     title: String.appLocalized("Claim"),
-                    isOn: reimbursable
+                    isOn: reimbursable,
+                    identifier: AccessibilityID.entryClaim
                 ) {
                     withAnimation(.easeOut(duration: 0.15)) { reimbursable.toggle() }
                     lightHaptic &+= 1
