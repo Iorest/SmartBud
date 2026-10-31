@@ -15,7 +15,6 @@
 
 import XCTest
 
-@MainActor
 final class LayoutUITests: SmartBudUITestCase {
 
     override func tearDown() {

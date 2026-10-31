@@ -22,7 +22,6 @@
 
 import XCTest
 
-@MainActor
 final class SmartBudUITests: SmartBudUITestCase {
 
     // MARK: - 1. Create an expense, delete it, undo the delete

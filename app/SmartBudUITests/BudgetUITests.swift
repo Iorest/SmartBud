@@ -11,7 +11,6 @@
 
 import XCTest
 
-@MainActor
 final class BudgetUITests: SmartBudUITestCase {
 
     func testD9_categoryBudget_remainingFallsThenGoesOver() throws {

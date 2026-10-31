@@ -10,7 +10,6 @@
 
 import XCTest
 
-@MainActor
 final class AccountTransferUITests: SmartBudUITestCase {
 
     // MARK: - E10. A new account with an opening balance lands in the list and the total

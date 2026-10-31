@@ -10,7 +10,6 @@
 
 import XCTest
 
-@MainActor
 final class SearchFilterUITests: SmartBudUITestCase {
 
     // MARK: - G14a. Search is applied on top of the type filter

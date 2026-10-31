@@ -24,7 +24,6 @@
 
 import XCTest
 
-@MainActor
 class SmartBudUITestCase: XCTestCase {
 
     /// The app under test. Set by `launch(...)`; `tearDown` uses it to attach

@@ -20,7 +20,6 @@
 
 import XCTest
 
-@MainActor
 final class DeepLinkLockUITests: SmartBudUITestCase {
 
     private static let addFoodURL =
