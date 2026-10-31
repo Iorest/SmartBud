@@ -804,7 +804,7 @@
 		E1A2B3C40000000000000500 /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Templates/TemplatesView.swift; sourceTree = "<group>"; };
 		AB1200000000000000000002 /* SmartBudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1200000000000000000007 /* SmartBudUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudUITests.swift; sourceTree = "<group>"; };
-		AB120000000000000000000E /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities/AccessibilityID.swift; sourceTree = SOURCE_ROOT; };
+		AB120000000000000000000E /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AccessibilityID.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
