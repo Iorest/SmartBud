@@ -98,6 +98,7 @@ extension BrandNewBudgetView {
                         )
                 }
                 .buttonStyle(BouncyButton(duration: 0.2, scale: 0.8))
+                .accessibilityIdentifier(AccessibilityID.budgetContinue)
             }
         }
         .padding(20)

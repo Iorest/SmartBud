@@ -185,6 +185,9 @@ extension SingleBudgetView {
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier(
+                            AccessibilityID.budgetRemaining(budget.wrappedName))
                     }
                     .padding(10)
                     .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
@@ -296,6 +299,9 @@ extension SingleBudgetView {
                         Spacer(minLength: 0)
                     }
                     .frame(maxWidth: .infinity)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier(
+                        AccessibilityID.budgetRemaining(budget.wrappedName))
 
                     Text(String.appFormatted("%@ • %@ spent", budgetType, percentString1))
                         .font(.footnote.weight(.medium))

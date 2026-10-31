@@ -148,6 +148,7 @@ struct BrandNewBudgetView: View {
                 }
                 .pickerStyle(.segmented)
                 .disabled(editMode)
+                .accessibilityIdentifier(AccessibilityID.budgetTypePicker)
             }
 
             if categoryBudget {
@@ -167,6 +168,7 @@ struct BrandNewBudgetView: View {
                             }
                         }
                         .labelsHidden()
+                        .accessibilityIdentifier(AccessibilityID.budgetCategoryPicker)
                     }
                 }
             }

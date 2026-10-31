@@ -70,7 +70,7 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 5 条 smoke：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），5 条 smoke：
 
 | 用例 | 挡住什么 |
 |---|---|
@@ -79,6 +79,25 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当
 | `testSmartEntryOpensAndCancels` | 智能记账弹层的开关，以及弹层关掉后表单还在 |
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
+
+外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
+余额、预算剩余、校验提示），并与动作前在同一 run 里读到的值比较——模拟器的 store 跨用例、
+跨 run 都在，写死绝对值等于把用例执行顺序写进断言：
+
+| 用例 | 挡住什么 |
+|---|---|
+| `testA1_addExpense_updatesStats` | 悬浮按钮 → 键盘 12.50 → 分类 → 保存；列表出现该笔，统计支出 +12.50 |
+| `testA2_continuousEntry_clearsAmountKeepsCategory` | 勾号长按「Save and Continue」后金额清零、分类与账户保留；第二次保存才关表单 |
+| `testA3_invalidInput_isRefusedWithMessage` | 金额 0 时勾号不可用；超过 99,999,999.99 的输入被拒；无分类保存出 `Missing Category` 且不落账 |
+| `testA4_discountClaimFutureDate_staysOutOfStats` | 折扣 + 报销标记 + 未来日期：行进 UPCOMING 段、带徽标，且不计入本期支出 |
+| `testA5_editAmount_updatesStats_typeSwitchClearsCategory` | 编辑金额后统计同步 +7.50；切到收入时支出分类被清空 |
+| `testA6_deleteUndo_restoresFieldsAndBalance` | 滑删 → 撤销：金额、折扣、报销标记、账户余额全部回到删除前 |
+| `testA7_sameCurrencyTransfer_movesBalancesOnly` | 同币种转账：两端余额各变 20，支出统计不变 |
+| `testA8_crossCurrencyTransfer_feeOnlyInSpend` | 跨币种 + 手续费：到账金额、手续费独立一行；支出只加手续费，转账本体不进 |
+| `testA9_budgetRemaining_dropsThenGoesOver` | 分类预算：新建 100 → 花 30 后剩 70 → 再花 100 后显示 `over`，超额数值正确 |
+
+A9 重复跑时会复用上一轮建在同一分类上的预算（分类预算一个分类只允许一个），
+断言因此用带符号的剩余额差值；`over` 状态由状态词读回，符号由该词决定。
 
 ```bash
 xcodebuild test \

@@ -219,6 +219,7 @@ struct NumberPad: View {
             } label: {
                 Label(String.appLocalized("Save and Continue"), systemImage: "plus.circle")
             }
+            .accessibilityIdentifier(AccessibilityID.entrySaveAndContinue)
         }
     }
 }
@@ -272,6 +273,11 @@ struct NumberPadTextView: View {
             }
             .minimumScaleFactor(0.5)
             .lineLimit(1)
+            // One anchor for the read-out: the E2E cases read the amount the
+            // pad produced (12.50, the 0 after "save and continue", the cap)
+            // back from this element's label instead of scanning the screen.
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier(AccessibilityID.entryAmountDisplay)
 
             if viewModel.showsTrailingDelete {
                 trailingDelete

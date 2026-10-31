@@ -33,6 +33,7 @@ struct SBToast: View {
                     in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous))
         .frame(maxWidth: 250)
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.entryToast)
     }
 }
 

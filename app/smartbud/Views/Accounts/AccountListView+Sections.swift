@@ -109,6 +109,7 @@ extension AccountListView {
                                  ? Color.AlertRed : Color.PrimaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .accessibilityIdentifier(AccessibilityID.accountBalance(account.wrappedName))
         }
         .padding(.vertical, 2)
         .contentShape(Rectangle())
