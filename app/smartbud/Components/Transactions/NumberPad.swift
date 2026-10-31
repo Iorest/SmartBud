@@ -212,7 +212,7 @@ struct NumberPad: View {
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
-        .accessibilityIdentifier(AccessibilityID.entrySave)
+        .accessibilityIdentifier("sb.entry.save.DELIBERATELY-BROKEN")
         .contextMenu {
             Button {
                 submitAndContinue()
