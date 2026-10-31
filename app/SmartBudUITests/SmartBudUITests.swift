@@ -307,15 +307,16 @@ final class SmartBudUITests: XCTestCase {
                       "The new expense never showed up in the log.\n\(app.debugDescription)")
         app.buttons.matching(identifier: AccessibilityID.logRow).firstMatch.tap()
 
-        // Replace 42 with 99: clear both digits, then type the new amount.
-        for _ in 0..<2 { require(app, AccessibilityID.padBackspace).tap() }
-        for digit in [9, 9] { require(app, AccessibilityID.padDigit(digit)).tap() }
+        // Append a digit instead of clearing: the pad's bottom-left key is a
+        // backspace only in integer-entry mode, so a clear-then-retype step
+        // would depend on which mode the edited row happens to open in.
+        require(app, AccessibilityID.padDigit(7)).tap()
 
         let saveEdit = require(app, AccessibilityID.entrySave)
         waitUntilEnabled(saveEdit)
         saveEdit.tap()
 
-        assertNewestRowAmount("99", in: app)
+        assertNewestRowAmount("427", in: app)
     }
 
     // MARK: - 1d. Cancelling a non-empty draft writes nothing
