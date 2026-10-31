@@ -68,6 +68,61 @@ open TestResults.xcresult
 
 只想跑一组用例时，把最后一行换成 `-only-testing:SmartBudTests/BudgetLogicTests`。
 
+## UI 测试
+
+交互回归由 `app/SmartBudUITests/` 的 5 条 XCUITest smoke 覆盖，走单独的 `SmartBudUITests` scheme：
+
+```bash
+xcodebuild test \
+  -project app/SmartBud.xcodeproj \
+  -scheme SmartBudUITests \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -resultBundlePath UITestResults.xcresult
+```
+
+| 用例 | 覆盖 |
+|---|---|
+| `testCreateExpenseSaveAndUndo` | 记一笔 → 保存 → 左滑删除 → 撤销条恢复 |
+| `testAllTabsSwitch` | 四个 tab 各切一次 |
+| `testSmartEntryCancel` | 打开智能记账 → 关闭 → 取消表单 |
+| `testSettingsProBack` | 设置 → Pro → 返回 |
+| `testImportPreviewCancel` | 设置 → 导入 → 映射预览 → 取消 |
+
+### 定位锚
+
+测试只认 `accessibilityIdentifier`，不拿界面文案当锚。id 集中在
+`app/SmartBudUITests/UITestIdentifiers.swift`，对应实现散在视图里（四个 tab、金额键盘、保存 / 取消、
+智能记账、搜索、导入、设置各分区入口、Pro 购买、撤销条）。改视图时 grep 一下 id 还有没有引用。
+
+SwiftUI 不一定会把 tab item 的 id 透传到 `UITabBarButton`，所以 `tabButton` 先取 id，取不到时按
+`HomeView.tabShell` 的固定顺序用 index 兜底——两条路都不依赖文案。
+
+### 可访问性审计
+
+每条用例跑一次 `performAccessibilityAudit`（iOS 17+）。失败时用例判红，并把当前屏幕截图 attach 进
+`.xcresult`。审计类别由 `AccessibilityAuditPolicy.auditedTypes` 决定，默认是 `.all` 减去
+`ignoredTypes`；**跳过的类别必须在本节列出原因**。
+
+当前跳过：无。
+
+报告随 `UITestResults` artifact 上传（`UITestResults.xcresult` + `xcodebuild-ui-test.log`），保留 7 天：
+
+```bash
+xcrun xcresulttool get test-results summary --path UITestResults.xcresult
+```
+
+### 测试专用启动开关（仅 DEBUG）
+
+- `-uiTestSkipIntro`：跳过首次启动的欢迎流程；
+- `IMPORT_SAMPLE=1`：导入向导直接读内置 `sample.csv`，绕开系统文件选择器，稳定到达映射预览。
+
+两个开关都在 `#if DEBUG` 内，Release 构建不受影响。
+
+### 证明测试会红
+
+把任一 identifier 改错（例如把保存按钮的 `entry.save` 改成 `entry.saveX`），`ui-test` job 会红在
+「The save button is missing」；改回来即绿。改流程或加交互时，先跑这 5 条，再动界面。
+
 ## 运行机约束
 
 **Linux 机器不能编译，也不能跑测试。** 这条约束是按实际运行写的：
@@ -83,10 +138,11 @@ open TestResults.xcresult
 | 项 | 值 |
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
+| Job | `test`：单元测试；`ui-test`：5 条 UI smoke + 可访问性审计 |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
-| 超时 | 45 分钟 |
-| 失败产物 | `TestResults.xcresult` 和完整日志，作为 `TestResults` artifact 保留 7 天 |
+| 命令 | 与上文「测试」/「UI 测试」两节相同，另外带 `-resultBundlePath` |
+| 超时 | 45 分钟 / job |
+| 产物 | `test` 失败时上传 `TestResults`；`ui-test` 每次上传 `UITestResults`（含截图和审计结果），保留 7 天 |
 
 没用 `macos-14`：该镜像最高只有 Xcode 16.2（没有 iOS 26 SDK），
 且 GitHub 在 2026-11-02 之后不再支持它。

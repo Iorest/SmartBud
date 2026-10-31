@@ -44,6 +44,7 @@ struct TransactionCategoryRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(accessibilityTitle)
+            .accessibilityIdentifier("entry.category")
         }
     }
 
@@ -96,6 +97,8 @@ struct TransactionCategoryRow: View {
             emptyButtonLabel
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String.appLocalized("Category"))
+        .accessibilityIdentifier("entry.category")
     }
 
     private var emptyButtonLabel: some View {

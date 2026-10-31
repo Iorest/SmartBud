@@ -66,6 +66,14 @@ final class ContentViewModel {
             defaults.set(1, forKey: "firstDayOfMonth")
         }
 
+        #if DEBUG
+        // QA hook: UI tests launch straight into the app instead of the
+        // first-run welcome flow. Debug builds only.
+        if ProcessInfo.processInfo.arguments.contains("-uiTestSkipIntro") {
+            firstLaunch = false
+        }
+        #endif
+
         if firstLaunch {
             showIntro = true
             firstLaunch = false

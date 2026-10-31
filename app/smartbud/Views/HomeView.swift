@@ -155,6 +155,7 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("Undo")))
+            .accessibilityIdentifier("log.undo")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -179,6 +180,7 @@ extension HomeView {
                     .tag("Log")
                     .tabItem {
                         Label(String.appLocalized("Log"), systemImage: "list.bullet")
+                            .accessibilityIdentifier("tab.log")
                     }
 
                 InsightsView(onAdd: { addTransaction = true })
@@ -187,6 +189,7 @@ extension HomeView {
                     .tag("Insights")
                     .tabItem {
                         Label(String.appLocalized("Insights"), systemImage: "chart.bar.fill")
+                            .accessibilityIdentifier("tab.insights")
                     }
 
                 BudgetView()
@@ -195,6 +198,7 @@ extension HomeView {
                     .tag("Budget")
                     .tabItem {
                         Label(String.appLocalized("Budget"), systemImage: "chart.pie.fill")
+                            .accessibilityIdentifier("tab.budget")
                     }
 
                 SettingsView()
@@ -203,6 +207,7 @@ extension HomeView {
                     .tag("Settings")
                     .tabItem {
                         Label(String.appLocalized("Settings"), systemImage: "gearshape.fill")
+                            .accessibilityIdentifier("tab.settings")
                     }
         }
     }

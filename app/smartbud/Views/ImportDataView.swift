@@ -220,6 +220,20 @@ struct ImportDataView: View {
                 importAccountID = AccountViewModel.shared.defaultAccount(
                     lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))?.id
             }
+            #if DEBUG
+            // QA hook: UI tests load the bundled sample instead of driving the
+            // system document picker, so the mapping preview is reachable
+            // without Files.app. Debug builds only.
+            if ProcessInfo.processInfo.environment["IMPORT_SAMPLE"] == "1",
+               data.isEmpty,
+               let url = Bundle.main.url(forResource: "sample", withExtension: "csv"),
+               let raw = try? Data(contentsOf: url),
+               let message = decodeCSV(raw) {
+                data = message
+                pendingDigest = "ui-test-sample"
+                processCSV()
+            }
+            #endif
         }
         .fileImporter(
             isPresented: $importing,

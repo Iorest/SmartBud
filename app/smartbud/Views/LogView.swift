@@ -90,6 +90,7 @@ struct LogView: View {
             prompt: Text(String.appLocalized("Search notes, categories, amounts"))
         )
         #endif
+        .accessibilityIdentifier("log.search")
         .toolbar {
             if !allTransactions.isEmpty {
                 #if os(iOS)
@@ -107,6 +108,7 @@ struct LogView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel(Text(String.appLocalized("Add New Transaction")))
+                .accessibilityIdentifier("log.add")
             }
         }
         .alert(

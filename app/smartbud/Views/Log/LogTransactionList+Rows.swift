@@ -75,12 +75,14 @@ extension LogTransactionList {
             LogTransactionRow(transaction: transaction, future: futureRow)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("log.row")
         .swipeActions(edge: .trailing, allowsFullSwipe: !stopsRecurring(transaction, future: futureRow)) {
             Button(role: .destructive) {
                 remove(transaction, future: futureRow)
             } label: {
                 Label(String.appLocalized("Delete"), systemImage: "trash")
             }
+            .accessibilityIdentifier("log.swipe.delete")
 
             Button {
                 transactionManager.toEdit = transaction

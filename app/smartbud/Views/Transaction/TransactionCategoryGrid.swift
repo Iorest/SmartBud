@@ -48,8 +48,8 @@ struct TransactionCategoryGrid: View {
             } else {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: SBSpace.extraSmall) {
-                        ForEach(categories) { item in
-                            tile(item)
+                        ForEach(Array(categories.enumerated()), id: \.element.id) { index, item in
+                            tile(item, index: index)
                         }
                     }
                     .padding(SBSpace.small)
@@ -77,13 +77,14 @@ struct TransactionCategoryGrid: View {
                 categoryVM.seedStarterCategories()
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("entry.category.seed")
             .padding(.top, SBSpace.xxs)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(SBSpace.large)
     }
 
-    private func tile(_ item: CategoryModel) -> some View {
+    private func tile(_ item: CategoryModel, index: Int) -> some View {
         let selected = item == category
         return Button {
             withAnimation(.easeOut(duration: 0.15)) {
@@ -124,6 +125,7 @@ struct TransactionCategoryGrid: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.wrappedName)
+        .accessibilityIdentifier("entry.category.tile.\(index)")
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 

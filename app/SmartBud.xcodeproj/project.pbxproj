@@ -510,6 +510,9 @@
 		E1A2B3C40000000000000402 /* LogTransactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000400 /* LogTransactionList.swift */; };
 		E1A2B3C40000000000000501 /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000500 /* TemplatesView.swift */; };
 		E1A2B3C40000000000000502 /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000500 /* TemplatesView.swift */; };
+		A11CE0000000000000000A11 /* SmartBudUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CE0000000000000000A02 /* SmartBudUITests.swift */; };
+		A11CE0000000000000000A12 /* AccessibilityAuditPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CE0000000000000000A03 /* AccessibilityAuditPolicy.swift */; };
+		A11CE0000000000000000A13 /* UITestIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CE0000000000000000A04 /* UITestIdentifiers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -518,6 +521,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 53B1D189288ED7E400E28062;
 			remoteInfo = ExpenditureWidgetExtension;
+		};
+		A11CE0000000000000000A52 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5327D27B287C697400F76ADF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5327D282287C697400F76ADF;
+			remoteInfo = SmartBud;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -791,6 +801,10 @@
 		E1A2B3C40000000000000F00 /* LogRowComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogRowComponents.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C40000000000000614 /* LogTransactionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Log/LogTransactionRow.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000500 /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Templates/TemplatesView.swift; sourceTree = "<group>"; };
+		A11CE0000000000000000A01 /* SmartBudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A11CE0000000000000000A02 /* SmartBudUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudUITests.swift; sourceTree = "<group>"; };
+		A11CE0000000000000000A03 /* AccessibilityAuditPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityAuditPolicy.swift; sourceTree = "<group>"; };
+		A11CE0000000000000000A04 /* UITestIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestIdentifiers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -861,6 +875,16 @@
 				E1A2B3C40000000000000260 /* BudgetEditPreservesAnchorTests.swift */,
 			);
 			path = SmartBudTests;
+			sourceTree = "<group>";
+		};
+		A11CE0000000000000000A21 /* SmartBudUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A11CE0000000000000000A02 /* SmartBudUITests.swift */,
+				A11CE0000000000000000A03 /* AccessibilityAuditPolicy.swift */,
+				A11CE0000000000000000A04 /* UITestIdentifiers.swift */,
+			);
+			path = SmartBudUITests;
 			sourceTree = "<group>";
 		};
 		B0A0F00000000000000000F0 /* Budget */ = {
@@ -937,6 +961,7 @@
 				5327D285287C697400F76ADF /* SmartBud */,
 				53B1D18F288ED7E500E28062 /* ExpenditureWidget */,
 				B0A0F00000000000000000B0 /* SmartBudTests */,
+				A11CE0000000000000000A21 /* SmartBudUITests */,
 				D0C0FFEE0000000000000009 /* SmartBudMac */,
 				E1A2B3C40000000000000200 /* SBTokens.swift */,
 				E1A2B3C40000000000000800 /* AppCommands.swift */,
@@ -989,6 +1014,7 @@
 				5327D283287C697400F76ADF /* SmartBud.app */,
 				53B1D18A288ED7E400E28062 /* ExpenditureWidgetExtension.appex */,
 				B0A0F00000000000000000C5 /* SmartBudTests.xctest */,
+				A11CE0000000000000000A01 /* SmartBudUITests.xctest */,
 				D0C0FFEE0000000000000001 /* SmartBud-macOS.app */,
 			);
 			name = Products;
@@ -1334,6 +1360,22 @@
 			productReference = B0A0F00000000000000000C5 /* SmartBudTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		A11CE0000000000000000A41 /* SmartBudUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A11CE0000000000000000A42 /* Build configuration list for PBXNativeTarget "SmartBudUITests" */;
+			buildPhases = (
+				A11CE0000000000000000A31 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A11CE0000000000000000A51 /* PBXTargetDependency */,
+			);
+			name = SmartBudUITests;
+			productName = SmartBudUITests;
+			productReference = A11CE0000000000000000A01 /* SmartBudUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		D0C0FFEE0000000000000002 /* SmartBud-macOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D0C0FFEE0000000000000003 /* Build configuration list for PBXNativeTarget "SmartBud-macOS" */;
@@ -1387,6 +1429,7 @@
 				5327D282287C697400F76ADF /* SmartBud */,
 				53B1D189288ED7E400E28062 /* ExpenditureWidgetExtension */,
 				B0A0F00000000000000000C0 /* SmartBudTests */,
+				A11CE0000000000000000A41 /* SmartBudUITests */,
 				D0C0FFEE0000000000000002 /* SmartBud-macOS */,
 			);
 		};
@@ -1964,12 +2007,27 @@
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A11CE0000000000000000A31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A11CE0000000000000000A11 /* SmartBudUITests.swift in Sources */,
+				A11CE0000000000000000A12 /* AccessibilityAuditPolicy.swift in Sources */,
+				A11CE0000000000000000A13 /* UITestIdentifiers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */		53B1D196288ED87000E28062 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 53B1D189288ED7E400E28062 /* ExpenditureWidgetExtension */;
 			targetProxy = 53B1D195288ED87000E28062 /* PBXContainerItemProxy */;
+		};
+		A11CE0000000000000000A51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5327D282287C697400F76ADF /* SmartBud */;
+			targetProxy = A11CE0000000000000000A52 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2354,6 +2412,38 @@
 			};
 			name = Release;
 		};
+		A11CE0000000000000000A43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5UNNTHMF44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iorest.smartbud.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SmartBud;
+			};
+			name = Debug;
+		};
+		A11CE0000000000000000A44 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5UNNTHMF44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iorest.smartbud.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SmartBud;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */		5327D27E287C697400F76ADF /* Build configuration list for PBXProject "SmartBud" */ = {
@@ -2397,6 +2487,15 @@
 			buildConfigurations = (
 				D0C0FFEE0000000000000004 /* Debug */,
 				D0C0FFEE0000000000000005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A11CE0000000000000000A42 /* Build configuration list for PBXNativeTarget "SmartBudUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A11CE0000000000000000A43 /* Debug */,
+				A11CE0000000000000000A44 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

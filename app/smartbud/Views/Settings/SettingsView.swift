@@ -18,11 +18,11 @@ import AppKit
 #endif
 
 /// Navigation routes for `SettingsView`. The 12 leaf screens in Settings are
-/// all `View` types with no parameters, so a single `Hashable` enum covers
-/// every value-based `NavigationLink` in the screen. The `navigationDestination`
+/// all `View` types with no parameters, so a single enum covers every
+/// value-based `NavigationLink` in the screen. The `navigationDestination`
 /// resolver lives at the bottom of `SettingsView` and dispatches the case to
-/// the matching subview.
-enum SettingsRoute: Hashable {
+/// the matching subview. Raw values double as UI-test accessibility ids.
+enum SettingsRoute: String, Hashable {
     case pro
     case notifications
     case currency
@@ -186,6 +186,7 @@ struct SettingsView: View {
               }
               .padding(.vertical, 2)
             }
+            .accessibilityIdentifier("settings.row.pro")
           }
 
           Section(String.appLocalized(SettingsKey.sectionGeneral)) {
@@ -243,6 +244,7 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("settings.import")
 
             settingsLink(.importBackup, "arrow.clockwise.icloud.fill", 105, SettingsKey.rowImportBackup, nil)
             settingsLink(.export, "square.and.arrow.up.fill", 113, SettingsKey.rowExportData, nil)

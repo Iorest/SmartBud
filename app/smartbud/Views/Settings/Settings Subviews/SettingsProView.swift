@@ -62,6 +62,7 @@ struct SettingsProView: View {
     var headerBar: some View {
         HStack {
             Button { dismiss() } label: { SettingsBackButton() }
+                .accessibilityIdentifier("pro.back")
             Spacer()
         }
         .overlay(alignment: .center) {
@@ -263,6 +264,7 @@ struct SettingsProView: View {
                 ForEach(subscription.subscriptionProducts) { product in
                     ProductView(product)
                         .productViewStyle(.compact)
+                        .accessibilityIdentifier("pro.purchase.\(product.id)")
                         .onInAppPurchaseCompletion { _, result in
                             // `result` is `Result<Product.PurchaseResult, Error>`.
                             // The ProductView handles the actual StoreKit
@@ -294,6 +296,7 @@ struct SettingsProView: View {
                 VStack(spacing: 4) {
                     ProductView(lifetime)
                         .productViewStyle(.compact)
+                        .accessibilityIdentifier("pro.purchase.\(lifetime.id)")
                         .onInAppPurchaseCompletion { _, result in
                             Task { await subscription.refreshEntitlements() }
                             if case .failure(let error) = result {

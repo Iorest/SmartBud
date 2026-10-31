@@ -132,3 +132,73 @@ jobs:
             xcodebuild-test.log
           if-no-files-found: warn
           retention-days: 7
+
+  ui-test:
+    name: UI smoke tests (iOS Simulator)
+    # Interaction regression net: five XCUITest smokes plus an accessibility
+    # audit per test. Kept as a second job so a UI red does not hide the unit
+    # test signal (and vice versa). See docs/engineering.md.
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    env:
+      PROJECT: app/SmartBud.xcodeproj
+      SCHEME: SmartBudUITests
+      DESTINATION: platform=iOS Simulator,name=iPhone 16
+      RESULT_BUNDLE: UITestResults.xcresult
+      LOG_FILE: xcodebuild-ui-test.log
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode 26
+        run: |
+          chosen=""
+          for version in 26.6 26.5 26.4 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            candidate="/Applications/Xcode_${version}.app"
+            if [ -d "$candidate" ]; then
+              chosen="$candidate"
+              break
+            fi
+          done
+          if [ -z "$chosen" ]; then
+            echo "No Xcode 26 found on this image; the iOS 26 SDK is required." >&2
+            ls -d /Applications/Xcode*.app >&2
+            exit 1
+          fi
+          sudo xcode-select -s "$chosen"
+          xcodebuild -version
+
+      - name: UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -resultBundlePath "$RESULT_BUNDLE" \
+            2>&1 | tee "$LOG_FILE"
+
+      - name: Summarise UI test result
+        if: always()
+        run: |
+          executed=$(grep -E "Executed [0-9]+ test" "$LOG_FILE" | tail -1 || true)
+          audits=$(grep -c "Accessibility audit failed" "$LOG_FILE" || true)
+          {
+            echo "### UI smoke tests"
+            echo
+            echo "${executed:-test count line not found}"
+            echo
+            echo "Accessibility audit failures in this run: ${audits:-0}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload UI test artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: UITestResults
+          path: |
+            UITestResults.xcresult
+            xcodebuild-ui-test.log
+          if-no-files-found: warn
+          retention-days: 7
