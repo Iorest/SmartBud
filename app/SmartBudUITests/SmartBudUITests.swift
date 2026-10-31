@@ -266,6 +266,79 @@ final class SmartBudUITests: XCTestCase {
         assertAccessible(app, screen: "log")
     }
 
+    // MARK: - 1b. Save stays disabled until there is an amount
+
+    func testSaveStaysDisabledWithoutAmount() throws {
+        let app = launch()
+        require(app, AccessibilityID.logAddButton).tap()
+
+        let save = require(app, AccessibilityID.entrySave)
+        XCTAssertFalse(save.isEnabled,
+                       "Save must stay disabled while the amount is zero")
+
+        require(app, AccessibilityID.padDigit(5)).tap()
+        waitUntilEnabled(save)
+        XCTAssertTrue(save.isEnabled,
+                      "Save must become enabled once an amount is entered")
+    }
+
+    // MARK: - 1c. Editing the amount updates the ledger row
+
+    func testEditingAmountUpdatesRow() throws {
+        let app = launch()
+        require(app, AccessibilityID.logAddButton).tap()
+        for digit in [4, 2] { require(app, AccessibilityID.padDigit(digit)).tap() }
+
+        require(app, AccessibilityID.entryCategoryButton).tap()
+        let seed = element(app, AccessibilityID.entrySeedCategories)
+        if seed.waitForExistence(timeout: 3) { seed.tap() }
+        let tile = element(app, AccessibilityID.entryCategoryTile)
+        XCTAssertTrue(tile.waitForExistence(timeout: 10),
+                      "Category grid stayed empty.\n\(app.debugDescription)")
+        tile.tap()
+        require(app, AccessibilityID.padDigit(0))
+
+        let save = require(app, AccessibilityID.entrySave)
+        waitUntilEnabled(save)
+        save.tap()
+
+        let created = newestRow(in: app)
+        XCTAssertTrue(created.waitForExistence(timeout: 20),
+                      "The new expense never showed up in the log.\n\(app.debugDescription)")
+        app.buttons.matching(identifier: AccessibilityID.logRow).firstMatch.tap()
+
+        // Replace 42 with 99: clear both digits, then type the new amount.
+        for _ in 0..<2 { require(app, AccessibilityID.padBackspace).tap() }
+        for digit in [9, 9] { require(app, AccessibilityID.padDigit(digit)).tap() }
+
+        let saveEdit = require(app, AccessibilityID.entrySave)
+        waitUntilEnabled(saveEdit)
+        saveEdit.tap()
+
+        assertNewestRowAmount("99", in: app)
+    }
+
+    // MARK: - 1d. Cancelling a non-empty draft writes nothing
+
+    func testCancelDiscardsDraft() throws {
+        let app = launch()
+        let rowsBefore = app.buttons.matching(identifier: AccessibilityID.logRow).count
+
+        require(app, AccessibilityID.logAddButton).tap()
+        require(app, AccessibilityID.padDigit(7)).tap()
+        require(app, AccessibilityID.entryCancel).tap()
+
+        // A non-empty draft asks for confirmation before it is dropped.
+        let discard = app.alerts.buttons.matching(
+            NSPredicate(format: "label == %@", "Discard")).firstMatch
+        if discard.waitForExistence(timeout: 5) { discard.tap() }
+
+        require(app, AccessibilityID.logAddButton)
+        XCTAssertEqual(app.buttons.matching(identifier: AccessibilityID.logRow).count,
+                       rowsBefore,
+                       "Cancelling a draft must not create a ledger row")
+    }
+
     // MARK: - 2. Every tab opens its own screen
 
     func testTabsCycleThroughAllFourSections() throws {
