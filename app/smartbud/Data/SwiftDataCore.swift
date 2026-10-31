@@ -150,7 +150,13 @@ final class DataRepository {
         // left in the App Group database. Reported as a healthy
         // configuration — nothing can go wrong here, so the degraded-storage
         // banner would only cover the screen under test.
-        if UITestFixture.isStoreRequested, let harness = memoryContainer() {
+        //
+        // The flag is spelled out here instead of going through
+        // `UITestFixture`: this file is also compiled into the widget target,
+        // which has no test fixture and must not grow one. `UITestFixture`
+        // remains the single place that documents the hooks.
+        if ProcessInfo.processInfo.arguments.contains("-uiTestStore"),
+           let harness = memoryContainer() {
             return BootResult(container: harness, reason: nil, mode: .appGroup)
         }
         #endif
