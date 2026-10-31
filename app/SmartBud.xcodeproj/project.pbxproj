@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A16B00B5000000000000B1E1 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
+		A16B00B5000000000000B1E2 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
+		A16B00B5000000000000B1E3 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
+		A16B00B5000000000000B1E4 /* MerchantSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A2 /* MerchantSummary.swift */; };
+		A16B00B5000000000000B1E5 /* MerchantSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A2 /* MerchantSummary.swift */; };
+		A16B00B5000000000000B1E6 /* MerchantSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A2 /* MerchantSummary.swift */; };
+		A16B00B5000000000000B1E7 /* MerchantMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A3 /* MerchantMigration.swift */; };
+		A16B00B5000000000000B1E8 /* MerchantMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A3 /* MerchantMigration.swift */; };
+		A16B00B5000000000000B1E9 /* MerchantMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A3 /* MerchantMigration.swift */; };
+		A16B00B5000000000000B1F1 /* MerchantBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A4 /* MerchantBreakdownView.swift */; };
+		A16B00B5000000000000B1F2 /* MerchantBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A4 /* MerchantBreakdownView.swift */; };
+		A16B00B5000000000000B1F3 /* MerchantNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A5 /* MerchantNormalizerTests.swift */; };
+		A16B00B5000000000000B1F4 /* MerchantAggregationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A6 /* MerchantAggregationTests.swift */; };
+		A16B00B5000000000000B1F5 /* MerchantMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A7 /* MerchantMigrationTests.swift */; };
 		E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
 		E1A2B3C40000000000001042 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
 		E1A2B3C40000000000001043 /* ExchangeRateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000001040 /* ExchangeRateService.swift */; };
@@ -522,6 +536,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logic/MerchantNormalizer.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A2 /* MerchantSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logic/MerchantSummary.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A3 /* MerchantMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/MerchantMigration.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A4 /* MerchantBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MerchantBreakdownView.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A5 /* MerchantNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MerchantNormalizerTests.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A6 /* MerchantAggregationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MerchantAggregationTests.swift; sourceTree = "<group>"; };
+		A16B00B5000000000000F1A7 /* MerchantMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MerchantMigrationTests.swift; sourceTree = "<group>"; };
 		08D7462C838073F70EB4B0F5 /* WidgetEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WidgetEnums.swift; path = smartbud/Shortcuts/Configuration/WidgetEnums.swift; sourceTree = SOURCE_ROOT; };
 		0FCAF0AE6D414F738BF4836B /* CategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewModel.swift; sourceTree = "<group>"; };
 		395B8D22DC1A4AD1B1235B22 /* SettingsProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsProView.swift; sourceTree = "<group>"; };
@@ -816,6 +837,9 @@
 			children = (
 				B0A0F00000000000000000B1 /* BudgetLogicTests.swift */,
 				E1A2B3C4000000000000C020 /* ParsingTests.swift */,
+				A16B00B5000000000000F1A5 /* MerchantNormalizerTests.swift */,
+				A16B00B5000000000000F1A6 /* MerchantAggregationTests.swift */,
+				A16B00B5000000000000F1A7 /* MerchantMigrationTests.swift */,
 				E1A2B3C4000000000000C0F1 /* ParsingMetricsTests.swift */,
 				E1A2B3C4000000000000C064 /* ProAccessTests.swift */,
 				E1A2B3C4000000000000C090 /* WipeOutcomeTests.swift */,
@@ -1004,6 +1028,10 @@
 				E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */,
 				E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */,
 				E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */,
+				A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */,
+				A16B00B5000000000000F1A2 /* MerchantSummary.swift */,
+				A16B00B5000000000000F1A3 /* MerchantMigration.swift */,
+				A16B00B5000000000000F1A4 /* MerchantBreakdownView.swift */,
 				E1A2B3C4000000000000A031 /* ExportSchema.swift */,
 				B0A0F0000000000000000133 /* LLMClient.swift */,
 				B1C2D3E4F5A60718293A4B01 /* LLMProvider.swift */,
@@ -1453,6 +1481,9 @@
 		E1A2B3C4000000000000F0A2 /* ReimbursementLedger.swift in Sources */,
 		E1A2B3C4000000000000F0D2 /* TransferFeeLedger.swift in Sources */,
 		E1A2B3C4000000000000F0E2 /* TransferFeeMigration.swift in Sources */,
+				A16B00B5000000000000B1E1 /* MerchantNormalizer.swift in Sources */,
+				A16B00B5000000000000B1E4 /* MerchantSummary.swift in Sources */,
+				A16B00B5000000000000B1E7 /* MerchantMigration.swift in Sources */,
 		E1A2B3C4000000000000F092 /* LogPeriodTotals.swift in Sources */,
 		E1A2B3C4000000000000A032 /* ExportSchema.swift in Sources */,
 		E1A2B3C4000000000000A042 /* CSVSupport.swift in Sources */,
@@ -1581,6 +1612,7 @@
 				E1A2B3C40000000000000601 /* InsightsView+Rows.swift in Sources */,
 				D63B205C2D8728C300CAFB31 /* BarGraph.swift in Sources */,
 				D63B205D2D8728C300CAFB41 /* CategoryBreakdownView.swift in Sources */,
+				A16B00B5000000000000B1F1 /* MerchantBreakdownView.swift in Sources */,
 				D63B205E2D8728C300CAFC01 /* SettingsLanguageView.swift in Sources */,
 				E0906D770E6D45DD97BD672A /* SettingsProView.swift in Sources */,
 				E1A2B3C40000000000000624 /* SettingsProView+Sections.swift in Sources */,
@@ -1695,6 +1727,12 @@
 				E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */,
 				E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */,
+				A16B00B5000000000000B1E2 /* MerchantNormalizer.swift in Sources */,
+				A16B00B5000000000000B1E5 /* MerchantSummary.swift in Sources */,
+				A16B00B5000000000000B1E8 /* MerchantMigration.swift in Sources */,
+				A16B00B5000000000000B1F3 /* MerchantNormalizerTests.swift in Sources */,
+				A16B00B5000000000000B1F4 /* MerchantAggregationTests.swift in Sources */,
+				A16B00B5000000000000B1F5 /* MerchantMigrationTests.swift in Sources */,
 				E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */,
 				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
@@ -1840,6 +1878,7 @@
 				E1A2B3C40000000000000602 /* InsightsView+Rows.swift in Sources */,
 				D0C0FFEE000000000000017C /* BarGraph.swift in Sources */,
 				D0C0FFEE000000000000017D /* CategoryBreakdownView.swift in Sources */,
+				A16B00B5000000000000B1F2 /* MerchantBreakdownView.swift in Sources */,
 				D0C0FFEE000000000000017F /* SettingsLanguageView.swift in Sources */,
 				D0C0FFEE0000000000000180 /* SettingsProView.swift in Sources */,
 				E1A2B3C40000000000000625 /* SettingsProView+Sections.swift in Sources */,
@@ -1861,6 +1900,9 @@
 				E1A2B3C4000000000000F0A3 /* ReimbursementLedger.swift in Sources */,
 				E1A2B3C4000000000000F0D3 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0E3 /* TransferFeeMigration.swift in Sources */,
+				A16B00B5000000000000B1E3 /* MerchantNormalizer.swift in Sources */,
+				A16B00B5000000000000B1E6 /* MerchantSummary.swift in Sources */,
+				A16B00B5000000000000B1E9 /* MerchantMigration.swift in Sources */,
 				E1A2B3C4000000000000F093 /* LogPeriodTotals.swift in Sources */,
 				E1A2B3C4000000000000A033 /* ExportSchema.swift in Sources */,
 				E1A2B3C4000000000000A043 /* CSVSupport.swift in Sources */,

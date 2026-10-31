@@ -15,10 +15,13 @@ extension DataExporter {
     // MARK: - CSV
 
     /// Column order of the CSV export. Kept as data so the header row and
-    /// every row are generated from the same list.
+    /// every row are generated from the same list. `merchant` and
+    /// `merchant_key` are appended rather than inserted so an existing
+    /// spreadsheet keeps its column positions.
     static let csvHeader = [
         "date", "type", "amount", "currency", "base_amount",
-        "category", "account", "note", "reimbursable", "reimbursed", "fee"
+        "category", "account", "note", "reimbursable", "reimbursed", "fee",
+        "merchant", "merchant_key"
     ]
 
     /// Spreadsheet-friendly export: one flat row per ledger entry, transfers
@@ -75,7 +78,9 @@ extension DataExporter {
                 txn.wrappedNote,
                 txn.reimbursable ? "true" : "false",
                 txn.reimbursedAt.map { formatter.string(from: $0) } ?? "",
-                ""
+                "",
+                txn.merchant ?? "",
+                txn.merchantKey ?? ""
             ]))
         }
 
@@ -94,7 +99,9 @@ extension DataExporter {
                 transfer.wrappedNote,
                 "false",
                 "",
-                amountField(transfer.fee)
+                amountField(transfer.fee),
+                "",
+                ""
             ]))
         }
 

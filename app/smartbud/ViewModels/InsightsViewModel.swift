@@ -32,6 +32,9 @@ final class InsightsViewModel {
     var periodAverageSpend: Double = 0
     var barChartData: [BarChartPoint] = []
     var categoryBreakdown: [PowerCategory] = []
+    /// Spend by merchant, largest first. Grouped on `merchantKey`, so the
+    /// three spellings of one shop are one row.
+    var merchantBreakdown: [MerchantSlice] = []
     var todayTotal: Double = 0
     var todayTransactions: [TransactionModel] = []
     var yesterdayTotal: Double = 0
@@ -118,6 +121,9 @@ final class InsightsViewModel {
 
         barChartData = getBarChartData(for: selectedPeriod)
         categoryBreakdown = getCategoryBreakdown(for: selectedPeriod)
+        // Same window as the totals above: `inPeriod` already drops future
+        // rows, so a planned purchase never enters the merchant ranking.
+        merchantBreakdown = MerchantSummary.breakdown(of: inPeriod)
 
         let cal = configuredCalendar
         let today = cal.startOfDay(for: .now)

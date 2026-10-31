@@ -108,6 +108,11 @@ final class ContentViewModel {
         // row now. Writing the missing rows keeps every balance unchanged.
         TransferFeeLedger.migrate(in: DataRepository.shared.context)
 
+        // Rows written before merchant normalisation have a note but no
+        // merchant; deriving it here means statistics work on the first
+        // launch after the update, not only on new entries.
+        MerchantMigration.migrate(in: DataRepository.shared.context)
+
         reconcileNotificationAuthorization()
     }
 

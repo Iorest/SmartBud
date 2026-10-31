@@ -49,7 +49,7 @@ TemplateTransactionModel                 快捷记账模板
 
 | 实体 | 关键字段 | 不变量 |
 |---|---|---|
-| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`adjustment` 行无分类、不进统计 |
+| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring`, `merchant?`, `merchantKey?` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`adjustment` 行无分类、不进统计；`merchantKey == nil` 当且仅当 `merchant == nil` |
 | `CategoryModel` | `name`, `emoji`, `colour`, `income`, `order` | `income` 决定它能挂在哪类记录上 |
 | `AccountModel` | `kind`, `currencyCode`, `openingBalance`, `hidden`, `archived`, `order` | `archived ⇒ 不出现在默认列表/总资产/转账端点` |
 | `TransferModel` | `amount`, `destinationAmount`, `fee`, `source`, `destination` | `amount > 0`；`fee >= 0`；跨币种时 `destinationAmount > 0`；`source != destination` |
@@ -59,10 +59,23 @@ TemplateTransactionModel                 快捷记账模板
 
 删除规则（当前实现，也是设计要求）：
 
+- 删交易 → 走 `TransactionSnapshot` 暂存，6 秒内可撤销；撤销必须恢复到"和删除前一模一样"（账户、baseAmount、折扣、报销、调整、商户都在快照里）。
 - 删分类 → 交易保留、`category = nil`、备注若是分类名副本则保留原样；关联 `BudgetModel` 一并删除。
 - 删账户 → 交易保留、`account = nil`；两端涉及它的转账一并删除。
-- 删交易 → 走 `TransactionSnapshot` 暂存，6 秒内可撤销；撤销必须恢复到"和删除前一模一样"（账户、baseAmount、折扣、报销、调整都在快照里）。
 - 删转账 → 只需它自己，两端余额自动回滚。
+
+商户（`merchant` / `merchantKey`）：
+
+- 没有商户实体，也没有商户主数据表。两个字段就是商户数据的全部：随交易一起删除（删交易、清空库），
+  改商户名就是改行本身，没有别处指向它。
+- 默认值都是 `nil`，含义是"未识别"：本功能之前写入的旧行、备注里没有商户名的行、
+  以及记账页之外写入的调整/手续费/报销行。`merchantKey == nil` 当且仅当 `merchant == nil`。
+- 派生规则见 `Logic/MerchantNormalizer.swift`：去掉平台前缀后的店铺细节
+  （"美团-张亮麻辣烫" → 美团）、公司/门店后缀、门店编号；全角与大小写折叠；
+  纯数字不算商户（否则两家店的编号会合并）；别名表可编辑（`MerchantAliasTable`）。
+- 写入时机：记账/改备注时按备注派生（`TransactionViewModel.create/update`）；
+  旧库在启动时由 `MerchantMigration` 一次性回填（只填 `merchantKey == nil` 的行，可重入），
+  JSON 导入后同样再跑一次回填。
 
 ## 3. 金额与货币
 
@@ -168,6 +181,7 @@ TemplateTransactionModel                 快捷记账模板
 - 周期：周 / 月 / 年；区间受 `firstDayOfMonth`、`firstWeekday` 影响。
 - 支出 = `countsAsSpend` 的 `baseAmount` 合计；收入 = `countsAsIncome`；净 = 收入 − 支出。
 - 分类占比只到支出分类；柱状图按周期分桶。
+- 商户维度按 `merchantKey` 聚合（`MerchantSummary`，最多 6 行，金额降序）：同一商户的多种写法是一行，未识别的行不进榜。
 - 待报销单独成卡，跨期统计，永不混入支出。
 - 今日/昨日列表只展示 `countsInTotals` 的行，头部合计与列表同口径。
 
@@ -179,7 +193,7 @@ TemplateTransactionModel                 快捷记账模板
 
 ### 6.9 导入 / 导出 / 清除
 
-- 导出：JSON（完整、可导回，`schemaVersion` 4）+ CSV（单向，给人看）。
+- 导出：JSON（完整、可导回，`schemaVersion` 4）+ CSV（单向，给人看）。CSV 末尾两列 `merchant` / `merchant_key` 是追加的，已有列位置不变。
 - 导入：按 id 合并、重复跳过、关系按 id 再按名字兜底、整份文件一次提交、失败回滚；拒绝更高版本、拒绝非备份、金额与汇率做防御性收敛。
 - 导入后必须刷新：账户、分类、预算、统计、小组件时间线。
 - 清除：本地全删（含账户/转账/汇率）+ 尝试删除 CloudKit zone，之后刷新所有缓存。
@@ -292,6 +306,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 
 - 导出格式 `ExportSchema.version`（当前 4）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
 - App 内数据迁移：新字段一律带默认值，依赖 SwiftData 轻量迁移；不允许"改字段类型"。
+- 商户字段（`merchant` / `merchantKey`）是可选普通字段：轻量迁移后为 `nil`，由 `MerchantMigration` 在启动与导入后从备注回填，可重入。JSON 备份不携带这两个字段（避免为一个可推导值升 schemaVersion），恢复后同样靠回填补齐。
 - 废弃策略：字段先保留、停止写入，至少一个大版本后再删（CloudKit 上删字段同样要部署）。
 
 ## 11. 未实现功能的模型影响
