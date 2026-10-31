@@ -10,7 +10,7 @@
 | macOS | 15 或更新 | 只在 macOS 上编译，Linux / Windows 没有 Xcode |
 | Xcode | 26.x | 工程按 Xcode 26.6 维护（`LastUpgradeCheck = 2660`），`IPHONEOS_DEPLOYMENT_TARGET = 26.0`，必须带 iOS 26 SDK |
 | Swift | 6.0 | `SWIFT_VERSION = 6.0`，严格并发检查开启 |
-| 模拟器 | iPhone 16 | 见 `app/SmartBud.xcodeproj/xcshareddata/xcschemes/SmartBud.xcscheme` |
+| 模拟器 | iPhone 16 | 构建/测试命令与 CI 的 `DESTINATION`；scheme 本身不固定机型 |
 
 依赖只有系统框架（SwiftUI、SwiftData、CloudKit、StoreKit、WidgetKit），
 工程里没有 Swift Package 依赖，克隆后不需要 `Resolve Package Versions`。
@@ -70,11 +70,14 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 5 条 smoke：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 8 条：
 
 | 用例 | 挡住什么 |
 |---|---|
 | `testCreateExpenseThenUndoDelete` | 记账主链路：金额键盘 → 分类 → 保存 → 上账 → 滑删 → 撤销恢复 |
+| `testSaveStaysDisabledWithoutAmount` | 金额为 0 时保存按钮禁用，输入金额后启用 |
+| `testEditingAmountUpdatesRow` | 编辑已有记录的金额后，流水行金额随之更新 |
+| `testCancelDiscardsDraft` | 取消非空草稿不写入账目行 |
 | `testTabsCycleThroughAllFourSections` | 四个 tab 各自还能打开自己的屏 |
 | `testSmartEntryOpensAndCancels` | 智能记账弹层的开关，以及弹层关掉后表单还在 |
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
@@ -120,7 +123,8 @@ xcodebuild test \
 
 ### 可访问性审计
 
-每条用例末尾都跑 `performAccessibilityAudit`，发现的问题全部打到日志里
+目前 5 条用例在末尾调用 `assertAccessible` 跑 `performAccessibilityAudit`
+（TELE-36 新增的 3 条纯交互用例尚未接入），发现的问题全部打到日志里
 （`AUDIT[屏幕] 类型 描述 [identifier]`），CI job summary 汇总最近 60 条，完整报告在
 `UITestResults.xcresult` / `xcodebuild-uitest.log` artifact 里。
 
