@@ -7,3 +7,6 @@ app/build/
 
 ## MacOS
 .DS_Store
+
+## Linux logic-test workspace (scripts/linux-tests.sh)
+.linux-tests/

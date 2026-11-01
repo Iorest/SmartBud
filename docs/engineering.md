@@ -146,12 +146,15 @@ xcodebuild test \
 
 ## 运行机约束
 
-**Linux 机器不能编译，也不能跑测试。** 这条约束是按实际运行写的：
+**Linux 机器不能编译 iOS 目标，也不能跑 UI 测试。** 这条约束是按实际运行写的：
 
-- 这台 Linux 运行机没有 `xcodebuild`、`simctl`、iOS SDK，`swift build` 也跑不了 iOS 目标；
-- 编译与运行验证只能走 CI，不能声称「本地测试通过」；
-- 不依赖 Xcode 的静态检查可以本地做：`python3 scripts/check_repo.py`（见下节），
-  再加读代码、`grep` 结构、检查 schema / 迁移版本号这类非编译验证。
+- 这台 Linux 运行机没有 `xcodebuild`、`simctl`、iOS SDK，编不了 app target；
+- 完整编译、SwiftData、SwiftUI、CloudKit、StoreKit、解析里的 NaturalLanguage，
+  以及全部 XCUITest，仍然只能在 macOS runner 或一台真 Mac 上验证；
+- 但 **Foundation-only 的逻辑层可以在 Linux 上真编译真测试**：
+  `scripts/linux-tests.sh`（见下节），当前覆盖 69 个用例 / 8 个 suite；
+- 不依赖 Xcode 的静态检查也在本地做：`python3 scripts/check_repo.py`。
+
 
 ## 离线结构检查
 
@@ -171,6 +174,39 @@ python3 scripts/check_repo.py          # 0 = 干净，1 = 有问题
 CI 的 `test` job 第一步就跑它，结构问题几秒内失败，不会先烧掉一次 macOS 构建。
 它**不替代** `xcodebuild test`：编译错误、运行行为、UI 流程都查不出来。
 接入前用四种真实故障验证过它会报错：漏 `smartbud/` 前缀、占位 identifier、未登记文件、断链。
+
+## Linux 逻辑测试
+
+`scripts/linux-tests.sh` 把 Foundation-only 的源码和对应测试拼成一个 SwiftPM
+测试 target，在 Linux 上真编译、真跑。不需要 Xcode、不需要模拟器、不消耗 macOS 机时。
+
+```bash
+# 需要一个 Linux Swift 工具链（6.0+），装机后：
+export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swift 放进 PATH
+scripts/linux-tests.sh
+# 输出：✔ Test run with 69 tests in 8 suites passed after 0.014 seconds.
+```
+
+覆盖的 suite：`AppPeriod` / `CSVTable` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` /
+`MoneyFormatting` / `ProAccess` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
+
+**不覆盖**：SwiftUI 视图、SwiftData 模型、CloudKit、StoreKit、`ExpenseTextParser` 的
+NaturalLanguage 商户抽取、本地化格式化（`AppLocale` / `AppLanguage` 用的是 Apple 专属 API，
+harness 用 `scripts/linux-tests/LinuxShims.swift` 顶替了其中三个符号，并已在文件头写明差异），
+以及全部 XCUITest。这些仍然只认 macOS。
+
+新增文件要不要进这个子集，看它的 import：只有 `Foundation` 才能进，写进脚本里的
+`app_sources` 数组，然后跟一个对应的测试文件。编译不过就是它依赖了 Apple-only 框架。
+
+**在 Arch / Manjaro 上装 swift.org 工具链的两个坑**（官方包按 Ubuntu 打包）：
+
+```bash
+ln -sf /usr/lib/libncursesw.so.6 <toolchain>/usr/lib/swift/linux/libncurses.so.6
+ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
+```
+
+另外 `TMPDIR` 必须指向一个可写目录，否则 `swift` 会报 `couldNotFindTmpDir`。
+
 
 ## CI
 
