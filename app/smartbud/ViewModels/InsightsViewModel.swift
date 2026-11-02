@@ -77,15 +77,9 @@ final class InsightsViewModel {
         }
     }
 
-    /// SABOTAGE (TELE-36 red-run demo): the statistics are computed once and
-    /// then never recomputed, the way a missing post-save refresh behaves.
-    private var hasComputedStatistics = false
-
     /// Recomputes every new `@Published` property above for the current `selectedPeriod`.
     /// Also refreshes today / yesterday transaction lists.
     func refreshAll() {
-        if hasComputedStatistics { return }
-        hasComputedStatistics = true
         let defaults = UserDefaults.appGroup
         // Missing keys have to fall back the same way `@AppStorage` does:
         // `bool(forKey:)` answers false for an absent key, which silently hid
