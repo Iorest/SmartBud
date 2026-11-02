@@ -46,6 +46,10 @@ final class SmartBudUITests: XCTestCase {
             // it at the top of the list for every case that follows, which is
             // how the first batch broke two older smoke cases.
             "-freshStore",
+            // The run creates enough transactions to cross the 3rd/10th/25th
+            // App Store review thresholds; the system sheet would cover the
+            // screen mid-case (ReviewRequester.requestReviewIfAppropriate).
+            "-skipReviewPrompt",
         ]
         app.launch()
         dismissLaunchOverlay(app)

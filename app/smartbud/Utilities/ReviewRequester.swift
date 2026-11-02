@@ -69,6 +69,12 @@ enum ReviewRequester {
     }
 
     private static func requestReviewIfAppropriate() {
+        #if DEBUG
+        // QA hook: a UI-test session creates transactions across many cases,
+        // so the lifetime counter crosses a threshold mid-run and the system
+        // review sheet covers the screen the test is driving.
+        if ProcessInfo.processInfo.arguments.contains("-skipReviewPrompt") { return }
+        #endif
         let store = UserDefaults.standard
         let currentVersion = Bundle.main.appVersion
         if store.string(forKey: lastAskedVersionKey) == currentVersion {
