@@ -753,6 +753,16 @@ final class SmartBudUITests: XCTestCase {
         if XCTWaiter().wait(for: [gone], timeout: 15) != .completed {
             XCTFail("The entry form never closed.\n\(app.debugDescription)",
                     file: file, line: line)
+            return
+        }
+        // The cover's views leave the hierarchy before the tab shell is laid
+        // out again, so "pad is gone" is not yet "the tabs are tappable".
+        let tabBar = app.tabBars.firstMatch
+        let shellBack = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isHittable == true"), object: tabBar)
+        if XCTWaiter().wait(for: [shellBack], timeout: 20) != .completed {
+            XCTFail("The tab bar never came back after the form closed.\n\(app.debugDescription)",
+                    file: file, line: line)
         }
     }
 
@@ -1300,7 +1310,8 @@ final class SmartBudUITests: XCTestCase {
 
         select(.budget, in: app)
         let overTile = element(app, AccessibilityID.budgetRemaining("Food"))
-        XCTAssertTrue(overTile.waitForExistence(timeout: 10))
+        XCTAssertTrue(overTile.waitForExistence(timeout: 15),
+                      "The budget tile never appeared after the second expense.\n\(app.debugDescription)")
         // The app renders the overage as a red "over $30" (magnitude + status
         // word), not as a negative figure. Turning it into -$30 is a design
         // change this test-infrastructure batch does not make, so the case
