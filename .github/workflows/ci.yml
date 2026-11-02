@@ -225,22 +225,40 @@ jobs:
           # xcodebuild test identifiers are Target/Class/Method. The shorter
           # "Target/method" form silently matches nothing, which is how a
           # shard can report success after running zero tests.
+          #
+          # Multiple -only-testing flags are a union, so the "only" shards must
+          # NOT also pass the target-level filter: that would select every case
+          # again. The "skip" shard keeps the target-level filter and subtracts
+          # the E2E cases by name.
           filters=()
-          for test in ${{ matrix.tests }}; do
-            filters+=("-${FILTER}-testing:SmartBudUITests/SmartBudUITests/${test}")
-          done
+          if [ "${{ matrix.filter }}" = "only" ]; then
+            for test in ${{ matrix.tests }}; do
+              filters+=("-only-testing:SmartBudUITests/SmartBudUITests/${test}")
+            done
+          else
+            filters+=("-only-testing:SmartBudUITests")
+            for test in ${{ matrix.tests }}; do
+              filters+=("-skip-testing:SmartBudUITests/SmartBudUITests/${test}")
+            done
+          fi
           xcodebuild test \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
-            -only-testing:SmartBudUITests \
             "${filters[@]}" \
             -testLanguage en \
             -testRegion US \
             -resultBundlePath "$RESULT_BUNDLE" \
             2>&1 | tee "$LOG_FILE"
-        env:
-          FILTER: ${{ matrix.filter }}
+
+      # A filter that matches nothing makes xcodebuild exit 0 after running
+      # zero cases — a vacuous green. Fail the shard instead of reporting it.
+      - name: Shard ran at least one case
+        run: |
+          if ! grep -qE "Test Case '\-\[SmartBudUITests .*\]' (passed|failed)" "$LOG_FILE"; then
+            echo "::error::This shard executed no SmartBudUITests cases; check the -only-testing/-skip-testing identifiers."
+            exit 1
+          fi
 
       - name: Summarise UI test results
         if: always()
