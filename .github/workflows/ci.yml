@@ -255,7 +255,7 @@ jobs:
       # zero cases — a vacuous green. Fail the shard instead of reporting it.
       - name: Shard ran at least one case
         run: |
-          if ! grep -qE "Test Case '\-\[SmartBudUITests .*\]' (passed|failed)" "$LOG_FILE"; then
+          if ! grep -q "Test Case '-\[SmartBudUITests\." "$LOG_FILE"; then
             echo "::error::This shard executed no SmartBudUITests cases; check the -only-testing/-skip-testing identifiers."
             exit 1
           fi
@@ -266,8 +266,8 @@ jobs:
           {
             echo "### UI smoke tests"
             echo
-            passed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' passed" "$LOG_FILE" || true)
-            failed=$(grep -c "Test Case '-\[SmartBudUITests .*\]' failed" "$LOG_FILE" || true)
+            passed=$(grep -c "Test Case '-\[SmartBudUITests\..*\]' passed" "$LOG_FILE" || true)
+            failed=$(grep -c "Test Case '-\[SmartBudUITests\..*\]' failed" "$LOG_FILE" || true)
             echo "passed: ${passed:-0} · failed: ${failed:-0}"
             echo
             echo "### Accessibility audit"
