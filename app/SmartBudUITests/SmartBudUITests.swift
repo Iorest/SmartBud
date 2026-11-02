@@ -582,17 +582,20 @@ final class SmartBudUITests: XCTestCase {
     private func openAccounts(_ app: XCUIApplication,
                               file: StaticString = #filePath, line: UInt = #line) {
         select(.settings, in: app)
-        // The Settings tab keeps its navigation stack across tab switches, so
-        // the row is only present when Accounts is not already pushed.
-        if !element(app, AccessibilityID.accountsAddButton).waitForExistence(timeout: 3) {
-            let row = scrollIntoView(AccessibilityID.settingsRow("accounts"), in: app)
-            if !row.exists {
-                XCTFail("The Accounts settings row never came into view.\n\(app.debugDescription)",
-                        file: file, line: line)
-                return
-            }
-            row.tap()
+        if element(app, AccessibilityID.accountsAddButton).waitForExistence(timeout: 3) {
+            // Already on Accounts (the tab keeps its navigation stack). Step
+            // out and back in so AccountListView.onAppear reloads: balances
+            // are derived from the store, and a rolled-back delete must be
+            // visible without relaunching the app.
+            app.navigationBars.buttons["BackButton"].firstMatch.tap()
         }
+        let row = scrollIntoView(AccessibilityID.settingsRow("accounts"), in: app)
+        if !row.exists {
+            XCTFail("The Accounts settings row never came into view.\n\(app.debugDescription)",
+                    file: file, line: line)
+            return
+        }
+        row.tap()
         require(app, AccessibilityID.accountsAddButton, file: file, line: line)
     }
 
@@ -621,7 +624,19 @@ final class SmartBudUITests: XCTestCase {
         currencyRow.tap()
         let option = app.descendants(matching: .any)
             .matching(NSPredicate(format: "label BEGINSWITH %@", code)).firstMatch
-        if !option.waitForExistence(timeout: 10) {
+        if !option.waitForExistence(timeout: 5) {
+            // The popup opens scrolled to the *current* selection, so codes
+            // that sort above it are outside the hierarchy. Drag the list
+            // (never the app: that dismisses the popup) until it appears.
+            let anOption = app.buttons
+                .matching(NSPredicate(format: "label CONTAINS %@ AND NOT (label BEGINSWITH %@)",
+                                      " · ", "Currency,"))
+                .firstMatch
+            for _ in 0..<25 where !option.exists {
+                if anOption.exists { anOption.swipeDown() } else { break }
+            }
+        }
+        if !option.waitForExistence(timeout: 5) {
             XCTFail("\(code) is not offered by the currency picker.\n\(app.debugDescription)",
                     file: file, line: line)
             return
@@ -717,6 +732,22 @@ final class SmartBudUITests: XCTestCase {
         return "rows=\(labels) pad=\(pad) toast=\(toast.exists ? toast.label : "none")"
     }
 
+    /// Waits until the full-screen entry form is gone.
+    ///
+    /// The dismissal is animated, and a tab-bar tap that lands while the form
+    /// is still on screen resolves to a {-1, -1} hit point and does nothing —
+    /// the caller would then assert on the wrong screen.
+    private func waitForFormDismissed(_ app: XCUIApplication,
+                                      file: StaticString = #filePath, line: UInt = #line) {
+        let pad = element(app, AccessibilityID.entryAmountDisplay)
+        let gone = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == false"), object: pad)
+        if XCTWaiter().wait(for: [gone], timeout: 15) != .completed {
+            XCTFail("The entry form never closed.\n\(app.debugDescription)",
+                    file: file, line: line)
+        }
+    }
+
     /// Saves a plain expense through the happy path and returns its row.
     @discardableResult
     private func addExpense(_ app: XCUIApplication, amount value: String, note: String,
@@ -740,7 +771,9 @@ final class SmartBudUITests: XCTestCase {
         let save = require(app, AccessibilityID.entrySave, file: file, line: line)
         waitUntilEnabled(save)
         save.tap()
-        return waitForRow(app, note: note, amount: value, file: file, line: line)
+        let row = waitForRow(app, note: note, amount: value, file: file, line: line)
+        waitForFormDismissed(app, file: file, line: line)
+        return row
     }
 
     private func chooseTransferAccount(_ app: XCUIApplication, picker: String, name: String,
@@ -860,6 +893,7 @@ final class SmartBudUITests: XCTestCase {
         save.tap()
 
         waitForRow(app, note: note, amount: "12.50")
+        waitForFormDismissed(app)
         let after = expenseTotal(app)
         XCTAssertEqual(after, before + 12.50, accuracy: 0.005,
                        "Expenses went \(before) → \(after); expected +12.50")
@@ -925,6 +959,7 @@ final class SmartBudUITests: XCTestCase {
         secondSave.tap()
 
         waitForRow(app, note: secondNote, amount: "3.00")
+        waitForFormDismissed(app)
         waitForRow(app, note: firstNote, amount: "5.00")
     }
 
@@ -992,6 +1027,7 @@ final class SmartBudUITests: XCTestCase {
         waitUntilEnabled(save)
         save.tap()
 
+        waitForFormDismissed(app)
         require(app, AccessibilityID.logUpcomingHeader, timeout: 20)
         let futureRow = waitForRow(app, note: futureNote, amount: "20.00")
         XCTAssertTrue(futureRow.label.contains("Discount $5.00"),
@@ -1041,6 +1077,7 @@ final class SmartBudUITests: XCTestCase {
         waitUntilEnabled(save)
         save.tap()
 
+        waitForFormDismissed(app)
         let afterEdit = expenseTotal(app)
         XCTAssertEqual(afterEdit, afterCreate + 7.50, accuracy: 0.005,
                        "Editing 12.50 → 20.00 did not move the total by 7.50")
@@ -1086,6 +1123,7 @@ final class SmartBudUITests: XCTestCase {
         save.tap()
 
         let created = waitForRow(app, note: note, amount: "40.00")
+        waitForFormDismissed(app)
         XCTAssertTrue(created.label.contains("Discount $10.00"),
                       "Saved row reads: \"\(created.label)\"")
         XCTAssertTrue(created.label.contains("Pending"),
@@ -1107,6 +1145,9 @@ final class SmartBudUITests: XCTestCase {
                       "The discount was lost by undo: \"\(restored.label)\"")
         XCTAssertTrue(restored.label.contains("Pending"),
                       "The claim flag was lost by undo: \"\(restored.label)\"")
+
+        XCTAssertTrue(restored.label.contains(accountName),
+                      "The row is no longer linked to its account: \(restored.label)")
 
         openAccounts(app)
         XCTAssertEqual(balance(app, of: accountName), 160, accuracy: 0.005,
@@ -1154,11 +1195,11 @@ final class SmartBudUITests: XCTestCase {
         let app = launch()
         let suffix = UUID().uuidString.prefix(4)
         let source = "QA USD \(suffix)"
-        let destination = "QA AUD \(suffix)"
+        let destination = "QA VND \(suffix)"
 
         openAccounts(app)
         makeAccount(app, name: source, opening: "100")
-        makeAccount(app, name: destination, currencyCode: "AUD", opening: "0")
+        makeAccount(app, name: destination, currencyCode: "VND", opening: "0")
 
         let spendBefore = expenseTotal(app)
         ensureAccounts(app)
@@ -1233,6 +1274,7 @@ final class SmartBudUITests: XCTestCase {
         waitUntilEnabled(save)
         save.tap()
 
+        waitForFormDismissed(app)
         let fresh = budgetRemaining(app, for: "Food") ?? .nan
         XCTAssertEqual(fresh, 100, accuracy: 0.01,
                        "A new 100 budget should start with 100 left, got \(fresh)")
