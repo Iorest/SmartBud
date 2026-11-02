@@ -95,6 +95,7 @@ struct NoteView: View {
                         }
                     }
                     .focused($textFocused)
+                    .accessibilityIdentifier(AccessibilityID.entryNoteField)
                     .foregroundStyle(Color.PrimaryText)
 
                 if note.isEmpty {

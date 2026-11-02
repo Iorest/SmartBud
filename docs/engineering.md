@@ -84,8 +84,11 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
 
 外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
-余额、预算剩余、校验提示），并与动作前在同一 run 里读到的值比较——模拟器的 store 跨用例、
-跨 run 都在，写死绝对值等于把用例执行顺序写进断言：
+余额、预算剩余、校验提示）。两条约定让断言不依赖执行顺序：
+
+- **一条用例一个干净库**：`launch()` 带 `-freshStore`，用空的内存 store 启动，
+  用例之间不继承数据（否则 A4 的未来日期行会永远排在列表第一，把所有 "最新一行" 断言带偏）。
+- **每条记录带唯一备注**（`QA A4b 3F2A`），断言靠备注找行，不靠列表顺序。
 
 | 用例 | 挡住什么 |
 |---|---|
@@ -132,6 +135,9 @@ xcodebuild test \
 分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例）、
 `e2e 记账/编辑`（A1–A5）、`e2e 删除/转账/预算`（A6–A9）。**新增用例要同时加进
 `.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke 分片会把它一起跑掉。
+分片用 `-only-testing` / `-skip-testing` 过滤时，标识符必须是 **Target/Class/Method**
+（`SmartBudUITests/SmartBudUITests/testA1_…`）：少写一层会静默匹配到 0 条用例，
+xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
 拆分的另一个约束是 10 分钟预算本身：单条用例再长出 60 秒以上，A6/A8 那个分片就要重新分。
 
 ### 元素怎么定位
@@ -156,6 +162,7 @@ xcodebuild test \
 |---|---|---|
 | `-skipIntro` | 跳过两页欢迎流程，直接进账本 | `ContentViewModel.bootstrap` |
 | `-importSample` | 导入向导直接用 bundle 里的 `sample.csv` 走到预览步，绕开系统文件选择器 | `ImportDataView.body` 的 `onAppear` |
+| `-freshStore` | 每次启动一个空的内存 store，不报降级、不弹提示条；UI 用例靠它做到「一条用例一个干净库」 | `DataRepository.freshMemoryContainer` |
 
 `XCUITest` 驱动不了系统文件选择器，所以导入用例走的是第二条：验的是「解析出预览 →
 返回 → 取消」这条链，不是「文件选择器能不能选到文件」。

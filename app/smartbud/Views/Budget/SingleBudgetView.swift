@@ -325,6 +325,13 @@ extension SingleBudgetView {
                                   ? Color.AlertRed
                                   : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
                             .frame(maxWidth: .infinity)
+                            // The row is one accessibility element and the
+                            // bar's value ("0%") would be appended to the
+                            // tile's numeric `accessibilityValue`, which the
+                            // E2E case reads as a bare number. The percentage
+                            // is already spelled out in the "… • 0% spent"
+                            // line and in the tile's label.
+                            .accessibilityHidden(true)
                         .overlay(alignment: .topLeading) {
                             if budget
                                 .type != 1 && totalSpent < budgetAmount

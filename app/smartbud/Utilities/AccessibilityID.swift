@@ -68,6 +68,9 @@ enum AccessibilityID {
     static let entrySeedCategories = "sb.entry.seedCategories"
     /// Big amount read-out above the keypad (value = plain amount string).
     static let entryAmountDisplay = "sb.entry.amountDisplay"
+    /// The note pill. The E2E cases put a unique note on every entry so they
+    /// can find that row again without relying on list order.
+    static let entryNoteField = "sb.entry.noteField"
     /// Inline validation toast (entry form and category editors); its label is
     /// the message.
     static let entryToast = "sb.entry.toast"

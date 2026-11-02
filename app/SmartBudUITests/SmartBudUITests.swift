@@ -40,6 +40,12 @@ final class SmartBudUITests: XCTestCase {
             // (ImportDataView.body).
             "-skipIntro",
             "-importSample",
+            // Each case gets its own empty in-memory store
+            // (DataRepository.freshMemoryContainer). Without it every case
+            // shares one ledger: a case that saves a future-dated row leaves
+            // it at the top of the list for every case that follows, which is
+            // how the first batch broke two older smoke cases.
+            "-freshStore",
         ]
         app.launch()
         dismissLaunchOverlay(app)
@@ -421,11 +427,20 @@ final class SmartBudUITests: XCTestCase {
     //
     // Nine flows that go past "the screen opened": every case reads a number
     // or a message back out of the app (ledger row, stats card, account
-    // balance, budget remaining, validation toast) and compares it with the
-    // value before the action. Assertions are deltas against a value measured
-    // in the same run, because the simulator's store is shared by every case
-    // and survives between runs — absolute numbers here would encode the
-    // order the suite happened to execute in.
+    // balance, budget remainder, validation toast) and compares it with the
+    // value before the action.
+    //
+    // Two rules keep these assertions stable:
+    // - `launch()` starts each case on its own empty in-memory store
+    //   (`-freshStore`), so a case never inherits another case's ledger.
+    // - Every entry carries a unique note and is found again by that note.
+    //   The ledger sorts by date, so "the newest row" is not the row a case
+    //   just saved as soon as a future-dated row exists.
+
+    /// Unique note for one case's entry, e.g. "QA A1 3F2A".
+    private func qaNote(_ area: String) -> String {
+        "QA \(area) \(UUID().uuidString.prefix(4))"
+    }
 
     /// Amount currently shown above the keypad, read out of the read-out's
     /// label ("$ 12.50") so the assertion is on the number, not on copy.
@@ -444,7 +459,7 @@ final class SmartBudUITests: XCTestCase {
 
     /// Types `value` ("12.50") the way the *current* entry mode expects.
     ///
-    /// `ContentViewModel.bootstrap` seeds the new "cent-less" mode
+    /// `ContentViewModel.bootstrap` seeds the "cent-less" mode
     /// (`numberEntryType = 2`), where the pad's bottom-left key is the decimal
     /// point and 12.50 is `12` `.` `50`. The older "pre-dotted" mode turns
     /// every two digits into cents, so the same amount is `1250` and there is
@@ -454,8 +469,8 @@ final class SmartBudUITests: XCTestCase {
                              file: StaticString = #filePath, line: UInt = #line) {
         clearAmount(app)
         // `clearAmount` already waited for the read-out, so the pad is up: a
-        // plain existence check is enough (and costs no 2 s timeout when the
-        // mode is "pre-dotted").
+        // plain existence check is enough (and costs no timeout when the mode
+        // is "pre-dotted").
         let centless = element(app, AccessibilityID.padDecimal).exists
         let parts = value.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: false)
         let whole = String(parts.first ?? "")
@@ -492,39 +507,17 @@ final class SmartBudUITests: XCTestCase {
         }
     }
 
-    /// Ledger rows currently rendered.
-    private func logRows(_ app: XCUIApplication) -> XCUIElementQuery {
-        app.buttons.matching(identifier: AccessibilityID.logRow)
-    }
-
-    /// Waits until the newest ledger row carries `amount`, i.e. until a save
-    /// has actually rendered. Counting rendered rows would not work: the
-    /// ledger is a lazy `List`, so a new row can push the last visible one out
-    /// of the hierarchy and leave the count unchanged.
-    @discardableResult
-    private func waitForNewestRow(_ app: XCUIApplication, amount: String,
-                                  timeout: TimeInterval = 20,
-                                  file: StaticString = #filePath, line: UInt = #line) -> Bool {
-        // A format predicate on the resolved element: XCTest re-evaluates it
-        // against the live snapshot, while a block predicate would run XCUITest
-        // queries off the main actor.
-        let firstRow = logRows(app).firstMatch
-        let expectation = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "exists == true AND label CONTAINS %@", amount),
-            object: firstRow)
-        if XCTWaiter().wait(for: [expectation], timeout: timeout) == .completed { return true }
-        XCTFail("No newest row carrying \"\(amount)\" after \(Int(timeout)) s: "
-                    + "\(ledgerSummary(app))\n\(app.debugDescription)", file: file, line: line)
-        return false
-    }
-
-    /// The newest few row labels plus the pad, for failure messages.
-    private func ledgerSummary(_ app: XCUIApplication) -> String {
-        let labels = logRows(app).allElementsBoundByIndex.prefix(6).map(\.label)
-        let pad = element(app, AccessibilityID.entryAmountDisplay).exists
-            ? (padAmount(app) ?? .nan) : .nan
-        let toast = element(app, AccessibilityID.entryToast)
-        return "newest=\(labels) pad=\(pad) toast=\(toast.exists ? toast.label : "none")"
+    /// Types a unique note and returns to the keypad. The note field owns the
+    /// system keyboard, which replaces the pad until focus goes away.
+    private func setNote(_ app: XCUIApplication, _ note: String,
+                         file: StaticString = #filePath, line: UInt = #line) {
+        let field = require(app, AccessibilityID.entryNoteField, file: file, line: line)
+        field.tap()
+        field.typeText(note)
+        // Return resigns the field; the pad coming back is the sync point that
+        // the keyboard is gone again.
+        app.typeText("\n")
+        require(app, AccessibilityID.padDigit(0), file: file, line: line)
     }
 
     /// Opens the category grid, seeding the starter set on a fresh store.
@@ -535,8 +528,7 @@ final class SmartBudUITests: XCTestCase {
     }
 
     /// Picks the first tile, or the tile whose label is `name`. The grid is
-    /// lazy and the list of categories grows with every run, so the named
-    /// variant scrolls.
+    /// lazy and scrollable, so the named variant scrolls when needed.
     private func pickCategory(_ app: XCUIApplication, named name: String? = nil,
                               file: StaticString = #filePath, line: UInt = #line) {
         let tile: XCUIElement
@@ -557,18 +549,25 @@ final class SmartBudUITests: XCTestCase {
         require(app, AccessibilityID.padDigit(0), file: file, line: line)
     }
 
-    /// Reads a displayed amount ("Expenses, $12.50", "-$5.00", "left, $70")
-    /// as a number. Currency copy is not used as a locator here, only parsed.
+    /// First amount in a label: "Expenses, $1,234.50" → 1234.5, "-$5.00" → -5,
+    /// "left, $70.00, 0% spent" → 70. Only the first number is read, so a
+    /// composite label cannot turn into one enormous number.
     private func amount(in text: String) -> Double? {
         var number = ""
+        var negative = false
+        var started = false
         for character in text.replacingOccurrences(of: ",", with: "") {
             if character.isNumber || character == "." {
                 number.append(character)
-            } else if character == "-" && number.isEmpty {
-                number.append(character)
+                started = true
+            } else if started {
+                break
+            } else if character == "-" || character == "\u{2212}" {
+                negative = true
             }
         }
-        return Double(number)
+        guard started, let value = Double(number) else { return nil }
+        return negative ? -value : value
     }
 
     /// Insights' expense total for the current period. `0` when the period is
@@ -609,30 +608,42 @@ final class SmartBudUITests: XCTestCase {
         require(app, AccessibilityID.accountsTransferButton, file: file, line: line)
     }
 
+    /// Picks a currency from the account editor's currency row. Tapped before
+    /// any text field has focus: the first tap on a Form row while the keyboard
+    /// is up is consumed by the dismissal, so the picker would never open.
+    private func selectCurrency(_ app: XCUIApplication, _ code: String,
+                                file: StaticString = #filePath, line: UInt = #line) {
+        let currencyRow = require(app, AccessibilityID.accountCurrencyPicker,
+                                  file: file, line: line)
+        XCTAssertTrue(currencyRow.isHittable,
+                      "The currency row is not hittable.\n\(app.debugDescription)",
+                      file: file, line: line)
+        currencyRow.tap()
+        let option = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label BEGINSWITH %@", code)).firstMatch
+        if !option.waitForExistence(timeout: 10) {
+            XCTFail("\(code) is not offered by the currency picker.\n\(app.debugDescription)",
+                    file: file, line: line)
+            return
+        }
+        option.tap()
+        // Back on the editor: the name field is its first input.
+        require(app, AccessibilityID.accountNameField, file: file, line: line)
+    }
+
     private func makeAccount(_ app: XCUIApplication, name: String,
                              currencyCode: String? = nil, opening: String,
                              file: StaticString = #filePath, line: UInt = #line) {
         require(app, AccessibilityID.accountsAddButton, file: file, line: line).tap()
 
+        // Currency first, while no keyboard is up (see `selectCurrency`).
+        if let currencyCode {
+            selectCurrency(app, currencyCode, file: file, line: line)
+        }
+
         let nameField = require(app, AccessibilityID.accountNameField, file: file, line: line)
         nameField.tap()
         nameField.typeText(name)
-
-        if let currencyCode {
-            require(app, AccessibilityID.accountCurrencyPicker, file: file, line: line).tap()
-            // The picker is a popup whose rows read "<CODE> · <name>". Match
-            // any element type (a popup row is not always a button) and never
-            // swipe the whole app: a swipe on the app dismisses the popup, so
-            // the row has to be found on the first screen it appears on.
-            let option = app.descendants(matching: .any)
-                .matching(NSPredicate(format: "label BEGINSWITH %@", currencyCode)).firstMatch
-            if !option.waitForExistence(timeout: 10) {
-                XCTFail("\(currencyCode) is not offered by the currency picker.\n\(app.debugDescription)",
-                        file: file, line: line)
-                return
-            }
-            option.tap()
-        }
 
         let openingField = require(app, AccessibilityID.accountOpeningBalance, file: file, line: line)
         openingField.tap()
@@ -665,13 +676,55 @@ final class SmartBudUITests: XCTestCase {
         app.buttons[title].firstMatch.tap()
     }
 
+    private func logRows(_ app: XCUIApplication) -> XCUIElementQuery {
+        app.buttons.matching(identifier: AccessibilityID.logRow)
+    }
+
+    /// The ledger row carrying `note`. Not "the newest row": the list sorts by
+    /// date, so a future-dated entry would answer that question instead.
+    private func row(note: String, in app: XCUIApplication) -> XCUIElement {
+        logRows(app).matching(NSPredicate(format: "label CONTAINS %@", note)).firstMatch
+    }
+
+    /// Waits until the row for `note` (and, when given, `amount`) is rendered.
+    @discardableResult
+    private func waitForRow(_ app: XCUIApplication, note: String, amount: String? = nil,
+                            timeout: TimeInterval = 20,
+                            file: StaticString = #filePath, line: UInt = #line) -> XCUIElement {
+        let target = row(note: note, in: app)
+        let predicate: NSPredicate
+        if let amount {
+            predicate = NSPredicate(format: "exists == true AND label CONTAINS %@", amount)
+        } else {
+            predicate = NSPredicate(format: "exists == true")
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: target)
+        if XCTWaiter().wait(for: [expectation], timeout: timeout) != .completed {
+            let wanted = amount.map { " carrying \($0)" } ?? ""
+            XCTFail("No row for \"\(note)\"\(wanted) after \(Int(timeout)) s: "
+                        + "\(ledgerSummary(app))\n\(app.debugDescription)",
+                    file: file, line: line)
+        }
+        return target
+    }
+
+    /// The rendered row labels plus the pad, for failure messages.
+    private func ledgerSummary(_ app: XCUIApplication) -> String {
+        let labels = logRows(app).allElementsBoundByIndex.prefix(6).map(\.label)
+        let pad = element(app, AccessibilityID.entryAmountDisplay).exists
+            ? (padAmount(app) ?? .nan) : .nan
+        let toast = element(app, AccessibilityID.entryToast)
+        return "rows=\(labels) pad=\(pad) toast=\(toast.exists ? toast.label : "none")"
+    }
+
     /// Saves a plain expense through the happy path and returns its row.
     @discardableResult
-    private func addExpense(_ app: XCUIApplication, amount value: String,
+    private func addExpense(_ app: XCUIApplication, amount value: String, note: String,
                             category: String? = nil, account: String? = nil,
                             file: StaticString = #filePath, line: UInt = #line) -> XCUIElement {
         require(app, AccessibilityID.logAddButton, file: file, line: line).tap()
         enterAmount(app, value, file: file, line: line)
+        setNote(app, note, file: file, line: line)
         openCategoryPicker(app)
         pickCategory(app, named: category, file: file, line: line)
         if let account {
@@ -687,10 +740,7 @@ final class SmartBudUITests: XCTestCase {
         let save = require(app, AccessibilityID.entrySave, file: file, line: line)
         waitUntilEnabled(save)
         save.tap()
-        // The newest row's own amount is the read-back: `value` may normalise
-        // ("12.5" → "12.50"), so match on the digits the row renders.
-        waitForNewestRow(app, amount: value, file: file, line: line)
-        return newestRow(in: app)
+        return waitForRow(app, note: note, amount: value, file: file, line: line)
     }
 
     private func chooseTransferAccount(_ app: XCUIApplication, picker: String, name: String,
@@ -765,6 +815,31 @@ final class SmartBudUITests: XCTestCase {
         app.alerts.buttons["Done"].firstMatch.tap()
     }
 
+    /// Budget remainder as a signed number, read from the tile's numeric
+    /// `accessibilityValue` (see `SingleBudgetView.signedRemainingText`).
+    /// Negative means overspent; the visible figure stays an unsigned
+    /// magnitude next to a "left" / "over" word.
+    private func budgetRemaining(_ app: XCUIApplication, for name: String,
+                                 file: StaticString = #filePath, line: UInt = #line) -> Double? {
+        let tile = element(app, AccessibilityID.budgetRemaining(name))
+        if !tile.waitForExistence(timeout: 10) {
+            XCTFail("No budget tile for \"\(name)\".\n\(app.debugDescription)",
+                    file: file, line: line)
+            return nil
+        }
+        let raw = (tile.value as? String) ?? ""
+        // Defensive: read only the number, in case the row's value ever picks
+        // up a second component from a sibling control again.
+        let numeric = raw.split(separator: ",").first.map(String.init) ?? raw
+        guard let value = Double(numeric.trimmingCharacters(in: .whitespaces)) else {
+            XCTFail("Budget \"\(name)\" exposes no numeric remainder "
+                        + "(value=\"\(raw)\", label=\"\(tile.label)\")",
+                    file: file, line: line)
+            return nil
+        }
+        return value
+    }
+
     // MARK: - A1. Expense from the add button updates the expense total
 
     func testA1_addExpense_updatesStats() throws {
@@ -772,22 +847,23 @@ final class SmartBudUITests: XCTestCase {
         let before = expenseTotal(app)
 
         select(.log, in: app)
+        let note = qaNote("A1")
         require(app, AccessibilityID.logAddButton).tap()
         enterAmount(app, "12.50")
         XCTAssertEqual(padAmount(app) ?? .nan, 12.50, accuracy: 0.001,
                        "The pad did not produce 12.50")
+        setNote(app, note)
         openCategoryPicker(app)
         pickCategory(app)
         let save = require(app, AccessibilityID.entrySave)
         waitUntilEnabled(save)
         save.tap()
 
-        waitForNewestRow(app, amount: "12.50")
-        assertNewestRowAmount("12.50", in: app)
-
+        waitForRow(app, note: note, amount: "12.50")
         let after = expenseTotal(app)
         XCTAssertEqual(after, before + 12.50, accuracy: 0.005,
                        "Expenses went \(before) → \(after); expected +12.50")
+
         select(.log, in: app)
     }
 
@@ -801,8 +877,11 @@ final class SmartBudUITests: XCTestCase {
         makeAccount(app, name: accountName, opening: "50")
         select(.log, in: app)
 
+        let firstNote = qaNote("A2a")
+        let secondNote = qaNote("A2b")
         require(app, AccessibilityID.logAddButton).tap()
         enterAmount(app, "5.00")
+        setNote(app, firstNote)
         openCategoryPicker(app)
         pickCategory(app)
         require(app, AccessibilityID.entryAccountChip).tap()
@@ -828,9 +907,9 @@ final class SmartBudUITests: XCTestCase {
             titled.tap()
         }
 
-        // The form is still open on a cleared pad. The ledger sits behind the
-        // full-screen form, so whether the first entry actually landed is
-        // checked once the second save closes the form.
+        // The form is still open on a cleared pad; the ledger sits behind the
+        // full-screen form, so whether the first entry landed is checked once
+        // the second save closes the form.
         XCTAssertEqual(padAmount(app) ?? .nan, 0, accuracy: 0.001,
                        "The amount was not cleared after save-and-continue")
         XCTAssertEqual(require(app, AccessibilityID.entryCategoryButton).label, categoryLabel,
@@ -840,25 +919,19 @@ final class SmartBudUITests: XCTestCase {
 
         // A second entry saved with the normal checkmark closes the form.
         enterAmount(app, "3.00")
+        setNote(app, secondNote)
         let secondSave = require(app, AccessibilityID.entrySave)
         waitUntilEnabled(secondSave)
         secondSave.tap()
-        waitForNewestRow(app, amount: "3.00")
-        assertNewestRowAmount("3.00", in: app)
-        let firstEntry = logRows(app).element(boundBy: 1)
-        XCTAssertTrue(firstEntry.exists && firstEntry.label.contains("5.00"),
-                      "The save-and-continue entry is missing from the ledger: \(ledgerSummary(app))")
+
+        waitForRow(app, note: secondNote, amount: "3.00")
+        waitForRow(app, note: firstNote, amount: "5.00")
     }
 
     // MARK: - A3. Zero, over-limit and missing category are refused
 
     func testA3_invalidInput_isRefusedWithMessage() throws {
         let app = launch()
-        // The newest row's label, not the row count: a refused save must leave
-        // the ledger exactly as it was, and the lazy list makes a count the
-        // weaker signal.
-        let newestBefore = logRows(app).firstMatch.exists ? logRows(app).firstMatch.label : ""
-
         require(app, AccessibilityID.logAddButton).tap()
 
         // Nothing typed: the checkmark cannot commit an empty amount.
@@ -874,8 +947,6 @@ final class SmartBudUITests: XCTestCase {
                        "The pad still accepted a digit past the 99,999,999.99 cap")
 
         enterAmount(app, "12.00")
-        XCTAssertEqual(padAmount(app) ?? .nan, 12, accuracy: 0.001,
-                       "The pad did not clear back down to 12.00")
         waitUntilEnabled(save)
         save.tap()
         let toast = require(app, AccessibilityID.entryToast, timeout: 5)
@@ -888,8 +959,8 @@ final class SmartBudUITests: XCTestCase {
         if discard.waitForExistence(timeout: 5) { discard.tap() }
         require(app, AccessibilityID.logAddButton)
 
-        let newestAfter = logRows(app).firstMatch.exists ? logRows(app).firstMatch.label : ""
-        XCTAssertEqual(newestAfter, newestBefore,
+        // Fresh store: a refused save must leave the ledger empty.
+        XCTAssertFalse(logRows(app).firstMatch.exists,
                        "A refused save still wrote a ledger row: \(ledgerSummary(app))")
     }
 
@@ -902,14 +973,16 @@ final class SmartBudUITests: XCTestCase {
 
         // A plain entry first: it gives the "today" section something to
         // compare the future row's position against.
-        addExpense(app, amount: "1.00")
-        assertNewestRowAmount("1.00", in: app)
+        let plainNote = qaNote("A4a")
+        addExpense(app, amount: "1.00", note: plainNote)
         let afterPlain = expenseTotal(app)
         XCTAssertEqual(afterPlain, before + 1.00, accuracy: 0.005)
 
         select(.log, in: app)
+        let futureNote = qaNote("A4b")
         require(app, AccessibilityID.logAddButton).tap()
         enterAmount(app, "20.00")
+        setNote(app, futureNote)
         openCategoryPicker(app)
         pickCategory(app)
         setDiscount(app, "5")
@@ -920,10 +993,7 @@ final class SmartBudUITests: XCTestCase {
         save.tap()
 
         require(app, AccessibilityID.logUpcomingHeader, timeout: 20)
-        let futureRow = app.buttons.matching(identifier: AccessibilityID.logRow)
-            .matching(NSPredicate(format: "label CONTAINS %@", "20.00")).firstMatch
-        XCTAssertTrue(futureRow.waitForExistence(timeout: 10),
-                      "The future expense is not in the ledger.\n\(app.debugDescription)")
+        let futureRow = waitForRow(app, note: futureNote, amount: "20.00")
         XCTAssertTrue(futureRow.label.contains("Discount $5.00"),
                       "The discount badge is missing: \"\(futureRow.label)\"")
         XCTAssertTrue(futureRow.label.contains("Pending"),
@@ -951,13 +1021,13 @@ final class SmartBudUITests: XCTestCase {
         let app = launch()
         let before = expenseTotal(app)
         select(.log, in: app)
-        addExpense(app, amount: "12.50")
-        assertNewestRowAmount("12.50", in: app)
+        let note = qaNote("A5")
+        addExpense(app, amount: "12.50", note: note)
         let afterCreate = expenseTotal(app)
         XCTAssertEqual(afterCreate, before + 12.50, accuracy: 0.005)
 
         select(.log, in: app)
-        element(app, AccessibilityID.logRow).tap()
+        row(note: note, in: app).tap()
 
         // Wait for the stored amount to load into the pad before editing it.
         let display = require(app, AccessibilityID.entryAmountDisplay)
@@ -965,8 +1035,6 @@ final class SmartBudUITests: XCTestCase {
             predicate: NSPredicate(format: "label CONTAINS %@", "12.50"), object: display)
         _ = XCTWaiter().wait(for: [loaded], timeout: 10)
 
-        // The edit form loads the stored amount into the pad; `enterAmount`
-        // clears whatever it loaded before typing, in either entry mode.
         enterAmount(app, "20.00")
         XCTAssertEqual(padAmount(app) ?? .nan, 20, accuracy: 0.001)
         let save = require(app, AccessibilityID.entrySave)
@@ -979,7 +1047,7 @@ final class SmartBudUITests: XCTestCase {
 
         // Switching to income drops a category that belongs to the other side.
         select(.log, in: app)
-        element(app, AccessibilityID.logRow).tap()
+        row(note: note, in: app).tap()
         tapSegment("Income", in: app)
         XCTAssertEqual(require(app, AccessibilityID.entryCategoryButton).label, "Category",
                        "The expense category survived the switch to income")
@@ -988,7 +1056,7 @@ final class SmartBudUITests: XCTestCase {
         if discard.waitForExistence(timeout: 5) { discard.tap() }
 
         // Cancelling kept the edited amount.
-        assertNewestRowAmount("20.00", in: app)
+        waitForRow(app, note: note, amount: "20.00")
     }
 
     // MARK: - A6. Delete, undo, and the snapshot behind it
@@ -1000,8 +1068,10 @@ final class SmartBudUITests: XCTestCase {
         openAccounts(app)
         makeAccount(app, name: accountName, opening: "200")
         select(.log, in: app)
+        let note = qaNote("A6")
         require(app, AccessibilityID.logAddButton).tap()
         enterAmount(app, "40.00")
+        setNote(app, note)
         openCategoryPicker(app)
         pickCategory(app)
         require(app, AccessibilityID.entryAccountChip).tap()
@@ -1015,11 +1085,11 @@ final class SmartBudUITests: XCTestCase {
         waitUntilEnabled(save)
         save.tap()
 
-        waitForNewestRow(app, amount: "40.00")
-        let createdLabel = logRows(app).firstMatch.label
-        XCTAssertTrue(createdLabel.contains("40.00"), "Saved row reads: \"\(createdLabel)\"")
-        XCTAssertTrue(createdLabel.contains("Discount $10.00"), "Saved row reads: \"\(createdLabel)\"")
-        XCTAssertTrue(createdLabel.contains("Pending"), "Saved row reads: \"\(createdLabel)\"")
+        let created = waitForRow(app, note: note, amount: "40.00")
+        XCTAssertTrue(created.label.contains("Discount $10.00"),
+                      "Saved row reads: \"\(created.label)\"")
+        XCTAssertTrue(created.label.contains("Pending"),
+                      "Saved row reads: \"\(created.label)\"")
 
         // The account was debited by the net amount.
         openAccounts(app)
@@ -1027,16 +1097,14 @@ final class SmartBudUITests: XCTestCase {
                        "The account balance did not include the new expense")
 
         select(.log, in: app)
-        swipeDelete(newestRow(in: app), in: app)
+        swipeDelete(row(note: note, in: app), in: app)
 
         // The undo banner is the staged-delete affordance; 6 s window.
         require(app, AccessibilityID.logUndoButton, timeout: 5).tap()
 
-        let restored = app.buttons.matching(identifier: AccessibilityID.logRow)
-            .matching(NSPredicate(format: "label CONTAINS %@", "Discount $10.00")).firstMatch
-        XCTAssertTrue(restored.waitForExistence(timeout: 15),
-                      "Undo did not restore the row.\n\(app.debugDescription)")
-        XCTAssertTrue(restored.label.contains("40.00"))
+        let restored = waitForRow(app, note: note, amount: "40.00", timeout: 15)
+        XCTAssertTrue(restored.label.contains("Discount $10.00"),
+                      "The discount was lost by undo: \"\(restored.label)\"")
         XCTAssertTrue(restored.label.contains("Pending"),
                       "The claim flag was lost by undo: \"\(restored.label)\"")
 
@@ -1121,7 +1189,7 @@ final class SmartBudUITests: XCTestCase {
                        "The transfer body leaked into the expense total")
 
         select(.log, in: app)
-        let feeRow = app.buttons.matching(identifier: AccessibilityID.logRow)
+        let feeRow = logRows(app)
             .matching(NSPredicate(format: "label CONTAINS %@", "Transfer Fee")).firstMatch
         XCTAssertTrue(feeRow.waitForExistence(timeout: 10),
                       "The fee was not booked as its own expense row.\n\(app.debugDescription)")
@@ -1136,28 +1204,6 @@ final class SmartBudUITests: XCTestCase {
 
     // MARK: - A9. Category budget: remaining drops, then goes over
 
-    /// Budget remaining as a signed number, read from the tile's accessibility
-    /// value (see `SingleBudgetView.signedRemainingText`). The visible figure
-    /// is an unsigned magnitude next to a "left" / "over" word, so parsing the
-    /// copy would have to rebuild the sign — and picks up every other digit on
-    /// the tile.
-    private func budgetRemaining(_ app: XCUIApplication, for name: String,
-                                 file: StaticString = #filePath, line: UInt = #line) -> Double? {
-        let tile = element(app, AccessibilityID.budgetRemaining(name))
-        if !tile.waitForExistence(timeout: 10) {
-            XCTFail("No budget tile for \"\(name)\".\n\(app.debugDescription)",
-                    file: file, line: line)
-            return nil
-        }
-        let raw = (tile.value as? String) ?? ""
-        guard let value = Double(raw) else {
-            XCTFail("Budget \"\(name)\" has no numeric remainder (value=\"\(raw)\", "
-                        + "label=\"\(tile.label)\")", file: file, line: line)
-            return nil
-        }
-        return value
-    }
-
     func testA9_budgetRemaining_dropsThenGoesOver() throws {
         let app = launch()
 
@@ -1171,45 +1217,36 @@ final class SmartBudUITests: XCTestCase {
         require(app, AccessibilityID.logAddButton)
 
         select(.budget, in: app)
-        let opening: Double
-        if element(app, AccessibilityID.budgetRemaining("Food")).waitForExistence(timeout: 3) {
-            // A re-run finds the budget an earlier run created. Its category
-            // also carries those runs' expenses, so the case asserts deltas
-            // instead of absolute remainders from here on.
-            opening = budgetRemaining(app, for: "Food") ?? .nan
-        } else {
-            require(app, AccessibilityID.budgetAddButton).tap()
-            require(app, AccessibilityID.budgetTypePicker)
-            tapSegment("Category Budget", in: app)
-            require(app, AccessibilityID.budgetCategoryPicker).tap()
-            let option = app.buttons.matching(
-                NSPredicate(format: "label CONTAINS %@", "Food")).firstMatch
-            XCTAssertTrue(option.waitForExistence(timeout: 10),
-                          "Food is missing from the budget picker.\n\(app.debugDescription)")
-            option.tap()
-            require(app, AccessibilityID.budgetContinue).tap()
+        require(app, AccessibilityID.budgetAddButton).tap()
+        require(app, AccessibilityID.budgetTypePicker)
+        tapSegment("Category Budget", in: app)
+        require(app, AccessibilityID.budgetCategoryPicker).tap()
+        let option = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "Food")).firstMatch
+        XCTAssertTrue(option.waitForExistence(timeout: 10),
+                      "Food is missing from the budget picker.\n\(app.debugDescription)")
+        option.tap()
+        require(app, AccessibilityID.budgetContinue).tap()
 
-            enterAmount(app, "100.00")
-            let save = require(app, AccessibilityID.entrySave)
-            waitUntilEnabled(save)
-            save.tap()
+        enterAmount(app, "100.00")
+        let save = require(app, AccessibilityID.entrySave)
+        waitUntilEnabled(save)
+        save.tap()
 
-            let fresh = budgetRemaining(app, for: "Food") ?? .nan
-            XCTAssertEqual(fresh, 100, accuracy: 0.01,
-                           "A new 100 budget should start with 100 left, got \(fresh)")
-            opening = fresh
-        }
+        let fresh = budgetRemaining(app, for: "Food") ?? .nan
+        XCTAssertEqual(fresh, 100, accuracy: 0.01,
+                       "A new 100 budget should start with 100 left, got \(fresh)")
 
         select(.log, in: app)
-        addExpense(app, amount: "30.00", category: "Food")
+        addExpense(app, amount: "30.00", note: qaNote("A9a"), category: "Food")
 
         select(.budget, in: app)
         let afterSpend = budgetRemaining(app, for: "Food") ?? .nan
-        XCTAssertEqual(afterSpend, opening - 30, accuracy: 0.01,
-                       "30 spent should leave \(opening - 30), got \(afterSpend)")
+        XCTAssertEqual(afterSpend, 70, accuracy: 0.01,
+                       "30 spent from 100 should leave 70, got \(afterSpend)")
 
         select(.log, in: app)
-        addExpense(app, amount: "100.00", category: "Food")
+        addExpense(app, amount: "100.00", note: qaNote("A9b"), category: "Food")
 
         select(.budget, in: app)
         let overTile = element(app, AccessibilityID.budgetRemaining("Food"))
@@ -1221,8 +1258,10 @@ final class SmartBudUITests: XCTestCase {
         XCTAssertTrue(overTile.label.contains("over"),
                       "130 against a 100 budget should read \"over\", got \"\(overTile.label)\"")
         let overage = budgetRemaining(app, for: "Food") ?? .nan
-        XCTAssertEqual(overage, opening - 130, accuracy: 0.01,
-                       "Expected a signed remainder of \(opening - 130), got \(overage)")
+        XCTAssertEqual(overage, -30, accuracy: 0.01,
+                       "130 spent against a 100 budget is -30, got \(overage)")
+
+        select(.log, in: app)
     }
 }
 

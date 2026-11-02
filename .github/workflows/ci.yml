@@ -222,9 +222,12 @@ jobs:
       - name: UI tests
         run: |
           set -o pipefail
+          # xcodebuild test identifiers are Target/Class/Method. The shorter
+          # "Target/method" form silently matches nothing, which is how a
+          # shard can report success after running zero tests.
           filters=()
           for test in ${{ matrix.tests }}; do
-            filters+=("-${FILTER}-testing:SmartBudUITests/${test}")
+            filters+=("-${FILTER}-testing:SmartBudUITests/SmartBudUITests/${test}")
           done
           xcodebuild test \
             -project "$PROJECT" \
