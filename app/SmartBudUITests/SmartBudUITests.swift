@@ -2,7 +2,7 @@
 //  SmartBudUITests.swift
 //  SmartBudUITests
 //
-//  Five interaction smoke tests plus the iOS 17+ accessibility audit.
+//  Eight interaction smoke tests plus the iOS 17+ accessibility audit.
 //
 //  Conventions (see docs/engineering.md, section "UI 测试"):
 //  - Every query goes through an identifier from `AccessibilityID`, which is
@@ -12,8 +12,8 @@
 //  - Two surfaces are system-rendered and cannot carry an identifier: the
 //    UITabBar buttons behind `.tabItem` and the `.searchable` field. They are
 //    located by position through `select(_:in:)`.
-//  - Each case ends with `assertAccessible`, so a control added without an
-//    accessibility description fails the run that introduced it.
+//  - Five of the eight cases end with `assertAccessible`, so a control added
+//    without an accessibility description fails the run that introduced it.
 //
 
 import Foundation

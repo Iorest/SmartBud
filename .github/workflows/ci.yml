@@ -32,6 +32,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Cheap, Xcode-free checks first: a dangling pbxproj path or a stray
+      # identifier fails here in seconds instead of after a full macOS build.
+      - name: Offline structure check
+        run: python3 scripts/check_repo.py
+
       - name: Select Xcode 26
         run: |
           chosen=""

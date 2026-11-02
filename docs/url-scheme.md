@@ -33,8 +33,9 @@ smartbud://add?amount=12.5&type=expense&category=餐饮&note=午饭
 
 ## 回调：x-callback-url
 
-在 `add` 上带 `x-success` / `x-error` / `x-cancel`，SmartBud 处理完会打开对应 URL
-并在查询串里追加结果：
+在 `add` 上带 `x-success` / `x-error`，SmartBud 处理完会打开对应 URL
+并在查询串里追加结果（`x-cancel` 没有触发点：`add` 没有"用户取消"这一路，
+带上也不会被调用）：
 
 ```
 smartbud://add?amount=12.5&note=午饭

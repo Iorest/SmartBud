@@ -10,7 +10,7 @@
 | macOS | 15 或更新 | 只在 macOS 上编译，Linux / Windows 没有 Xcode |
 | Xcode | 26.x | 工程按 Xcode 26.6 维护（`LastUpgradeCheck = 2660`），`IPHONEOS_DEPLOYMENT_TARGET = 26.0`，必须带 iOS 26 SDK |
 | Swift | 6.0 | `SWIFT_VERSION = 6.0`，严格并发检查开启 |
-| 模拟器 | iPhone 16 | 见 `app/SmartBud.xcodeproj/xcshareddata/xcschemes/SmartBud.xcscheme` |
+| 模拟器 | iPhone 16 | 构建/测试命令与 CI 的 `DESTINATION`；scheme 本身不固定机型 |
 
 依赖只有系统框架（SwiftUI、SwiftData、CloudKit、StoreKit、WidgetKit），
 工程里没有 Swift Package 依赖，克隆后不需要 `Resolve Package Versions`。
@@ -70,18 +70,18 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），8 条 smoke：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 8 条冒烟 + 9 条交互 E2E：
 
 | 用例 | 挡住什么 |
 |---|---|
 | `testCreateExpenseThenUndoDelete` | 记账主链路：金额键盘 → 分类 → 保存 → 上账 → 滑删 → 撤销恢复 |
+| `testSaveStaysDisabledWithoutAmount` | 金额为 0 时保存按钮禁用，输入金额后启用 |
+| `testEditingAmountUpdatesRow` | 编辑已有记录的金额后，流水行金额随之更新 |
+| `testCancelDiscardsDraft` | 取消非空草稿不写入账目行 |
 | `testTabsCycleThroughAllFourSections` | 四个 tab 各自还能打开自己的屏 |
 | `testSmartEntryOpensAndCancels` | 智能记账弹层的开关，以及弹层关掉后表单还在 |
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
-| `testSaveStaysDisabledWithoutAmount` | 金额为 0 时勾号不可用，输入后变可用 |
-| `testEditingAmountUpdatesRow` | 点开账本行改金额后，行上的数字跟着变 |
-| `testCancelDiscardsDraft` | 有内容时取消要确认，且不落账 |
 
 外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
 余额、预算剩余、校验提示），并与动作前在同一 run 里读到的值比较——模拟器的 store 跨用例、
@@ -162,7 +162,8 @@ xcodebuild test \
 
 ### 可访问性审计
 
-每条 **smoke** 用例末尾都跑 `performAccessibilityAudit`，发现的问题全部打到日志里
+目前 5 条用例在末尾调用 `assertAccessible` 跑 `performAccessibilityAudit`
+（其余用例尚未接入），发现的问题全部打到日志里
 （`AUDIT[屏幕] 类型 描述 [identifier]`），CI job summary 汇总最近 60 条，完整报告在
 `UITestResults-<分片>.xcresult` / `xcodebuild-uitest.log` artifact 里。9 条交互 E2E 不跑审计：
 它们每条要多走 4–6 个界面，审计本身每次 3–8 秒，加进去就把 E2E 分片顶出 10 分钟预算；
@@ -186,11 +187,67 @@ xcodebuild test \
 
 ## 运行机约束
 
-**Linux 机器不能编译，也不能跑测试。** 这条约束是按实际运行写的：
+**Linux 机器不能编译 iOS 目标，也不能跑 UI 测试。** 这条约束是按实际运行写的：
 
-- 这台 Linux 运行机没有 `xcodebuild`、`simctl`、iOS SDK，`swift build` 也跑不了 iOS 目标；
-- 所有验证只能走 CI，不能声称「本地测试通过」；
-- 改代码时能做的静态检查只有读代码、`grep` 结构、检查 schema / 迁移版本号这类非编译验证。
+- 这台 Linux 运行机没有 `xcodebuild`、`simctl`、iOS SDK，编不了 app target；
+- 完整编译、SwiftData、SwiftUI、CloudKit、StoreKit、解析里的 NaturalLanguage，
+  以及全部 XCUITest，仍然只能在 macOS runner 或一台真 Mac 上验证；
+- 但 **Foundation-only 的逻辑层可以在 Linux 上真编译真测试**：
+  `scripts/linux-tests.sh`（见下节），当前覆盖 69 个用例 / 8 个 suite；
+- 不依赖 Xcode 的静态检查也在本地做：`python3 scripts/check_repo.py`。
+
+
+## 离线结构检查
+
+`scripts/check_repo.py` 只用 Python 3 标准库，不需要 Xcode、不需要模拟器，Linux 上也能跑，
+覆盖三类「编译前就能发现、不查就要等 CI 变红」的问题：
+
+| 检查 | 挡住什么 |
+|---|---|
+| `project.pbxproj` 引用 | 文件引用解析不到磁盘上的文件（历史事故：漏写 `smartbud/` 前缀）、磁盘上新增的 `.swift` 没登记进工程、sources 阶段指向不存在的 build file |
+| 可访问性 identifier | UI 测试查的 identifier 没有任何 app 源码声明、`AccessibilityID` 常量被改名、`DELIBERATELY-BROKEN` 这类占位值被误合入（历史事故） |
+| 文档链接 | `README.md` 与 `docs/*.md` 里指向不存在的相对路径 |
+
+```bash
+python3 scripts/check_repo.py          # 0 = 干净，1 = 有问题
+```
+
+CI 的 `test` job 第一步就跑它，结构问题几秒内失败，不会先烧掉一次 macOS 构建。
+它**不替代** `xcodebuild test`：编译错误、运行行为、UI 流程都查不出来。
+接入前用四种真实故障验证过它会报错：漏 `smartbud/` 前缀、占位 identifier、未登记文件、断链。
+
+## Linux 逻辑测试
+
+`scripts/linux-tests.sh` 把 Foundation-only 的源码和对应测试拼成一个 SwiftPM
+测试 target，在 Linux 上真编译、真跑。不需要 Xcode、不需要模拟器、不消耗 macOS 机时。
+
+```bash
+# 需要一个 Linux Swift 工具链（6.0+），装机后：
+export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swift 放进 PATH
+scripts/linux-tests.sh
+# 输出：✔ Test run with 69 tests in 8 suites passed after 0.014 seconds.
+```
+
+覆盖的 suite：`AppPeriod` / `CSVTable` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` /
+`MoneyFormatting` / `ProAccess` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
+
+**不覆盖**：SwiftUI 视图、SwiftData 模型、CloudKit、StoreKit、`ExpenseTextParser` 的
+NaturalLanguage 商户抽取、本地化格式化（`AppLocale` / `AppLanguage` 用的是 Apple 专属 API，
+harness 用 `scripts/linux-tests/LinuxShims.swift` 顶替了其中三个符号，并已在文件头写明差异），
+以及全部 XCUITest。这些仍然只认 macOS。
+
+新增文件要不要进这个子集，看它的 import：只有 `Foundation` 才能进，写进脚本里的
+`app_sources` 数组，然后跟一个对应的测试文件。编译不过就是它依赖了 Apple-only 框架。
+
+**在 Arch / Manjaro 上装 swift.org 工具链的两个坑**（官方包按 Ubuntu 打包）：
+
+```bash
+ln -sf /usr/lib/libncursesw.so.6 <toolchain>/usr/lib/swift/linux/libncurses.so.6
+ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
+```
+
+另外 `TMPDIR` 必须指向一个可写目录，否则 `swift` 会报 `couldNotFindTmpDir`。
+
 
 ## CI
 
