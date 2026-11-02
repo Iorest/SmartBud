@@ -108,6 +108,11 @@ final class SmartBudUITests: XCTestCase {
                     file: file, line: line)
             return
         }
+        // A full-screen cover removes the tab bar while it dismisses; tapping
+        // in that window resolves to a {-1, -1} hit point and does nothing.
+        let tappable = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isHittable == true"), object: button)
+        _ = XCTWaiter().wait(for: [tappable], timeout: 10)
         button.tap()
     }
 
@@ -677,6 +682,9 @@ final class SmartBudUITests: XCTestCase {
                     file: file, line: line)
             return .nan
         }
+        // The visible figure drops the sign of a negative balance (it goes
+        // red instead), so the row exposes the signed number as its value.
+        if let raw = figure.value as? String, let signed = Double(raw) { return signed }
         return amount(in: figure.label) ?? .nan
     }
 

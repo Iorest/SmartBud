@@ -110,6 +110,11 @@ extension AccountListView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .accessibilityIdentifier(AccessibilityID.accountBalance(account.wrappedName))
+                // The visible figure is a magnitude (a negative balance goes
+                // red instead of showing a minus), so expose the signed number
+                // for the balance assertions.
+                .accessibilityValue(Text(String(format: "%.2f",
+                                                accountVM.balance(for: account))))
         }
         .padding(.vertical, 2)
         .contentShape(Rectangle())
