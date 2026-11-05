@@ -86,6 +86,13 @@ struct SingleBudgetView: View {
         return "\(Int(round(Money.spendFraction(totalSpent, of: budgetAmount) * 100)))%"
     }
 
+    /// Machine-readable remainder for the E2E cases: a plain signed number, so
+    /// a case never has to reconstruct the sign from the "left" / "over" copy.
+    /// Negative means overspent. `difference` stays the visual magnitude.
+    var signedRemainingText: String {
+        String(format: "%.2f", budgetAmount - totalSpent)
+    }
+
     /// Share of the period still ahead, measured from the *current* period's
     /// start (the stored one only rolls when the budget screen opens).
     var remainingFraction: Double {
@@ -185,6 +192,10 @@ extension SingleBudgetView {
                                 .font(.caption2.weight(.medium))
                                 .foregroundStyle(Color.SubtitleText)
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier(
+                            AccessibilityID.budgetRemaining(budget.wrappedName))
+                        .accessibilityValue(Text(signedRemainingText))
                     }
                     .padding(10)
                     .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
@@ -296,6 +307,10 @@ extension SingleBudgetView {
                         Spacer(minLength: 0)
                     }
                     .frame(maxWidth: .infinity)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier(
+                        AccessibilityID.budgetRemaining(budget.wrappedName))
+                    .accessibilityValue(Text(signedRemainingText))
 
                     Text(String.appFormatted("%@ • %@ spent", budgetType, percentString1))
                         .font(.footnote.weight(.medium))
@@ -310,6 +325,13 @@ extension SingleBudgetView {
                                   ? Color.AlertRed
                                   : Color(hex: budget.category?.wrappedColour ?? "#007AFF"))
                             .frame(maxWidth: .infinity)
+                            // The row is one accessibility element and the
+                            // bar's value ("0%") would be appended to the
+                            // tile's numeric `accessibilityValue`, which the
+                            // E2E case reads as a bare number. The percentage
+                            // is already spelled out in the "… • 0% spent"
+                            // line and in the tile's label.
+                            .accessibilityHidden(true)
                         .overlay(alignment: .topLeading) {
                             if budget
                                 .type != 1 && totalSpent < budgetAmount

@@ -121,6 +121,17 @@ final class DataRepository {
     }
 
     #if DEBUG
+    /// QA hook: a clean in-memory store **without** a degradation notice.
+    /// `-memoryStore` deliberately reports `storageCorrupted` so the
+    /// "nothing will be saved" banner can be exercised; UI tests need the
+    /// same throw-away store without that banner, one per launch, so a case
+    /// never inherits the previous case's ledger.
+    private static func freshMemoryContainer() -> BootResult? {
+        guard ProcessInfo.processInfo.arguments.contains("-freshStore"),
+              let memory = memoryContainer() else { return nil }
+        return BootResult(container: memory, reason: nil, mode: .memory)
+    }
+
     /// QA hook: exercise the "nothing will be saved" path (banner copy, wipe
     /// refusal) without corrupting a real store.
     private static func forcedMemoryContainer() -> BootResult? {
@@ -144,6 +155,7 @@ final class DataRepository {
     /// believe their ledger came back while the real one sat untouched.
     private static func makeContainer() -> BootResult {
         #if DEBUG
+        if let fresh = freshMemoryContainer() { return fresh }
         if let forced = forcedMemoryContainer() { return forced }
         #endif
 

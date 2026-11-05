@@ -46,5 +46,7 @@ struct InsightsSummaryBlockView: View {
         .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title), \(amountString)")
+        .accessibilityIdentifier(
+            income ? AccessibilityID.insightsIncomeCard : AccessibilityID.insightsExpenseCard)
     }
 }

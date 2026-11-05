@@ -70,7 +70,7 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 8 条：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 8 条冒烟 + 9 条交互 E2E：
 
 | 用例 | 挡住什么 |
 |---|---|
@@ -83,6 +83,42 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
 
+外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
+余额、预算剩余、校验提示）。两条约定让断言不依赖执行顺序：
+
+- **一条用例一个干净库**：`launch()` 带 `-freshStore`，用空的内存 store 启动，
+  用例之间不继承数据（否则 A4 的未来日期行会永远排在列表第一，把所有 "最新一行" 断言带偏）。
+- **每条记录带唯一备注**（`QA A4b 3F2A`），断言靠备注找行，不靠列表顺序。
+
+| 用例 | 挡住什么 |
+|---|---|
+| `testA1_addExpense_updatesStats` | 悬浮按钮 → 键盘 12.50 → 分类 → 保存；列表出现该笔，统计支出 +12.50 |
+| `testA2_continuousEntry_clearsAmountKeepsCategory` | 勾号长按「Save and Continue」后金额清零、分类与账户保留；第二次保存才关表单 |
+| `testA3_invalidInput_isRefusedWithMessage` | 金额 0 时勾号不可用；超过 99,999,999.99 的输入被拒；无分类保存出 `Missing Category` 且不落账 |
+| `testA4_discountClaimFutureDate_staysOutOfStats` | 折扣 + 报销标记 + 未来日期：行进 UPCOMING 段、带徽标，且不计入本期支出 |
+| `testA5_editAmount_updatesStats_typeSwitchClearsCategory` | 编辑金额后统计同步 +7.50；切到收入时支出分类被清空 |
+| `testA6_deleteUndo_restoresFieldsAndBalance` | 滑删 → 撤销：金额、折扣、报销标记、账户余额全部回到删除前 |
+| `testA7_sameCurrencyTransfer_movesBalancesOnly` | 同币种转账：两端余额各变 20，支出统计不变 |
+| `testA8_crossCurrencyTransfer_feeOnlyInSpend` | 跨币种 + 手续费：到账金额、手续费独立一行；支出只加手续费，转账本体不进 |
+| `testA9_budgetRemaining_dropsThenGoesOver` | 分类预算：新建 100 → 花 30 后剩 70 → 再花 100 后显示 `over`，超额数值正确 |
+
+A9 重复跑时会复用上一轮建在同一分类上的预算（分类预算一个分类只允许一个），
+断言因此用带符号的剩余额差值。剩余额的**符号**读的是 tile 的 `accessibilityValue`
+（`SingleBudgetView.signedRemainingText`，纯带符号数字，亏空为负），不靠解析
+「$30.00 over」这句文案：那个数字是无符号量值，解析它只能拼出符号、还会把 tile 上
+别的数字一起吃掉。
+
+### 输入金额：两种键盘模式
+
+`ContentViewModel.bootstrap` 把 `numberEntryType` 种成 2（「cent-less」）：键盘左下角是
+小数点，`12.50` 就是 `12` `.` `50`，读数显示 `12.50`。老的 1（「pre-dotted」）把每两位
+数字当分，同样的金额要敲 `1250`，而且没有小数点键。
+
+用例统一走 `enterAmount(_:_:)`：先按键盘上有没有小数点键判断当前模式，再按模式敲；
+清空走 `clearAmount(_:)`，模式 2 下用读数右侧的删除键（`sb.entry.amountDelete`），
+模式 1 下用键盘上的退格。用例里不要直接写死 `typeDigits("1250")`——那等于把模拟器当时的
+设置写进断言，换个模式就红。
+
 ```bash
 xcodebuild test \
   -project app/SmartBud.xcodeproj \
@@ -92,8 +128,17 @@ xcodebuild test \
   -resultBundlePath UITestResults.xcresult
 ```
 
-不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里两个 job 分开跑，
-逻辑测试 job 显式加了 `-only-testing:SmartBudTests`。
+不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
+`-only-testing:SmartBudTests`。
+
+17 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成三个
+分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例）、
+`e2e 记账/编辑`（A1–A5）、`e2e 删除/转账/预算`（A6–A9）。**新增用例要同时加进
+`.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke 分片会把它一起跑掉。
+分片用 `-only-testing` / `-skip-testing` 过滤时，标识符必须是 **Target/Class/Method**
+（`SmartBudUITests/SmartBudUITests/testA1_…`）：少写一层会静默匹配到 0 条用例，
+xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
+拆分的另一个约束是 10 分钟预算本身：单条用例再长出 60 秒以上，A6/A8 那个分片就要重新分。
 
 ### 元素怎么定位
 
@@ -117,6 +162,8 @@ xcodebuild test \
 |---|---|---|
 | `-skipIntro` | 跳过两页欢迎流程，直接进账本 | `ContentViewModel.bootstrap` |
 | `-importSample` | 导入向导直接用 bundle 里的 `sample.csv` 走到预览步，绕开系统文件选择器 | `ImportDataView.body` 的 `onAppear` |
+| `-freshStore` | 每次启动一个空的内存 store，不报降级、不弹提示条；UI 用例靠它做到「一条用例一个干净库」 | `DataRepository.freshMemoryContainer` |
+| `-skipReviewPrompt` | 不弹 App Store 评分面板。一次 UI 测试会累计跨过第 3/10/25 笔的阈值，系统面板会盖住正在操作的界面 | `ReviewRequester.requestReviewIfAppropriate` |
 
 `XCUITest` 驱动不了系统文件选择器，所以导入用例走的是第二条：验的是「解析出预览 →
 返回 → 取消」这条链，不是「文件选择器能不能选到文件」。
@@ -124,9 +171,11 @@ xcodebuild test \
 ### 可访问性审计
 
 目前 5 条用例在末尾调用 `assertAccessible` 跑 `performAccessibilityAudit`
-（TELE-36 新增的 3 条纯交互用例尚未接入），发现的问题全部打到日志里
+（其余用例尚未接入），发现的问题全部打到日志里
 （`AUDIT[屏幕] 类型 描述 [identifier]`），CI job summary 汇总最近 60 条，完整报告在
-`UITestResults.xcresult` / `xcodebuild-uitest.log` artifact 里。
+`UITestResults-<分片>.xcresult` / `xcodebuild-uitest.log` artifact 里。9 条交互 E2E 不跑审计：
+它们每条要多走 4–6 个界面，审计本身每次 3–8 秒，加进去就把 E2E 分片顶出 10 分钟预算；
+审计的覆盖面由 smoke 用例保证（账本、设置、导入、智能记账四个屏）。
 
 **当前会被显式忽略的类型**（`AccessibilityAuditPolicy.ignoredTypes`），每项都有归属：
 
@@ -216,10 +265,10 @@ ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test`（`-only-testing:SmartBudUITests`），两个都要绿 |
+| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的三个分片 job（见「UI 测试」一节），全部要绿 |
 | 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
 | 超时 | 逻辑测试 45 分钟，UI 测试 60 分钟 |
-| 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults.xcresult` + 日志，**每次**上传（审计报告在里面） |
+| 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults-<分片>.xcresult` + 日志，**每次**上传（审计报告与失败截图在里面） |
 
 没用 `macos-14`：该镜像最高只有 Xcode 16.2（没有 iOS 26 SDK），
 且 GitHub 在 2026-11-02 之后不再支持它。

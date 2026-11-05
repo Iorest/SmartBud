@@ -177,6 +177,7 @@ struct LogTransactionList<Header: View>: View {
                     }
                 } header: {
                     Text(String.appLocalized("UPCOMING"))
+                        .accessibilityIdentifier(AccessibilityID.logUpcomingHeader)
                 }
             }
 

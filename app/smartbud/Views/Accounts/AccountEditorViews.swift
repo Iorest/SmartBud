@@ -55,6 +55,7 @@ struct AccountEditor: View {
                             }
 
                         TextField(String.appLocalized("Account name"), text: $name)
+                            .accessibilityIdentifier(AccessibilityID.accountNameField)
                     }
                 }
 
@@ -74,6 +75,7 @@ struct AccountEditor: View {
                             Text("\(currency.code) · \(currency.name)").tag(currency.code)
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.accountCurrencyPicker)
                 } footer: {
                     Text(String.appLocalized(
                         "Amounts in this account use this currency. Totals convert "
@@ -90,6 +92,7 @@ struct AccountEditor: View {
                             #endif
                             .multilineTextAlignment(.trailing)
                             .monospacedDigit()
+                            .accessibilityIdentifier(AccessibilityID.accountOpeningBalance)
                     }
                 } footer: {
                     Text(String.appLocalized(
@@ -114,6 +117,7 @@ struct AccountEditor: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String.appLocalized("Done")) { save() }
                         .disabled(!canSave)
+                        .accessibilityIdentifier(AccessibilityID.accountDone)
                 }
             }
             .onAppear(perform: loadValues)
@@ -266,6 +270,7 @@ struct AccountPickerSheet: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier(AccessibilityID.accountOption(account.wrappedName))
                 }
             }
             .navigationTitle(String.appLocalized("Account"))

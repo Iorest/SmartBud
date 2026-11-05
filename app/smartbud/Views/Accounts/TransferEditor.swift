@@ -75,21 +75,26 @@ struct TransferEditor: View {
                             Text("\(account.wrappedEmoji) \(account.wrappedName)").tag(Optional(account))
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.transferFrom)
                     Picker(String.appLocalized("To"), selection: $destination) {
                         ForEach(accounts) { account in
                             Text("\(account.wrappedEmoji) \(account.wrappedName)").tag(Optional(account))
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.transferTo)
                 }
 
                 Section {
-                    amountRow(titleKey: "Amount", text: $amount, code: sourceCurrency)
+                    amountRow(titleKey: "Amount", text: $amount, code: sourceCurrency,
+                              identifier: AccessibilityID.transferAmount)
 
-                    amountRow(titleKey: "Fee", text: $fee, code: sourceCurrency)
+                    amountRow(titleKey: "Fee", text: $fee, code: sourceCurrency,
+                              identifier: AccessibilityID.transferFee)
 
                     if isCrossCurrency {
                         amountRow(titleKey: "Amount Received",
-                                  text: $destinationAmount, code: destinationCurrency)
+                                  text: $destinationAmount, code: destinationCurrency,
+                                  identifier: AccessibilityID.transferReceived)
 
                         if let rateHint {
                             Text(rateHint)
@@ -132,6 +137,7 @@ struct TransferEditor: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String.appLocalized("Done")) { save() }
                         .disabled(!canSave)
+                        .accessibilityIdentifier(AccessibilityID.transferDone)
                 }
             }
             .onAppear(perform: pickDefaults)
@@ -180,7 +186,8 @@ struct TransferEditor: View {
     }
 
     @ViewBuilder
-    private func amountRow(titleKey: String, text: Binding<String>, code: String) -> some View {
+    private func amountRow(titleKey: String, text: Binding<String>, code: String,
+                           identifier: String) -> some View {
         HStack(spacing: SBSpace.extraSmall) {
             Text(String.appLocalized(titleKey))
             Spacer()
@@ -190,6 +197,7 @@ struct TransferEditor: View {
                 #endif
                 .multilineTextAlignment(.trailing)
                 .monospacedDigit()
+                .accessibilityIdentifier(identifier)
             Text(code)
                 .font(.footnote)
                 .foregroundStyle(Color.SubtitleText)

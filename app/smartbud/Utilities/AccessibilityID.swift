@@ -30,7 +30,18 @@ enum AccessibilityID {
     // MARK: - Insights / Budget (the other two tabs)
 
     static let insightsPeriodPicker = "sb.insights.periodPicker"
+    /// The two summary cards. Their label carries the formatted total
+    /// ("Expenses, $12.50"), which is what the E2E cases read back.
+    static let insightsIncomeCard = "sb.insights.incomeCard"
+    static let insightsExpenseCard = "sb.insights.expenseCard"
     static let budgetAddButton = "sb.budget.addButton"
+    /// "Continue" on the new-budget sheet's first page.
+    static let budgetContinue = "sb.budget.continueButton"
+    static let budgetTypePicker = "sb.budget.typePicker"
+    static let budgetCategoryPicker = "sb.budget.categoryPicker"
+    /// One budget tile's remaining figure. Keyed by the budget's name (= the
+    /// category name) because more than one budget can be on screen.
+    static func budgetRemaining(_ name: String) -> String { "sb.budget.remaining.\(name)" }
 
     // MARK: - Log
 
@@ -42,6 +53,8 @@ enum AccessibilityID {
     static let logUndoButton = "sb.log.undoButton"
     /// Swipe action on a ledger row; stages the delete so "Undo" can restore it.
     static let logRowDelete = "sb.log.row.delete"
+    /// Section header above future/repeating rows.
+    static let logUpcomingHeader = "sb.log.upcomingHeader"
 
     // MARK: - Entry form
 
@@ -50,9 +63,27 @@ enum AccessibilityID {
     static let entrySmartEntry = "sb.entry.smartEntry"
     static let entryCategoryButton = "sb.entry.categoryButton"
     /// Every tile in the category grid shares this identifier; tests address
-    /// them by position because the tile's own label is the category name.
+    /// them by position, or by the category name the tile's label carries.
     static let entryCategoryTile = "sb.entry.categoryTile"
     static let entrySeedCategories = "sb.entry.seedCategories"
+    /// Big amount read-out above the keypad (value = plain amount string).
+    static let entryAmountDisplay = "sb.entry.amountDisplay"
+    /// The note pill. The E2E cases put a unique note on every entry so they
+    /// can find that row again without relying on list order.
+    static let entryNoteField = "sb.entry.noteField"
+    /// Inline validation toast (entry form and category editors); its label is
+    /// the message.
+    static let entryToast = "sb.entry.toast"
+    /// Optional extras row.
+    static let entryAccountChip = "sb.entry.accountChip"
+    static let entryDiscountChip = "sb.entry.discountChip"
+    static let entryClaimChip = "sb.entry.claimChip"
+    static let entryDateButton = "sb.entry.dateButton"
+    /// Long-press alternative on the checkmark.
+    static let entrySaveAndContinue = "sb.entry.saveAndContinue"
+    /// The read-out's trailing delete, the only erase key in "cent-less" entry
+    /// mode (the pad's bottom-left key is the decimal point there).
+    static let entryAmountDelete = "sb.entry.amountDelete"
 
     // MARK: - Number pad
 
@@ -88,4 +119,27 @@ enum AccessibilityID {
     /// Column-preview table title; only on screen after a CSV was parsed.
     static let importPreview = "sb.import.preview"
     static let importContinue = "sb.import.continueButton"
+
+    // MARK: - Accounts
+
+    static let accountsAddButton = "sb.accounts.addButton"
+    static let accountsTransferButton = "sb.accounts.transferButton"
+    /// One account's balance figure, keyed by the account name so two rows on
+    /// screen are distinguishable.
+    static func accountBalance(_ name: String) -> String { "sb.accounts.balance.\(name)" }
+    /// One row of the entry form's account picker sheet.
+    static func accountOption(_ name: String) -> String { "sb.entry.accountOption.\(name)" }
+    static let accountNameField = "sb.accounts.nameField"
+    static let accountCurrencyPicker = "sb.accounts.currencyPicker"
+    static let accountOpeningBalance = "sb.accounts.openingBalance"
+    static let accountDone = "sb.accounts.done"
+
+    // MARK: - Transfer editor
+
+    static let transferFrom = "sb.transfer.from"
+    static let transferTo = "sb.transfer.to"
+    static let transferAmount = "sb.transfer.amount"
+    static let transferFee = "sb.transfer.fee"
+    static let transferReceived = "sb.transfer.received"
+    static let transferDone = "sb.transfer.done"
 }

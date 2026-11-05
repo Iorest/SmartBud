@@ -197,6 +197,7 @@ extension TransactionView {
                         hideKeyboard()
                         showAccountPicker = true
                     }
+                    .accessibilityIdentifier(AccessibilityID.entryAccountChip)
                     Spacer(minLength: 4)
                 }
 
@@ -298,6 +299,7 @@ extension TransactionView {
             hideKeyboard()
             showingDatePicker = true
         }
+        .accessibilityIdentifier(AccessibilityID.entryDateButton)
     }
 
     private var categoryButtonArea: some View {
@@ -343,6 +345,7 @@ extension TransactionView {
                     discountInput = discount > 0 ? String(format: "%.2f", discount) : ""
                     showDiscountEditor = true
                 }
+                .accessibilityIdentifier(AccessibilityID.entryDiscountChip)
             }
 
             if !income {
@@ -354,6 +357,7 @@ extension TransactionView {
                     withAnimation(.easeOut(duration: 0.15)) { reimbursable.toggle() }
                     lightHaptic &+= 1
                 }
+                .accessibilityIdentifier(AccessibilityID.entryClaimChip)
             }
         }
     }

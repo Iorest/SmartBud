@@ -82,6 +82,7 @@ struct AccountListView: View {
                     Image(systemName: "arrow.left.arrow.right")
                 }
                 .accessibilityLabel(String.appLocalized("Transfer"))
+                .accessibilityIdentifier(AccessibilityID.accountsTransferButton)
                 .disabled(accountVM.visibleAccounts.count < 2)
             }
 
@@ -92,6 +93,7 @@ struct AccountListView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel(String.appLocalized("New Account"))
+                .accessibilityIdentifier(AccessibilityID.accountsAddButton)
             }
         }
         .onAppear { accountVM.load() }
