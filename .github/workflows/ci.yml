@@ -55,6 +55,13 @@ jobs:
           sudo xcode-select -s "$chosen"
           xcodebuild -version
 
+      # Parser-only pass over all five targets (app, unit tests, UI tests,
+      # widget, macOS shell): seconds, no SDK, and it fails on the line that no
+      # longer parses instead of after the build below. Type errors still need
+      # the build; see docs/engineering.md § 离线语法检查.
+      - name: Swift syntax check
+        run: scripts/check-syntax.sh
+
       # No Swift packages today; the step activates once a Package.resolved lands.
       - name: Cache Swift Package dependencies
         if: hashFiles('**/Package.resolved') != ''
@@ -78,6 +85,21 @@ jobs:
             -only-testing:SmartBudTests \
             -resultBundlePath "$RESULT_BUNDLE" \
             2>&1 | tee "$LOG_FILE"
+
+      # A filter that matches nothing makes xcodebuild exit 0 after running zero
+      # cases. The UI shards below guard against that; this job had no such
+      # guard, so a broken -only-testing target would have reported green.
+      #
+      # Note the two frameworks: this suite is Swift Testing, so XCTest's own
+      # "Executed 0 tests" line is normal and NOT a failure signal — the count
+      # that matters is "✔ Test run with N tests".
+      - name: Logic tests actually ran
+        if: success()
+        run: |
+          if ! grep -qE "Test run with [1-9][0-9]* test|Executed [1-9][0-9]* test" "$LOG_FILE"; then
+            echo "::error::No test cases executed. Check that -only-testing:SmartBudTests still matches a target with test sources."
+            exit 1
+          fi
 
       - name: Summarise test count
         if: success()
