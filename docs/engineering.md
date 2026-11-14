@@ -202,7 +202,8 @@ xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿�
   以及全部 XCUITest，仍然只能在 macOS runner 或一台真 Mac 上验证；
 - 但 **Foundation-only 的逻辑层可以在 Linux 上真编译真测试**：
   `scripts/linux-tests.sh`（见下节），当前覆盖 69 个用例 / 8 个 suite；
-- 不依赖 Xcode 的静态检查也在本地做：`python3 scripts/check_repo.py`。
+- 不依赖 Xcode 的静态检查也在本地做：`python3 scripts/check_repo.py`（结构与引用）、
+  `scripts/check-syntax.sh`（全部 Swift 文件的语法）。
 
 
 ## 离线结构检查
@@ -223,6 +224,26 @@ python3 scripts/check_repo.py          # 0 = 干净，1 = 有问题
 CI 的 `test` job 第一步就跑它，结构问题几秒内失败，不会先烧掉一次 macOS 构建。
 它**不替代** `xcodebuild test`：编译错误、运行行为、UI 流程都查不出来。
 接入前用四种真实故障验证过它会报错：漏 `smartbud/` 前缀、占位 identifier、未登记文件、断链。
+
+## 离线语法检查
+
+`scripts/check-syntax.sh` 对 `app/` 下全部 Swift 文件（app、单元测试、UI 测试、Widget、macOS 壳）
+跑一次 `swiftc -parse`：只走语法分析，不解析 import、不要 SDK，所以 Linux 上也能跑，
+230 个文件约 8 秒。
+
+```bash
+export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swiftc 放进 PATH
+scripts/check-syntax.sh    # 0 = 全部能解析；1 = 有文件解析失败；2 = 没有工具链（跳过，不算失败）
+```
+
+挡的是「合进来的文件根本解析不了」这一类：少一个右括号、字符串没闭合、`#if` 没配平。
+真正要防的是「作者本地能编，合并后的那一版却从没编过」——这类错误在这里几秒报出来，
+不用等 6 分钟的 macOS 构建跑完才看到。
+
+**不挡类型错误**：改签名、把 `Int` 传给 `String`、删掉还在用的符号，都能通过解析，
+只有 `xcodebuild` 能发现。所以它是 macOS job 前面的一道便宜闸门，不是替代品。
+
+CI 的 `test` job 在「Select Xcode 26」之后跑它（那时 `swiftc` 一定在 PATH 上）。
 
 ## Linux 逻辑测试
 
@@ -272,6 +293,13 @@ ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
 
 没用 `macos-14`：该镜像最高只有 Xcode 16.2（没有 iOS 26 SDK），
 且 GitHub 在 2026-11-02 之后不再支持它。
+
+`test` job 的顺序是「便宜的闸门在前」：`check_repo.py`（结构，秒级）→ `Select Xcode 26` →
+`check-syntax.sh`（语法，秒级）→ 构建与测试。测试跑完还有一道「确实跑过用例」的校验：
+`-only-testing` 过滤不到任何 target 时 xcodebuild 会以 0 退出，
+分片 job 因此有过「全绿但一条没跑」的假绿，`test` job 现在也会在日志里找不到
+`✔ Test run with N tests`（Swift Testing）或 `Executed N tests`（XCTest）时失败。
+注意这个 suite 用的是 Swift Testing，XCTest 自己那行 `Executed 0 tests` 是正常的，不是失败信号。
 
 失败时先看 job summary 里的测试计数行，再下 artifact 里的 `xcodebuild-test.log`
 找第一条 `error:` / `failed`；`.xcresult` 里有逐条用例的截图和日志。
