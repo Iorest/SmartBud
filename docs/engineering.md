@@ -132,14 +132,25 @@ xcodebuild test \
 不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
 `-only-testing:SmartBudTests`。
 
-17 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成三个
-分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例）、
-`e2e 记账/编辑`（A1–A5）、`e2e 删除/转账/预算`（A6–A9）。**新增用例要同时加进
-`.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke 分片会把它一起跑掉。
+17 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成五个
+分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），
+其余四个分片按**实测用例耗时**均衡分 E2E：
+
+| 分片 | 用例 | 实测用例耗时（run 44026222552） |
+| --- | --- | --- |
+| `e2e 记账/校验` | A1–A3 | 353 s |
+| `e2e 折扣/编辑` | A4–A5 | 327 s |
+| `e2e 删除/转账` | A6–A7 | 405 s |
+| `e2e 跨币种/预算` | A8–A9 | 383 s |
+
+**新增用例要同时加进 `.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke
+分片会把它一起跑掉。
 分片用 `-only-testing` / `-skip-testing` 过滤时，标识符必须是 **Target/Class/Method**
 （`SmartBudUITests/SmartBudUITests/testA1_…`）：少写一层会静默匹配到 0 条用例，
 xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
-拆分的另一个约束是 10 分钟预算本身：单条用例再长出 60 秒以上，A6/A8 那个分片就要重新分。
+分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等，
+三个分片的方案让两个分片跑到 680 s / 788 s，越过了 10 分钟预算；再加一条长用例时
+先看实测耗时，把最慢的分片一分为二。
 
 ### 元素怎么定位
 
@@ -291,7 +302,7 @@ ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的三个分片 job（见「UI 测试」一节），全部要绿 |
+| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的五个分片 job（见「UI 测试」一节），全部要绿 |
 | 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
 | 超时 | 逻辑测试 45 分钟，UI 测试 60 分钟 |
 | 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults-<分片>.xcresult` + 日志，**每次**上传（审计报告与失败截图在里面） |
