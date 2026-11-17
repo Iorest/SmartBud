@@ -56,11 +56,18 @@ enum RefundLedger {
     /// currency: its base amount is converted with the rate frozen on the
     /// original row, which only means something for the same currency.
     static func currency(of original: TransactionModel) -> String {
-        original.account?.resolvedCurrencyCode ?? AppBaseCurrency.code
+        currency(of: original.account)
     }
 
+    /// Same rule as `AccountModel.resolvedCurrencyCode`, spelled out here so
+    /// the ledger also compiles into the test target (which does not include
+    /// the rate store). An empty code means the account follows the base
+    /// currency.
     static func currency(of account: AccountModel?) -> String {
-        account?.resolvedCurrencyCode ?? AppBaseCurrency.code
+        guard let code = account?.currencyCode, !code.isEmpty else {
+            return AppBaseCurrency.code
+        }
+        return code
     }
 
     /// Writes a refund row (not saved; the caller commits). The amount is in
