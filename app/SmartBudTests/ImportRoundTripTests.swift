@@ -30,7 +30,7 @@ struct ImportRoundTripTests {
             onceRecurring: false, categoryId: nil, categoryName: nil,
             accountId: fixture.accountID, accountName: "招行", baseAmount: 2.5,
             accountCurrency: "CNY", discount: 0, reimbursable: false,
-            reimbursedAt: nil, reimbursementOf: nil, transferFeeOf: transferID,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil, transferFeeOf: transferID,
             adjustment: false
         )
         let transfer = ExportSchema.TransferDTO(
@@ -63,7 +63,7 @@ struct ImportRoundTripTests {
             onceRecurring: false, categoryId: nil, categoryName: "餐饮",
             accountId: fixture.accountID, accountName: "招行", baseAmount: 88,
             accountCurrency: "CNY", discount: 0, reimbursable: true,
-            reimbursedAt: .now, reimbursementOf: nil, transferFeeOf: nil,
+            reimbursedAt: .now, reimbursementOf: nil, refundOf: nil, transferFeeOf: nil,
             adjustment: false
         )
         let repayment = ExportSchema.TransactionDTO(
@@ -72,7 +72,7 @@ struct ImportRoundTripTests {
             recurringCoefficient: 0, onceRecurring: false, categoryId: nil,
             categoryName: nil, accountId: fixture.accountID, accountName: "招行",
             baseAmount: 88, accountCurrency: "CNY", discount: 0, reimbursable: false,
-            reimbursedAt: nil, reimbursementOf: claimID, transferFeeOf: nil,
+            reimbursedAt: nil, reimbursementOf: claimID, refundOf: nil, transferFeeOf: nil,
             adjustment: false
         )
 
@@ -90,5 +90,44 @@ struct ImportRoundTripTests {
         #expect(restoredClaim?.countsAsSpend == false)
         #expect(restoredRepayment?.countsAsIncome == false)
         #expect(restoredRepayment?.amount == 88)
+    }
+
+    @Test("A refund keeps its link and stays out of income through export and import")
+    func refundRoundTrip() throws {
+        let purchaseID = UUID()
+        let purchase = ExportSchema.TransactionDTO(
+            id: purchaseID, amount: 100, date: .now, day: nil, month: nil,
+            note: "耳机", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: fixture.categoryID, categoryName: "餐饮",
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 720,
+            accountCurrency: "CNY", discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil,
+            transferFeeOf: nil, adjustment: false
+        )
+        let refund = ExportSchema.TransactionDTO(
+            id: UUID(), amount: 30, date: .now, day: nil, month: nil,
+            note: "退款", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: fixture.categoryID, categoryName: "餐饮",
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 216,
+            accountCurrency: "CNY", discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: purchaseID,
+            transferFeeOf: nil, adjustment: false
+        )
+
+        _ = try DataImporter.apply(
+            fixture.payload(categories: [fixture.sampleCategory],
+                            accounts: [fixture.sampleAccount],
+                            transactions: [purchase, refund]),
+            context: fixture.context
+        )
+
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        let restoredRefund = stored.first { $0.refundOf == purchaseID }
+
+        #expect(restoredRefund?.isRefund == true)
+        #expect(restoredRefund?.countsAsIncome == false)
+        #expect(restoredRefund?.countsAsSpend == false)
+        #expect(restoredRefund?.spendBaseAmount == -216)
+        #expect(Money.double(Money.sum(stored.map(\.spendBaseAmount))) == 504)
     }
 }

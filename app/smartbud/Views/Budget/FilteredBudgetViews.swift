@@ -43,20 +43,25 @@ struct FilteredCategoryDayBudgetView: View {
         .scrollContentBackground(.hidden)
         .onAppear {
             DispatchQueue.main.async {
-                totalSpent = transactions.reduce(0) { $0 + $1.wrappedBaseAmount }
+                totalSpent = transactionSpendTotal
             }
         }
         .onChange(of: date) { _, _ in
             DispatchQueue.main.async {
-                totalSpent = transactions.reduce(0) { $0 + $1.wrappedBaseAmount }
+                totalSpent = transactionSpendTotal
             }
         }
         // The ledger can change while this view stays alive (add from the
         // detail screen); recompute instead of showing a stale header.
-        .onChange(of: transactions.map(\.wrappedBaseAmount)) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
+        .onChange(of: transactions.map(\.spendBaseAmount)) { _, _ in
+            totalSpent = transactionSpendTotal
         }
         .frame(maxHeight: .infinity)
+    }
+
+    /// Net of refunds, which is what the budget card subtracts.
+    private var transactionSpendTotal: Double {
+        transactions.reduce(0.0) { $0 + $1.spendBaseAmount }
     }
 
     init(category: CategoryModel?, day: Date, totalSpent: Binding<Double>) {
@@ -67,14 +72,20 @@ struct FilteredCategoryDayBudgetView: View {
 
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
+            // Refund rows belong in the list too: they explain why the total
+            // is lower than the receipts show.
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                ($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
-                    && ($0.date ?? future) <= now && $0.category?.id == categoryId
+                (($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? future) <= now && $0.category?.id == categoryId)
+                    || (($0.day ?? past) == day && $0.refundOf != nil
+                    && ($0.date ?? future) <= now && $0.category?.id == categoryId)
             }, sort: [SortDescriptor(\.date, order: .reverse)])
         } else {
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                ($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
-                    && ($0.date ?? future) <= now
+                (($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
+                    && ($0.date ?? future) <= now)
+                    || (($0.day ?? past) == day && $0.refundOf != nil
+                    && ($0.date ?? future) <= now)
             }, sort: [SortDescriptor(\.date, order: .reverse)])
         }
 
@@ -106,10 +117,16 @@ struct FilteredBudgetView: View {
         }
     }
 
+    /// Net of refunds, which is what the budget card subtracts.
+    private var transactionSpendTotal: Double {
+        transactions.reduce(0.0) { $0 + $1.spendBaseAmount }
+    }
+
     private func dayTotal(_ dayTransactions: [TransactionModel]) -> Double {
         // Cross-account totals are read in the base currency, the same as the
-        // budget card and the insights screen.
-        dayTransactions.reduce(0.0) { $0 + ($1.income ? $1.wrappedBaseAmount : -$1.wrappedBaseAmount) }
+        // budget card and the insights screen. `signedBaseAmount` carries the
+        // sign for income, spend and refund rows alike.
+        dayTransactions.reduce(0.0) { $0 + $1.signedBaseAmount }
     }
 
     private func dayTotalString(_ total: Double) -> String {
@@ -175,13 +192,13 @@ struct FilteredBudgetView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .onAppear {
-            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
+            totalSpent = transactionSpendTotal
         }
         .onChange(of: date) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
+            totalSpent = transactionSpendTotal
         }
-        .onChange(of: transactions.map(\.wrappedBaseAmount)) { _, _ in
-            totalSpent = transactions.reduce(0.0) { $0 + $1.wrappedBaseAmount }
+        .onChange(of: transactions.map(\.spendBaseAmount)) { _, _ in
+            totalSpent = transactionSpendTotal
         }
     }
 
@@ -213,14 +230,19 @@ struct FilteredBudgetView: View {
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                !$0.income && !$0.adjustment && !$0.reimbursable
+                ((!$0.income && !$0.adjustment && !$0.reimbursable)
                     && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
-                    && $0.category?.id == categoryId
+                    && $0.category?.id == categoryId)
+                    || ($0.refundOf != nil
+                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
+                    && $0.category?.id == categoryId)
             })
         } else {
             _transactions = Query(filter: #Predicate<TransactionModel> {
-                !$0.income && !$0.adjustment && !$0.reimbursable
-                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
+                ((!$0.income && !$0.adjustment && !$0.reimbursable)
+                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate)
+                    || ($0.refundOf != nil
+                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate)
             })
         }
 

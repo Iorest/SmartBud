@@ -82,7 +82,7 @@ struct TransferFeeTests {
         _ = TransferFeeLedger.recordFee(for: setup.transfer, in: context)
 
         let rows = (try context.fetch(FetchDescriptor<TransactionModel>()))
-            .map { (amount: $0.amount, income: $0.income) }
+            .map { (amount: $0.amount, income: $0.income, isRefund: $0.isRefund) }
         let sent = AccountBalance.current(opening: setup.source.openingBalance,
                                           transactions: rows,
                                           transfersIn: 0,

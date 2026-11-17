@@ -70,7 +70,7 @@ extension LogTransactionList {
     func editableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {
         let futureRow = isFuture
         return Button {
-            transactionManager.toEdit = transaction
+            openEditor(transaction)
         } label: {
             LogTransactionRow(transaction: transaction, future: futureRow)
         }
@@ -85,7 +85,7 @@ extension LogTransactionList {
             .accessibilityIdentifier(AccessibilityID.logRowDelete)
 
             Button {
-                transactionManager.toEdit = transaction
+                openEditor(transaction)
             } label: {
                 Label(String.appLocalized("Edit"), systemImage: "pencil")
             }
@@ -101,13 +101,14 @@ extension LogTransactionList {
             }
 
             Button {
-                transactionManager.toEdit = transaction
+                openEditor(transaction)
             } label: {
                 Label(String.appLocalized("Edit"), systemImage: "pencil")
             }
 
-            if !transaction.income && !transaction.adjustment {
+            if !transaction.income && !transaction.adjustment && !transaction.isRefund {
                 reimbursementMenuItems(transaction)
+                refundMenuItems(transaction)
             }
 
             if !stopsRecurring(transaction, future: futureRow) {
@@ -150,6 +151,31 @@ extension LogTransactionList {
             } label: {
                 Label(String.appLocalized("Mark as Reimbursable"),
                       systemImage: "arrow.uturn.backward.circle")
+            }
+        }
+    }
+
+    /// A refund's amount, date and account are bounded by the purchase it
+    /// gives back, so it opens the refund sheet instead of the generic form —
+    /// the form has no way to check the remaining amount or the frozen rate.
+    func openEditor(_ transaction: TransactionModel) {
+        if transaction.isRefund,
+           let original = transactionVM.refundOriginal(for: transaction) {
+            transactionManager.toRefund = RefundTarget(original: original, refund: transaction)
+        } else {
+            transactionManager.toEdit = transaction
+        }
+    }
+
+    /// "Refund…" on an expense that still has something left to give back.
+    /// Refund rows get their action through Edit, which opens the same sheet.
+    @ViewBuilder
+    func refundMenuItems(_ transaction: TransactionModel) -> some View {
+        if !transaction.isRefund && transactionVM.canRefund(transaction) {
+            Button {
+                transactionManager.toRefund = RefundTarget(original: transaction, refund: nil)
+            } label: {
+                Label(String.appLocalized("Refund"), systemImage: "arrow.uturn.backward.circle")
             }
         }
     }

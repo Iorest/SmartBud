@@ -42,12 +42,15 @@ struct SingleTransactionView: View {
         }
     }
 
+    /// Income and refunds both bring money in; only expenses take it out.
+    private var incoming: Bool { transaction.income || transaction.isRefund }
+
     private var amountLabel: some View {
         Text(showExpenseOrIncomeSign
-             ? "\(transaction.income ? "+" : "-")\(transactionAmountString)"
+             ? "\(incoming ? "+" : "-")\(transactionAmountString)"
              : transactionAmountString)
             .font(.title3.weight(.medium).monospacedDigit())
-            .foregroundStyle(transaction.income
+            .foregroundStyle(incoming
                              ? (future ? Color.SubtitleText : Color.IncomeGreen)
                              : (future ? Color.SubtitleText : Color.PrimaryText))
             .minimumScaleFactor(0.6)

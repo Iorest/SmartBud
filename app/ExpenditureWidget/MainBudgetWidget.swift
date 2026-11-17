@@ -98,10 +98,10 @@ struct MainBudgetWidgetProvider: TimelineProvider {
         let descriptor = FetchDescriptor<TransactionModel>()
         let allTransactions = (try? context.fetch(descriptor)) ?? []
         let filtered = allTransactions.filter {
-            $0.countsAsSpend && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
+            ($0.countsAsSpend || $0.isRefund) && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
         }
 
-        let holdingTotal = Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
+        let holdingTotal = Money.double(Money.sum(filtered.map(\.spendBaseAmount)))
 
         let percentageOfDays: Double
         let calendar = Calendar.current

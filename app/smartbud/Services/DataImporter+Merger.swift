@@ -126,6 +126,7 @@ struct BackupMerger {
                 discount: amount(dto.discount ?? 0),
                 reimbursable: dto.reimbursable ?? false,
                 reimbursementOf: dto.reimbursementOf,
+                refundOf: dto.refundOf,
                 transferFeeOf: dto.transferFeeOf,
                 adjustment: dto.adjustment ?? false
             )

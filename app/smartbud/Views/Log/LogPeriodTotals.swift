@@ -16,7 +16,9 @@ struct LogPeriodTotals: View {
     let showCents: Bool
 
     private var spent: Decimal {
-        Money.sum(entries.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
+        // Net of refunds, matching the insights card: money given back within
+        // the filtered range reduces that range's spend figure.
+        Money.sum(entries.map(\.spendBaseAmount))
     }
 
     private var income: Decimal {

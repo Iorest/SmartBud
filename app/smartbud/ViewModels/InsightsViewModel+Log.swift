@@ -31,7 +31,8 @@ extension InsightsViewModel {
             avgDivisor = Double(cal.range(of: .day, in: .month, for: now)?.count ?? 30)
         }
         let filtered = all.filter { ($0.date ?? .distantPast) >= start }
-        let spent = Money.sum(filtered.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
+        // Refunds reduce spend where the money arrived (they are not income).
+        let spent = Money.sum(filtered.map(\.spendBaseAmount))
         let income = Money.sum(filtered.filter(\.countsAsIncome).map(\.wrappedBaseAmount))
         let net = income - spent
         summary = SummaryData(spent: Money.double(spent), income: Money.double(income),
@@ -105,7 +106,7 @@ extension InsightsViewModel {
             all = all.filter { ($0.date ?? .distantPast) >= start }
         }
         switch income {
-        case .some(false): all = all.filter(\.countsAsSpend)
+        case .some(false): all = all.filter { $0.countsAsSpend || $0.isRefund }
         case .some(true): all = all.filter(\.countsAsIncome)
         case .none: all = all.filter(\.countsInTotals)
         }
@@ -113,7 +114,7 @@ extension InsightsViewModel {
     }
 
     func getLogViewTotalSpent(type: Int) -> Double {
-        Money.double(Money.sum(logViewTransactions(type: type, income: false).map(\.wrappedBaseAmount)))
+        Money.double(Money.sum(logViewTransactions(type: type, income: false).map(\.spendBaseAmount)))
     }
 
     func getLogViewTotalIncome(type: Int) -> Double {
@@ -168,15 +169,17 @@ extension InsightsViewModel {
         guard let (dates, step) = logLineGraphBuckets(type: type) else { return [] }
         let calendar = Calendar.current
         let all = repo.fetch(TransactionModel.self).filter {
-            income ? $0.countsAsIncome : $0.countsAsSpend
+            income ? $0.countsAsIncome : ($0.countsAsSpend || $0.isRefund)
         }
         return dates.map { bucketStart in
             let bucketEnd = calendar.date(byAdding: step, value: 1, to: bucketStart) ?? bucketStart
+            // A refund subtracts from its bucket; clamped at zero because the
+            // line graph has no negative region.
             let total = Money.sum(all.filter {
                 let date = $0.date ?? .distantPast
                 return date >= bucketStart && date < bucketEnd
             }
-                .map(\.wrappedBaseAmount))
+                .map { income ? $0.wrappedBaseAmount : max(0, $0.spendBaseAmount) })
             return LineGraphDataPoint(date: bucketStart, amount: Money.double(total))
         }
     }
@@ -312,9 +315,9 @@ extension InsightsViewModel {
         }
         if type == 1 {
             return Money.double(Money.sum(txns.map(\.signedBaseAmount)))
-        } else {
-            return Money.double(Money.sum(txns.map(\.wrappedBaseAmount)))
         }
+        let spentType = optionalIncome == false
+        return Money.double(Money.sum(txns.map { spentType ? $0.spendBaseAmount : $0.wrappedBaseAmount }))
     }
 
     // MARK: - Redesign (SwiftData / "Insights" screen)

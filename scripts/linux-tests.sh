@@ -61,6 +61,7 @@ app_sources=(
     Logic/CurrencyRebase.swift
     Logic/ImportAmount.swift
     Logic/MerchantNormalizer.swift
+    Logic/RefundPolicy.swift
     Logic/Money.swift
     Logic/TransactionValidation.swift
     Models/BudgetTimeFrame.swift
@@ -83,6 +84,7 @@ test_sources=(
     LLMProviderTests.swift
     MerchantNormalizerTests.swift
     MoneyFormattingTests.swift
+    RefundPolicyTests.swift
     ProAccessTests.swift
     TransactionValidationTests.swift
 )

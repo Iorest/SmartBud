@@ -55,7 +55,7 @@
 | §6.5 手续费是独立支出行、`outgoingTotal` 只含 `amount` | `app/smartbud/Services/TransferFeeLedger.swift:40-98`、`Data/Helper.swift:342` | 一致 | — |
 | §6.6 预算只统计 `countsAsSpend`；无分类预算不匹配任何交易 | `app/smartbud/ViewModels/BudgetViewModel.swift:101-133`、`Views/Budget/FilteredBudgetViews.swift:70-76` | 一致 | — |
 | §6.7 商户榜按 `merchantKey` 聚合、最多 6 行、金额降序 | `app/smartbud/Logic/MerchantSummary.swift:25-66` | 一致 | — |
-| §6.9 导出 JSON `schemaVersion` 4 | `ExportSchema.version = 6`（`Services/ExportSchema.swift:16`） | 文档错 | 已改：4 → 6 |
+| §6.9 导出 JSON `schemaVersion` 4 | `ExportSchema.version = 7`（`Services/ExportSchema.swift:16`） | 文档错 | 已改：4 → 6，随后 schema 7 加 `refundOf` |
 | §6.9 CSV 末尾追加 `merchant` / `merchant_key` | `app/smartbud/Services/DataExporter+CSV.swift:21-25` | 一致 | — |
 | §6.10 深链 `add` 参数、错误码、成功回参 | `app/smartbud/Utilities/DeepLink.swift:47-157`、`Views/HomeView+DeepLink.swift:47-122` | 一致 | — |
 | §7 “远端同步没有观察者，建议加 DataChangeCenter” | `app/smartbud/Services/DataRefreshCenter.swift:27-57` 已监听 `NSPersistentStoreRemoteChange` 与 CloudKit 导入，`SmartBudApp.swift:33` 启动 | 文档错 | 已改：改为描述现有 `DataRefreshCenter` |
@@ -65,10 +65,10 @@
 | §9 iPhone 四个 Tab、iPad/Mac 详情列 860 | `app/smartbud/Views/HomeView.swift:174-216`、`HomeView.swift:122` | 一致 | — |
 | §9 记账页字号上限 accessibility1 | `app/smartbud/Views/TransactionView+Subviews.swift:78` | 一致 | — |
 | §9.1 Pro 只拦三项、额外图标 6 款 | `app/smartbud/Utilities/ProAccess.swift:16-45`、`Views/Settings/Settings Subviews/SettingsAppIconView.swift:32-60`（默认 + 6 款） | 一致 | — |
-| §10 导出格式“当前 4” | `ExportSchema.version = 6` | 文档错 | 已改：4 → 6 |
+| §10 导出格式“当前 4” | `ExportSchema.version = 7` | 文档错 | 已改：4 → 6 → 7 |
 | §12 表格开头重复两行表头，列数不一致 | 仅文档问题 | 文档错 | 已改：删掉多余表头 |
 | §12 已标 ✅ 的九项（对应折算/备份设置/月度/远端刷新/归档/折扣/筛选/预览/本地化） | 逐项抽查：`CurrencyRebaseService.swift:50`、`DataImporter.swift:168-185`、`AppPeriod.swift`、`DataRefreshCenter.swift:27`、`AccountListView+Sections.swift:137`、`TransactionView+Body.swift:332`、`Views/LogView.swift:268`、`SettingsImportView.swift:170`、`LocalizationCoverageTests.swift:109-117` | 一致 | — |
-| §12 未实现项：退款、净资产与信用卡、基准币重述审计 | 未找到 `refundOf` / `creditLimit` / 重述记录；分别由 TELE-32、TELE-33 与本审计 T3 承接 | 一致 | — |
+| §12 未实现项：退款、净资产与信用卡、基准币重述审计 | 退款已实现（`Services/RefundLedger.swift`）；`creditLimit` 与重述记录仍未建模，由 TELE-33 与本审计 T3 承接 | 部分过时 | 已改：退款一项标为完成 |
 
 ## 2. ledger-rules.md
 
@@ -93,8 +93,8 @@
 | 文档主张 | 代码事实 | 结论 | 处理 |
 |---|---|---|---|
 | 收付实现制，无应计/账期模型 | 模型无应收应付字段；`TransactionModel` 只有收付事实 | 一致 | — |
-| 五种身份判定与现金流/费用归属 | `Helper.swift:128-155` | 一致 | — |
-| 退款、坏账、分期未实现 | `grep` 搜 `refundOf` / `badDebtOf` / `Installment` 均无结果 | 一致 | 已有任务 TELE-32 / TELE-29 |
+| 六种身份判定与现金流/费用归属（含退款） | `Helper.swift` 的 `countsAsSpend` / `isRefund` / `spendBaseAmount` | 一致 | — |
+| 退款、坏账、分期未实现（审计当时） | 退款已实现（`refundOf` + `RefundPolicy`）；`badDebtOf` / `Installment` 仍无结果 | 退款已过时 | 已改；坏账/分期仍由 TELE-32 余项与 TELE-29 承接 |
 | 信用卡：还款是转账、余额为负表示欠款、额度/账单日未建模 | `AccountViewModel.createTransfer`；无 `creditLimit` / `statementDay` | 一致 | 已有任务 TELE-33 |
 | 预算信封法、周期结束不结转 | `BudgetViewModel.leftover` 只累计当前周期（`ViewModels/BudgetViewModel.swift:101-133`） | 一致 | — |
 | 金额最小单位分，折算四舍五入 | `Money.cents` 用 `NSDecimalRound(..., .plain)`（`Logic/Money.swift:20-44`） | 一致 | — |
@@ -104,18 +104,18 @@
 | 切换基准币是一次性重述，必须留审计记录 | 未找到重述记录写入 | 代码缺 | T3 |
 | 调整应带原因；当前无原因字段 | `AccountViewModel.adjustBalance` 只写金额/账户/日期，无 reason（`ViewModels/AccountViewModel.swift:219-238`） | 一致 | 已有缺口，见 T6 |
 | 调整后余额必须相等（有测试） | 测试目录无 `adjustBalance` 相关用例 | 文档错 | 已改：删掉“（有测试）”，注明现状 |
-| §8 每个口径至少一条测试 | 现金流/舍入/重述已有 `ReimbursementLedgerTests`、`CurrencyRebaseTests`、`AppPeriodTests`；退款/坏账等随功能落地 | 一致 | — |
+| §8 每个口径至少一条测试 | 现金流/舍入/重述已有 `ReimbursementLedgerTests`、`CurrencyRebaseTests`、`AppPeriodTests`；退款有 `RefundPolicyTests` / `RefundLedgerTests`；坏账等随功能落地 | 一致 | — |
 
 ## 4. data-portability.md
 
 | 文档主张 | 代码事实 | 结论 | 处理 |
 |---|---|---|---|
 | 设置 → 数据 三个入口（导出 JSON / 导出 CSV / 从备份恢复 / 清除） | `Views/Settings/SettingsView.swift:358`、`Views/Settings/Settings Subviews/SettingsImportView.swift` | 一致 | — |
-| JSON 当前 `schemaVersion` 6 | `Services/ExportSchema.swift:16` | 一致 | — |
+| JSON 当前 `schemaVersion` 7 | `Services/ExportSchema.swift:16` | 一致 | — |
 | JSON 文件含 `settings` | 实际 `Payload.settings` 存在且导出时写入（`ExportSchema.swift:32,99-105`），文档示例漏了该键 | 文档错 | 已改：示例补 `settings` |
 | 金额是账户币种原值 + 冻结 `baseAmount` | `ExportSchema.swift:108-134`、`DataExporter.swift` | 一致 | — |
 | 关系以 id 为主、`categoryName` / `accountName` 兜底 | `Services/DataImporter+Merger.swift` 的 `resolveAccount` / 分类解析 | 一致 | — |
-| schema 6 加 `transferFeeOf`、schema 5 加 `reimbursementOf`、schema 4 加字段 | `git log -S` 确认：`2a21687` 4→5、`11b401b` 5→6；DTO 字段均可选 | 一致 | — |
+| schema 7 加 `refundOf`、schema 6 加 `transferFeeOf`、schema 5 加 `reimbursementOf`、schema 4 加字段 | `git log -S` 确认：`2a21687` 4→5、`11b401b` 5→6；schema 7 的 `refundOf` 新增于本次退款实现；DTO 字段均可选 | 一致 | — |
 | 只有 `schemaVersion > 0` 的文件算备份 | `Services/DataImporter.swift:120-123` | 一致 | — |
 | `settings` 校验：空库采用、有数据且基准币不同则拒绝 | `DataImporter.resolveSettings`（`Services/DataImporter.swift:168-185`） | 一致 | — |
 | `baseCurrency` 永远非空 | `ExportSchema.SettingsDTO.current` 走 `AppBaseCurrency.code`（`ExportSchema.swift:99-105`） | 一致 | — |

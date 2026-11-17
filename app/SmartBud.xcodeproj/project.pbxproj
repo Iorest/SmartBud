@@ -514,6 +514,18 @@
 		AB120000000000000000000F /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
 		AB1200000000000000000010 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
 		AB1200000000000000000011 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB120000000000000000000E /* AccessibilityID.swift */; };
+		E1A2B3C4000000000000F112 /* RefundPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F111 /* RefundPolicy.swift */; };
+		E1A2B3C4000000000000F113 /* RefundPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F111 /* RefundPolicy.swift */; };
+		E1A2B3C4000000000000F114 /* RefundPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F111 /* RefundPolicy.swift */; };
+		E1A2B3C4000000000000F122 /* RefundLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F121 /* RefundLedger.swift */; };
+		E1A2B3C4000000000000F123 /* RefundLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F121 /* RefundLedger.swift */; };
+		E1A2B3C4000000000000F124 /* RefundLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F121 /* RefundLedger.swift */; };
+		E1A2B3C4000000000000F132 /* TransactionViewModel+Refund.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F131 /* TransactionViewModel+Refund.swift */; };
+		E1A2B3C4000000000000F133 /* TransactionViewModel+Refund.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F131 /* TransactionViewModel+Refund.swift */; };
+		E1A2B3C4000000000000F142 /* RefundSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F141 /* RefundSheet.swift */; };
+		E1A2B3C4000000000000F143 /* RefundSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F141 /* RefundSheet.swift */; };
+		E1A2B3C4000000000000F152 /* RefundPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */; };
+		E1A2B3C4000000000000F162 /* RefundLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -805,6 +817,12 @@
 		AB1200000000000000000002 /* SmartBudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmartBudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1200000000000000000007 /* SmartBudUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudUITests.swift; sourceTree = "<group>"; };
 		AB120000000000000000000E /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AccessibilityID.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F111 /* RefundPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/RefundPolicy.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F121 /* RefundLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/RefundLedger.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F131 /* TransactionViewModel+Refund.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionViewModel+Refund.swift"; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F141 /* RefundSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/RefundSheet.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/RefundPolicyTests.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/RefundLedgerTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -868,6 +886,8 @@
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
 				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
 				E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */,
+						E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */,
+						E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */,
 				E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */,
 				E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */,
 				E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */,
@@ -938,6 +958,7 @@
 			children = (
 				F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */,
 				E1A2B3C4000000000000F0C1 /* TransactionViewModel+Reimbursement.swift */,
+						E1A2B3C4000000000000F131 /* TransactionViewModel+Refund.swift */,
 				0FCAF0AE6D414F738BF4836B /* CategoryViewModel.swift */,
 				F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */,
 				F69F2676652B477A97938CFD /* InsightsViewModel.swift */,
@@ -978,6 +999,8 @@
 				E1A2B3C40000000000000B00 /* SettingsRowLink.swift */,
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
+						E1A2B3C4000000000000F111 /* RefundPolicy.swift */,
+						E1A2B3C4000000000000F141 /* RefundSheet.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
 				E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */,
@@ -1057,6 +1080,7 @@
 				E1A2B3C4000000000000F061 /* DataImporter+Merger.swift */,
 				E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */,
 				E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */,
+						E1A2B3C4000000000000F121 /* RefundLedger.swift */,
 				E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */,
 				E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */,
 				A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */,
@@ -1540,6 +1564,10 @@
 		E1A2B3C4000000000000F062 /* DataImporter+Merger.swift in Sources */,
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */,
 		E1A2B3C4000000000000F0A2 /* ReimbursementLedger.swift in Sources */,
+		E1A2B3C4000000000000F112 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F122 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F132 /* TransactionViewModel+Refund.swift in Sources */,
+		E1A2B3C4000000000000F142 /* RefundSheet.swift in Sources */,
 		E1A2B3C4000000000000F0D2 /* TransferFeeLedger.swift in Sources */,
 		E1A2B3C4000000000000F0E2 /* TransferFeeMigration.swift in Sources */,
 				A16B00B5000000000000B1E1 /* MerchantNormalizer.swift in Sources */,
@@ -1787,6 +1815,10 @@
 				E1A2B3C4000000000000F0A4 /* ReimbursementLedger.swift in Sources */,
 				E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */,
+		E1A2B3C4000000000000F113 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F123 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F152 /* RefundPolicyTests.swift in Sources */,
+		E1A2B3C4000000000000F162 /* RefundLedgerTests.swift in Sources */,
 				E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */,
 				A16B00B5000000000000B1E2 /* MerchantNormalizer.swift in Sources */,
 				A16B00B5000000000000B1E5 /* MerchantSummary.swift in Sources */,
@@ -1960,6 +1992,10 @@
 				E1A2B3C4000000000000F063 /* DataImporter+Merger.swift in Sources */,
 				E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */,
 				E1A2B3C4000000000000F0A3 /* ReimbursementLedger.swift in Sources */,
+		E1A2B3C4000000000000F114 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F124 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F133 /* TransactionViewModel+Refund.swift in Sources */,
+		E1A2B3C4000000000000F143 /* RefundSheet.swift in Sources */,
 				E1A2B3C4000000000000F0D3 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0E3 /* TransferFeeMigration.swift in Sources */,
 				A16B00B5000000000000B1E3 /* MerchantNormalizer.swift in Sources */,

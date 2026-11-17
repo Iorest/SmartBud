@@ -61,6 +61,10 @@ extension DataExporter {
             let type: String
             if txn.adjustment {
                 type = "adjustment"
+            } else if txn.isRefund {
+                // Its own type so a spreadsheet that sums `expense` does not
+                // count a purchase and its refund as two purchases.
+                type = "refund"
             } else {
                 type = txn.income ? "income" : "expense"
             }

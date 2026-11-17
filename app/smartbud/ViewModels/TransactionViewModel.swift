@@ -76,7 +76,18 @@ final class TransactionViewModel {
     /// already been rolled back, so the caller must keep the form open.
     @discardableResult
     func update(_ txn: TransactionModel, with edit: TransactionEdit) -> Bool {
-        txn.note = edit.note
+        // A refund is its own identity: amount, date and account must stay
+        // inside the original's remaining amount and use its frozen rate.
+        // `RefundLedger.update` enforces all of that; the generic form must not
+        // be able to turn a refund into an ordinary expense.
+        if txn.isRefund {
+            if RefundLedger.update(txn, amount: edit.amount, date: edit.date,
+                                   account: edit.account, note: edit.note,
+                                   in: repo.context) != nil {
+                return false
+            }
+            return repo.save()
+        }
         // Re-derive whenever the note changes: the merchant is a projection of
         // it. A balance adjustment names no merchant at all.
         let merchant = txn.adjustment ? nil : MerchantNormalizer.derive(fromNote: edit.note)
@@ -291,6 +302,7 @@ final class TransactionViewModel {
 
     func delete(_ txn: TransactionModel) {
         ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+        RefundLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         repo.save()
@@ -303,6 +315,7 @@ final class TransactionViewModel {
         guard !transactions.isEmpty else { return }
         for txn in transactions {
             ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+            RefundLedger.prepareForDeletion(of: txn, in: repo.context)
             TransferFeeLedger.detachFeeRow(txn, in: repo.context)
             repo.delete(txn)
         }
@@ -315,6 +328,10 @@ final class TransactionViewModel {
     func setCategory(_ category: CategoryModel?, for transactions: [TransactionModel]) {
         guard !transactions.isEmpty else { return }
         for txn in transactions {
+            // A refund belongs to the purchase it gives back; moving it to
+            // another category would detach it from the spend it is meant to
+            // reduce and leave the new category showing a negative purchase.
+            guard !txn.isRefund else { continue }
             // Rows created without a note fall back to the category name, so
             // move that auto-derived note along with the category; a real
             // user-written note is left alone.
@@ -370,6 +387,7 @@ final class TransactionViewModel {
         // into the pending list. The rows are deleted but not saved, so
         // `rollback()` still restores the pair as a whole.
         ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
+        RefundLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         pendingDelete = PendingDelete(snapshot: snapshot)

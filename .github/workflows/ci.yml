@@ -194,6 +194,7 @@ jobs:
               testA7_sameCurrencyTransfer_movesBalancesOnly
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
+              testA10_refund_reducesSpendWithoutIncome
           - key: e2e-entry
             label: e2e 记账/编辑
             filter: only
@@ -203,6 +204,7 @@ jobs:
               testA3_invalidInput_isRefusedWithMessage
               testA4_discountClaimFutureDate_staysOutOfStats
               testA5_editAmount_updatesStats_typeSwitchClearsCategory
+              testA10_refund_reducesSpendWithoutIncome
           - key: e2e-ledger
             label: e2e 删除/转账/预算
             filter: only

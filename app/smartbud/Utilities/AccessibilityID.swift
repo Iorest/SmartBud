@@ -85,6 +85,12 @@ enum AccessibilityID {
     /// mode (the pad's bottom-left key is the decimal point there).
     static let entryAmountDelete = "sb.entry.amountDelete"
 
+    // MARK: - Refund sheet
+
+    static let refundAmount = "sb.refund.amount"
+    static let refundRemaining = "sb.refund.remaining"
+    static let refundSave = "sb.refund.save"
+
     // MARK: - Number pad
 
     static func padDigit(_ digit: Int) -> String { "sb.pad.digit.\(digit)" }

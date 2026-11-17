@@ -15,7 +15,7 @@ extension TransactionViewModel {
     /// Turns the claim flag on/off. Only expenses can be claimed back, and
     /// clearing the flag also clears the "paid back" date.
     func setReimbursable(_ reimbursable: Bool, for txn: TransactionModel) {
-        let allowed = reimbursable && !txn.income && !txn.adjustment
+        let allowed = reimbursable && !txn.income && !txn.adjustment && !txn.isRefund
         guard txn.reimbursable != allowed else { return }
         txn.reimbursable = allowed
         if !allowed {

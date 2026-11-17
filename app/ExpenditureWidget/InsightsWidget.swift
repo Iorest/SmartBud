@@ -111,13 +111,13 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
         let allTransactions = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         let transactions = allTransactions.filter {
-            let counted = income ? $0.countsAsIncome : $0.countsAsSpend
+            let counted = income ? $0.countsAsIncome : ($0.countsAsSpend || $0.isRefund)
             return counted && $0.wrappedDate >= period.startDate && $0.wrappedDate <= now
         }
         let allCategories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
         let categories = allCategories.filter { $0.income == income }
 
-        let series = bucketSeries(for: transactions, period: period, calendar: calendar)
+        let series = bucketSeries(for: transactions, period: period, calendar: calendar, income: income)
         let elapsed = Calendar.current.dateComponents([period.elapsedUnit],
                                                       from: period.startDate, to: now)
         let divisor = (elapsed.value(for: period.elapsedUnit) ?? 0) + 1
@@ -131,7 +131,8 @@ struct InsightsProvider: AppIntentTimelineProvider {
             dateDictionary: series.byDate,
             categories: categoryBreakdown(transactions: transactions,
                                           categories: categories,
-                                          total: series.total)
+                                          total: series.total,
+                                          income: income)
         )
     }
 
@@ -161,7 +162,8 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     private func bucketSeries(for transactions: [TransactionModel],
                               period: PeriodSpec,
-                              calendar: Calendar) -> BucketSeries {
+                              calendar: Calendar,
+                              income: Bool) -> BucketSeries {
         var dates: [Date] = []
         var byDate: [Date: Double] = [:]
         var total = 0.0
@@ -173,7 +175,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
             let next = calendar.date(byAdding: period.step, value: period.value, to: cursor) ?? cursor
             let bucket = transactions
                 .filter { $0.wrappedDate >= cursor && $0.wrappedDate < next }
-                .reduce(0.0) { $0 + $1.wrappedBaseAmount }
+                .reduce(0.0) { $0 + (income ? $1.wrappedBaseAmount : max(0, $1.spendBaseAmount)) }
 
             total += bucket
             byDate[cursor] = bucket
@@ -189,13 +191,16 @@ struct InsightsProvider: AppIntentTimelineProvider {
 
     private func categoryBreakdown(transactions: [TransactionModel],
                                    categories: [CategoryModel],
-                                   total: Double) -> [HoldingCategory] {
+                                   total: Double,
+                                   income: Bool) -> [HoldingCategory] {
         guard total > 0 else { return [] }
         return categories.compactMap { category in
+            // Refunds net out of their category; a category fully refunded
+            // has no share of the total to show.
             let amount = transactions
                 .filter { $0.category == category }
-                .reduce(0.0) { $0 + $1.wrappedBaseAmount }
-            guard amount != 0 else { return nil }
+                .reduce(0.0) { $0 + (income ? $1.wrappedBaseAmount : $1.spendBaseAmount) }
+            guard amount > 0 else { return nil }
             return HoldingCategory(colour: category.wrappedColour,
                                    name: category.wrappedName,
                                    percent: amount / total)
