@@ -175,12 +175,15 @@ struct InsightsProvider: AppIntentTimelineProvider {
             let next = calendar.date(byAdding: period.step, value: period.value, to: cursor) ?? cursor
             let bucket = transactions
                 .filter { $0.wrappedDate >= cursor && $0.wrappedDate < next }
-                .reduce(0.0) { $0 + (income ? $1.wrappedBaseAmount : max(0, $1.spendBaseAmount)) }
+                .reduce(0.0) { $0 + (income ? $1.wrappedBaseAmount : $1.spendBaseAmount) }
+            // The bar cannot draw below zero; the total still carries the
+            // refund so the headline matches the app's net figure.
+            let bar = max(0, bucket)
 
             total += bucket
-            byDate[cursor] = bucket
-            maximum = max(maximum, bucket)
-            if bucket != 0 { activeDays += 1 }
+            byDate[cursor] = bar
+            maximum = max(maximum, bar)
+            if bar != 0 { activeDays += 1 }
             dates.append(cursor)
             cursor = next
         }

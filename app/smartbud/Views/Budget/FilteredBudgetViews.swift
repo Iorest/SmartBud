@@ -3,7 +3,12 @@ import SwiftUI
 import SwiftData
 
 struct FilteredCategoryDayBudgetView: View {
-    @Query private var transactions: [TransactionModel]
+    /// The query stays deliberately simple: SwiftData's `#Predicate` cannot
+    /// call computed properties, and composing "spend or refund, same day,
+    /// same category, not future" inside the macro made the type checker give
+    /// up. The rows are filtered below, in memory, through the same three
+    /// rules every other spend view uses.
+    @Query private var fetchedTransactions: [TransactionModel]
     @Environment(OverallTransactionManager.self) private var transactionManager
     @Binding var totalSpent: Double
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -12,6 +17,20 @@ struct FilteredCategoryDayBudgetView: View {
     }
 
     var date: Date
+
+    private let categoryFilter: CategoryModel?
+
+    /// Normal spend plus refunds (a refund reduces its category's spend).
+    private var transactions: [TransactionModel] {
+        fetchedTransactions.filter { txn in
+            guard (txn.day ?? .distantPast) == date, txn.wrappedDate <= .now else {
+                return false
+            }
+            guard txn.countsAsSpend || txn.isRefund else { return false }
+            guard let categoryFilter else { return true }
+            return txn.category?.id == categoryFilter.id
+        }
+    }
 
     @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
     @AppStorage("swapTimeLabel", store: .appGroup) var swapTimeLabel: Bool = false
@@ -66,38 +85,34 @@ struct FilteredCategoryDayBudgetView: View {
 
     init(category: CategoryModel?, day: Date, totalSpent: Binding<Double>) {
         date = day
-        let now = Date.now
-        let past = Date.distantPast
-        let future = Date.distantFuture
-
-        if let unwrappedCategory = category {
-            let categoryId = unwrappedCategory.id
-            // Refund rows belong in the list too: they explain why the total
-            // is lower than the receipts show.
-            _transactions = Query(filter: #Predicate<TransactionModel> {
-                (($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
-                    && ($0.date ?? future) <= now && $0.category?.id == categoryId)
-                    || (($0.day ?? past) == day && $0.refundOf != nil
-                    && ($0.date ?? future) <= now && $0.category?.id == categoryId)
-            }, sort: [SortDescriptor(\.date, order: .reverse)])
-        } else {
-            _transactions = Query(filter: #Predicate<TransactionModel> {
-                (($0.day ?? past) == day && !$0.income && !$0.adjustment && !$0.reimbursable
-                    && ($0.date ?? future) <= now)
-                    || (($0.day ?? past) == day && $0.refundOf != nil
-                    && ($0.date ?? future) <= now)
-            }, sort: [SortDescriptor(\.date, order: .reverse)])
-        }
-
+        categoryFilter = category
+        _fetchedTransactions = Query(sort: [SortDescriptor(\.date, order: .reverse)])
         _totalSpent = totalSpent
     }
 }
 
 struct FilteredBudgetView: View {
-    @Query private var transactions: [TransactionModel]
+    /// Same split as the day view: the query stays unfiltered, the period and
+    /// the spend/refund rule are applied below (see the comment there).
+    @Query private var fetchedTransactions: [TransactionModel]
 
     @Binding var totalSpent: Double
     var date: Date
+
+    private let categoryFilter: CategoryModel?
+    private let periodStart: Date
+    /// Exclusive end, already clipped to now.
+    private let periodEnd: Date
+
+    private var transactions: [TransactionModel] {
+        fetchedTransactions.filter { txn in
+            let when = txn.wrappedDate
+            guard when >= periodStart, when < periodEnd else { return false }
+            guard txn.countsAsSpend || txn.isRefund else { return false }
+            guard let categoryFilter else { return true }
+            return txn.category?.id == categoryFilter.id
+        }
+    }
 
     @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
@@ -224,28 +239,10 @@ struct FilteredBudgetView: View {
         let periodEnd = calendar.date(byAdding: component, value: step, to: startDate) ?? .now
         let endDate = min(periodEnd, .now)
 
-        let past = Date.distantPast
-        let future = Date.distantFuture
-
-        if let unwrappedCategory = category {
-            let categoryId = unwrappedCategory.id
-            _transactions = Query(filter: #Predicate<TransactionModel> {
-                ((!$0.income && !$0.adjustment && !$0.reimbursable)
-                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
-                    && $0.category?.id == categoryId)
-                    || ($0.refundOf != nil
-                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate
-                    && $0.category?.id == categoryId)
-            })
-        } else {
-            _transactions = Query(filter: #Predicate<TransactionModel> {
-                ((!$0.income && !$0.adjustment && !$0.reimbursable)
-                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate)
-                    || ($0.refundOf != nil
-                    && ($0.date ?? past) >= startDate && ($0.date ?? future) < endDate)
-            })
-        }
-
+        categoryFilter = category
+        periodStart = startDate
+        periodEnd = endDate
+        _fetchedTransactions = Query(sort: [SortDescriptor(\.date, order: .reverse)])
         _totalSpent = totalSpent
     }
 }
