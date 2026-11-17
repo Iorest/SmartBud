@@ -89,16 +89,25 @@ struct LogTransactionRow: View {
 
         let isRepayment = transaction.isReimbursementIncome
         let isRefund = transaction.isRefund
+        let isWriteOff = transaction.isBadDebt
+        let writtenOff = transaction.isWrittenOffClaim
 
         if transaction.adjustment || transaction.reimbursable || isRepayment
-            || isRefund || showsDiscount {
+            || isRefund || isWriteOff || showsDiscount {
             HStack(spacing: 4) {
                 if transaction.adjustment {
                     badge(String.appLocalized("Balance Adjustment"), tint: Color.SubtitleText)
                 }
                 if transaction.reimbursable {
-                    badge(String.appLocalized(pending ? "Pending" : "Reimbursed"),
-                          tint: pending ? Color.orange : Color.IncomeGreen)
+                    if writtenOff {
+                        badge(String.appLocalized("Written Off"), tint: Color.AlertRed)
+                    } else {
+                        badge(String.appLocalized(pending ? "Pending" : "Reimbursed"),
+                              tint: pending ? Color.orange : Color.IncomeGreen)
+                    }
+                }
+                if isWriteOff {
+                    badge(String.appLocalized("Bad Debt"), tint: Color.AlertRed)
                 }
                 if isRepayment {
                     badge(String.appLocalized("Reimbursement"), tint: Color.IncomeGreen)

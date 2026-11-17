@@ -13,7 +13,7 @@ import Foundation
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
     /// Old values are never reused.
-    static let version: Int = 7
+    static let version: Int = 8
 
     struct Payload: Codable {
         var exportDate: Date
@@ -135,6 +135,14 @@ enum ExportSchema {
         /// On the expense row that pays a transfer's fee: the id of the transfer.
         var transferFeeOf: UUID?
         var adjustment: Bool?
+        /// On the expense row that writes off a claim (schema 8): the id of the
+        /// claim. Optional so files written before 8 still decode — their
+        /// unwritten-off claims simply stay claims.
+        var badDebtOf: UUID?
+        /// Why the claim was written off (`BadDebtPolicy.Reason` raw value).
+        var badDebtReason: String?
+        /// On a written-off claim: the day the money was given up on.
+        var badDebtAt: Date?
     }
 
     struct AccountDTO: Codable {

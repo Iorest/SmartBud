@@ -19,6 +19,8 @@ class OverallTransactionManager {
     /// edit. Kept apart from `toEdit` because a refund is created without
     /// going through the transaction form.
     var toRefund: RefundTarget?
+    /// The write-off sheet: giving up on a claim that will never be paid back.
+    var toBadDebt: BadDebtTarget?
     var showPopup: Bool = false
     var future: Bool = false
 }
@@ -316,6 +318,9 @@ extension HomeView {
         }
         .sheet(item: $transactionManager.toRefund) { target in
             RefundSheet(target: target)
+        }
+        .sheet(item: $transactionManager.toBadDebt) { target in
+            BadDebtSheet(claim: target.claim)
         }
         .fullScreenPresentation(isPresented: $addTransaction, onDismiss: {
             if confetti && transactionCountBeforeAdd != transactions.count {

@@ -19,6 +19,8 @@ struct PendingReimbursementSheet: View {
     @AppStorage("currency", store: .appGroup) private var currency: String =
         Locale.current.currency?.identifier ?? "USD"
     @AppStorage("showCents", store: .appGroup) private var showCents: Bool = true
+    /// The claim being written off, if the sheet is open.
+    @State private var writeOffTarget: BadDebtTarget?
 
     var body: some View {
         NavigationStack {
@@ -44,11 +46,29 @@ struct PendingReimbursementSheet: View {
                                               systemImage: "checkmark.circle")
                                     }
                                     .tint(Color.IncomeGreen)
+
+                                    // A claim nobody paid back becomes a real
+                                    // expense instead of waiting forever. The
+                                    // action only appears after the waiting
+                                    // period (`BadDebtPolicy.thresholdDays`).
+                                    if transactionVM.canWriteOff(transaction) {
+                                        Button {
+                                            writeOffTarget = BadDebtTarget(claim: transaction)
+                                        } label: {
+                                            Label(String.appLocalized("Write Off"),
+                                                  systemImage: "xmark.bin")
+                                        }
+                                        .tint(Color.AlertRed)
+                                    }
                                 }
                         }
                     } footer: {
-                        Text(String.appLocalized(
-                            "Swipe a row to record that the money came back."))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(String.appLocalized(
+                                "Swipe a row to record that the money came back."))
+                            Text(String.appLocalized(
+                                "Money nobody pays back can be written off after 90 days, so it stops being invisible."))
+                        }
                     }
                 }
             }
@@ -63,6 +83,9 @@ struct PendingReimbursementSheet: View {
             }
         }
         .onAppear { insightsVM.refreshAll() }
+        .sheet(item: $writeOffTarget) { target in
+            BadDebtSheet(claim: target.claim)
+        }
     }
 
     private func row(_ transaction: TransactionModel) -> some View {
