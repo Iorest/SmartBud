@@ -61,6 +61,9 @@ struct TransactionView: View {
     @State var showToast = false
     @State var toastTitle = ""
     @State var toastImage = ""
+    /// Refusals and save failures stay on screen until the user edits the
+    /// form; "Saved" keeps the 2 s window.
+    @State var toastSticks = false
 
     /// Keeps the form open after saving (Settings → Number Entry, or a
     /// one-off long-press on the checkmark).
@@ -200,6 +203,7 @@ struct TransactionView: View {
         ) {
             toastImage = validationError.systemImage
             toastTitle = String.appLocalized(validationError.toastTitleKey)
+            toastSticks = true
             showToast = true
             if validationError.highlightsFields {
                 toggleFieldColors()
@@ -236,6 +240,7 @@ struct TransactionView: View {
             errorHaptic &+= 1
             toastImage = "exclamationmark.triangle"
             toastTitle = String.appLocalized("无法保存更改，请稍后重试。")
+            toastSticks = true
             showToast = true
             isSubmitting = false
             return
@@ -276,11 +281,20 @@ struct TransactionView: View {
             errorHaptic &+= 1
             toastImage = "exclamationmark.triangle"
             toastTitle = String.appLocalized("无法保存更改，请稍后重试。")
+            toastSticks = true
             showToast = true
             isSubmitting = false
             return
         }
         dismiss()
+    }
+
+    /// Drops a sticky message once the user changes the form: the next digit,
+    /// date or income switch is the signal that they have read it.
+    func clearStickyToast() {
+        guard toastSticks else { return }
+        toastSticks = false
+        showToast = false
     }
 
     /// Closes the form, or keeps it open in continuous-entry mode.
@@ -304,6 +318,7 @@ struct TransactionView: View {
         reimbursable = false
         toastImage = "checkmark.circle.fill"
         toastTitle = String.appLocalized("Saved")
+        toastSticks = false
         showToast = true
         // Without this the guard at the top of `submit()` would swallow the
         // next tap; `dismiss()` used to make the reset unnecessary.

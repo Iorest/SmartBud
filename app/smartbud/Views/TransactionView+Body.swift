@@ -107,6 +107,10 @@ extension TransactionView {
             if showToast {
                 SBToast(title: toastTitle, systemImage: toastImage)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    // Sticky refusals stay until edited; tapping the message
+                    // is the explicit "I read it" for users who want the
+                    // income/expense picker back first.
+                    .onTapGesture { clearStickyToast() }
             } else {
                 Picker(String.appLocalized("Type"), selection: $income) {
                     Text(String.appLocalized("Expense")).tag(false)
