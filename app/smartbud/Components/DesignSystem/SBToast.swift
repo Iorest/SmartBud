@@ -41,22 +41,32 @@ extension View {
     /// Hides `isPresented` after `after`. The timer is tied to the flag's
     /// identity, so a second message restarts the window instead of being
     /// cut short by the previous message's timer.
+    ///
+    /// Pass `nil` for messages that must outlive a fixed window: a validation
+    /// refusal is unreadable in 2 s with VoiceOver, and a UI test's first
+    /// accessibility snapshot can arrive several seconds after the tap. The
+    /// caller clears the flag when the user next edits the form.
     func sbToastDismissal(_ isPresented: Binding<Bool>,
-                          after: Duration = .seconds(2)) -> some View {
+                          after: Duration? = .seconds(2)) -> some View {
         modifier(SBToastDismissalModifier(isPresented: isPresented, duration: after))
     }
 }
 
 private struct SBToastDismissalModifier: ViewModifier {
     @Binding var isPresented: Bool
-    let duration: Duration
+    let duration: Duration?
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content.task(id: isPresented) {
-            guard isPresented else { return }
-            try? await Task.sleep(for: duration)
-            guard !Task.isCancelled else { return }
-            isPresented = false
+        if let duration {
+            content.task(id: isPresented) {
+                guard isPresented else { return }
+                try? await Task.sleep(for: duration)
+                guard !Task.isCancelled else { return }
+                isPresented = false
+            }
+        } else {
+            content
         }
     }
 }
