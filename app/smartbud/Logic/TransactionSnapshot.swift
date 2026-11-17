@@ -32,6 +32,10 @@ struct TransactionSnapshot {
     /// income and a fee row belongs to its transfer. Dropping them on restore
     /// turned a neutral 88 back into 88 of earnings.
     let reimbursementOf: UUID?
+    /// On a refund row: the purchase it gives back. Without it an undo would
+    /// restore the money as an ordinary expense-shaped row that counts as
+    /// spend instead of reducing it.
+    let refundOf: UUID?
     let transferFeeOf: UUID?
     let adjustment: Bool
     /// Merchant is a projection of the note, but a restore has to bring back
@@ -57,6 +61,7 @@ struct TransactionSnapshot {
         reimbursable = txn.reimbursable
         reimbursedAt = txn.reimbursedAt
         reimbursementOf = txn.reimbursementOf
+        refundOf = txn.refundOf
         transferFeeOf = txn.transferFeeOf
         adjustment = txn.adjustment
         merchant = txn.merchant
@@ -80,6 +85,7 @@ struct TransactionSnapshot {
             discount: discount,
             reimbursable: reimbursable,
             reimbursementOf: reimbursementOf,
+            refundOf: refundOf,
             transferFeeOf: transferFeeOf,
             adjustment: adjustment,
             merchant: merchant,

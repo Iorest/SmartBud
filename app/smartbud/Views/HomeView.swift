@@ -15,6 +15,10 @@ import SwiftUI
 class OverallTransactionManager {
     var toEdit: TransactionModel?
     var toDelete: TransactionModel?
+    /// The refund sheet: a new refund for the original, or an existing row to
+    /// edit. Kept apart from `toEdit` because a refund is created without
+    /// going through the transaction form.
+    var toRefund: RefundTarget?
     var showPopup: Bool = false
     var future: Bool = false
 }
@@ -309,6 +313,9 @@ extension HomeView {
         }
         .fullScreenPresentation(item: $transactionManager.toEdit) { transaction in
             TransactionView(toEdit: transaction)
+        }
+        .sheet(item: $transactionManager.toRefund) { target in
+            RefundSheet(target: target)
         }
         .fullScreenPresentation(isPresented: $addTransaction, onDismiss: {
             if confetti && transactionCountBeforeAdd != transactions.count {

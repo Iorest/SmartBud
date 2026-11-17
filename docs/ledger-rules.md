@@ -16,12 +16,13 @@
 | 普通收入 | `income = true` | 真的赚到了 |
 | 报销支出 | `reimbursable = true`（`reimbursedAt` 表示已回款） | 垫付，钱会回来 |
 | 报销回款 | `income = true` + `reimbursementOf = <报销支出的 id>` | 公司/同事把钱还回来 |
+| 退款 | `refundOf = <原支出 id>`，`income = false` | 钱退回来了，冲减原分类的支出；**不是收入** |
 | 余额调整 | `adjustment = true` | 只是把账面数字改对，不是消费 |
 
-待实现的三种身份——退款（冲减原支出，不得记为收入）、坏账（核销为费用）、
-分期本金/利息（本金不进费用、利息进费用）——规则见
-[accounting-conventions.md](accounting-conventions.md) 第 2 节。在它们实现之前，
-不要用"记一笔收入"来模拟退款，也不要用删行来处理不回款的报销。
+待实现的两种身份——坏账（核销为费用）、分期本金/利息（本金不进费用、利息进费用）
+——规则见 [accounting-conventions.md](accounting-conventions.md) 第 2 节。在它们实现之前，
+不要用删行来处理不回款的报销。退款已按第 2 节实现（`RefundLedger`），
+也不要再用"记一笔收入"来模拟。
 
 **报销是一对两行，不能只有一半。** 只标记「已报销」而不记账，账户余额会永远少那笔钱；
 只记一笔收入而不标记，收入会凭空多出来。所以核销时由 `ReimbursementLedger` 自动写入
@@ -34,17 +35,17 @@
 
 ## 影响面
 
-| 用途 | 普通支出 | 普通收入 | 报销支出 | 报销回款 | 余额调整 | 转账 |
-|---|---|---|---|---|---|---|
-| 账户余额 | 计入 | 计入 | **计入**（钱确实出去了） | **计入**（钱确实回来了） | **计入** | 转出扣 `amount`，转入加 `receivedAmount`；手续费由独立支出行扣 |
-| 支出统计 / 分类占比 / 柱状图 | 计入 | — | 不计入 | 不计入 | 不计入 | 转账本身不计入；**手续费行计入** |
-| 收入统计 | — | 计入 | — | **不计入** | 不计入 | — |
-| 净收入（收入 − 支出） | 计入 | 计入 | 不计入 | 不计入 | 不计入 | 不计入 |
-| 预算剩余 | 计入 | — | 不计入 | 不计入 | 不计入 | 不计入 |
-| 流水日小计 | 计入 | 计入 | 0 | 0 | 0 | 0 |
-| 「待报销」卡片 | — | — | 未回款的计入 | — | — | — |
-| AI 账单分析 | 计入 `totalSpent` | 计入 `totalIncome` | 单独字段 `pendingReimbursement` | 不计入 | 不计入 | 不计入 |
-| 小组件 | 同 App | 同 App | 不计入 | 不计入 | 不计入 | 不计入 |
+| 用途 | 普通支出 | 普通收入 | 报销支出 | 报销回款 | 退款 | 余额调整 | 转账 |
+|---|---|---|---|---|---|---|---|
+| 账户余额 | 计入 | 计入 | **计入**（钱确实出去了） | **计入**（钱确实回来了） | **计入**（到账账户加回） | **计入** | 转出扣 `amount`，转入加 `receivedAmount`；手续费由独立支出行扣 |
+| 支出统计 / 分类占比 / 柱状图 | 计入 | — | 不计入 | 不计入 | **负向冲减**（到账当期） | 不计入 | 转账本身不计入；**手续费行计入** |
+| 收入统计 | — | 计入 | — | **不计入** | **不计入** | 不计入 | — |
+| 净收入（收入 − 支出） | 计入 | 计入 | 不计入 | 不计入 | 通过冲减支出计入 | 不计入 | 不计入 |
+| 预算剩余 | 计入 | — | 不计入 | 不计入 | **冲减**（到账当期） | 不计入 | 不计入 |
+| 流水日小计 | 计入 | 计入 | 0 | 0 | **计入（正）** | 0 | 0 |
+| 「待报销」卡片 | — | — | 未回款的计入 | — | — | — | — |
+| AI 账单分析 | 计入 `totalSpent` | 计入 `totalIncome` | 单独字段 `pendingReimbursement` | 不计入 | 从 `totalSpent` 扣减 | 不计入 | 不计入 |
+| 小组件 | 同 App | 同 App | 不计入 | 不计入 | 冲减支出 | 不计入 | 不计入 |
 
 一对报销的净效果永远是 0：账户 −88 再 +88，支出和收入都不变，日小计也不变
 （流水里两行加起来正好抵消）。
@@ -52,9 +53,10 @@
 实现上只有三个判定，全部在 `TransactionModel` 的扩展里：
 
 ```swift
-countsAsSpend   // !income && !adjustment && !reimbursable
-countsAsIncome  // income && !adjustment && !isReimbursementIncome
-signedBaseAmount // 收入 +base，支出 -base，其余 0
+countsAsSpend    // !income && !adjustment && !reimbursable && !isRefund
+countsAsIncome   // income && !adjustment && !isReimbursementIncome
+spendBaseAmount  // 支出 +base，退款 -base，其余 0（所有"花了多少"一律用它）
+signedBaseAmount // 收入 +base，退款 +base，支出 -base，其余 0
 ```
 
 **所有统计代码都必须走这三个判定**，不要再手写 `!$0.income` —— 那正是
@@ -66,10 +68,10 @@ SQL 侧的 `#Predicate` 同样不能表达 `reimbursementOf != nil` 之外的组
 取所有回款行再在内存里比较 id。
 
 例外只有一处：SwiftData 的 `#Predicate` 不能调用计算属性，预算明细的查询里
-必须把三个标记写全：
+必须把标记写全，并把退款行单独并进来（它的 `spendBaseAmount` 为负）：
 
 ```swift
-!$0.income && !$0.adjustment && !$0.reimbursable
+(!$0.income && !$0.adjustment && !$0.reimbursable) || $0.refundOf != nil
 ```
 
 改动其中任何一个标记时，记得同步 `FilteredBudgetViews` 里的谓词。

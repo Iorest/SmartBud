@@ -108,13 +108,13 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
         let filteredTxns = allTxns.filter {
             guard let categoryID = budgetCategory?.id else { return false }
-            return $0.countsAsSpend
+            return ($0.countsAsSpend || $0.isRefund)
                 && $0.wrappedDate >= budgetStartDate
                 && $0.wrappedDate <= now
                 && $0.category?.id == categoryID
         }
 
-        let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.wrappedBaseAmount)))
+        let holdingTotal = Money.double(Money.sum(filteredTxns.map(\.spendBaseAmount)))
 
         let returnBudget = HoldingBudget(
             type: budgetModel.type,

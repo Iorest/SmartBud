@@ -49,7 +49,7 @@ TemplateTransactionModel                 快捷记账模板
 
 | 实体 | 关键字段 | 不变量 |
 |---|---|---|
-| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring`, `merchant?`, `merchantKey?` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`adjustment` 行无分类、不进统计；`merchantKey == nil` 当且仅当 `merchant == nil` |
+| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `reimbursementOf?`, `refundOf?`, `transferFeeOf?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring`, `merchant?`, `merchantKey?` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`adjustment` 行无分类、不进统计；`merchantKey == nil` 当且仅当 `merchant == nil` |
 | `CategoryModel` | `name`, `emoji`, `colour`, `income`, `order` | `income` 决定它能挂在哪类记录上 |
 | `AccountModel` | `kind`, `currencyCode`, `openingBalance`, `hidden`, `archived`, `order` | `archived ⇒ 不出现在默认列表/总资产/转账端点` |
 | `TransferModel` | `amount`, `destinationAmount`, `fee`, `source`, `destination` | `amount > 0`；`fee >= 0`；跨币种时 `destinationAmount > 0`；`source != destination` |
@@ -185,15 +185,16 @@ TemplateTransactionModel                 快捷记账模板
 
 ### 6.6 预算
 
-- 分类预算只统计该分类的 `countsAsSpend`；总预算统计全部 `countsAsSpend`。
-- 报销与调整不计入；转账不计入。
+- 分类预算统计该分类的 `spendBaseAmount`（退款为负）；总预算统计全部 `spendBaseAmount`。
+- 报销与调整不计入；转账不计入；退款冲减到账当期。
 - 周期到期自动滚动；历史周期不保留快照（按记录实时算）。
 - 无分类的预算视为脏数据：剩余显示为全额，不匹配任何交易。
 
 ### 6.7 统计
 
 - 周期：周 / 月 / 年；区间受 `firstDayOfMonth`、`firstWeekday` 影响。
-- 支出 = `countsAsSpend` 的 `baseAmount` 合计；收入 = `countsAsIncome`；净 = 收入 − 支出。
+- 支出 = `spendBaseAmount` 合计（退款为负，冲减到账当期）；收入 = `countsAsIncome` 的
+  `baseAmount` 合计；净 = 收入 − 支出。
 - 分类占比只到支出分类；柱状图按周期分桶。
 - 商户维度按 `merchantKey` 聚合（`MerchantSummary`，最多 6 行，金额降序）：同一商户的多种写法是一行，未识别的行不进榜。
 - 待报销单独成卡，跨期统计，永不混入支出。
@@ -335,7 +336,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 
 ## 10. 版本与迁移
 
-- 导出格式 `ExportSchema.version`（当前 6）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
+- 导出格式 `ExportSchema.version`（当前 7，schema 7 新增 `refundOf`）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
 - App 内数据迁移：新字段一律带默认值，依赖 SwiftData 轻量迁移；不允许"改字段类型"。
 - 商户字段（`merchant` / `merchantKey`）是可选普通字段：轻量迁移后为 `nil`，由 `MerchantMigration` 在启动与导入后从备注回填，可重入。JSON 备份不携带这两个字段（避免为一个可推导值升 schemaVersion），恢复后同样靠回填补齐。
 - 废弃策略：字段先保留、停止写入，至少一个大版本后再删（CloudKit 上删字段同样要部署）。
@@ -347,7 +348,6 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 | 多账本 | `bookID` 贯穿交易/分类/账户/预算/模板 + 当前账本设置 | 所有查询、统计、小组件、导入导出；属于结构性改动 |
 | 存钱目标 | 新实体 `SavingsGoalModel`（目标额、截止日、关联账户或独立余额） | 账户页/统计页新增区块；不影响现有口径 |
 | 分期 | 新实体 `InstallmentPlanModel` + 生成计划交易（本金/手续费拆分） | 与报销类似，需要"计划支出"这种新身份，先改口径表 |
-| 退款 | `refundOf` 指向原支出 + 已退金额累加；统计按负向冲减原分类 | 影响统计、预算、分类占比、导出 schema；不得记为收入 |
 | 坏账 | `badDebtOf` 费用行 + 原因枚举 | 只影响待报销列表与费用口径，不动账户余额 |
 | Apple Watch | 新 target + App Group 只读 + 极简记账 Intent | 不改变模型，但要同步 schema 与本地化 |
 
@@ -365,7 +365,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 | ~~P2~~ | 类型筛选包含余额调整 | ✅ 类型筛选排除 `adjustment` |
 | ~~P2~~ | 导入无预览 | ✅ 选文件后先显示"备份日期 + N 条记录"，确认后才写库 |
 | ~~P2~~ | 本地化无校验 | ✅ `LocalizationCoverageTests` 扫描源码字面量与 SettingsKeys 常量，并校验三语齐全 |
-| **P1** | 退款身份缺失 | 未实现：退款只能记成收入，虚增收入与净收入 |
+| ~~P1~~ | 退款身份缺失 | ✅ 已实现：`refundOf` 退款行 + `spendBaseAmount` 负向冲减 + 导出 schema 7；退款不计收入 |
 | **P1** | 净资产与信用卡 | 未实现：`kind = credit` 只影响图标，没有额度、账单日与净资产口径 |
 | **P2** | 基准币重述无审计 | 未实现：切换基准币折算历史后没有记录，半年后无法解释数字差异 |
 

@@ -132,14 +132,14 @@ xcodebuild test \
 不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
 `-only-testing:SmartBudTests`。
 
-17 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成五个
+18 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成五个
 分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），
 其余四个分片按**实测用例耗时**均衡分 E2E：
 
 | 分片 | 用例 | 实测用例耗时（run 44026222552） |
 | --- | --- | --- |
 | `e2e 记账/校验` | A1–A3 | 353 s |
-| `e2e 折扣/编辑` | A4–A5 | 327 s |
+| `e2e 折扣/编辑` | A4–A5、A10 | 327 s（A10 新加，未单独计时） |
 | `e2e 删除/转账` | A6–A7 | 405 s |
 | `e2e 跨币种/预算` | A8–A9 | 383 s |
 
@@ -270,11 +270,11 @@ CI 的 `test` job 在「Select Xcode 26」之后跑它（那时 `swiftc` 一定�
 # 需要一个 Linux Swift 工具链（6.0+），装机后：
 export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swift 放进 PATH
 scripts/linux-tests.sh
-# 输出：✔ Test run with 69 tests in 8 suites passed after 0.014 seconds.
+# 输出：✔ Test run with 79 tests in 9 suites passed after 0.014 seconds.
 ```
 
 覆盖的 suite：`AppPeriod` / `CSVTable` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` /
-`MoneyFormatting` / `ProAccess` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
+`MoneyFormatting` / `ProAccess` / `Refund policy` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
 
 **不覆盖**：SwiftUI 视图、SwiftData 模型、CloudKit、StoreKit、`ExpenseTextParser` 的
 NaturalLanguage 商户抽取、本地化格式化（`AppLocale` / `AppLanguage` 用的是 Apple 专属 API，

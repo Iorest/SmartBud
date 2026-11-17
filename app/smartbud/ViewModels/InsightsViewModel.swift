@@ -98,7 +98,9 @@ final class InsightsViewModel {
             guard let date = txn.date else { return false }
             return date >= periodStart && date < periodEnd && date <= now
         }
-        let spent = Money.sum(inPeriod.filter(\.countsAsSpend).map(\.wrappedBaseAmount))
+        // `spendBaseAmount` is negative on a refund row, so money given back
+        // reduces the period it arrived in without ever touching income.
+        let spent = Money.sum(inPeriod.map(\.spendBaseAmount))
         let inc = Money.sum(inPeriod.filter(\.countsAsIncome).map(\.wrappedBaseAmount))
         let net = inc - spent
         periodTotalSpent = Money.double(spent)
@@ -183,13 +185,15 @@ final class InsightsViewModel {
         let monthLetters = cal.veryShortMonthSymbols      // ["J","F","M",...]
         for index in 0..<count {
             let next = cal.date(byAdding: step, value: 1, to: cursor) ?? cursor
+            // Clamped at zero: Swift Charts' y-axis starts at 0, and a
+            // refund-heavy day would otherwise draw a negative bar. The
+            // period total above stays net.
             let sum = Money.sum(all
-                .filter(\.countsAsSpend)
                 .filter {
                     guard let date = $0.date else { return false }
                     return date >= cursor && date < next && date <= .now
                 }
-                .map(\.wrappedBaseAmount))
+                .map { max(0, $0.spendBaseAmount) })
 
             let label: String
             switch period {
@@ -218,20 +222,24 @@ final class InsightsViewModel {
     func getCategoryBreakdown(for period: Int) -> [PowerCategory] {
         let (periodStart, periodEnd) = getPeriodDateRange(for: period)
         let txns = repo.fetch(TransactionModel.self).filter { txn in
-            guard let date = txn.date, txn.countsAsSpend, let category = txn.category else { return false }
+            guard let date = txn.date, let category = txn.category else { return false }
+            guard txn.countsAsSpend || txn.isRefund else { return false }
             return date >= periodStart && date < periodEnd && date <= .now && !category.income
         }
         var amounts = [UUID: Decimal]()
         var categories = [UUID: CategoryModel]()
         for txn in txns {
             guard let category = txn.category else { continue }
-            amounts[category.id, default: 0] += Money.cents(txn.wrappedBaseAmount)
+            amounts[category.id, default: 0] += Money.cents(txn.spendBaseAmount)
             categories[category.id] = category
         }
         let total = amounts.values.reduce(Decimal.zero, +)
         guard total > 0 else { return [] }
         let entries: [PowerCategory] = amounts.compactMap { (id, amount) in
-            guard let cat = categories[id] else { return nil }
+            // A category whose purchases were fully refunded nets to zero (or
+            // below, if a refund arrived without its purchase in this period);
+            // it has no share of spend to show.
+            guard let cat = categories[id], amount > 0 else { return nil }
             return PowerCategory(id: id, category: cat,
                                  percent: min(1, Money.double(amount / total)),
                                  amount: Money.double(amount))

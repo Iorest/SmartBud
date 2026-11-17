@@ -37,9 +37,12 @@ enum MerchantSummary {
         // "starbucks"), and the biggest one is the one the user recognises.
         var largest = [String: (amount: Decimal, name: String)]()
 
-        for txn in transactions where txn.countsAsSpend {
+        // Refunds count with a negative amount: money given back must not keep
+        // a merchant on the ranking. A key whose rows net to zero or below is
+        // dropped by the `amount > 0` check below.
+        for txn in transactions where txn.countsAsSpend || txn.isRefund {
             guard let key = txn.merchantKey else { continue }
-            let amount = Money.cents(txn.wrappedBaseAmount)
+            let amount = Money.cents(txn.spendBaseAmount)
             amounts[key, default: 0] += amount
             counts[key, default: 0] += 1
             let name = txn.merchant ?? key
@@ -52,7 +55,7 @@ enum MerchantSummary {
         guard total > 0 else { return [] }
 
         let slices: [MerchantSlice] = amounts.compactMap { (key, amount) in
-            guard let entry = largest[key] else { return nil }
+            guard let entry = largest[key], amount > 0 else { return nil }
             return MerchantSlice(
                 id: key,
                 name: entry.name,

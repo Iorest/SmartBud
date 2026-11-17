@@ -99,7 +99,7 @@ struct ReimbursementLedgerTests {
         let afterSpend = AccountBalance.current(
             opening: account.openingBalance,
             transactions: (try context.fetch(FetchDescriptor<TransactionModel>()))
-                .map { (amount: $0.amount, income: $0.income) },
+                .map { (amount: $0.amount, income: $0.income, isRefund: $0.isRefund) },
             transfersIn: 0, transfersOut: 0)
         #expect(afterSpend == 912)
 
@@ -108,7 +108,7 @@ struct ReimbursementLedgerTests {
         let afterSettle = AccountBalance.current(
             opening: account.openingBalance,
             transactions: (try context.fetch(FetchDescriptor<TransactionModel>()))
-                .map { (amount: $0.amount, income: $0.income) },
+                .map { (amount: $0.amount, income: $0.income, isRefund: $0.isRefund) },
             transfersIn: 0, transfersOut: 0)
         #expect(afterSettle == 1000)
     }

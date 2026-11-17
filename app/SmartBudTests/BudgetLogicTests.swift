@@ -131,15 +131,15 @@ struct AccountBalanceTests {
     @Test("Expenses subtract and income adds")
     func mixedTransactions() {
         let balance = AccountBalance.current(opening: 100, transactions: [
-            (amount: 30, income: false),
-            (amount: 50, income: true)
+            (amount: 30, income: false, isRefund: false),
+            (amount: 50, income: true, isRefund: false)
         ])
         #expect(balance == 120)
     }
 
     @Test("Overdraft is negative, not clamped")
     func negativeBalance() {
-        #expect(AccountBalance.current(opening: 10, transactions: [(amount: 35, income: false)]) == -25)
+        #expect(AccountBalance.current(opening: 10, transactions: [(amount: 35, income: false, isRefund: false)]) == -25)
     }
 
     @Test("Transfers move money without touching income or spend")

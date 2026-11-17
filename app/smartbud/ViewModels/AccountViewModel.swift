@@ -95,7 +95,9 @@ final class AccountViewModel {
     func balance(for account: AccountModel) -> Double {
         AccountBalance.current(
             opening: account.openingBalance,
-            transactions: (account.transactions ?? []).map { ($0.amount, $0.income) },
+            transactions: (account.transactions ?? []).map {
+                (amount: $0.amount, income: $0.income, isRefund: $0.isRefund)
+            },
             transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.receivedAmount },
             transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.outgoingTotal }
         )

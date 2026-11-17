@@ -13,12 +13,14 @@ import Foundation
 enum AccountBalance {
     static func current(
         opening: Double,
-        transactions: [(amount: Double, income: Bool)],
+        transactions: [(amount: Double, income: Bool, isRefund: Bool)],
         transfersIn: Double = 0,
         transfersOut: Double = 0
     ) -> Double {
+        // A refund is money coming back even though it is not income, so it
+        // has to move the balance the other way from an expense.
         let spent = transactions.reduce(opening) { total, txn in
-            total + (txn.income ? txn.amount : -txn.amount)
+            total + (txn.income || txn.isRefund ? txn.amount : -txn.amount)
         }
         return spent + transfersIn - transfersOut
     }

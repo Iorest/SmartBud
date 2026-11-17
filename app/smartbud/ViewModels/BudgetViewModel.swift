@@ -110,11 +110,14 @@ final class BudgetViewModel {
         // Shortcuts and the insights screen, which may run first.
         let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type)
             ?? budget.startDate
+        // Refunds count here too: their `spendBaseAmount` is negative, so a
+        // refunded purchase gives the budget its money back in the period the
+        // refund arrived (never the original period).
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
             return date >= start && date <= Date.now
-                && txn.countsAsSpend && txn.category?.id == categoryID
-        }.map(\.wrappedBaseAmount))
+                && (txn.countsAsSpend || txn.isRefund) && txn.category?.id == categoryID
+        }.map(\.spendBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 
@@ -123,8 +126,8 @@ final class BudgetViewModel {
             ?? budget.startDate
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
             let date = txn.date ?? .distantPast
-            return date >= start && date <= Date.now && txn.countsAsSpend
-        }.map(\.wrappedBaseAmount))
+            return date >= start && date <= Date.now && (txn.countsAsSpend || txn.isRefund)
+        }.map(\.spendBaseAmount))
         return Money.double(Money.cents(budget.amount) - spent)
     }
 

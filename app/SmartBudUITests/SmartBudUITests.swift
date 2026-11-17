@@ -1341,6 +1341,43 @@ final class SmartBudUITests: XCTestCase {
 
         select(.log, in: app)
     }
+
+    // MARK: - A10. A refund reduces spend and never becomes income
+
+    func testA10_refund_reducesSpendWithoutIncome() throws {
+        let app = launch()
+        let before = expenseTotal(app)
+        select(.log, in: app)
+
+        let note = qaNote("A10")
+        addExpense(app, amount: "20.00", note: note)
+        XCTAssertEqual(expenseTotal(app), before + 20, accuracy: 0.005,
+                       "The purchase did not reach spend")
+        select(.log, in: app)
+
+        // The refund action shares the context menu with the claim actions.
+        let original = waitForRow(app, note: note)
+        original.press(forDuration: 1.5)
+        let refundAction = app.buttons["Refund"].firstMatch
+        XCTAssertTrue(refundAction.waitForExistence(timeout: 10),
+                      "A refundable expense offered no refund action.\n\(app.debugDescription)")
+        refundAction.tap()
+
+        let remaining = require(app, AccessibilityID.refundRemaining)
+        XCTAssertTrue(remaining.label.contains("20"),
+                      "Remaining should start at 20, got \(remaining.label)")
+
+        // The sheet prefills the whole remaining amount; a full refund is
+        // one tap, and no software keyboard is involved.
+        require(app, AccessibilityID.refundAmount)
+        require(app, AccessibilityID.refundSave).tap()
+
+        // The refund is its own row, named after the purchase it gives back.
+        waitForRow(app, note: "Refund · \(note)")
+        XCTAssertEqual(expenseTotal(app), before, accuracy: 0.005,
+                       "Refunding the full 20 should remove it from spend")
+        select(.log, in: app)
+    }
 }
 
 // MARK: - Audit policy

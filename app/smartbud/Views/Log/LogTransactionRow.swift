@@ -27,7 +27,9 @@ struct LogTransactionRow: View {
             code: transaction.account?.resolvedCurrencyCode ?? currency,
             showCents: showCents,
             signed: showExpenseOrIncomeSign,
-            income: transaction.income
+            // Money coming back renders with the incoming sign even though a
+            // refund is not income.
+            income: transaction.income || transaction.isRefund
         )
     }
 
@@ -56,7 +58,7 @@ struct LogTransactionRow: View {
         if future {
             return Color.SubtitleText
         }
-        return transaction.income ? Color.IncomeGreen : Color.PrimaryText
+        return (transaction.income || transaction.isRefund) ? Color.IncomeGreen : Color.PrimaryText
     }
 
     /// Balance corrections have no category; give them a neutral icon of
@@ -86,8 +88,10 @@ struct LogTransactionRow: View {
         let showsDiscount = discountText != nil
 
         let isRepayment = transaction.isReimbursementIncome
+        let isRefund = transaction.isRefund
 
-        if transaction.adjustment || transaction.reimbursable || isRepayment || showsDiscount {
+        if transaction.adjustment || transaction.reimbursable || isRepayment
+            || isRefund || showsDiscount {
             HStack(spacing: 4) {
                 if transaction.adjustment {
                     badge(String.appLocalized("Balance Adjustment"), tint: Color.SubtitleText)
@@ -98,6 +102,9 @@ struct LogTransactionRow: View {
                 }
                 if isRepayment {
                     badge(String.appLocalized("Reimbursement"), tint: Color.IncomeGreen)
+                }
+                if isRefund {
+                    badge(String.appLocalized("Refund"), tint: Color.IncomeGreen)
                 }
                 if let discountText {
                     badge(String.appFormatted("Discount %@", discountText),

@@ -106,8 +106,10 @@ struct Provider: AppIntentTimelineProvider {
 
         case .expense:
             let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
-            let filtered = allTxns.filter { $0.countsAsSpend && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
-            return Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
+            let filtered = allTxns.filter {
+                ($0.countsAsSpend || $0.isRefund) && $0.wrappedDate >= startDate && $0.wrappedDate <= now
+            }
+            return Money.double(Money.sum(filtered.map(\.spendBaseAmount)))
 
         default:
             return 0
@@ -144,8 +146,11 @@ struct Provider: AppIntentTimelineProvider {
         let limited = Array(filtered.prefix(count))
 
         return limited.map { txn in
+            // A refund returns money, so it renders on the incoming side even
+            // though `income` is false (it is not earnings).
             HoldingTransaction(colour: txn.wrappedColour, note: txn.wrappedNote,
-                               amount: txn.wrappedBaseAmount, income: txn.income)
+                               amount: txn.wrappedBaseAmount,
+                               income: txn.income || txn.isRefund)
         }
     }
 }

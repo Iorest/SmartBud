@@ -66,6 +66,13 @@ final class TransactionModel {
     /// Invariant: `merchantKey == nil` exactly when `merchant == nil`, so a
     /// key is never guessed from an unknown name.
     var merchantKey: String?
+    /// On a refund row: the id of the expense it refunds. A refund is money
+    /// coming back for a purchase, not new earnings — it reduces the original
+    /// category's spend in the period the money arrived and never enters
+    /// income. The refunded total is *derived* from these rows (see
+    /// `RefundPolicy`), not mirrored on the original: a second stored field
+    /// would have to be kept in step with every edit and delete.
+    var refundOf: UUID?
 
     init(
         note: String = "",
@@ -80,6 +87,7 @@ final class TransactionModel {
         discount: Double = 0,
         reimbursable: Bool = false,
         reimbursementOf: UUID? = nil,
+        refundOf: UUID? = nil,
         transferFeeOf: UUID? = nil,
         adjustment: Bool = false,
         merchant: String? = nil,
@@ -93,6 +101,7 @@ final class TransactionModel {
         self.discount = discount
         self.reimbursable = reimbursable
         self.reimbursementOf = reimbursementOf
+        self.refundOf = refundOf
         self.transferFeeOf = transferFeeOf
         self.adjustment = adjustment
         self.merchant = merchant
@@ -134,21 +143,48 @@ extension TransactionModel {
     /// claim into profit.
     @Transient var isReimbursementIncome: Bool { reimbursementOf != nil }
 
+    /// A row that gives part (or all) of an expense back. Its money returns
+    /// to the account, but it is the counterpart of a purchase, not income.
+    @Transient var isRefund: Bool { refundOf != nil }
+
+    /// An ordinary expense that can still be refunded. Claims (money already
+    /// expected back), adjustments and refund rows themselves are excluded:
+    /// every one of them would double-count the return.
+    @Transient var canBeRefunded: Bool {
+        !income && !adjustment && !reimbursable && !isRefund
+    }
+
     /// Counts towards "spent" in insights and budgets. Reimbursable rows are
-    /// pass-through and balance adjustments are not spend at all.
-    @Transient var countsAsSpend: Bool { !income && !adjustment && !reimbursable }
+    /// pass-through, balance adjustments and refunds are not spend at all
+    /// (a refund *reduces* spend through `spendBaseAmount`).
+    @Transient var countsAsSpend: Bool {
+        !income && !adjustment && !reimbursable && !isRefund
+    }
 
     /// Counts towards "earned" in insights.
     @Transient var countsAsIncome: Bool { income && !adjustment && !isReimbursementIncome }
 
     /// A row that belongs in income/spend totals. Adjustments and
-    /// reimbursable claims are pass-through money and stay out of both.
-    @Transient var countsInTotals: Bool { countsAsSpend || countsAsIncome }
+    /// reimbursable claims are pass-through money and stay out of both; a
+    /// refund does belong in them, on the spend side.
+    @Transient var countsInTotals: Bool { countsAsSpend || countsAsIncome || isRefund }
+
+    /// Contribution to the **spend** figure: a normal expense adds its base
+    /// amount, a refund subtracts it, everything else adds nothing. Every
+    /// place that answers "how much was spent" must sum this instead of
+    /// filtering on `countsAsSpend` and adding `wrappedBaseAmount` — otherwise
+    /// refunded money silently keeps counting as spend.
+    @Transient var spendBaseAmount: Double {
+        if isRefund { return -wrappedBaseAmount }
+        return countsAsSpend ? wrappedBaseAmount : 0
+    }
 
     /// Signed amount in the base currency for net-total maths. Pass-through
     /// rows (balance adjustments and reimbursable claims) count as zero so
     /// "net" always equals income minus the spend figure shown next to it.
+    /// A refund returns money, so it is positive.
     @Transient var signedBaseAmount: Double {
+        if isRefund { return wrappedBaseAmount }
         if countsAsIncome { return wrappedBaseAmount }
         if countsAsSpend { return -wrappedBaseAmount }
         return 0
