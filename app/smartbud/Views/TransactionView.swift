@@ -251,7 +251,6 @@ struct TransactionView: View {
         // but we clear again here in case the user taps a different commit
         // path (e.g. via the keyboard return key) before the pad re-renders.
         padVM.submit()
-        finishEntry()
     }
 
     /// Writes an edited transaction, keeping the note in sync with the
