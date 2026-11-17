@@ -84,12 +84,14 @@ extension LogTransactionList {
             }
             .accessibilityIdentifier(AccessibilityID.logRowDelete)
 
-            Button {
-                openEditor(transaction)
-            } label: {
-                Label(String.appLocalized("Edit"), systemImage: "pencil")
+            if !transaction.isBadDebt {
+                Button {
+                    openEditor(transaction)
+                } label: {
+                    Label(String.appLocalized("Edit"), systemImage: "pencil")
+                }
+                .tint(.accentColor)
             }
-            .tint(.accentColor)
         }
         .contextMenu {
             if transaction.recurringType > 0 {
@@ -100,10 +102,14 @@ extension LogTransactionList {
                 }
             }
 
-            Button {
-                openEditor(transaction)
-            } label: {
-                Label(String.appLocalized("Edit"), systemImage: "pencil")
+            // A loss row is a memo of a claim, not an entry of its own: editing
+            // it would desync it from the claim it writes off.
+            if !transaction.isBadDebt {
+                Button {
+                    openEditor(transaction)
+                } label: {
+                    Label(String.appLocalized("Edit"), systemImage: "pencil")
+                }
             }
 
             if !transaction.income && !transaction.adjustment && !transaction.isRefund {
@@ -126,7 +132,16 @@ extension LogTransactionList {
     @ViewBuilder
     func reimbursementMenuItems(_ transaction: TransactionModel) -> some View {
         if transaction.reimbursable {
-            if transaction.isPendingReimbursement {
+            if transaction.isWrittenOffClaim {
+                if let row = transactionVM.writeOffRow(for: transaction) {
+                    Button {
+                        transactionVM.undoWriteOff(row)
+                    } label: {
+                        Label(String.appLocalized("Undo Write-Off"),
+                              systemImage: "arrow.uturn.backward.circle")
+                    }
+                }
+            } else if transaction.isPendingReimbursement {
                 Button {
                     transactionVM.setReimbursed(true, for: transaction)
                 } label: {
@@ -138,6 +153,15 @@ extension LogTransactionList {
                 } label: {
                     Label(String.appLocalized("Undo Reimbursement"),
                           systemImage: "arrow.uturn.backward.circle")
+                }
+            }
+            // Only once the money has clearly not come back: see
+            // `BadDebtPolicy.thresholdDays`.
+            if transactionVM.canWriteOff(transaction) {
+                Button {
+                    transactionManager.toBadDebt = BadDebtTarget(claim: transaction)
+                } label: {
+                    Label(String.appLocalized("Write Off…"), systemImage: "xmark.bin")
                 }
             }
             Button {
@@ -159,6 +183,13 @@ extension LogTransactionList {
     /// gives back, so it opens the refund sheet instead of the generic form —
     /// the form has no way to check the remaining amount or the frozen rate.
     func openEditor(_ transaction: TransactionModel) {
+        // The loss row has nothing of its own to edit — it follows its claim —
+        // so opening it opens the claim instead.
+        if transaction.isBadDebt,
+           let claim = transactionVM.writeOffClaim(for: transaction) {
+            transactionManager.toEdit = claim
+            return
+        }
         if transaction.isRefund,
            let original = transactionVM.refundOriginal(for: transaction) {
             transactionManager.toRefund = RefundTarget(original: original, refund: transaction)

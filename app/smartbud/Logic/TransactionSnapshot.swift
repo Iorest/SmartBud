@@ -36,6 +36,13 @@ struct TransactionSnapshot {
     /// restore the money as an ordinary expense-shaped row that counts as
     /// spend instead of reducing it.
     let refundOf: UUID?
+    /// On a write-off row: the claim it writes off. Dropping it on restore
+    /// would turn the loss back into an ordinary expense *and* leave the claim
+    /// written off, so the money would be counted twice.
+    let badDebtOf: UUID?
+    let badDebtReason: String?
+    /// On a written-off claim: the day it was given up on.
+    let badDebtAt: Date?
     let transferFeeOf: UUID?
     let adjustment: Bool
     /// Merchant is a projection of the note, but a restore has to bring back
@@ -62,6 +69,9 @@ struct TransactionSnapshot {
         reimbursedAt = txn.reimbursedAt
         reimbursementOf = txn.reimbursementOf
         refundOf = txn.refundOf
+        badDebtOf = txn.badDebtOf
+        badDebtReason = txn.badDebtReason
+        badDebtAt = txn.badDebtAt
         transferFeeOf = txn.transferFeeOf
         adjustment = txn.adjustment
         merchant = txn.merchant
@@ -86,6 +96,8 @@ struct TransactionSnapshot {
             reimbursable: reimbursable,
             reimbursementOf: reimbursementOf,
             refundOf: refundOf,
+            badDebtOf: badDebtOf,
+            badDebtReason: badDebtReason,
             transferFeeOf: transferFeeOf,
             adjustment: adjustment,
             merchant: merchant,
@@ -94,6 +106,7 @@ struct TransactionSnapshot {
         txn.id = id
         txn.onceRecurring = onceRecurring
         txn.reimbursedAt = reimbursedAt
+        txn.badDebtAt = badDebtAt
         return txn
     }
 }

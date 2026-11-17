@@ -109,6 +109,13 @@ final class TransactionViewModel {
         } else if txn.reimbursedAt != nil {
             ReimbursementLedger.sync(txn, in: repo.context)
         }
+        // A written-off claim that changes amount keeps one loss row, in step
+        // with it; one that stops being a claim loses its loss row altogether.
+        if txn.reimbursable {
+            BadDebtLedger.sync(txn, in: repo.context)
+        } else {
+            BadDebtLedger.clearWriteOff(of: txn, in: repo.context)
+        }
         if txn.isReimbursementIncome {
             ReimbursementLedger.syncClaim(from: txn, in: repo.context)
         }
@@ -303,6 +310,7 @@ final class TransactionViewModel {
     func delete(_ txn: TransactionModel) {
         ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
         RefundLedger.prepareForDeletion(of: txn, in: repo.context)
+        BadDebtLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         repo.save()
@@ -354,6 +362,7 @@ final class TransactionViewModel {
                     }
                     txn.reimbursable = false
                     txn.reimbursedAt = nil
+                    BadDebtLedger.clearWriteOff(of: txn, in: repo.context)
                 }
                 if noteWasCategoryName {
                     txn.note = category.wrappedName
@@ -388,6 +397,7 @@ final class TransactionViewModel {
         // `rollback()` still restores the pair as a whole.
         ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
         RefundLedger.prepareForDeletion(of: txn, in: repo.context)
+        BadDebtLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
         repo.delete(txn)
         pendingDelete = PendingDelete(snapshot: snapshot)

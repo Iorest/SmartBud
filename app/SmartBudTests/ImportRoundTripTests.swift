@@ -130,4 +130,49 @@ struct ImportRoundTripTests {
         #expect(restoredRefund?.spendBaseAmount == -216)
         #expect(Money.double(Money.sum(stored.map(\.spendBaseAmount))) == 504)
     }
+
+    @Test("A write-off keeps its reason and its link through export and import")
+    func badDebtRoundTrip() throws {
+        let claimID = UUID()
+        var claim = ExportSchema.TransactionDTO(
+            id: claimID, amount: 100, date: .now, day: nil, month: nil,
+            note: "差旅垫付", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: fixture.categoryID, categoryName: "餐饮",
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 720,
+            accountCurrency: "CNY", discount: 0, reimbursable: true,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil,
+            transferFeeOf: nil, adjustment: false
+        )
+        claim.badDebtAt = .now
+        let loss = ExportSchema.TransactionDTO(
+            id: UUID(), amount: 100, date: .now, day: nil, month: nil,
+            note: "坏账", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: fixture.categoryID, categoryName: "餐饮",
+            accountId: nil, accountName: nil, baseAmount: 720,
+            accountCurrency: nil, discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil,
+            transferFeeOf: nil, adjustment: false, badDebtOf: claimID,
+            badDebtReason: "unreachable", badDebtAt: nil
+        )
+
+        _ = try DataImporter.apply(
+            fixture.payload(categories: [fixture.sampleCategory],
+                            accounts: [fixture.sampleAccount],
+                            transactions: [claim, loss]),
+            context: fixture.context
+        )
+
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        let restoredClaim = stored.first { $0.id == claimID }
+        let restoredLoss = stored.first { $0.badDebtOf == claimID }
+
+        #expect(restoredClaim?.badDebtAt != nil)
+        #expect(restoredClaim?.isPendingReimbursement == false)
+        #expect(restoredClaim?.countsAsSpend == false)
+        #expect(restoredLoss?.isBadDebt == true)
+        #expect(restoredLoss?.badDebtReason == "unreachable")
+        #expect(restoredLoss?.account == nil)
+        #expect(restoredLoss?.countsAsSpend == true)
+        #expect(Money.double(Money.sum(stored.map(\.spendBaseAmount))) == 720)
+    }
 }

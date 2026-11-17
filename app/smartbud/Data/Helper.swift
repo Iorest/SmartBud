@@ -73,6 +73,19 @@ final class TransactionModel {
     /// `RefundPolicy`), not mirrored on the original: a second stored field
     /// would have to be kept in step with every edit and delete.
     var refundOf: UUID?
+    /// On a written-off claim: the day the money was given up on. Mirrors
+    /// `reimbursedAt` because the pending list is computed from the row itself
+    /// — a `#Predicate`/`@Transient` property cannot look for the write-off row
+    /// that points back at it. The loss itself is the write-off row (`badDebtOf`),
+    /// which is where the amount and the reason live.
+    var badDebtAt: Date?
+    /// On the expense row that writes off a claim: the id of that claim. The
+    /// row is the loss — it counts as spend, so the money the user never got
+    /// back stops being invisible — but it moves no money, so it has no
+    /// account of its own.
+    var badDebtOf: UUID?
+    /// Why the claim was written off (`BadDebtPolicy.Reason` raw value).
+    var badDebtReason: String?
 
     init(
         note: String = "",
@@ -88,6 +101,8 @@ final class TransactionModel {
         reimbursable: Bool = false,
         reimbursementOf: UUID? = nil,
         refundOf: UUID? = nil,
+        badDebtOf: UUID? = nil,
+        badDebtReason: String? = nil,
         transferFeeOf: UUID? = nil,
         adjustment: Bool = false,
         merchant: String? = nil,
@@ -102,6 +117,8 @@ final class TransactionModel {
         self.reimbursable = reimbursable
         self.reimbursementOf = reimbursementOf
         self.refundOf = refundOf
+        self.badDebtOf = badDebtOf
+        self.badDebtReason = badDebtReason
         self.transferFeeOf = transferFeeOf
         self.adjustment = adjustment
         self.merchant = merchant
@@ -133,10 +150,20 @@ extension TransactionModel {
     @Transient var grossAmount: Double { amount + discount }
 
     /// Still waiting for the money to come back. A repayment row carries the
-    /// same account but is income, so it never shows up as pending.
+    /// same account but is income, so it never shows up as pending; a claim
+    /// that was written off is no longer expected back.
     @Transient var isPendingReimbursement: Bool {
-        reimbursable && !income && reimbursedAt == nil
+        reimbursable && !income && reimbursedAt == nil && badDebtAt == nil
     }
+
+    /// The expense row that writes off a claim: the money is gone, so it is
+    /// spend — but no account moved, so it stays out of every balance.
+    @Transient var isBadDebt: Bool { badDebtOf != nil }
+
+    /// A claim nobody paid back. The original row stays an ordinary claim (its
+    /// spend and balance rules are unchanged); this only drives the badges and
+    /// the "undo" action.
+    @Transient var isWrittenOffClaim: Bool { badDebtAt != nil }
 
     /// Income row that settles a claim. It puts the money back into the
     /// account but is not new earnings — counting it would turn a neutral
@@ -151,7 +178,7 @@ extension TransactionModel {
     /// expected back), adjustments and refund rows themselves are excluded:
     /// every one of them would double-count the return.
     @Transient var canBeRefunded: Bool {
-        !income && !adjustment && !reimbursable && !isRefund
+        !income && !adjustment && !reimbursable && !isRefund && !isBadDebt
     }
 
     /// Counts towards "spent" in insights and budgets. Reimbursable rows are

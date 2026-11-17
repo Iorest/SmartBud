@@ -526,6 +526,18 @@
 		E1A2B3C4000000000000F143 /* RefundSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F141 /* RefundSheet.swift */; };
 		E1A2B3C4000000000000F152 /* RefundPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */; };
 		E1A2B3C4000000000000F162 /* RefundLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */; };
+		E1A2B3C4000000000000F202 /* BadDebtPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F201 /* BadDebtPolicy.swift */; };
+		E1A2B3C4000000000000F203 /* BadDebtPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F201 /* BadDebtPolicy.swift */; };
+		E1A2B3C4000000000000F204 /* BadDebtPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F201 /* BadDebtPolicy.swift */; };
+		E1A2B3C4000000000000F212 /* BadDebtLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F211 /* BadDebtLedger.swift */; };
+		E1A2B3C4000000000000F213 /* BadDebtLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F211 /* BadDebtLedger.swift */; };
+		E1A2B3C4000000000000F214 /* BadDebtLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F211 /* BadDebtLedger.swift */; };
+		E1A2B3C4000000000000F222 /* TransactionViewModel+BadDebt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F221 /* TransactionViewModel+BadDebt.swift */; };
+		E1A2B3C4000000000000F223 /* TransactionViewModel+BadDebt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F221 /* TransactionViewModel+BadDebt.swift */; };
+		E1A2B3C4000000000000F232 /* BadDebtSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F231 /* BadDebtSheet.swift */; };
+		E1A2B3C4000000000000F233 /* BadDebtSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F231 /* BadDebtSheet.swift */; };
+		E1A2B3C4000000000000F242 /* BadDebtPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F241 /* BadDebtPolicyTests.swift */; };
+		E1A2B3C4000000000000F252 /* BadDebtLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F251 /* BadDebtLedgerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */		53B1D195288ED87000E28062 /* PBXContainerItemProxy */ = {
@@ -823,6 +835,12 @@
 		E1A2B3C4000000000000F141 /* RefundSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/RefundSheet.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/RefundPolicyTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/RefundLedgerTests.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F201 /* BadDebtPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BadDebtPolicy.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F211 /* BadDebtLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BadDebtLedger.swift; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F221 /* TransactionViewModel+BadDebt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionViewModel+BadDebt.swift"; sourceTree = "<group>"; };
+		E1A2B3C4000000000000F231 /* BadDebtSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/BadDebtSheet.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F241 /* BadDebtPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BadDebtPolicyTests.swift; sourceTree = SOURCE_ROOT; };
+		E1A2B3C4000000000000F251 /* BadDebtLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BadDebtLedgerTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */		5327D280287C697400F76ADF /* Frameworks */ = {
@@ -887,7 +905,9 @@
 				E1A2B3C4000000000000F011 /* AppPeriodTests.swift */,
 				E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */,
 						E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */,
+				E1A2B3C4000000000000F241 /* BadDebtPolicyTests.swift */,
 						E1A2B3C4000000000000F161 /* RefundLedgerTests.swift */,
+				E1A2B3C4000000000000F251 /* BadDebtLedgerTests.swift */,
 				E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */,
 				E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */,
 				E1A2B3C4000000000000F031 /* CurrencyRebaseTests.swift */,
@@ -959,6 +979,7 @@
 				F67FFDAC3CA54C56A22EF30A /* TransactionViewModel.swift */,
 				E1A2B3C4000000000000F0C1 /* TransactionViewModel+Reimbursement.swift */,
 						E1A2B3C4000000000000F131 /* TransactionViewModel+Refund.swift */,
+				E1A2B3C4000000000000F221 /* TransactionViewModel+BadDebt.swift */,
 				0FCAF0AE6D414F738BF4836B /* CategoryViewModel.swift */,
 				F03220E594E9430E8A4BC37F /* BudgetViewModel.swift */,
 				F69F2676652B477A97938CFD /* InsightsViewModel.swift */,
@@ -1000,7 +1021,9 @@
 				E1A2B3C40000000000000A00 /* AccountViewModel.swift */,
 				E1A2B3C40000000000000D00 /* AccountBalance.swift */,
 						E1A2B3C4000000000000F111 /* RefundPolicy.swift */,
+				E1A2B3C4000000000000F201 /* BadDebtPolicy.swift */,
 						E1A2B3C4000000000000F141 /* RefundSheet.swift */,
+				E1A2B3C4000000000000F231 /* BadDebtSheet.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
 				E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */,
@@ -1081,6 +1104,7 @@
 				E1A2B3C4000000000000F081 /* CurrencyRebaseService.swift */,
 				E1A2B3C4000000000000F0A1 /* ReimbursementLedger.swift */,
 						E1A2B3C4000000000000F121 /* RefundLedger.swift */,
+				E1A2B3C4000000000000F211 /* BadDebtLedger.swift */,
 				E1A2B3C4000000000000F0D1 /* TransferFeeLedger.swift */,
 				E1A2B3C4000000000000F0E1 /* TransferFeeMigration.swift */,
 				A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */,
@@ -1565,9 +1589,13 @@
 		E1A2B3C4000000000000F082 /* CurrencyRebaseService.swift in Sources */,
 		E1A2B3C4000000000000F0A2 /* ReimbursementLedger.swift in Sources */,
 		E1A2B3C4000000000000F112 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F202 /* BadDebtPolicy.swift in Sources */,
 		E1A2B3C4000000000000F122 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F212 /* BadDebtLedger.swift in Sources */,
 		E1A2B3C4000000000000F132 /* TransactionViewModel+Refund.swift in Sources */,
+		E1A2B3C4000000000000F222 /* TransactionViewModel+BadDebt.swift in Sources */,
 		E1A2B3C4000000000000F142 /* RefundSheet.swift in Sources */,
+		E1A2B3C4000000000000F232 /* BadDebtSheet.swift in Sources */,
 		E1A2B3C4000000000000F0D2 /* TransferFeeLedger.swift in Sources */,
 		E1A2B3C4000000000000F0E2 /* TransferFeeMigration.swift in Sources */,
 				A16B00B5000000000000B1E1 /* MerchantNormalizer.swift in Sources */,
@@ -1816,9 +1844,13 @@
 				E1A2B3C4000000000000F0D4 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0B2 /* ReimbursementLedgerTests.swift in Sources */,
 		E1A2B3C4000000000000F113 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F203 /* BadDebtPolicy.swift in Sources */,
 		E1A2B3C4000000000000F123 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F213 /* BadDebtLedger.swift in Sources */,
 		E1A2B3C4000000000000F152 /* RefundPolicyTests.swift in Sources */,
+		E1A2B3C4000000000000F242 /* BadDebtPolicyTests.swift in Sources */,
 		E1A2B3C4000000000000F162 /* RefundLedgerTests.swift in Sources */,
+		E1A2B3C4000000000000F252 /* BadDebtLedgerTests.swift in Sources */,
 				E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */,
 				A16B00B5000000000000B1E2 /* MerchantNormalizer.swift in Sources */,
 				A16B00B5000000000000B1E5 /* MerchantSummary.swift in Sources */,
@@ -1993,9 +2025,13 @@
 				E1A2B3C4000000000000F083 /* CurrencyRebaseService.swift in Sources */,
 				E1A2B3C4000000000000F0A3 /* ReimbursementLedger.swift in Sources */,
 		E1A2B3C4000000000000F114 /* RefundPolicy.swift in Sources */,
+		E1A2B3C4000000000000F204 /* BadDebtPolicy.swift in Sources */,
 		E1A2B3C4000000000000F124 /* RefundLedger.swift in Sources */,
+		E1A2B3C4000000000000F214 /* BadDebtLedger.swift in Sources */,
 		E1A2B3C4000000000000F133 /* TransactionViewModel+Refund.swift in Sources */,
+		E1A2B3C4000000000000F223 /* TransactionViewModel+BadDebt.swift in Sources */,
 		E1A2B3C4000000000000F143 /* RefundSheet.swift in Sources */,
+		E1A2B3C4000000000000F233 /* BadDebtSheet.swift in Sources */,
 				E1A2B3C4000000000000F0D3 /* TransferFeeLedger.swift in Sources */,
 				E1A2B3C4000000000000F0E3 /* TransferFeeMigration.swift in Sources */,
 				A16B00B5000000000000B1E3 /* MerchantNormalizer.swift in Sources */,

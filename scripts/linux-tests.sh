@@ -55,6 +55,7 @@ fi
 app_sources=(
     Logic/AccountBalance.swift
     Logic/AppPeriod.swift
+    Logic/BadDebtPolicy.swift
     Logic/BudgetLogic.swift
     Logic/CSVSupport.swift
     Logic/CurrencyConversion.swift
@@ -79,6 +80,7 @@ app_sources=(
 
 test_sources=(
     AppPeriodTests.swift
+    BadDebtPolicyTests.swift
     CSVTableTests.swift
     DeepLinkTests.swift
     LLMProviderTests.swift

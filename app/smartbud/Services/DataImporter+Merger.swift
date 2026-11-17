@@ -127,12 +127,15 @@ struct BackupMerger {
                 reimbursable: dto.reimbursable ?? false,
                 reimbursementOf: dto.reimbursementOf,
                 refundOf: dto.refundOf,
+                badDebtOf: dto.badDebtOf,
+                badDebtReason: dto.badDebtReason,
                 transferFeeOf: dto.transferFeeOf,
                 adjustment: dto.adjustment ?? false
             )
             transaction.id = dto.id
             transaction.onceRecurring = dto.onceRecurring
             transaction.reimbursedAt = dto.reimbursedAt
+            transaction.badDebtAt = dto.badDebtAt
             if let day = dto.day { transaction.day = day }
             if let month = dto.month { transaction.month = month }
             context.insert(transaction)

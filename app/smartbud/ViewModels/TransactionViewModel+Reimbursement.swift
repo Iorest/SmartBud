@@ -20,6 +20,7 @@ extension TransactionViewModel {
         txn.reimbursable = allowed
         if !allowed {
             ReimbursementLedger.unsettle(txn, in: repo.context)
+            BadDebtLedger.clearWriteOff(of: txn, in: repo.context)
         }
         repo.save()
     }
@@ -29,6 +30,9 @@ extension TransactionViewModel {
     /// removes that row again.
     func setReimbursed(_ reimbursed: Bool, for txn: TransactionModel) {
         guard txn.reimbursable, !txn.income else { return }
+        // A written-off claim already carries its loss: paying it back as well
+        // would count the money twice. Undo the write-off first.
+        guard txn.badDebtAt == nil else { return }
 
         if reimbursed {
             guard txn.reimbursedAt == nil else { return }

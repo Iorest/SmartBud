@@ -94,7 +94,7 @@
 |---|---|---|---|
 | 收付实现制，无应计/账期模型 | 模型无应收应付字段；`TransactionModel` 只有收付事实 | 一致 | — |
 | 六种身份判定与现金流/费用归属（含退款） | `Helper.swift` 的 `countsAsSpend` / `isRefund` / `spendBaseAmount` | 一致 | — |
-| 退款、坏账、分期未实现（审计当时） | 退款已实现（`refundOf` + `RefundPolicy`）；`badDebtOf` / `Installment` 仍无结果 | 退款已过时 | 已改；坏账/分期仍由 TELE-32 余项与 TELE-29 承接 |
+| 退款、坏账、分期未实现（审计当时） | 退款与坏账均已实现（`refundOf` + `RefundPolicy`、`badDebtOf` + `BadDebtPolicy`）；`Installment` 仍无结果 | 退款/坏账已过时 | 已改；分期由 TELE-29 承接 |
 | 信用卡：还款是转账、余额为负表示欠款、额度/账单日未建模 | `AccountViewModel.createTransfer`；无 `creditLimit` / `statementDay` | 一致 | 已有任务 TELE-33 |
 | 预算信封法、周期结束不结转 | `BudgetViewModel.leftover` 只累计当前周期（`ViewModels/BudgetViewModel.swift:101-133`） | 一致 | — |
 | 金额最小单位分，折算四舍五入 | `Money.cents` 用 `NSDecimalRound(..., .plain)`（`Logic/Money.swift:20-44`） | 一致 | — |
@@ -104,7 +104,7 @@
 | 切换基准币是一次性重述，必须留审计记录 | 未找到重述记录写入 | 代码缺 | T3 |
 | 调整应带原因；当前无原因字段 | `AccountViewModel.adjustBalance` 只写金额/账户/日期，无 reason（`ViewModels/AccountViewModel.swift:219-238`） | 一致 | 已有缺口，见 T6 |
 | 调整后余额必须相等（有测试） | 测试目录无 `adjustBalance` 相关用例 | 文档错 | 已改：删掉“（有测试）”，注明现状 |
-| §8 每个口径至少一条测试 | 现金流/舍入/重述已有 `ReimbursementLedgerTests`、`CurrencyRebaseTests`、`AppPeriodTests`；退款有 `RefundPolicyTests` / `RefundLedgerTests`；坏账等随功能落地 | 一致 | — |
+| §8 每个口径至少一条测试 | 现金流/舍入/重述已有 `ReimbursementLedgerTests`、`CurrencyRebaseTests`、`AppPeriodTests`；退款有 `RefundPolicyTests` / `RefundLedgerTests`；坏账有 `BadDebtPolicyTests` / `BadDebtLedgerTests` | 一致 | — |
 
 ## 4. data-portability.md
 
