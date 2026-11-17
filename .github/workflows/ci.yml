@@ -82,6 +82,7 @@ jobs:
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
+            -destination-timeout 300 \
             -only-testing:SmartBudTests \
             -resultBundlePath "$RESULT_BUNDLE" \
             2>&1 | tee "$LOG_FILE"
@@ -239,6 +240,18 @@ jobs:
           sudo xcode-select -s "$chosen"
           xcodebuild -version
 
+      # A fresh runner can spend ~60s before CoreSimulatorService answers, and
+      # xcodebuild then gives up with "Unable to find a device matching" even
+      # though the iPhone 16 / iOS 26.2 device exists (observed on run
+      # 43553153061: the two e2e shards died after 66s, the logic job on the
+      # same image resolved the same destination after 38s). Boot it once and
+      # keep a generous destination timeout so a slow lookup is not fatal.
+      - name: Boot iPhone 16 simulator
+        run: |
+          xcrun simctl list devices available | grep "iPhone 16 (" || true
+          xcrun simctl boot "iPhone 16" || true
+          xcrun simctl bootstatus "iPhone 16" -b
+
       # Every case launches the app with -skipIntro / -importSample (DEBUG-only
       # hooks) and queries accessibility identifiers from AccessibilityID.swift.
       - name: UI tests
@@ -267,6 +280,7 @@ jobs:
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
+            -destination-timeout 300 \
             "${filters[@]}" \
             -testLanguage en \
             -testRegion US \

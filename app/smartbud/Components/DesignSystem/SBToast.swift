@@ -37,6 +37,22 @@ struct SBToast: View {
     }
 }
 
+extension SBToast {
+    /// XCUITest's accessibility snapshots on a loaded CI runner can stall for
+    /// tens of seconds (A3's first poll took 28 s after the tap), so neither
+    /// the default 2 s window nor a 30 s one survives to the assertion.
+    /// `-holdToasts` keeps the message up for ten minutes; the test dismisses
+    /// the form itself. Product builds are unchanged.
+    static var dismissalDuration: Duration {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-holdToasts") {
+            return .seconds(600)
+        }
+        #endif
+        return .seconds(2)
+    }
+}
+
 extension View {
     /// Hides `isPresented` after `after`. The timer is tied to the flag's
     /// identity, so a second message restarts the window instead of being

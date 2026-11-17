@@ -26,7 +26,7 @@ final class SmartBudUITests: XCTestCase {
 
     /// No `setUp` launch: some cases need their own arguments, so each test
     /// launches the app itself.
-    private func launch() -> XCUIApplication {
+    private func launch(extraArguments: [String] = []) -> XCUIApplication {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchArguments += [
@@ -51,6 +51,7 @@ final class SmartBudUITests: XCTestCase {
             // screen mid-case (ReviewRequester.requestReviewIfAppropriate).
             "-skipReviewPrompt",
         ]
+        app.launchArguments += extraArguments
         app.launch()
         dismissLaunchOverlay(app)
         return app
@@ -988,7 +989,9 @@ final class SmartBudUITests: XCTestCase {
     // MARK: - A3. Zero, over-limit and missing category are refused
 
     func testA3_invalidInput_isRefusedWithMessage() throws {
-        let app = launch()
+        // The refusal toast is the assertion; hold it (SBToast.dismissalDuration)
+        // instead of racing XCUITest's first poll against a 2 s window.
+        let app = launch(extraArguments: ["-holdToasts"])
         require(app, AccessibilityID.logAddButton).tap()
 
         // Nothing typed: the checkmark cannot commit an empty amount.
