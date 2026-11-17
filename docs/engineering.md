@@ -191,6 +191,10 @@ xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿�
 正好是本文件「元素怎么定位」那套 identifier 的地基。新增一个没有可访问性描述或 trait 的控件，
 会直接让当次 CI 变红。
 
+审计引擎自身超时（`com.apple.xcode.xctest.accessibilityAudit` 错误码 -56，日志里的
+"Audit failed to complete in time"）不算发现：`assertAccessible` 会打一行
+`AUDIT[屏幕] skipped: ...` 后放行，不再让整条 CI 变红。真实越界仍按上面的硬门槛失败。
+
 要放行某个具体元素（而不是整类问题），把它加进 `ignoredElementIdentifiers` 并写清原因——
 按 identifier 放行，不会因为文案改动而意外放宽到别的元素。
 
