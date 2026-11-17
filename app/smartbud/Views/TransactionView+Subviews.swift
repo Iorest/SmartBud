@@ -76,7 +76,7 @@ extension TransactionView {
         // date/category row cannot fit on a phone. Documented exception to
         // unlimited scaling, same approach as Apple's Calculator.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .sbToastDismissal($showToast)
+        .sbToastDismissal($showToast, after: SBToast.dismissalDuration)
         .onChange(of: income) { _, newValue in
             lightHaptic &+= 1
             // Only drop a category that belongs to the other side; clearing
