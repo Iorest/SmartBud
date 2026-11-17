@@ -170,11 +170,13 @@ jobs:
     # Same image and Xcode selection as the logic-test job: the UI cases need
     # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
     #
-    # Three shards rather than one job: a single simulator run of the whole
-    # suite takes ~14 minutes, which is past the 10-minute budget this
-    # project keeps for the UI gate. Each shard is its own job (they run
-    # concurrently) and each stays under it. A new case must be added to one
-    # of `tests` below — the smoke shard skips every E2E case by name.
+    # Four e2e shards plus the smoke shard: the nine E2E cases cost 1459 s of
+    # case time on macos-15 (run 44026222552: A1 102 s, A2 141 s, A3 110 s,
+    # A4 167 s, A5 159 s, A6 227 s, A7 179 s, A8 179 s, A9 204 s), so three
+    # shards put two of them past the 10-minute budget. Shards are balanced on
+    # measured case time, not on case count; the slowest now sits at ~6.8
+    # minutes. A new case must be added to one of `tests` below — the smoke
+    # shard skips every E2E case by name.
     runs-on: macos-15
     timeout-minutes: 60
     strategy:
@@ -195,20 +197,28 @@ jobs:
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
           - key: e2e-entry
-            label: e2e 记账/编辑
+            label: e2e 记账/校验
             filter: only
             tests: >-
               testA1_addExpense_updatesStats
               testA2_continuousEntry_clearsAmountKeepsCategory
               testA3_invalidInput_isRefusedWithMessage
+          - key: e2e-edit
+            label: e2e 折扣/编辑
+            filter: only
+            tests: >-
               testA4_discountClaimFutureDate_staysOutOfStats
               testA5_editAmount_updatesStats_typeSwitchClearsCategory
           - key: e2e-ledger
-            label: e2e 删除/转账/预算
+            label: e2e 删除/转账
             filter: only
             tests: >-
               testA6_deleteUndo_restoresFieldsAndBalance
               testA7_sameCurrencyTransfer_movesBalancesOnly
+          - key: e2e-budget
+            label: e2e 跨币种/预算
+            filter: only
+            tests: >-
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
 
