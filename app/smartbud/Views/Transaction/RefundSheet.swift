@@ -152,7 +152,14 @@ struct RefundSheet: View {
                 }
             }
         }
-        .onAppear { accountVM.load() }
+        .onAppear {
+            accountVM.load()
+            // Default to the whole amount: a full refund is the common case,
+            // and a partial one is a single edit away.
+            if amountText.isEmpty {
+                amountText = Self.plainAmount(budget)
+            }
+        }
     }
 
     private var refusalMessage: String? {

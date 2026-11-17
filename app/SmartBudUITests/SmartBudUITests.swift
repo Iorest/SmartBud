@@ -1367,9 +1367,9 @@ final class SmartBudUITests: XCTestCase {
         XCTAssertTrue(remaining.label.contains("20"),
                       "Remaining should start at 20, got \(remaining.label)")
 
-        let amountField = require(app, AccessibilityID.refundAmount)
-        amountField.tap()
-        amountField.typeText("20")
+        // The sheet prefills the whole remaining amount; a full refund is
+        // one tap, and no software keyboard is involved.
+        require(app, AccessibilityID.refundAmount)
         require(app, AccessibilityID.refundSave).tap()
 
         // The refund is its own row, named after the purchase it gives back.
