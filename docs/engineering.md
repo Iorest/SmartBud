@@ -17,14 +17,15 @@
 
 ## 克隆
 
-仓库是私有的，用 SSH：
+仓库是公开的（GPL-3.0），HTTPS 与 SSH 都能克隆，不需要申请权限：
 
 ```bash
-git clone git@github.com:Iorest/SmartBud.git
+git clone https://github.com/Iorest/SmartBud.git
 cd SmartBud
 ```
 
-如果 SSH 走的是 443 端口（公司网络常见），在 `~/.ssh/config` 里加：
+只读浏览、提 issue、开 fork 都不需要账号权限；要走 SSH（推送分支）时如果 22 端口被封
+（公司网络常见），在 `~/.ssh/config` 里加：
 
 ```
 Host github.com
