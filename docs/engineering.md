@@ -165,7 +165,6 @@ xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿�
 | `-importSample` | 导入向导直接用 bundle 里的 `sample.csv` 走到预览步，绕开系统文件选择器 | `ImportDataView.body` 的 `onAppear` |
 | `-freshStore` | 每次启动一个空的内存 store，不报降级、不弹提示条；UI 用例靠它做到「一条用例一个干净库」 | `DataRepository.freshMemoryContainer` |
 | `-skipReviewPrompt` | 不弹 App Store 评分面板。一次 UI 测试会累计跨过第 3/10/25 笔的阈值，系统面板会盖住正在操作的界面 | `ReviewRequester.requestReviewIfAppropriate` |
-| `-holdToasts` | 拒绝保存的 toast 默认只显示 2s，而 CI runner 上 XCUITest 的一次快照可能卡 28s，断言会错过窗口。带上后 toast 保持 10 分钟、由用例自己关表单（仅 A3 使用） | `SBToast.dismissalDuration` |
 
 `XCUITest` 驱动不了系统文件选择器，所以导入用例走的是第二条：验的是「解析出预览 →
 返回 → 取消」这条链，不是「文件选择器能不能选到文件」。

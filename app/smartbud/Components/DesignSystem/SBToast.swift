@@ -37,42 +37,37 @@ struct SBToast: View {
     }
 }
 
-extension SBToast {
-    /// XCUITest's accessibility snapshots on a loaded CI runner can stall for
-    /// tens of seconds (A3's first poll took 28 s after the tap), so neither
-    /// the default 2 s window nor a 30 s one survives to the assertion.
-    /// `-holdToasts` keeps the message up for ten minutes; the test dismisses
-    /// the form itself. Product builds are unchanged.
-    static var dismissalDuration: Duration {
-        #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("-holdToasts") {
-            return .seconds(600)
-        }
-        #endif
-        return .seconds(2)
-    }
-}
-
 extension View {
     /// Hides `isPresented` after `after`. The timer is tied to the flag's
     /// identity, so a second message restarts the window instead of being
     /// cut short by the previous message's timer.
+    ///
+    /// Pass `nil` for messages that must outlive a fixed window: a refusal is
+    /// unreadable in 2 s with VoiceOver, and on a loaded CI runner XCUITest's
+    /// first accessibility snapshot has taken 28 s (A3). No window is long
+    /// enough to survive that, so the caller clears the flag when the user
+    /// next edits the form.
     func sbToastDismissal(_ isPresented: Binding<Bool>,
-                          after: Duration = .seconds(2)) -> some View {
+                          after: Duration? = .seconds(2)) -> some View {
         modifier(SBToastDismissalModifier(isPresented: isPresented, duration: after))
     }
 }
 
 private struct SBToastDismissalModifier: ViewModifier {
     @Binding var isPresented: Bool
-    let duration: Duration
+    let duration: Duration?
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content.task(id: isPresented) {
-            guard isPresented else { return }
-            try? await Task.sleep(for: duration)
-            guard !Task.isCancelled else { return }
-            isPresented = false
+        if let duration {
+            content.task(id: isPresented) {
+                guard isPresented else { return }
+                try? await Task.sleep(for: duration)
+                guard !Task.isCancelled else { return }
+                isPresented = false
+            }
+        } else {
+            content
         }
     }
 }

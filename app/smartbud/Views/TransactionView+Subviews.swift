@@ -76,8 +76,13 @@ extension TransactionView {
         // date/category row cannot fit on a phone. Documented exception to
         // unlimited scaling, same approach as Apple's Calculator.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .sbToastDismissal($showToast, after: SBToast.dismissalDuration)
+        .sbToastDismissal($showToast, after: toastSticks ? nil : .seconds(2))
+        // A sticky refusal clears on the first edit, so the picker it
+        // replaced comes back without hunting for a close button.
+        .onChange(of: padVM.price) { _, _ in clearStickyToast() }
+        .onChange(of: date) { _, _ in clearStickyToast() }
         .onChange(of: income) { _, newValue in
+            clearStickyToast()
             lightHaptic &+= 1
             // Only drop a category that belongs to the other side; clearing
             // unconditionally wiped the category when editing an income
