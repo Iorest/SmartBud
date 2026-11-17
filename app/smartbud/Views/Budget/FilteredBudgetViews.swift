@@ -236,12 +236,12 @@ struct FilteredBudgetView: View {
         case 2: component = .month; step = 1
         default: component = .year; step = 1
         }
-        let periodEnd = calendar.date(byAdding: component, value: step, to: startDate) ?? .now
-        let endDate = min(periodEnd, .now)
+        let periodBoundary = calendar.date(byAdding: component, value: step, to: startDate) ?? .now
+        let endDate = min(periodBoundary, .now)
 
         categoryFilter = category
         periodStart = startDate
-        periodEnd = endDate
+        self.periodEnd = endDate
         _fetchedTransactions = Query(sort: [SortDescriptor(\.date, order: .reverse)])
         _totalSpent = totalSpent
     }
