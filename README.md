@@ -58,10 +58,10 @@ SmartBud does not have its own App Store listing yet, so build it from source (s
 
 ## How to build
 
-The repository is private, so ask a maintainer for access first. Clone and open the project:
+The repository is public — clone it with HTTPS or SSH, no access request needed:
 
 ```bash
-git clone git@github.com:Iorest/SmartBud.git
+git clone https://github.com/Iorest/SmartBud.git   # or git@github.com:Iorest/SmartBud.git
 cd SmartBud
 open app/SmartBud.xcodeproj
 ```
