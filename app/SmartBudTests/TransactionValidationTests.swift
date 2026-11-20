@@ -48,11 +48,26 @@ struct TransactionValidationTests {
         #expect(TransactionValidationError.incompleteEntry.highlightsFields)
         #expect(TransactionValidationError.missingCategory.highlightsFields)
         #expect(!TransactionValidationError.missingAmount.highlightsFields)
+        #expect(!TransactionValidationError.missingExchangeRate.highlightsFields)
+    }
+
+    @Test("An account without a rate refuses the entry instead of guessing 1:1")
+    func missingExchangeRate() {
+        #expect(TransactionValidation.error(amount: 12.5, hasCategory: true,
+                                            needsExchangeRate: true) == .missingExchangeRate)
+        // A blank form is still a blank form: the user has to type something
+        // before the rate matters.
+        #expect(TransactionValidation.error(amount: 0, hasCategory: true,
+                                            needsExchangeRate: true) == .missingAmount)
+        // Without the flag nothing changes.
+        #expect(TransactionValidation.error(amount: 12.5, hasCategory: true,
+                                            needsExchangeRate: false) == nil)
     }
 
     @Test("Each error carries a distinct message and icon")
     func distinctMessages() {
-        let all: [TransactionValidationError] = [.incompleteEntry, .missingAmount, .missingCategory]
+        let all: [TransactionValidationError] = [.incompleteEntry, .missingAmount,
+                                                .missingCategory, .missingExchangeRate]
         #expect(Set(all.map(\.toastTitleKey)).count == all.count)
         #expect(Set(all.map(\.systemImage)).count == all.count)
     }

@@ -91,6 +91,16 @@ extension HomeView {
         let account = resolveAccount(request.accountHint)
         let note = request.note.isEmpty ? (category?.wrappedName ?? "") : request.note
 
+        // Same rule as the entry form: no rate means no 1:1 guess frozen into
+        // `baseAmount`. An automation gets a code it can act on instead of a
+        // transaction that quietly distorts the totals.
+        if let account,
+           CurrencyRateStore.shared.needsRate(for: account.resolvedCurrencyCode) {
+            fireCallback(request.callbackError,
+                         items: [URLQueryItem(name: "error", value: "missing_rate")])
+            return
+        }
+
         guard let transaction = transactionVM.create(TransactionEdit(
             note: note,
             category: category,

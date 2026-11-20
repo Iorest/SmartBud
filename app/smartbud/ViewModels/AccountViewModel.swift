@@ -220,6 +220,12 @@ final class AccountViewModel {
     @discardableResult
     func adjustBalance(_ account: AccountModel, to target: Double, date: Date = .now) -> TransactionModel? {
         guard target.isFinite else { return nil }
+        // The correction row stores a base-currency amount too. Without a rate
+        // that number would be a 1:1 guess, so the adjustment is refused — the
+        // sheet already says which screen fixes it.
+        guard !CurrencyRateStore.shared.needsRate(for: account.resolvedCurrencyCode) else {
+            return nil
+        }
         let delta = Money.double(Money.cents(target) - Money.cents(balance(for: account)))
         guard delta != 0 else { return nil }
 
