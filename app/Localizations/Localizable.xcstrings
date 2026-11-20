@@ -18410,6 +18410,28 @@
           }
         }
       }
+    },
+    "“%@” has no exchange rate yet, so this CSV cannot be imported. Add one in Settings → Currency → Exchange Rates first." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” has no exchange rate yet, so this CSV cannot be imported. Add one in Settings → Currency → Exchange Rates first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”还没有汇率，这份 CSV 不能导入。请先到「设置 → 货币 → 汇率」里填一个。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”還沒有匯率，這份 CSV 不能匯入。請先到「設定 → 貨幣 → 匯率」裡填一個。"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"

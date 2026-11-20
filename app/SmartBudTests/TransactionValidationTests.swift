@@ -72,3 +72,51 @@ struct TransactionValidationTests {
         #expect(Set(all.map(\.systemImage)).count == all.count)
     }
 }
+
+/// The write gate and the converter share `usableRate`. A store could hold a
+/// 0 / negative / non-finite rate from a legacy backup: `rate` ignores it and
+/// returns 1, so the gate has to refuse that row too, not just a missing one.
+@Suite("CurrencyRateGate")
+struct CurrencyRateGateTests {
+    private let base = "CNY"
+    private let rates: [String: Double] = ["USD": 7.2, "JPY": 0, "EUR": .infinity]
+
+    @Test("Base and empty currencies convert at 1 without a rate row")
+    func baseNeedsNoRate() {
+        #expect(!CurrencyConversion.needsRate(for: "CNY", base: base, rates: [:]))
+        #expect(!CurrencyConversion.needsRate(for: "cny", base: base, rates: [:]))
+        #expect(!CurrencyConversion.needsRate(for: "", base: base, rates: [:]))
+        #expect(CurrencyConversion.rate(for: "CNY", base: base, rates: [:]) == 1)
+    }
+
+    @Test("A valid rate can be written")
+    func validRate() {
+        #expect(!CurrencyConversion.needsRate(for: "USD", base: base, rates: rates))
+        #expect(CurrencyConversion.rate(for: "usd", base: base, rates: rates) == 7.2)
+    }
+
+    @Test("Missing or unusable stored rates refuse the write")
+    func unusableRates() {
+        #expect(CurrencyConversion.needsRate(for: "GBP", base: base, rates: rates))
+        let badTables: [[String: Double]] = [
+            ["USD": 0], ["USD": -1], ["USD": .infinity], ["USD": .nan]
+        ]
+        for bad in badTables {
+            #expect(CurrencyConversion.needsRate(for: "USD", base: base, rates: bad))
+            #expect(CurrencyConversion.rate(for: "USD", base: base, rates: bad)
+                    == CurrencyConversion.fallbackRate)
+        }
+    }
+
+    @Test("Every refused conversion is the 1:1 fallback")
+    func gateMatchesConverter() {
+        for code in ["USD", "GBP", "JPY", "EUR", "CNY", ""] {
+            if CurrencyConversion.needsRate(for: code, base: base, rates: rates) {
+                #expect(CurrencyConversion.rate(for: code, base: base, rates: rates)
+                        == CurrencyConversion.fallbackRate)
+            }
+        }
+        #expect(CurrencyConversion.needsRate(for: "JPY", base: base, rates: rates))
+        #expect(CurrencyConversion.needsRate(for: "EUR", base: base, rates: rates))
+    }
+}

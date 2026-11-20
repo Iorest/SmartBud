@@ -126,3 +126,8 @@ date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbur
 导入不经过 `DataRepository.save()`（整份文件一次提交），所以要显式刷新：
 账户、分类、统计视图模型和小组件时间线。`SettingsImportView` 已经这么做；
 新增导入入口时别漏掉这一步。账目口径见 [ledger-rules.md](ledger-rules.md)。
+
+CSV 导入向导在写库前还会检查目标账户的币种有没有可用汇率：没有就整份拒绝、一条也不写，
+避免把 1:1 猜测冻结进 `baseAmount`。JSON 的交易行本来就带着导出时冻结的 `baseAmount`，
+不受影响；只有旧备份转账缺手续费行时，若该币种仍无汇率就先不补写，等下次启动的
+`TransferFeeLedger.migrate` 再按真实汇率补。

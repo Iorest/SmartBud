@@ -109,9 +109,12 @@ SmartBud 是个人记账，采用**收付实现制（cash basis）**：钱动了
   重述必须留审计记录（时间、旧基准、新基准、汇率、影响行数），否则半年后无法解释
   "为什么 3 月的数字和当时截图不一样"。当前只有折算、没有审计记录，属实现缺口。
 - 汇率来源优先级：手动设置 > 网络更新（Frankfurter/ECB）> 上次缓存；缺汇率时拒绝折算，
-  不允许按 1:1 猜。记账、编辑、调整余额三处写入口在 `CurrencyRateStore.needsRate`
-  为真时直接拒绝（提示去「设置 → 货币 → 汇率」补），深链回 `error=missing_rate`；
-  `CurrencyConversion.rate` 仍保留 1 的兜底，只给还没有入口拦截的 CSV/JSON 导入用。
+  不允许按 1:1 猜。记账、编辑、调整余额、深链、CSV 导入这些写入口在
+  `CurrencyRateStore.needsRate` 为真时直接拒绝（提示去「设置 → 货币 → 汇率」补）；
+  JSON 的交易行本来带导出时冻结好的 `baseAmount`，只有旧备份的手续费补写可能缺汇率，
+  此时跳过该行、等下次启动 `TransferFeeLedger.migrate` 再补，不写猜测值。
+  `CurrencyConversion.rate` 的 1 兜底只用于只读合计与转账建议，不再落到任何 `baseAmount`。
+  判定统一由 `CurrencyConversion.needsRate` 给出：汇率缺失或存了 0、负数、非有限值都算缺。
 
 ## 7. 对账与调整
 
