@@ -47,7 +47,8 @@ smartbud://add?amount=12.5&note=午饭
 - 失败：`...?error=invalid_amount`（金额缺失、为 0 或不是数字）、
   `...?error=invalid_date`（日期无法解析）、
   `...?error=save_failed`（写入失败，已回滚）、
-  `...?error=app_locked`（App 密码锁未解锁，拒绝写入）
+  `...?error=app_locked`（App 密码锁未解锁，拒绝写入）、
+  `...?error=missing_rate`（账户币种还没有汇率，拒绝按 1:1 折算；先去设置里补汇率）
 
 回调 URL 原有的查询参数会保留，SmartBud 只往后追加。
 

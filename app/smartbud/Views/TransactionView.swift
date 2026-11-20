@@ -197,9 +197,16 @@ struct TransactionView: View {
         // Adjustment rows and repayment rows are defined by having no
         // category; requiring one made them uneditable.
         let categoryOptional = toEdit?.adjustment == true || toEdit?.reimbursementOf != nil
+        // The amount is stored in the base currency as well as in the
+        // account's. Without a rate that second number would be a 1:1 guess
+        // baked into every total, so the entry is refused instead.
+        let needsRate = account.map {
+            CurrencyRateStore.shared.needsRate(for: $0.resolvedCurrencyCode)
+        } ?? false
         if let validationError = TransactionValidation.error(
             amount: amount, hasCategory: category != nil,
-            requiresCategory: !categoryOptional
+            requiresCategory: !categoryOptional,
+            needsExchangeRate: needsRate
         ) {
             toastImage = validationError.systemImage
             toastTitle = String.appLocalized(validationError.toastTitleKey)

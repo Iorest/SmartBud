@@ -158,6 +158,7 @@ struct AccountListView: View {
                 adjustmentInput = ""
             }
             Button(String.appLocalized("Done")) { applyAdjustment() }
+                .disabled(adjustingNeedsRate)
         } message: {
             Text(adjustmentMessage)
         }
@@ -243,8 +244,24 @@ struct AccountListView: View {
         }
     }
 
+    /// A foreign-currency account without a rate cannot be adjusted: the
+    /// correction row stores a base-currency amount, and without a rate that
+    /// number would be a 1:1 guess (`accounting-conventions.md` §6). The alert
+    /// says where to fix it and keeps "Done" disabled instead of dropping the
+    /// tap.
+    var adjustingNeedsRate: Bool {
+        guard let account = adjusting else { return false }
+        return CurrencyRateStore.shared.needsRate(for: account.resolvedCurrencyCode)
+    }
+
     var adjustmentMessage: String {
         guard let account = adjusting else { return "" }
+        if adjustingNeedsRate {
+            return String.appFormatted(
+                "“%@” has no exchange rate yet, so a correction cannot be converted. "
+                    + "Add one in Settings → Currency → Exchange Rates first.",
+                account.wrappedName)
+        }
         let current = Money.format(accountVM.balance(for: account),
                                    currencyCode: account.resolvedCurrencyCode,
                                    showsCents: showCents, locale: .appLocale)

@@ -40,7 +40,7 @@
 | §3 汇总一律 `wrappedBaseAmount` | `app/smartbud/Data/Helper.swift:116` | 一致 | — |
 | §3 切换基准币：一次提交、失败回滚、汇率表重整 | `app/smartbud/Logic/CurrencyRebase.swift:43-71`、`app/smartbud/Services/CurrencyRebaseService.swift:50-91` | 一致 | — |
 | §3 切换时缺汇率拒绝并提示 | `CurrencyRebase.plan` 返回 `.missingRate`（`CurrencyRebase.swift:52`），错误文案在 `CurrencyRebaseService.swift:25-29` | 一致 | — |
-| §3/会计基础 6“缺汇率时拒绝折算，不允许 1:1 猜” | 记账/编辑路径 `CurrencyRateStore.convertToBase` → `CurrencyConversion.rate` 在缺行时返回 `fallbackRate = 1`（`app/smartbud/Logic/CurrencyConversion.swift:16,23-25`）；只有转账编辑器查 `needsRate`（`Views/Accounts/TransferEditor.swift:57`） | 代码缺 | T1 |
+| §3/会计基础 6“缺汇率时拒绝折算，不允许 1:1 猜” | 记账/编辑：`Views/TransactionView.swift` 的 `submit()` 查 `CurrencyRateStore.needsRate` 后由 `TransactionValidation.error(needsExchangeRate:)` 拒绝；调余额：`AccountViewModel.adjustBalance` 直接 return nil；深链：`HomeView+DeepLink.swift` 回 `missing_rate`。`CurrencyConversion.rate` 仍保留 `fallbackRate = 1`（`Logic/CurrencyConversion.swift:16,23-25`），只剩导入在用 | 部分实现 | T1（剩 CSV/JSON 导入） |
 | §3 基准币重述必须留审计记录 | 未找到重述记录类型/写入；文档已自认是缺口（`design.md` §3、§12 P2） | 代码缺 | T3 |
 | §4 只允许三个判定 `countsAsSpend/countsAsIncome/signedBaseAmount` | `app/smartbud/Data/Helper.swift:139-155` | 一致 | — |
 | §5 `Recurrence.maxCatchUp` 限制单次补齐 | `app/smartbud/Logic/BudgetLogic.swift:82-85`（值 366） | 一致 | — |
@@ -100,7 +100,7 @@
 | 金额最小单位分，折算四舍五入 | `Money.cents` 用 `NSDecimalRound(..., .plain)`（`Logic/Money.swift:20-44`） | 一致 | — |
 | 多币种先折算后求和 | 每行 `baseAmount` 录入时冻结（`Helper.swift:116`），统计按 `Money.sum` 累加（`InsightsViewModel.swift:101`） | 一致 | — |
 | 尾差挂当期金额最大项 | 未找到尾差分配逻辑；逐行折算即冻结，不存在汇总层再分配 | 代码缺 | T4 |
-| 缺汇率时拒绝折算，不允许 1:1 | `CurrencyConversion.fallbackRate = 1` 并在缺行时返回它（`Logic/CurrencyConversion.swift:16,23-25`） | 代码缺 | T1 |
+| 缺汇率时拒绝折算，不允许 1:1 | 写入口（记账/编辑/调余额/深链）已拦，只剩 CSV/JSON 导入仍走 `CurrencyConversion.fallbackRate = 1`（`Logic/CurrencyConversion.swift:16,23-25`） | 部分实现 | T1（剩导入） |
 | 切换基准币是一次性重述，必须留审计记录 | 未找到重述记录写入 | 代码缺 | T3 |
 | 调整应带原因；当前无原因字段 | `AccountViewModel.adjustBalance` 只写金额/账户/日期，无 reason（`ViewModels/AccountViewModel.swift:219-238`） | 一致 | 已有缺口，见 T6 |
 | 调整后余额必须相等（有测试） | 测试目录无 `adjustBalance` 相关用例 | 文档错 | 已改：删掉“（有测试）”，注明现状 |
@@ -149,7 +149,7 @@
 | `add` 参数：amount/type/category/account/note/date/reimbursable/discount | `Utilities/DeepLink.swift:78-114` | 一致 | — |
 | 路由：search / open?tab / insights / budget / newExpense | `DeepLink.swift:47-56`、`Views/HomeView.swift:331-337` | 一致 | — |
 | 成功回 `id/amount/date` | `Views/HomeView+DeepLink.swift:118-122` | 一致 | — |
-| 失败错误码 `invalid_amount/invalid_date/save_failed/app_locked` | `HomeView+DeepLink.swift:47-51,70-80,105-111` | 一致 | — |
+| 失败错误码 `invalid_amount/invalid_date/save_failed/app_locked/missing_rate` | `HomeView+DeepLink.swift:47-51,70-80,105-116` | 一致 | — |
 | `add` 支持 `x-cancel` 并会打开对应 URL | `DeepLink.swift:73` 只解析、不保存以外的使用；`HomeView+DeepLink` 只触发 success/error | 文档错 | 已改：注明 `x-cancel` 没有触发点 |
 | 锁定时 `add` 返回 `app_locked`，不写数据 | `HomeView+DeepLink.swift:47-51`、`Utilities/AppLockGate.swift:18` | 一致 | — |
 | `add` 不做重复检测 | 无去重逻辑 | 一致 | — |
@@ -263,7 +263,7 @@
 
 | 编号 | 标题 | 优先级 | 依赖 | 证据 / 范围 |
 |---|---|---|---|---|
-| T1 | 录入/导入缺汇率时不得静默按 1:1 折算 | P1 | 无 | `Logic/CurrencyConversion.swift:16,23-25`；`accounting-conventions.md` §6。建议：记账/编辑/导入在 `needsRate` 为真时阻断或明确标注“未折算”，并补一条口径测试 |
+| T1 | 录入/导入缺汇率时不得静默按 1:1 折算 | P1 | 无 | 已实现写入口拦截（`Views/TransactionView.swift` `submit()`、`AccountViewModel.adjustBalance`、`HomeView+DeepLink` 的 `missing_rate`），口径测试在 `SmartBudTests/TransactionValidationTests.swift`。**未做**：CSV/JSON 导入仍按 1:1 折算（`DataImporter` 无 `needsRate` 判断）。证据：`Logic/CurrencyConversion.swift:16,23-25`；`accounting-conventions.md` §6 |
 | T2 | 明确并统一“未来记录是否计入账户余额” | P2 | 需产品确认口径 | `Logic/AccountBalance.swift:14-29` 计入全部记录，与统计的 `date <= now` 不一致；文档已按现状描述，需决定是否改实现 |
 | T3 | 基准币重述写审计记录 | P2 | 无 | `Services/CurrencyRebaseService.swift:50-91` 只折算不记录；`design.md` §12 P2、会计基础 §6 |
 | T4 | 多币种尾差归属 | P3 | T1 的口径确定后再做 | `accounting-conventions.md` §6 要求尾差挂当期最大项，代码逐行折算后直接求和，无尾差分配 |
