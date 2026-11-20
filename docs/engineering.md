@@ -132,9 +132,9 @@ xcodebuild test \
 不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
 `-only-testing:SmartBudTests`。
 
-18 条 UI 用例串行跑一次约 13–14 分钟，超过本项目的 10 分钟预算，所以 CI 把它拆成五个
-分片 job（并发跑）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），
-其余四个分片按**实测用例耗时**均衡分 E2E：
+18 条 UI 用例的用例执行时间串行合计约 28m44s（实测，不含编译与约 2 分钟的模拟器 warm-up），
+远超单个 job 的 10 分钟预算——这是**串行所需**；**分片后** CI 把它们拆成五个 job 并发跑，
+每个都回到预算内（最慢约 6.8 分钟）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），其余四个分片按**实测用例耗时**均衡分 E2E：
 
 | 分片 | 用例 | 实测用例耗时（run 44026222552） |
 | --- | --- | --- |
@@ -148,9 +148,9 @@ xcodebuild test \
 分片用 `-only-testing` / `-skip-testing` 过滤时，标识符必须是 **Target/Class/Method**
 （`SmartBudUITests/SmartBudUITests/testA1_…`）：少写一层会静默匹配到 0 条用例，
 xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
-分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等，
-三个分片的方案让两个分片跑到 680 s / 788 s，越过了 10 分钟预算；再加一条长用例时
-先看实测耗时，把最慢的分片一分为二。
+分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等。旧的
+三个分片方案曾让两个分片跑到 680 s / 788 s、越过 10 分钟预算，这正是 PR #23 按实测耗时
+重拆成四个 e2e 分片的原因；现在四片为 353 / 327 / 405 / 383 s（见上表），最慢约 6.8 分钟，回到预算内；再加长用例先看实测耗时，把最慢的分片一分为二。
 
 ### 元素怎么定位
 
@@ -217,7 +217,7 @@ xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿�
 - 完整编译、SwiftData、SwiftUI、CloudKit、StoreKit、解析里的 NaturalLanguage，
   以及全部 XCUITest，仍然只能在 macOS runner 或一台真 Mac 上验证；
 - 但 **Foundation-only 的逻辑层可以在 Linux 上真编译真测试**：
-  `scripts/linux-tests.sh`（见下节），当前覆盖 69 个用例 / 8 个 suite；
+  `scripts/linux-tests.sh`（见下节），当前覆盖 89 个用例 / 11 个 suite；
 - 不依赖 Xcode 的静态检查也在本地做：`python3 scripts/check_repo.py`（结构与引用）、
   `scripts/check-syntax.sh`（全部 Swift 文件的语法）。
 
@@ -270,7 +270,7 @@ CI 的 `test` job 在「Select Xcode 26」之后跑它（那时 `swiftc` 一定�
 # 需要一个 Linux Swift 工具链（6.0+），装机后：
 export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swift 放进 PATH
 scripts/linux-tests.sh
-# 输出：✔ Test run with 79 tests in 9 suites passed after 0.014 seconds.
+# 输出：✔ Test run with 89 tests in 11 suites passed after 0.014 seconds.
 ```
 
 覆盖的 suite：`AppPeriod` / `CSVTable` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` /
