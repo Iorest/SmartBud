@@ -192,7 +192,9 @@ extension ImportDataView {
         return ids
     }
 
-    /// Rejects an incomplete wizard before any parsing happens.
+    /// Rejects an incomplete wizard, or an account we cannot convert, before
+    /// any parsing happens. The whole batch is refused: one row written at a
+    /// guessed rate would make every total wrong.
     private func importSelectionIsValid() -> Bool {
         if selectedColumns.count <= 3 {
             processingState = .error
@@ -202,6 +204,14 @@ extension ImportDataView {
         if dateFormatString.isEmpty {
             processingState = .error
             errorMessage = String.appLocalized("请先选择日期格式。")
+            return false
+        }
+        if let account = accounts.first(where: { $0.id == importAccountID }),
+           CurrencyRateStore.shared.needsRate(for: account.resolvedCurrencyCode) {
+            processingState = .error
+            errorMessage = String.appFormatted(
+                "“%@” has no exchange rate yet, so this CSV cannot be imported. Add one in Settings → Currency → Exchange Rates first.",
+                account.resolvedCurrencyCode)
             return false
         }
         return true

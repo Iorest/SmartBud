@@ -37,10 +37,11 @@ final class CurrencyRateStore {
         CurrencyConversion.rate(for: code, base: baseCurrency, rates: rates)
     }
 
-    /// True when the currency has no rate row yet and is not the base currency.
+    /// True when converting `code` would fall back to 1:1 — no rate row, or a
+    /// stored value `CurrencyConversion.rate` has to ignore. Writing a
+    /// `baseAmount` in that state would freeze a made-up number into totals.
     func needsRate(for code: String) -> Bool {
-        let target = code.uppercased()
-        return !target.isEmpty && target != baseCurrency.uppercased() && rates[target] == nil
+        CurrencyConversion.needsRate(for: code, base: baseCurrency, rates: rates)
     }
 
     func setRate(_ value: Double, for code: String) {

@@ -218,8 +218,9 @@ struct SettingsImportView: View {
                 // without needing a relaunch.
                 // The fee row's base amount converts with the *imported*
                 // rates, so the rate cache has to catch up before the repair
-                // runs; otherwise a missing rate falls back to 1:1 and the
-                // fee is frozen at the wrong scale.
+                // runs. A transfer whose currency still has no rate keeps
+                // waiting: `migrate` reruns on every launch, so the row is
+                // written at the real rate instead of a 1:1 guess.
                 CurrencyRateStore.shared.load()
                 // Older backups carry transfers whose fee has no expense row;
                 // write the missing rows so the imported balances add up.

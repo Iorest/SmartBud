@@ -28,8 +28,11 @@ extension TransferFeeLedger {
         var created = 0
         for transfer in transfers where transfer.fee > 0 {
             guard !recorded.contains(transfer.id) else { continue }
-            recordFee(for: transfer, in: context,
-                      baseAmount: convertedFee(transfer))
+            // A missing rate leaves the row unwritten; `migrate` reruns on
+            // every launch, so it is filled at the real rate later instead
+            // of freezing a 1:1 guess into `baseAmount`.
+            guard let baseAmount = convertedFee(transfer) else { continue }
+            recordFee(for: transfer, in: context, baseAmount: baseAmount)
             recorded.insert(transfer.id)
             created += 1
         }
@@ -37,9 +40,10 @@ extension TransferFeeLedger {
         return created
     }
 
-    private static func convertedFee(_ transfer: TransferModel) -> Double {
-        CurrencyRateStore.shared.convertToBase(
-            transfer.fee,
-            from: transfer.source?.resolvedCurrencyCode ?? "")
+    /// Nil when the source currency still has no usable rate.
+    private static func convertedFee(_ transfer: TransferModel) -> Double? {
+        let code = transfer.source?.resolvedCurrencyCode ?? ""
+        guard !CurrencyRateStore.shared.needsRate(for: code) else { return nil }
+        return CurrencyRateStore.shared.convertToBase(transfer.fee, from: code)
     }
 }
