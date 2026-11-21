@@ -10,20 +10,38 @@
 import Foundation
 
 enum CurrencyConversion {
-    /// Rate used when the user has not entered one for `code`. Treating an
-    /// unknown currency as 1:1 keeps totals finite; the rates screen lists any
+    /// Read-only fallback for an unknown currency: keeps a displayed total
+    /// finite. Every write path checks `needsRate` first, so no stored
+    /// `baseAmount` can come from this guess; the rates screen lists any
     /// currency still on the fallback so it can be corrected.
     static let fallbackRate: Double = 1
 
-    static func rate(for code: String, base: String, rates: [String: Double]) -> Double {
+    /// The rate `code` converts at, or nil when only the 1:1 fallback is
+    /// available. Base currency and empty codes convert at 1 by definition.
+    private static func usableRate(
+        for code: String,
+        base: String,
+        rates: [String: Double]
+    ) -> Double? {
         let target = code.uppercased()
         let baseCode = base.uppercased()
         if target.isEmpty || target == baseCode { return 1 }
 
         guard let value = rates[target], value > 0, value.isFinite else {
-            return fallbackRate
+            return nil
         }
         return value
+    }
+
+    static func rate(for code: String, base: String, rates: [String: Double]) -> Double {
+        usableRate(for: code, base: base, rates: rates) ?? fallbackRate
+    }
+
+    /// True when a foreign currency has no usable rate, i.e. `rate` would
+    /// silently substitute 1:1. Write paths gate on this before freezing a
+    /// `baseAmount`, so a made-up number never lands in the ledger.
+    static func needsRate(for code: String, base: String, rates: [String: Double]) -> Bool {
+        usableRate(for: code, base: base, rates: rates) == nil
     }
 
     static func convert(
