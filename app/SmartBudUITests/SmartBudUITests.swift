@@ -1378,6 +1378,224 @@ final class SmartBudUITests: XCTestCase {
                        "Refunding the full 20 should remove it from spend")
         select(.log, in: app)
     }
+
+    // MARK: - TELE-37 · accounts, import/export, search & filter, deep links
+    //
+    // These six cases stay on the surfaces that ship on `main`: the SwiftData
+    // account editor, the `-importSample` CSV preview, the Log filter/search
+    // controls, and the `smartbud://add` URL scheme. The JSON backup/restore
+    // sheets use system share/file pickers with no accessibility hooks on this
+    // build, and App Lock has no DEBUG unlock hook here, so the round-trip and
+    // locked-x-error paths are covered up to the observable behaviour: a
+    // cancelled preview writes no row and a locked session refuses the add.
+    // Each case asserts on data (balances, ledger row counts, spend) rather
+    // than on a screen merely appearing.
+
+    /// Launches a fresh app with App Lock forced on through the
+    /// NSArgumentDomain key that Authentication.migrateLegacyAppLockKey()
+    /// copies into the App Group suite. launch() itself stays untouched.
+    private func launchLocked() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
+            "-skipIntro", "-importSample", "-freshStore",
+            "-skipReviewPrompt", "-appLockEnabled", "YES",
+        ]
+        app.launch()
+        return app
+    }
+
+    /// Clears the persisted App Lock flag (the in-memory store does not reset
+    /// UserDefaults) so the next case in this shard boots unlocked.
+    private func resetAppLock() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
+            "-skipIntro", "-freshStore", "-skipReviewPrompt",
+            "-appLockEnabled", "NO",
+        ]
+        app.launch()
+    }
+
+    // B1. A new account with an opening balance is listed with that balance.
+    func testB1_newAccountWithOpeningBalance_listsBalanceAndTotal() throws {
+        let app = launch()
+        let name = qaNote("B1")
+        openAccounts(app)
+        makeAccount(app, name: name, opening: "250")
+
+        // DATA: the row's accessibilityValue carries the opening balance.
+        XCTAssertEqual(balance(app, of: name), 250, accuracy: 0.005,
+                       "A new account must list its opening balance")
+        // The aggregate Total Balance row has no stable identifier on this
+        // build; its presence (fed by the balance above) is asserted here.
+        let total = app.staticTexts
+            .matching(NSPredicate(format: "label CONTAINS[c] %@", "Total Balance"))
+            .firstMatch
+        XCTAssertTrue(total.waitForExistence(timeout: 10),
+                      "The Total Balance row must be rendered")
+    }
+
+    // B2. Archiving a funded account prompts first, then leaves the default list.
+    func testB2_archiveFundedAccount_promptsThenLeavesDefaultList() throws {
+        let app = launch()
+        let name = qaNote("B2")
+        openAccounts(app)
+        makeAccount(app, name: name, opening: "120")
+        XCTAssertEqual(balance(app, of: name), 120, accuracy: 0.005,
+                       "The funded account must show its opening balance")
+
+        // Long-press (context menu) or swipe reveals the Archive action.
+        let cell = app.cells
+            .containing(.staticText, identifier: AccessibilityID.accountBalance(name))
+            .firstMatch
+        let accountCell: XCUIElement = cell.exists
+            ? cell
+            : scrollIntoView(AccessibilityID.accountBalance(name), in: app)
+        accountCell.press(forDuration: 1.5)
+        var archive = app.buttons["Archive"].firstMatch
+        if !archive.waitForExistence(timeout: 6) {
+            accountCell.swipeLeft()
+            archive = app.buttons["Archive"].firstMatch
+        }
+        XCTAssertTrue(archive.waitForExistence(timeout: 10),
+                      "No Archive action for the account row")
+        archive.tap()
+
+        // A non-zero balance must not archive silently.
+        let prompt = app.alerts.firstMatch
+        XCTAssertTrue(prompt.waitForExistence(timeout: 10),
+                      "Archiving a funded account must prompt for confirmation")
+        prompt.buttons["Archive"].firstMatch.tap()
+
+        // DATA: once archived, the balance figure drops out of the visible list.
+        let figure = element(app, AccessibilityID.accountBalance(name))
+        let gone = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == false"), object: figure)
+        XCTAssertEqual(XCTWaiter().wait(for: [gone], timeout: 10), .completed,
+                       "Archived account is still in the default list")
+    }
+
+    // B3. The import preview can be cancelled without writing a single row.
+    func testB3_importPreview_cancelWritesNothing() throws {
+        let app = launch()
+        let note = qaNote("B3")
+        addExpense(app, amount: "18.00", note: note)
+        let before = logRows(app).count
+        XCTAssertGreaterThan(before, 0, "A seeded ledger is needed to prove a no-op")
+
+        select(.settings, in: app)
+        let importRow = scrollIntoView(AccessibilityID.settingsImportData, in: app)
+        XCTAssertTrue(importRow.exists, "The Import Data row is missing")
+        importRow.tap()
+        require(app, AccessibilityID.importPreview, timeout: 20)
+        require(app, AccessibilityID.importContinue)
+        // Step back to the file step, then dismiss: the proven cancel sequence.
+        require(app, AccessibilityID.importClose).tap()
+        require(app, AccessibilityID.importChooseFile, timeout: 10)
+        require(app, AccessibilityID.importClose).tap()
+        require(app, AccessibilityID.settingsImportData, timeout: 10)
+
+        // DATA: cancelling the preview leaves the ledger count unchanged.
+        select(.log, in: app)
+        XCTAssertEqual(logRows(app).count, before,
+                       "Cancelling the import preview must not write any row")
+    }
+
+    // B4. Opening the same sample twice and cancelling adds no rows either time.
+    func testB4_importSameSampleTwice_addsNothing() throws {
+        let app = launch()
+        let note = qaNote("B4")
+        addExpense(app, amount: "24.00", note: note)
+        let before = logRows(app).count
+        XCTAssertGreaterThan(before, 0)
+
+        for _ in 0..<2 {
+            select(.settings, in: app)
+            let importRow = scrollIntoView(AccessibilityID.settingsImportData, in: app)
+            XCTAssertTrue(importRow.exists)
+            importRow.tap()
+            require(app, AccessibilityID.importPreview, timeout: 20)
+            require(app, AccessibilityID.importContinue)
+            require(app, AccessibilityID.importClose).tap()
+            require(app, AccessibilityID.importChooseFile, timeout: 10)
+            require(app, AccessibilityID.importClose).tap()
+            require(app, AccessibilityID.settingsImportData, timeout: 10)
+
+            // DATA: each preview — including the second import of the same file —
+            // leaves the ledger untouched when cancelled.
+            select(.log, in: app)
+            XCTAssertEqual(logRows(app).count, before,
+                           "Importing the same sample twice must add no rows")
+        }
+    }
+
+    // B5. Search stacks on the active filter; the type filter keeps real expenses.
+    func testB5_searchStacksOnFilter_typeFilterKeepsExpenses() throws {
+        let app = launch()
+        let first = qaNote("B5a")
+        let second = qaNote("B5b")
+        addExpense(app, amount: "12.00", note: first)
+        addExpense(app, amount: "34.00", note: second)
+
+        // Type filter keeps genuine expenses (LogView drops balance adjustments
+        // through the !adjustment predicate in visibleTransactions).
+        let filter = app.buttons["Filter"].firstMatch
+        XCTAssertTrue(filter.waitForExistence(timeout: 10), "The Filter menu is missing")
+        filter.tap()
+        let byType = app.buttons
+            .matching(NSPredicate(format: "label CONTAINS[c] %@", "by type"))
+            .firstMatch
+        XCTAssertTrue(byType.waitForExistence(timeout: 10), "No 'by type' filter option")
+        byType.tap()
+        XCTAssertGreaterThanOrEqual(logRows(app).count, 2,
+                                    "The type filter must keep both real expenses")
+
+        // Search narrows within the current filter instead of resetting it.
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 10), "The searchable field is missing")
+        field.tap()
+        field.typeText(first)
+        waitForRow(app, note: first)
+        XCTAssertEqual(logRows(app).count, 1,
+                       "Search must stack on the filter, leaving only the match")
+        XCTAssertFalse(row(note: second, in: app).exists,
+                       "The non-matching row must be filtered out")
+    }
+
+    // B6. `smartbud://add` writes a row when unlocked and is refused when locked.
+    func testB6_deepLinkAdd_unlockedWrites_lockedRefuses() throws {
+        // No x-error target is attached: fireCallback is a no-op without one, so
+        // a rejected URL cannot loop back into another onOpenURL. The refusal is
+        // asserted on data (no row written) rather than on the callback URL.
+        let addURL = URL(string: "smartbud://add?amount=35&category=%E9%A4%90%E9%A5%AE")!
+
+        // Unlocked: the add deep link books a 35.00 expense.
+        let app = launch()
+        let before = expenseTotal(app)
+        app.open(addURL)
+        select(.log, in: app)
+        let firstRow = logRows(app).firstMatch
+        let appeared = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == true"), object: firstRow)
+        XCTAssertEqual(XCTWaiter().wait(for: [appeared], timeout: 20), .completed,
+                       "The unlocked add deep link must write a row")
+        XCTAssertEqual(expenseTotal(app), before + 35, accuracy: 0.005,
+                       "The add deep link must book the 35 amount")
+
+        // Locked: the same URL is refused (x-error=app_locked) and writes nothing.
+        let locked = launchLocked()
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.waitForExistence(timeout: 20),
+                      "The session should be locked")
+        locked.open(addURL)
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.exists,
+                      "A locked session must not be bypassed by the add deep link")
+        XCTAssertEqual(logRows(locked).count, 0,
+                       "A refused deep link must not write a row (it wrote one above)")
+
+        // Clear the persisted App Lock flag so later cases in this shard boot unlocked.
+        resetAppLock()
+    }
 }
 
 // MARK: - Audit policy

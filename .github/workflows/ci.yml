@@ -170,13 +170,14 @@ jobs:
     # Same image and Xcode selection as the logic-test job: the UI cases need
     # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
     #
-    # Four e2e shards plus the smoke shard: the nine E2E cases cost 1459 s of
-    # case time on macos-15 (run 44026222552: A1 102 s, A2 141 s, A3 110 s,
-    # A4 167 s, A5 159 s, A6 227 s, A7 179 s, A8 179 s, A9 204 s), so three
-    # shards put two of them past the 10-minute budget. Shards are balanced on
-    # measured case time, not on case count; the slowest now sits at ~6.8
-    # minutes. A new case must be added to one of `tests` below — the smoke
-    # shard skips every E2E case by name.
+    # Four e2e shards plus the smoke shard. PR #23 (823f016) balanced the E2E
+    # cases on measured case time from run 44026222552 into shard totals of
+    # 353 s (entry), 327 s (edit), 405 s (ledger) and 383 s (budget) on
+    # macos-15; there are now ten A cases (A1-A10). Shards are balanced on
+    # measured case time, not on case count, and each stays under the
+    # 10-minute budget. The six TELE-37 B cases sit on the shards with the
+    # most remaining headroom. A new case must be added to one of `tests`
+    # below — the smoke shard skips every E2E case by name.
     runs-on: macos-15
     timeout-minutes: 60
     strategy:
@@ -197,6 +198,12 @@ jobs:
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
               testA10_refund_reducesSpendWithoutIncome
+              testB1_newAccountWithOpeningBalance_listsBalanceAndTotal
+              testB2_archiveFundedAccount_promptsThenLeavesDefaultList
+              testB3_importPreview_cancelWritesNothing
+              testB4_importSameSampleTwice_addsNothing
+              testB5_searchStacksOnFilter_typeFilterKeepsExpenses
+              testB6_deepLinkAdd_unlockedWrites_lockedRefuses
           - key: e2e-entry
             label: e2e 记账/校验
             filter: only
@@ -204,6 +211,8 @@ jobs:
               testA1_addExpense_updatesStats
               testA2_continuousEntry_clearsAmountKeepsCategory
               testA3_invalidInput_isRefusedWithMessage
+              testB1_newAccountWithOpeningBalance_listsBalanceAndTotal
+              testB3_importPreview_cancelWritesNothing
           - key: e2e-edit
             label: e2e 折扣/编辑
             filter: only
@@ -211,18 +220,22 @@ jobs:
               testA4_discountClaimFutureDate_staysOutOfStats
               testA5_editAmount_updatesStats_typeSwitchClearsCategory
               testA10_refund_reducesSpendWithoutIncome
+              testB2_archiveFundedAccount_promptsThenLeavesDefaultList
+              testB6_deepLinkAdd_unlockedWrites_lockedRefuses
           - key: e2e-ledger
             label: e2e 删除/转账
             filter: only
             tests: >-
               testA6_deleteUndo_restoresFieldsAndBalance
               testA7_sameCurrencyTransfer_movesBalancesOnly
+              testB5_searchStacksOnFilter_typeFilterKeepsExpenses
           - key: e2e-budget
             label: e2e 跨币种/预算
             filter: only
             tests: >-
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
+              testB4_importSameSampleTwice_addsNothing
 
     env:
       PROJECT: app/SmartBud.xcodeproj
