@@ -132,25 +132,31 @@ xcodebuild test \
 不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
 `-only-testing:SmartBudTests`。
 
-18 条 UI 用例的用例执行时间串行合计约 28m44s（实测，不含编译与约 2 分钟的模拟器 warm-up），
+24 条 UI 用例（8 条 smoke + A1–A10 + B1–B6）的用例执行时间串行合计约 38m34s
+（run 44760878898 五个分片各自的 `Executed … tests … in … seconds` 相加，不含编译与约 2 分钟的模拟器 warm-up），
 远超单个 job 的 10 分钟预算——这是**串行所需**；**分片后** CI 把它们拆成五个 job 并发跑，
-每个都回到预算内（最慢约 6.8 分钟）：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），其余四个分片按**实测用例耗时**均衡分 E2E：
+最慢的一片 587.793 s（约 9.8 分钟）距 600 s 预算只剩 12 s：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），其余四个分片按**实测用例耗时**均衡分 E2E：
 
-| 分片 | 用例 | 实测用例耗时（run 44026222552） |
+| 分片 | 用例 | 实测用例耗时（run 44760878898） |
 | --- | --- | --- |
-| `e2e 记账/校验` | A1–A3 | 353 s |
-| `e2e 折扣/编辑` | A4–A5、A10 | 327 s（A10 新加，未单独计时） |
-| `e2e 删除/转账` | A6–A7 | 405 s |
-| `e2e 跨币种/预算` | A8–A9 | 383 s |
+| `smoke` | 8 条冒烟 | 253.804 s |
+| `e2e 记账/校验` | A1–A3、B1、B3 | 553.738 s |
+| `e2e 折扣/编辑` | A4、A5、A10、B2、B6 | 587.793 s |
+| `e2e 删除/转账` | A6、A7、B5 | 386.847 s |
+| `e2e 跨币种/预算` | A8、A9、B4 | 531.371 s |
 
 **新增用例要同时加进 `.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke
 分片会把它一起跑掉。
 分片用 `-only-testing` / `-skip-testing` 过滤时，标识符必须是 **Target/Class/Method**
 （`SmartBudUITests/SmartBudUITests/testA1_…`）：少写一层会静默匹配到 0 条用例，
 xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
-分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等。旧的
+分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等
+（run 44026222552），B 用例实测 65–100 s（run 44760878898）。旧的
 三个分片方案曾让两个分片跑到 680 s / 788 s、越过 10 分钟预算，这正是 PR #23 按实测耗时
-重拆成四个 e2e 分片的原因；现在四片为 353 / 327 / 405 / 383 s（见上表），最慢约 6.8 分钟，回到预算内；再加长用例先看实测耗时，把最慢的分片一分为二。
+重拆成四个 e2e 分片的原因（当时四片 353 / 327 / 405 / 383 s，run 44026222552）。
+PR #29 把 6 条 B 用例挂进剩余余量最大的分片后，四片实测变成
+553.738 / 587.793 / 386.847 / 531.371 s（见上表，run 44760878898），最慢的 `e2e 折扣/编辑`
+距 600 s 只剩 12 s。再加长用例不能往最慢的一片塞：先看实测耗时，新开第五个 e2e 分片或重新均衡。
 
 ### 元素怎么定位
 
@@ -302,7 +308,7 @@ ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的五个分片 job（见「UI 测试」一节），全部要绿 |
+| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的五个分片 job（smoke + 四个 e2e，见「UI 测试」一节），全部要绿 |
 | 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
 | 超时 | 逻辑测试 45 分钟，UI 测试 60 分钟 |
 | 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults-<分片>.xcresult` + 日志，**每次**上传（审计报告与失败截图在里面） |
