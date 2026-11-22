@@ -71,7 +71,7 @@ open TestResults.xcresult
 
 ## UI 测试
 
-UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 8 条冒烟 + 9 条交互 E2E：
+UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当前 34 条 UI 用例（8 条冒烟 + 26 条交互 E2E）。下表是 8 条冒烟：
 
 | 用例 | 挡住什么 |
 |---|---|
@@ -84,7 +84,7 @@ UI 测试在 `app/SmartBudUITests/`，用的是 XCUITest（`XCTestCase`），当
 | `testSettingsOpensProAndBackReturns` | 设置 → Pro → 返回 |
 | `testImportPreviewThenCancel` | 导入向导的预览步骤与取消 |
 
-外加 9 条交互 E2E（前缀 `testA<n>_`）。每条的断言都落在数据或文案上（账本行、统计卡、
+外加 26 条交互 E2E（`testA` / `testB` / `testC` 三批），下表以其中 9 条 A 用例为例。每条的断言都落在数据或文案上（账本行、统计卡、
 余额、预算剩余、校验提示）。两条约定让断言不依赖执行顺序：
 
 - **一条用例一个干净库**：`launch()` 带 `-freshStore`，用空的内存 store 启动，
@@ -132,18 +132,17 @@ xcodebuild test \
 不带 `-only-testing` 会把 `SmartBudTests` 一起跑掉；CI 里逻辑测试 job 显式加了
 `-only-testing:SmartBudTests`。
 
-24 条 UI 用例（8 条 smoke + A1–A10 + B1–B6）的用例执行时间串行合计约 38m34s
-（run 44760878898 五个分片各自的 `Executed … tests … in … seconds` 相加，不含编译与约 2 分钟的模拟器 warm-up），
-远超单个 job 的 10 分钟预算——这是**串行所需**；**分片后** CI 把它们拆成五个 job 并发跑，
-最慢的一片 587.793 s（约 9.8 分钟）距 600 s 预算只剩 12 s：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），其余四个分片按**实测用例耗时**均衡分 E2E：
+34 条 UI 用例（8 条 smoke + A1–A10 + B1–B6 + 10 条 C）的用例执行时间串行合计约 52m56s
+（run 45001201989 六个分片各自的 `Executed … tests … in … seconds` 相加，不含编译与约 2 分钟的模拟器 warm-up）——这是**串行所需**；**分片后** CI 把它们拆成六个 job 并发跑，按 `ui-test` 的 `timeout-minutes: 60` 留余量：`smoke`（8 条冒烟，按名字 `-skip-testing` 掉全部 E2E 用例），其余五个分片按**实测用例耗时**均衡分 E2E：
 
-| 分片 | 用例 | 实测用例耗时（run 44760878898） |
+| 分片 | 用例 | 实测用例耗时（run 45001201989） |
 | --- | --- | --- |
-| `smoke` | 8 条冒烟 | 253.804 s |
-| `e2e 记账/校验` | A1–A3、B1、B3 | 553.738 s |
-| `e2e 折扣/编辑` | A4、A5、A10、B2、B6 | 587.793 s |
-| `e2e 删除/转账` | A6、A7、B5 | 386.847 s |
-| `e2e 跨币种/预算` | A8、A9、B4 | 531.371 s |
+| `smoke` | 8 条冒烟 | 339.911 s |
+| `e2e 记账/校验` | A1–A3、B1、B3、C1、C1b、C3 | 673.080 s |
+| `e2e 折扣/编辑` | A4、A5、A10、B2、B6 | 666.960 s |
+| `e2e 删除/转账` | A6、A7、B5、C2、C4、C5 | 756.279 s |
+| `e2e 跨币种/预算` | A8、A9、B4、C3b、C4b、C4c | 684.267 s |
+| `e2e 布局/iPad` | C5b | 55.105 s |
 
 **新增用例要同时加进 `.github/workflows/ci.yml` 对应分片的 `tests` 列表**，否则 smoke
 分片会把它一起跑掉。
@@ -152,11 +151,15 @@ xcodebuild test \
 xcodebuild 仍然返回成功——分片"全绿"但一条都没跑，这种绿是假的。
 分片按耗时不按条数：同一台 runner 上单条用例从 100 s（A1）到 227 s（A6）不等
 （run 44026222552），B 用例实测 65–100 s（run 44760878898）。旧的
-三个分片方案曾让两个分片跑到 680 s / 788 s、越过 10 分钟预算，这正是 PR #23 按实测耗时
+三个分片方案曾让两个分片跑到 680 s / 788 s、越过当时的 600 s 目标，这正是 PR #23 按实测耗时
 重拆成四个 e2e 分片的原因（当时四片 353 / 327 / 405 / 383 s，run 44026222552）。
 PR #29 把 6 条 B 用例挂进剩余余量最大的分片后，四片实测变成
-553.738 / 587.793 / 386.847 / 531.371 s（见上表，run 44760878898），最慢的 `e2e 折扣/编辑`
-距 600 s 只剩 12 s。再加长用例不能往最慢的一片塞：先看实测耗时，新开第五个 e2e 分片或重新均衡。
+553.738 / 587.793 / 386.847 / 531.371 s（run 44760878898），最慢的 `e2e 折扣/编辑`
+距 600 s 只剩 12 s。PR #31 的 10 条 C 用例按余量分给 `e2e 记账/校验`、
+`e2e 删除/转账`、`e2e 跨币种/预算` 各 3 条，iPad 分栏布局单开第五个 e2e 分片
+`e2e 布局/iPad`，`e2e 折扣/编辑` 不加用例。早期按 600 s 卡分片，现在按
+`timeout-minutes: 60` 留余量，最慢的一片 756.279 s（约 12.6 分钟，见上表，run 45001201989）。
+再加长用例先看实测耗时，必要时重新均衡或再开分片。
 
 ### 元素怎么定位
 
@@ -191,8 +194,8 @@ PR #29 把 6 条 B 用例挂进剩余余量最大的分片后，四片实测变�
 目前 5 条用例在末尾调用 `assertAccessible` 跑 `performAccessibilityAudit`
 （其余用例尚未接入），发现的问题全部打到日志里
 （`AUDIT[屏幕] 类型 描述 [identifier]`），CI job summary 汇总最近 60 条，完整报告在
-`UITestResults-<分片>.xcresult` / `xcodebuild-uitest.log` artifact 里。9 条交互 E2E 不跑审计：
-它们每条要多走 4–6 个界面，审计本身每次 3–8 秒，加进去就把 E2E 分片顶出 10 分钟预算；
+`UITestResults-<分片>.xcresult` / `xcodebuild-uitest.log` artifact 里。26 条交互 E2E 不跑审计：
+它们每条要多走 4–6 个界面，审计本身每次 3–8 秒，全量接入会继续拉长最慢已到 756.279 s 的 E2E 分片；
 审计的覆盖面由 smoke 用例保证（账本、设置、导入、智能记账四个屏）。
 
 **当前会被显式忽略的类型**（`AccessibilityAuditPolicy.ignoredTypes`），每项都有归属：
@@ -308,7 +311,7 @@ ln -sf /usr/lib/libxml2.so.16    <toolchain>/usr/lib/swift/linux/libxml2.so.2
 |---|---|
 | 触发 | push 到 `main`、指向 `main` 的 PR、手动 `workflow_dispatch` |
 | 运行机 | `macos-15`（镜像自带 Xcode 26.x，job 里 `xcode-select` 到最新的 26.x） |
-| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的五个分片 job（smoke + 四个 e2e，见「UI 测试」一节），全部要绿 |
+| job | `test`（逻辑测试，`-only-testing:SmartBudTests`）与 `ui-test` 的六个分片 job（smoke + 五个 e2e，见「UI 测试」一节），全部要绿 |
 | 命令 | 与上文「测试」一节相同，另外带 `-resultBundlePath` |
 | 超时 | 逻辑测试 45 分钟，UI 测试 60 分钟 |
 | 失败产物 | 逻辑测试：`TestResults.xcresult` + 日志，失败时上传；UI 测试：`UITestResults-<分片>.xcresult` + 日志，**每次**上传（审计报告与失败截图在里面） |

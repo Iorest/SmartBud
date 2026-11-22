@@ -30,7 +30,9 @@
 
 > 2026-11-20 复核：T1 已收口，详见下方 [建议任务](#建议任务代码缺口)。
 > 2026-11-22 复核：PR #29 给 `SmartBudUITests.swift` 净增 218 行，§8 里的 `:行号` 引用
-> 是 2026-10-31 的快照，已改写为符号名；T7 的缺口按当前 16 条 A/B E2E 重算。
+> 是 2026-10-31 的快照，已改写为符号名；T7 的缺口按当时 16 条 A/B E2E 重算。
+> 2026-11-22 复核（PR #31）：10 条 C 用例合入后 UI 用例 24 → 34、分片 5 → 6
+> （新增 `e2e 布局/iPad`）；§8 的 ci.yml 行号引用改写为符号名；T7 缺口按 26 条 A/B/C E2E 重算。
 > 上面的摘要是 2026-10-31 的审计快照，历史计数未回改。
 
 ## 1. design.md
@@ -198,9 +200,9 @@
 | 文档主张 | 代码事实 | 结论 | 处理 |
 |---|---|---|---|
 | macOS 15+ / Xcode 26.x / `LastUpgradeCheck = 2660` / iOS 26.0 / Swift 6.0 | `app/SmartBud.xcodeproj/project.pbxproj:1411,2119,2230` | 一致 | — |
-| 模拟器 iPhone 16 “见 SmartBud.xcscheme” | scheme 不含 destination/机型；iPhone 16 只出现在文档命令与 CI 的 `DESTINATION`（`.github/workflows/ci.yml:28`） | 文档错 | 已改：改为“命令与 CI 的 destination” |
+| 模拟器 iPhone 16 “见 SmartBud.xcscheme” | scheme 不含 destination/机型；iPhone 16 只出现在文档命令与 `jobs.test` / `jobs.ui-test` 的 `env.DESTINATION` | 文档错 | 已改：改为“命令与 CI 的 destination” |
 | 工程无 Swift Package 依赖 | 仓库无 `Package.resolved` / `Package.swift` | 一致 | — |
-| 构建/测试命令（iPhone 16、`-project app/...`） | `ci.yml:20-23` 与文档一致 | 一致 | — |
+| 构建/测试命令（iPhone 16、`-project app/...`） | `jobs.test` 的 `env` 与 xcodebuild 步骤和文档一致 | 一致 | — |
 | 当前 213 个逻辑测试、36 个 suite | `grep -r "@Test"` = 213、`@Suite` = 36 | 一致 | — |
 | “当前 5 条 smoke”及用例表 | TELE-36 合并后有 8 条（`app/SmartBudUITests/SmartBudUITests.swift` 的 8 条 smoke 用例，从 `testCreateExpenseThenUndoDelete` 起） | 文档错 | 已改：补 3 条并改为 8 条 |
 | “每条用例末尾都跑 `performAccessibilityAudit`” | `assertAccessible(app, screen:)` 只在 smoke 段调用 5 处（`screen` 值 `log` / `tabs` / `smart-entry` / `settings` / `settings-after-import`），A/B E2E 未接入 | 文档错 | 已改：写明 5/8；同步改测试文件头注释；剩余缺口见 T7 |
@@ -209,8 +211,8 @@
 | `-skipIntro` / `-importSample` 仅 DEBUG 生效 | `ViewModels/ContentViewModel.swift:71-78`、`Views/ImportDataView.swift:224-234` | 一致 | — |
 | audit 忽略四类 `.contrast/.dynamicType/.textClipped/.hitRegion` | `app/SmartBudUITests/SmartBudUITests.swift` 的 `AccessibilityAuditPolicy.ignoredTypes` | 一致 | — |
 | Linux 运行机不能编译/跑测试 | 本机无 `xcodebuild`/iOS SDK；本轮只做静态核对与 Python 校验 | 一致 | — |
-| CI：macos-15、45/60 分钟、两个 job、artifact 策略 | `.github/workflows/ci.yml:18-23,129,140-145,213` | 一致 | — |
-| Parsing metrics step `if: always()` 写 job summary | `.github/workflows/ci.yml:86-127` | 一致 | — |
+| CI：macos-15、45/60 分钟、两个 job、artifact 策略 | `jobs.test` / `jobs.ui-test` 的 `runs-on`、`timeout-minutes` 与 `Upload test artifacts` / `Upload UI test artifacts` 步骤 | 一致 | — |
+| Parsing metrics step `if: always()` 写 job summary | `jobs.test` 的 `Parsing metrics` 步骤 | 一致 | — |
 
 ## 9. ai-eval.md
 
@@ -274,7 +276,7 @@
 | T4 | 多币种尾差归属 | P3 | 无（T1 口径已定） | `accounting-conventions.md` §6 要求尾差挂当期最大项，代码逐行折算后直接求和，无尾差分配 |
 | T5 | 余额调整不变量测试 | P3 | 无 | `ViewModels/AccountViewModel.swift:219-238`；补“调整后 `balance == target`”的用例（可用内存 container，参照现有 `MerchantMigrationTests`） |
 | T6 | 余额调整原因字段 | P2 | 需先定枚举与迁移方案 | `design.md` §6.4、会计基础 §7 都标注缺失；新增可选字段 + 迁移说明 |
-| T7 | 16 条 A/B E2E 接入可访问性审计 | P3 | 无 | `app/SmartBudUITests/SmartBudUITests.swift` 中 `testA1_`–`testA10_`、`testB1_`–`testB6_` 均未调用 `assertAccessible(app, screen:)`（PR #29 又新增 6 条 B 用例）；只有 5 条 smoke 接入。逐条接入或写明豁免理由 |
+| T7 | 26 条 A/B/C E2E 接入可访问性审计 | P3 | 无 | `app/SmartBudUITests/SmartBudUITests.swift` 中 `testA1_`–`testA10_`、`testB1_`–`testB6_` 与 10 条 `testC` 用例均未调用 `assertAccessible(app, screen:)`（PR #29 新增 6 条 B 用例，PR #31 又新增 10 条 C 用例）；只有 5 条 smoke 接入。逐条接入或写明豁免理由 |
 
 ## 附录：README 索引内其余文档（不计入上表 154 条）
 
