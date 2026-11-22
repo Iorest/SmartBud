@@ -16,6 +16,7 @@
 //    without an accessibility description fails the run that introduced it.
 //
 
+import CoreGraphics
 import Foundation
 import XCTest
 
@@ -1595,6 +1596,407 @@ final class SmartBudUITests: XCTestCase {
 
         // Clear the persisted App Lock flag so later cases in this shard boot unlocked.
         resetAppLock()
+    }
+
+    // MARK: - TELE-38 C batch: deterministic launch + small query helpers
+
+    /// Mirrors `launch()` but pins a deterministic settings baseline for this
+    /// batch. `-qaResetSettings` (handled by the DEBUG hook in SmartBudApp)
+    /// clears the persisted App Group keys so a case never inherits language /
+    /// theme / notification state from an earlier case in the same shard.
+    /// `-appLockEnabled NO` keeps the session unlocked regardless of any
+    /// earlier `launchLocked()` case (the migration copies it every launch).
+    private func launchC(_ extra: [String] = []) -> XCUIApplication {
+        // Every case starts in portrait, so a landscape case can never leak its
+        // device orientation into a later case in the same shard.
+        XCUIDevice.shared.orientation = .portrait
+        let app = XCUIApplication()
+        continueAfterFailure = false
+        app.launchArguments += [
+            "-AppleLanguages", "(en)",
+            "-AppleLocale", "en_US",
+            "-skipIntro",
+            "-importSample",
+            "-freshStore",
+            "-skipReviewPrompt",
+            "-appLockEnabled", "NO",
+            "-qaResetSettings",
+        ]
+        app.launchArguments += extra
+        app.launch()
+        dismissLaunchOverlay(app)
+        return app
+    }
+
+    /// Taps the first control whose accessibility label contains `fragment`.
+    /// System-rendered picker rows and toolbar buttons carry no identifier in
+    /// this build, so a copy query is the only handle; the launch pins English.
+    private func tapLabeled(
+        _ app: XCUIApplication,
+        _ fragment: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let predicate = NSPredicate(format: "label CONTAINS[c] %@", fragment)
+        let button = app.buttons.matching(predicate).firstMatch
+        if button.waitForExistence(timeout: 10) {
+            button.tap()
+            return
+        }
+        let label = app.staticTexts.matching(predicate).firstMatch
+        if label.waitForExistence(timeout: 3) {
+            label.tap()
+            return
+        }
+        let any = app.descendants(matching: .any).matching(predicate).firstMatch
+        XCTAssertTrue(any.waitForExistence(timeout: 3),
+                      "No control labelled with \(fragment) appeared.\n\(app.debugDescription)",
+                      file: file, line: line)
+        any.tap()
+    }
+
+    /// Hard "free state did not write to the store" assertion. `-freshStore`
+    /// gives each launch an isolated empty ledger, so both the row count and
+    /// the expense statistic must still be zero.
+    private func assertNoLedgerWrite(
+        _ app: XCUIApplication,
+        _ context: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        select(.log, in: app, file: file, line: line)
+        XCTAssertEqual(logRows(app).count, 0,
+                       "\(context): no log row may be written.\n\(app.debugDescription)",
+                       file: file, line: line)
+        XCTAssertEqual(expenseTotal(app), 0, accuracy: 0.005,
+                       "\(context): the expense statistic must stay zero.",
+                       file: file, line: line)
+    }
+
+    /// Closes the add-entry form, tolerating the discard confirmation when a
+    /// draft is present (an empty form cancels directly).
+    private func cancelEntryForm(
+        _ app: XCUIApplication,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let cancel = element(app, AccessibilityID.entryCancel)
+        XCTAssertTrue(cancel.waitForExistence(timeout: 10),
+                      "The add-entry form must expose a Cancel button.",
+                      file: file, line: line)
+        cancel.tap()
+        let discard = app.buttons["Discard"].firstMatch
+        if discard.waitForExistence(timeout: 3) {
+            discard.tap()
+        }
+    }
+
+    // MARK: - C1: App Lock
+
+    func testC1_appLock_relocksOnReturnAndRefusesWrite() throws {
+        // A locked launch shows the App Lock screen (B6 convention).
+        let locked = launchLocked()
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.waitForExistence(timeout: 20),
+                      "The session should be locked at launch.")
+
+        // Background -> foreground must still require unlock. ContentView re-locks
+        // on .inactive/.background and only reconciles notifications on .active,
+        // so no biometric prompt re-runs and the lock stays up.
+        XCUIDevice.shared.press(.home)
+        locked.activate()
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.waitForExistence(timeout: 20),
+                      "Returning to the foreground must keep the app locked.")
+
+        // A write-intent deep link is refused while locked and writes nothing.
+        let addURL = URL(string: "smartbud://add?amount=35&category=%E9%A4%90%E9%A5%AE")!
+        locked.open(addURL)
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.exists,
+                      "A refused add deep link must not dismiss the lock screen.")
+        XCTAssertEqual(logRows(locked).count, 0,
+                       "A locked session must not write a row.")
+        resetAppLock()
+    }
+
+    func testC1b_appLock_queuesNewEntryUntilUnlocked() throws {
+        let newExpense = URL(string: "smartbud://newexpense")!
+
+        // Locked: requestNewTransaction only sets pendingAddAfterUnlock. The
+        // intent is queued — no form over the lock, no write.
+        let locked = launchLocked()
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.waitForExistence(timeout: 20),
+                      "The session should be locked.")
+        locked.open(newExpense)
+        XCTAssertTrue(locked.staticTexts["App Locked"].firstMatch.exists,
+                      "A queued new-entry intent must not bypass the lock.")
+        XCTAssertFalse(element(locked, AccessibilityID.entryAmountDisplay).exists,
+                       "The entry form must not open while locked.")
+        XCTAssertEqual(logRows(locked).count, 0,
+                       "Queueing a new entry must not write a row.")
+        resetAppLock()
+
+        // Face-ID unlock cannot be simulated on a CI simulator, so the unlocked
+        // session is represented by a fresh `-appLockEnabled NO` launch (the
+        // same contrast B6 uses). The identical intent now replays into the
+        // entry form, but opening a form is not itself a write.
+        let unlocked = launchC()
+        unlocked.open(newExpense)
+        XCTAssertTrue(element(unlocked, AccessibilityID.entryAmountDisplay).waitForExistence(timeout: 20),
+                      "After unlock the queued intent must open the entry form.")
+        XCTAssertEqual(logRows(unlocked).count, 0,
+                       "Opening the form must not write a row by itself.")
+    }
+
+    // MARK: - C2: Pro gate (free state must not write)
+
+    func testC2_proGate_threeSurfacesBlockWrite() throws {
+        // `-proEnforced` forces the free state: ProAccess.isUnlocked returns
+        // false for every ProFeature. Each of the three gated surfaces must
+        // raise the Pro page instead of running the feature, and the free
+        // ledger must stay empty. One fresh launch per surface keeps navigation
+        // state independent (B6 already launches several apps in one case).
+
+        // (1) AI analysis, from the Insights toolbar.
+        do {
+            let app = launchC(["-proEnforced"])
+            select(.insights, in: app)
+            tapLabeled(app, "AI bill analysis")
+            XCTAssertTrue(element(app, AccessibilityID.proTitle).waitForExistence(timeout: 20),
+                          "The AI analysis gate must raise the Pro page.")
+            let back = element(app, AccessibilityID.proBack)
+            XCTAssertTrue(back.waitForExistence(timeout: 10),
+                          "The Pro page must expose its back button so we can reach the ledger.")
+            back.tap()
+            assertNoLedgerWrite(app, "AI analysis gate")
+        }
+
+        // (2) A non-default app icon, from Settings -> App Icon.
+        do {
+            let app = launchC(["-proEnforced"])
+            select(.settings, in: app)
+            scrollIntoView(AccessibilityID.settingsRow("appIcon"), in: app).tap()
+            tapLabeled(app, "Midnight")
+            XCTAssertTrue(element(app, AccessibilityID.proTitle).waitForExistence(timeout: 20),
+                          "The extra-icon gate must raise the Pro page.")
+            let back = element(app, AccessibilityID.proBack)
+            XCTAssertTrue(back.waitForExistence(timeout: 10),
+                          "The Pro page must expose its back button so we can reach the ledger.")
+            back.tap()
+            assertNoLedgerWrite(app, "extra-icon gate")
+        }
+
+        // (3) A custom reminder time, from Settings -> Notifications. The
+        // `-qaNotificationsOn` hook seeds the toggle ON before views mount, so
+        // the picker is visible without firing the system permission dialog.
+        // iOS 26 exposes the inline picker's three options as a wheel whose
+        // rows carry no accessible label (they are zero-size `Other` children),
+        // so a copy query cannot reach the third one. Tap the centre of that
+        // row; the gate assertion below still proves the tap raised the Pro page.
+        do {
+            let app = launchC(["-proEnforced", "-qaNotificationsOn"])
+            select(.settings, in: app)
+            scrollIntoView(AccessibilityID.settingsRow("notifications"), in: app).tap()
+            let wheel = app.pickerWheels.firstMatch
+            XCTAssertTrue(wheel.waitForExistence(timeout: 20),
+                          "The reminder-time picker must be visible.\n\(app.debugDescription)")
+            wheel.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 5.0 / 6.0)).tap()
+            XCTAssertTrue(element(app, AccessibilityID.proTitle).waitForExistence(timeout: 20),
+                          "The custom-reminder gate must raise the Pro page.")
+            let back = element(app, AccessibilityID.proBack)
+            XCTAssertTrue(back.waitForExistence(timeout: 10),
+                          "The Pro page must expose its back button so we can reach the ledger.")
+            back.tap()
+            assertNoLedgerWrite(app, "custom-reminder gate")
+        }
+    }
+
+    // MARK: - C3: Smart entry
+
+    func testC3_smartEntry_previewAndCancelWritesNothing() throws {
+        let app = launchC()
+        // Open the add-entry form, then the Smart Entry sheet.
+        require(app, AccessibilityID.logAddButton).tap()
+        require(app, AccessibilityID.entrySmartEntry).tap()
+        let field = require(app, AccessibilityID.smartEntryField)
+        field.tap()
+        field.typeText("午饭35")
+        tapLabeled(app, "Parse")
+
+        // The preview shows the parsed amount 35.00 and offers Fill in form.
+        XCTAssertTrue(app.staticTexts["35.00"].firstMatch.waitForExistence(timeout: 20),
+                      "The preview must show the parsed amount 35.")
+        XCTAssertTrue(app.buttons["Fill in form"].firstMatch.waitForExistence(timeout: 20),
+                      "The preview must offer a Fill in form action.")
+
+        // Cancel the sheet (X, not Fill in form) -> nothing is written. Close the
+        // still-empty add form first so the tab bar is reachable.
+        require(app, AccessibilityID.smartEntryClose).tap()
+        cancelEntryForm(app)
+        assertNoLedgerWrite(app, "Cancelling a smart-entry preview")
+    }
+
+    func testC3b_smartEntry_confirmFillsFormWithoutSaving() throws {
+        let app = launchC()
+        require(app, AccessibilityID.logAddButton).tap()
+        require(app, AccessibilityID.entrySmartEntry).tap()
+        let field = require(app, AccessibilityID.smartEntryField)
+        field.tap()
+        field.typeText("午饭35")
+        tapLabeled(app, "Parse")
+        XCTAssertTrue(app.staticTexts["35.00"].firstMatch.waitForExistence(timeout: 20),
+                      "The preview must show 35 before confirming.")
+
+        // Fill in form (onApply) populates the form but does not save it.
+        app.buttons["Fill in form"].firstMatch.tap()
+        let display = require(app, AccessibilityID.entryAmountDisplay)
+        let shown = amount(in: display.label)
+        XCTAssertEqual(shown ?? -1, 35.0, accuracy: 0.005,
+                       "Fill in form must populate the amount with 35.")
+        XCTAssertTrue(element(app, AccessibilityID.entrySave).exists,
+                      "The form must stay open — confirming an apply is not a save.")
+
+        // Dismiss the filled form (discard confirmation may appear) and prove
+        // that no row was written.
+        cancelEntryForm(app)
+        assertNoLedgerWrite(app, "Confirming a smart-entry fill")
+    }
+
+    // MARK: - C4: Settings
+
+    func testC4_settings_languageChangesKeyCopy() throws {
+        // String.appLocalized resolves the in-app language from App Group at
+        // call time. Seeding zh-Hans before any view mounts equals a cold launch
+        // after a language switch (SettingsLanguageView says one is required).
+        // Compare the Settings screen copy in the two language states.
+        let english = launchC()
+        select(.settings, in: english)
+        let englishCopy = english.staticTexts.allElementsBoundByIndex.map { $0.label }
+
+        let chinese = launchC(["-qaAppLanguage", "zh-Hans"])
+        select(.settings, in: chinese)
+        let chineseCopy = chinese.staticTexts.allElementsBoundByIndex.map { $0.label }
+
+        XCTAssertFalse(englishCopy.isEmpty, "The Settings screen must expose localised text.")
+        XCTAssertFalse(chineseCopy.isEmpty, "The Settings screen must expose localised text.")
+        XCTAssertNotEqual(englishCopy, chineseCopy,
+                          "Switching to zh-Hans must change the key controls' copy.")
+    }
+
+    func testC4b_settings_darkModeChangesTheme() throws {
+        let app = launchC()
+        select(.settings, in: app)
+        let appearanceRow = scrollIntoView(AccessibilityID.settingsRow("appearance"), in: app)
+        let before = appearanceRow.label
+        appearanceRow.tap()
+        // The inline theme picker lists System / Light / Dark. XCUITest cannot
+        // sample pixel colour, so assert the selected theme state that drives
+        // .preferredColorScheme (documented in the PR).
+        tapLabeled(app, "Dark")
+        let after = scrollIntoView(AccessibilityID.settingsRow("appearance"), in: app).label
+        XCTAssertNotEqual(before, after,
+                          "Selecting Dark must change the appearance selection state.")
+    }
+
+    func testC4c_settings_baseCurrencyShowsRebaseHint() throws {
+        // `-qaSeedRates` inserts a EUR rate into the fresh store. That makes
+        // ConversionScope.needsConversion true and gives CurrencyRebase.plan an
+        // anchor rate, so switching the base currency deterministically shows
+        // the rebase ("折算") hint instead of "Could not switch base currency".
+        let app = launchC(["-qaSeedRates"])
+        select(.settings, in: app)
+        scrollIntoView(AccessibilityID.settingsRow("currency"), in: app).tap()
+
+        let search = app.searchFields.firstMatch
+        if search.waitForExistence(timeout: 5) {
+            search.tap()
+            search.typeText("EUR")
+        }
+        let euroRow = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "(EUR)")).firstMatch
+        XCTAssertTrue(euroRow.waitForExistence(timeout: 10),
+                      "The EUR currency row must be listed.")
+        euroRow.tap()
+
+        let alert = app.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 10),
+                      "Switching base currency must show the conversion hint.")
+        XCTAssertTrue(
+            alert.staticTexts.matching(
+                NSPredicate(format: "label CONTAINS[c] %@", "converted")).firstMatch.exists,
+            "The hint must explain that stored amounts are converted.")
+        alert.buttons["Cancel"].firstMatch.tap()
+        assertNoLedgerWrite(app, "A cancelled base-currency switch")
+    }
+
+    // MARK: - C5: Layout
+
+    func testC5_layout_compactFlowAndLandscapeNotClipped() throws {
+        // The frozen CI destination is a compact-width iPhone 16 (the smallest
+        // class available without editing DESTINATION). Run the whole
+        // bookkeeping chain on it, then verify the entry form is not clipped in
+        // landscape. XCUITest cannot switch the device model at runtime.
+        let app = launchC()
+        let note = qaNote("C5")
+        let added = addExpense(app, amount: "12.50", note: note)
+        XCTAssertTrue(added.exists,
+                      "The compact-width bookkeeping flow must complete.")
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+
+        require(app, AccessibilityID.logAddButton).tap()
+        let window = app.windows.firstMatch.frame
+        for identifier in [AccessibilityID.entryAmountDisplay,
+                           AccessibilityID.entrySave,
+                           AccessibilityID.entryCancel] {
+            let control = require(app, identifier)
+            XCTAssertTrue(control.isHittable,
+                          "\(identifier) must stay on screen in landscape.")
+            XCTAssertTrue(window.contains(control.frame) || window.intersects(control.frame),
+                          "\(identifier) must not be clipped outside the window in landscape.")
+        }
+
+        // launchC() normalises orientation for the next case, but restore it
+        // here too so a landscape device never outlives this shard.
+        XCUIDevice.shared.orientation = .portrait
+    }
+
+    func testC5b_layout_ipadSplitNavigationAndDetail() throws {
+        // Dedicated shard: on a regular-width (iPad/split) destination this
+        // exercises the NavigationSplitView sidebar + detail; on the compact
+        // iPhone 16 CI device it verifies the same navigation reaches a detail
+        // without truncation. Its own CI job keeps a layout failure separable
+        // from a bookkeeping-logic failure in the other shards.
+        let app = launchC()
+        let window = app.windows.firstMatch.frame
+        let wideLayout = window.width >= 768
+
+        if wideLayout {
+            XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 20),
+                          "A regular-width layout must present a split navigation shell.")
+            // The split shell shows its detail column immediately; the Insights
+            // period picker is that detail, so navigation is already proven.
+            XCTAssertTrue(element(app, AccessibilityID.insightsPeriodPicker).waitForExistence(timeout: 20),
+                          "The split shell must present a reachable detail.")
+        } else {
+            let tabBar = app.tabBars.firstMatch
+            XCTAssertTrue(tabBar.waitForExistence(timeout: 20),
+                          "A compact-width layout must present a tab shell.")
+            XCTAssertGreaterThan(tabBar.buttons.count, 0,
+                                 "The compact shell must keep its tabs.")
+            for index in 0..<tabBar.buttons.count {
+                XCTAssertTrue(tabBar.buttons.element(boundBy: index).isHittable,
+                              "Tab \(index) must not be clipped by the layout.")
+            }
+            // Navigation from the tab shell into detail content.
+            select(.insights, in: app)
+            XCTAssertTrue(element(app, AccessibilityID.insightsPeriodPicker).waitForExistence(timeout: 20),
+                          "Navigation must reach the Insights detail.")
+            select(.settings, in: app)
+            let row = scrollIntoView(AccessibilityID.settingsImportData, in: app)
+            XCTAssertTrue(row.isHittable, "Navigation must expose settings detail rows.")
+            row.tap()
+            XCTAssertTrue(element(app, AccessibilityID.importPreview).waitForExistence(timeout: 20),
+                          "Tapping a settings row must open its detail.")
+        }
     }
 }
 

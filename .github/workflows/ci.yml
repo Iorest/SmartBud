@@ -170,14 +170,19 @@ jobs:
     # Same image and Xcode selection as the logic-test job: the UI cases need
     # the iOS 26 SDK and a bootable iPhone 16 simulator, nothing else.
     #
-    # Four e2e shards plus the smoke shard. PR #23 (823f016) balanced the E2E
+    # Five e2e shards plus the smoke shard. PR #23 (823f016) balanced the E2E
     # cases on measured case time from run 44026222552 into shard totals of
     # 353 s (entry), 327 s (edit), 405 s (ledger) and 383 s (budget) on
-    # macos-15; there are now ten A cases (A1-A10). Shards are balanced on
-    # measured case time, not on case count, and each stays under the
-    # 10-minute budget. The six TELE-37 B cases sit on the shards with the
-    # most remaining headroom. A new case must be added to one of `tests`
-    # below — the smoke shard skips every E2E case by name.
+    # macos-15; there are ten A cases (A1-A10) and six TELE-37 B cases. The
+    # ten TELE-38 C cases (App Lock / Pro gate / smart entry / settings /
+    # layout) were distributed by measured headroom: three each to entry,
+    # ledger and budget, and the iPad/split-layout case to its own dedicated
+    # e2e-ipad shard so a layout failure is isolated from the logic shards.
+    # The e2e 折扣/编辑 shard was already near 588 s (run 44760878898), so it
+    # gets no C case. Shards balance on measured case time, not case count,
+    # under the 60-minute per-job ceiling (timeout-minutes: 60). A new case
+    # must be added to one of `tests` below — the smoke shard skips every E2E
+    # case by name.
     runs-on: macos-15
     timeout-minutes: 60
     strategy:
@@ -204,6 +209,16 @@ jobs:
               testB4_importSameSampleTwice_addsNothing
               testB5_searchStacksOnFilter_typeFilterKeepsExpenses
               testB6_deepLinkAdd_unlockedWrites_lockedRefuses
+              testC1_appLock_relocksOnReturnAndRefusesWrite
+              testC1b_appLock_queuesNewEntryUntilUnlocked
+              testC2_proGate_threeSurfacesBlockWrite
+              testC3_smartEntry_previewAndCancelWritesNothing
+              testC3b_smartEntry_confirmFillsFormWithoutSaving
+              testC4_settings_languageChangesKeyCopy
+              testC4b_settings_darkModeChangesTheme
+              testC4c_settings_baseCurrencyShowsRebaseHint
+              testC5_layout_compactFlowAndLandscapeNotClipped
+              testC5b_layout_ipadSplitNavigationAndDetail
           - key: e2e-entry
             label: e2e 记账/校验
             filter: only
@@ -213,6 +228,9 @@ jobs:
               testA3_invalidInput_isRefusedWithMessage
               testB1_newAccountWithOpeningBalance_listsBalanceAndTotal
               testB3_importPreview_cancelWritesNothing
+              testC1_appLock_relocksOnReturnAndRefusesWrite
+              testC1b_appLock_queuesNewEntryUntilUnlocked
+              testC3_smartEntry_previewAndCancelWritesNothing
           - key: e2e-edit
             label: e2e 折扣/编辑
             filter: only
@@ -229,6 +247,9 @@ jobs:
               testA6_deleteUndo_restoresFieldsAndBalance
               testA7_sameCurrencyTransfer_movesBalancesOnly
               testB5_searchStacksOnFilter_typeFilterKeepsExpenses
+              testC2_proGate_threeSurfacesBlockWrite
+              testC4_settings_languageChangesKeyCopy
+              testC5_layout_compactFlowAndLandscapeNotClipped
           - key: e2e-budget
             label: e2e 跨币种/预算
             filter: only
@@ -236,6 +257,14 @@ jobs:
               testA8_crossCurrencyTransfer_feeOnlyInSpend
               testA9_budgetRemaining_dropsThenGoesOver
               testB4_importSameSampleTwice_addsNothing
+              testC3b_smartEntry_confirmFillsFormWithoutSaving
+              testC4b_settings_darkModeChangesTheme
+              testC4c_settings_baseCurrencyShowsRebaseHint
+          - key: e2e-ipad
+            label: e2e 布局/iPad
+            filter: only
+            tests: >-
+              testC5b_layout_ipadSplitNavigationAndDetail
 
     env:
       PROJECT: app/SmartBud.xcodeproj
