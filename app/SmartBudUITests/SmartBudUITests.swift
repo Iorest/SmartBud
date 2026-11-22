@@ -16,6 +16,7 @@
 //    without an accessibility description fails the run that introduced it.
 //
 
+import CoreGraphics
 import Foundation
 import XCTest
 
@@ -1786,11 +1787,18 @@ final class SmartBudUITests: XCTestCase {
         // (3) A custom reminder time, from Settings -> Notifications. The
         // `-qaNotificationsOn` hook seeds the toggle ON before views mount, so
         // the picker is visible without firing the system permission dialog.
+        // iOS 26 exposes the inline picker's three options as a wheel whose
+        // rows carry no accessible label (they are zero-size `Other` children),
+        // so a copy query cannot reach the third one. Tap the centre of that
+        // row; the gate assertion below still proves the tap raised the Pro page.
         do {
             let app = launchC(["-proEnforced", "-qaNotificationsOn"])
             select(.settings, in: app)
             scrollIntoView(AccessibilityID.settingsRow("notifications"), in: app).tap()
-            tapLabeled(app, "Custom Time")
+            let wheel = app.pickerWheels.firstMatch
+            XCTAssertTrue(wheel.waitForExistence(timeout: 20),
+                          "The reminder-time picker must be visible.\n\(app.debugDescription)")
+            wheel.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 5.0 / 6.0)).tap()
             XCTAssertTrue(element(app, AccessibilityID.proTitle).waitForExistence(timeout: 20),
                           "The custom-reminder gate must raise the Pro page.")
             let back = element(app, AccessibilityID.proBack)
