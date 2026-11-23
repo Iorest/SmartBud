@@ -49,7 +49,7 @@ TemplateTransactionModel                 快捷记账模板
 
 | 实体 | 关键字段 | 不变量 |
 |---|---|---|
-| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `reimbursementOf?`, `refundOf?`, `transferFeeOf?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring`, `merchant?`, `merchantKey?` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`adjustment` 行无分类、不进统计；`merchantKey == nil` 当且仅当 `merchant == nil` |
+| `TransactionModel` | `amount`, `baseAmount?`, `income`, `date`, `day?`, `month?`, `discount`, `reimbursable`, `reimbursedAt?`, `reimbursedAmount`, `reimbursementOf?`, `refundOf?`, `transferFeeOf?`, `adjustment`, `recurringType/Coefficient`, `onceRecurring`, `merchant?`, `merchantKey?` | `amount >= 0`；`baseAmount` 写入后不再变；`reimbursable` 只对支出成立；`0 <= reimbursedAmount <= wrappedBaseAmount`，仅报销支出可大于 0；`reimbursedAt != nil` 当且仅当已全额回款；`adjustment` 行无分类、不进统计；`merchantKey == nil` 当且仅当 `merchant == nil` |
 | `CategoryModel` | `name`, `emoji`, `colour`, `income`, `order` | `income` 决定它能挂在哪类记录上 |
 | `AccountModel` | `kind`, `currencyCode`, `openingBalance`, `hidden`, `archived`, `order` | `archived ⇒ 不出现在默认列表/总资产/转账端点` |
 | `TransferModel` | `amount`, `destinationAmount`, `fee`, `source`, `destination` | `amount > 0`；`fee >= 0`；跨币种时 `destinationAmount > 0`；`source != destination` |
@@ -156,10 +156,10 @@ TemplateTransactionModel                 快捷记账模板
 
 ### 6.3 报销
 
-- 状态机：`普通支出 → 待报销（reimbursable=true, reimbursedAt=nil） → 已报销（reimbursedAt 有值） → 可撤销回待报销`。
-- 待报销/已报销都**不计入**支出、预算、分类占比、净收入；账户余额照常扣减。
-- 「待报销」列表跨期：三个月前没回款的仍然要出现（这是钱，不是当期消费）。
-- 后续扩展（未实现）：部分报销需要 `reimbursedAmount`，否则 8 折报销的自付部分会从统计里消失；关联回款收入交易需要 `reimbursedByID` 才能对账。**在实现部分报销前，规则是"整笔报销"，自付部分另记一笔普通支出。**
+- 状态机：`待报销（reimbursable=true, reimbursedAmount=0） → 部分回款（0 < reimbursedAmount < baseAmount，仍待报销） → 全额回款（reimbursedAmount == baseAmount, reimbursedAt 有值）`，每一步可撤销回上一状态。
+- 口径：支出统计 = `baseAmount - reimbursedAmount`（自付部分）；待报销 = 同一差额；每次回款生成一条 `reimbursementOf` 回款行，账户余额按实际到账累加。全额回款后两部分都归零。
+- 「待报销」列表跨期：三个月前没回款的仍然要出现（这是钱，不是当期消费）；列表显示未回款余额，部分回款的多条记录可分别删除。
+- 关联回款行通过 `reimbursementOf` 对账；`reimbursedAmount` 是基准币累计额，按原行冻结汇率折算，超额申请被 `ReimbursementPolicy` 拒绝。
 - 坏账（已实现）：垫付满 90 天可"核销为支出"——写一条带原因的**费用行**而不是删原行，
   原行只记 `badDebtAt` 退出待报销列表。核销行没有账户（钱当天没动），所以账户余额一分不变，
   但支出、分类占比与预算按核销当期计入损失。规则见
@@ -212,7 +212,7 @@ TemplateTransactionModel                 快捷记账模板
 
 ### 6.9 导入 / 导出 / 清除
 
-- 导出：JSON（完整、可导回，`schemaVersion` 8）+ CSV（单向，给人看）。CSV 末尾两列 `merchant` / `merchant_key` 是追加的，已有列位置不变。
+- 导出：JSON（完整、可导回，`schemaVersion` 9；新增 `reimbursedAmount`，旧文件按 `reimbursedAt` 推导全额）+ CSV（单向，给人看）。CSV 末尾两列 `merchant` / `merchant_key` 是追加的，已有列位置不变。
 - 导入：按 id 合并、重复跳过、关系按 id 再按名字兜底、整份文件一次提交、失败回滚；拒绝更高版本、拒绝非备份、金额与汇率做防御性收敛。CSV 向导在写库前检查目标账户有无可用汇率，缺则整份拒绝（一条不写）；口径见 [accounting-conventions.md](accounting-conventions.md) §6。
 - 导入后必须刷新：账户、分类、预算、统计、小组件时间线。
 - 清除：本地全删（含账户/转账/汇率）+ 尝试删除 CloudKit zone，之后刷新所有缓存。
@@ -364,9 +364,10 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 
 ## 10. 版本与迁移
 
-- 导出格式 `ExportSchema.version`（当前 8，schema 8 新增 `badDebtOf` / `badDebtReason` / `badDebtAt`）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
+- 导出格式 `ExportSchema.version`（当前 9，schema 9 新增 `reimbursedAmount`；schema 8 新增 `badDebtOf` / `badDebtReason` / `badDebtAt`）。加字段必须可选并有默认值；改语义必须升版本，导入端拒绝更高版本。
 - App 内数据迁移：新字段一律带默认值，依赖 SwiftData 轻量迁移；不允许"改字段类型"。
 - 商户字段（`merchant` / `merchantKey`）是可选普通字段：轻量迁移后为 `nil`，由 `MerchantMigration` 在启动与导入后从备注回填，可重入。JSON 备份不携带这两个字段（避免为一个可推导值升 schemaVersion），恢复后同样靠回填补齐。
+- 报销额字段（`reimbursedAmount`）默认 0，轻量迁移后旧行有日期无金额；`ReimbursementLedger.migrate` 在启动时把这些整笔报销补成全额，可重入，保证升级前后统计一致。
 - 废弃策略：字段先保留、停止写入，至少一个大版本后再删（CloudKit 上删字段同样要部署）。
 
 ## 11. 未实现功能的模型影响
@@ -387,7 +388,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 | ~~P0~~ | 每月起始日统一 | ✅ 已实现：`AppPeriod` 统一 Log / Insights / 小组件，含 12 个月连续覆盖测试 |
 | ~~P1~~ | 远端同步刷新缓存 | ✅ 已实现：`DataRefreshCenter` 监听远端变更与 CloudKit 导入，回前台也会刷新 |
 | ~~P1~~ | 归档余额非零 | ✅ 已实现：余额非零时先弹窗说明，再允许归档 |
-| **P1（暂缓）** | 部分报销 | 仍未实现：需要 `reimbursedAmount` 与"结算后计自付"口径，按第 13 节第 3 条与分期一起做 |
+| ~~P1~~ | 部分报销 | ✅ 已实现：`reimbursedAmount` + `ReimbursementPolicy` 口径（自付计入支出）+ 多次回款与余额显示；导出 schema 9 |
 | ~~P2~~ | 收入行显示折扣入口 | ✅ 收入不再显示折扣，切到收入会清空折扣 |
 | ~~P2~~ | 类型筛选包含余额调整 | ✅ 类型筛选排除 `adjustment` |
 | ~~P2~~ | 导入无预览 | ✅ 选文件后先显示"备份日期 + N 条记录"，确认后才写库 |
@@ -403,4 +404,4 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
    - 推荐折算：可用性最好；代价是历史金额会随切换那一刻的汇率轻微变化一次。
 2. **归档非零余额账户**：提示后允许（推荐），还是必须余额为 0 才能归档？
    - 推荐提示后允许：账户可能只是不再使用，强制清零会逼用户造假账。
-3. **部分报销**：已按推荐决定——本轮保持整笔报销，自付部分另记一笔；`reimbursedAmount` 与"结算后计自付"留到分期功能一起做（两者都需要"分摊"这种新身份）。
+3. **部分报销**：已按推荐决定并已实现——`reimbursedAmount` 记录已回款额，"结算后计自付"计入支出；自付不再另记普通支出。分摊身份与分期留给 TELE-29 一起设计，本轮不碰。

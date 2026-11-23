@@ -175,4 +175,52 @@ struct ImportRoundTripTests {
         #expect(restoredLoss?.countsAsSpend == true)
         #expect(Money.double(Money.sum(stored.map(\.spendBaseAmount))) == 720)
     }
+
+    @Test("Partial payments survive export and import; old full settlements are inferred")
+    func reimbursedAmountRoundTrip() throws {
+        let partialID = UUID()
+        let legacyID = UUID()
+        var partial = ExportSchema.TransactionDTO(
+            id: partialID, amount: 100, date: .now, day: nil, month: nil,
+            note: "团队午餐", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: nil, categoryName: nil,
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 100,
+            accountCurrency: "CNY", discount: 0, reimbursable: true,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil, transferFeeOf: nil,
+            adjustment: false
+        )
+        partial.reimbursedAmount = 40
+        let wire = try JSONSerialization.jsonObject(with: JSONEncoder().encode(partial)) as? [String: Any]
+        #expect(wire?["reimbursedAmount"] as? Double == 40)
+        let instalment = ExportSchema.TransactionDTO(
+            id: UUID(), amount: 40, date: .now, day: nil, month: nil,
+            note: "报销回款", income: true, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: nil, categoryName: nil,
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 40,
+            accountCurrency: "CNY", discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: partialID, refundOf: nil,
+            transferFeeOf: nil, adjustment: false
+        )
+        // A backup written before schema 9 carries only the settlement date.
+        var legacy = partial
+        legacy.id = legacyID
+        legacy.reimbursedAmount = nil
+        legacy.reimbursedAt = .now
+
+        _ = try DataImporter.apply(
+            fixture.payload(accounts: [fixture.sampleAccount],
+                            transactions: [partial, instalment, legacy]),
+            context: fixture.context
+        )
+
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        let restoredPartial = try #require(stored.first { $0.id == partialID })
+        let restoredLegacy = try #require(stored.first { $0.id == legacyID })
+
+        #expect(restoredPartial.reimbursedAmount == 40)
+        #expect(restoredPartial.unreimbursedBaseAmount == 60)
+        #expect(restoredPartial.isPendingReimbursement)
+        #expect(restoredLegacy.reimbursedAmount == 100)
+        #expect(restoredLegacy.spendBaseAmount == 0)
+    }
 }

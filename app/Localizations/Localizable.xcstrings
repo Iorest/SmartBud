@@ -470,6 +470,69 @@
         }
       }
     },
+    "%@ of %@" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ of %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%@ / %@" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "%@ / %@" } }
+      }
+    },
+    "Couldn't save the repayment." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't save the repayment." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存回款失败。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存回款失敗。" } }
+      }
+    },
+    "Only an expense waiting to be paid back can be reimbursed." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only an expense waiting to be paid back can be reimbursed." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "只有待回款的支出才能记录回款。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "只有待回款的支出才能記錄回款。" } }
+      }
+    },
+    "Only the part still owed counts as your spending. The money returns to the account." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only the part still owed counts as your spending. The money returns to the account." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "只有尚未回款的部分计入你的支出；回款会退回账户。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "只有尚未回款的部分計入你的支出；回款會退回帳戶。" } }
+      }
+    },
+    "Opens the repayment sheet." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opens the repayment sheet." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开回款输入面板。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟回款輸入面板。" } }
+      }
+    },
+    "Repay Part…" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Repay Part…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "部分回款…" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "部分回款…" } }
+      }
+    },
+    "Repayment amount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Repayment amount" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本次回款金额" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本次回款金額" } }
+      }
+    },
+    "Still owed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Still owed" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "待回款" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "待回款" } }
+      }
+    },
+    "That is more than the claim: %@ is still owed." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That is more than the claim: %@ is still owed." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "金额超过垫付款：仍有 %@ 待回款。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "金額超過墊付款：仍有 %@ 待回款。" } }
+      }
+    },
     "Reimbursement" : {
       "localizations" : {
         "en" : {

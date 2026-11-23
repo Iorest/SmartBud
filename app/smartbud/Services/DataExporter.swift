@@ -121,6 +121,7 @@ enum DataExporter {
                 discount: txn.discount,
                 reimbursable: txn.reimbursable,
                 reimbursedAt: txn.reimbursedAt,
+                reimbursedAmount: txn.reimbursedAmount,
                 reimbursementOf: txn.reimbursementOf,
                 refundOf: txn.refundOf,
                 transferFeeOf: txn.transferFeeOf,

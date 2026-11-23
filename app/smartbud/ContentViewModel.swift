@@ -121,6 +121,11 @@ final class ContentViewModel {
         // launch after the update, not only on new entries.
         MerchantMigration.migrate(in: DataRepository.shared.context)
 
+        // Claims settled by an older build have a date but no paid-back
+        // amount. Backfill it before any statistic is rendered so the first
+        // launch after the update keeps the same numbers as the last one.
+        ReimbursementLedger.migrate(in: DataRepository.shared.context)
+
         reconcileNotificationAuthorization()
     }
 

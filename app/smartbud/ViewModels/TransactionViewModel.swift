@@ -106,7 +106,7 @@ final class TransactionViewModel {
         txn.reimbursable = edit.reimbursable && !edit.income && !txn.adjustment
         if !txn.reimbursable {
             ReimbursementLedger.unsettle(txn, in: repo.context)
-        } else if txn.reimbursedAt != nil {
+        } else if txn.reimbursedAmount > 0 || txn.reimbursedAt != nil {
             ReimbursementLedger.sync(txn, in: repo.context)
         }
         // A written-off claim that changes amount keeps one loss row, in step
@@ -357,7 +357,7 @@ final class TransactionViewModel {
                     // Clearing the claim without removing its repayment row
                     // would leave the money on the account twice: once as this
                     // row's new income and once as the untouched repayment.
-                    if txn.reimbursedAt != nil {
+                    if txn.reimbursedAmount > 0 || txn.reimbursedAt != nil {
                         ReimbursementLedger.unsettle(txn, in: repo.context)
                     }
                     txn.reimbursable = false

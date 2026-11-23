@@ -10,7 +10,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 | 从备份恢复 | 选择 JSON 备份，合并进本机 | — |
 | 清除数据 | 删除本机全部记录并尝试清空 iCloud 区域 | — |
 
-## JSON 备份格式（schemaVersion 8）
+## JSON 备份格式（schemaVersion 9）
 
 文件形状见 `smartbud/Services/ExportSchema.swift`，字段名就是磁盘上的契约，
 改名前要同时改导出和导入，并且**必须**升 `schemaVersion`。
@@ -19,7 +19,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 {
   "exportDate": "2026-10-22T05:00:00Z",
   "appVersion": "4.0",
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "transactions": [ ... ],
   "categories": [ ... ],
   "budgets": [ ... ],
@@ -44,6 +44,9 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   所以历史统计不会因为之后改汇率而漂移。
 - 关系用 id 表示：交易带 `categoryId` / `accountId`，转账带 `sourceId` / `destinationId`。
   为了兼容只存名字的旧文件，导入时会退回到 `categoryName` / `accountName`。
+- schema 9 新增 `reimbursedAmount`（报销支出已回款的基准币累计额）。旧备份没有该键时，
+  有 `reimbursedAt` 的整笔报销按全额推导、没有日期的按 0 导入，升级前后统计不变。
+  导出端始终写该键；多次回款只合并累计额与各自的回款行，不会重复写入。
 - schema 8 新增 `badDebtOf` / `badDebtReason` / `badDebtAt`（坏账核销：损失行指向原垫付、
   原因原始值、原行的核销日）。三者都可选，旧备份按 `nil` 导入——旧文件里的垫付仍是待报销，
   不会凭空多出一条费用。

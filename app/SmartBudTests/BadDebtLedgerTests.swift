@@ -226,4 +226,17 @@ struct BadDebtLedgerTests {
         #expect(row.canBeRefunded == false)
         #expect(failure(writeOff(row)) == .notAClaim)
     }
+
+    @Test("A partially reimbursed claim writes off only what is still owed")
+    func writeOffUsesTheOutstandingBalance() throws {
+        let claim = self.claim(account: account())
+        claim.reimbursedAmount = 40
+
+        let row = try writeOff(claim).get()
+
+        #expect(row.baseAmount == 60)
+        #expect(row.amount == 60)
+        #expect(claim.badDebtAt != nil)
+        #expect(claim.spendBaseAmount == 0)
+    }
 }
