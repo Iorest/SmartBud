@@ -11,8 +11,8 @@
 import Testing
 import Foundation
 
-@Suite("Account balance adjustment")
-struct AccountBalanceTests {
+@Suite("Balance adjustment invariant")
+struct BalanceAdjustmentInvariantTests {
 
     /// Applies the adjustment row the same way `adjustBalance` does and
     /// recomputes the balance from the opening amount and all rows.
