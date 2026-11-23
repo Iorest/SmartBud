@@ -492,6 +492,7 @@
 		E1A2B3C4000000000000C0F2 /* ParsingMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C0F1 /* ParsingMetricsTests.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
+		E1A2B3C400000000000002A6 /* AccountBalanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A7 /* AccountBalanceTests.swift */; };
 		E1A2B3C40000000000000282 /* SBToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000280 /* SBToast.swift */; };
 		E1A2B3C40000000000000254 /* MoneyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */; };
 		E1A2B3C40000000000000271 /* TransactionSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C40000000000000270 /* TransactionSnapshot.swift */; };
@@ -816,6 +817,7 @@
 		E1A2B3C40000000000000410 /* ImportDataView+Chrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportDataView+Chrome.swift"; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A0 /* TransactionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidation.swift; sourceTree = "<group>"; };
 		E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionValidationTests.swift; sourceTree = "<group>"; };
+		E1A2B3C400000000000002A7 /* AccountBalanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountBalanceTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormattingTests.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000270 /* TransactionSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionSnapshot.swift; sourceTree = "<group>"; };
 		E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoRestoresRecurrenceTests.swift; sourceTree = "<group>"; };
@@ -919,6 +921,7 @@
 				E1A2B3C40000000000000253 /* MoneyFormattingTests.swift */,
 				E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */,
 				E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */,
+				E1A2B3C400000000000002A7 /* AccountBalanceTests.swift */,
 				E1A2B3C40000000000000260 /* BudgetEditPreservesAnchorTests.swift */,
 			);
 			path = SmartBudTests;
@@ -1877,6 +1880,7 @@
 				E1A2B3C4000000000000C021 /* ParsingTests.swift in Sources */,
 				E1A2B3C4000000000000C0F2 /* ParsingMetricsTests.swift in Sources */,
 				E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */,
+				E1A2B3C400000000000002A6 /* AccountBalanceTests.swift in Sources */,
 				E1A2B3C40000000000000276 /* Helper.swift in Sources */,
 				C10100000000000000000005 /* TemplateTransactionModel.swift in Sources */,
 				E1A2B3C40000000000000277 /* AppLocale.swift in Sources */,
