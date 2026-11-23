@@ -91,6 +91,8 @@ struct CategoryStepperView: View {
                                                       style: StrokeStyle(lineWidth: 1.5))
                                 }
                             }
+                            .contentShape(Rectangle())
+                            .frame(minHeight: 44)
                             .onTapGesture {
                                 categoryFilter = item
                                 withAnimation {
@@ -104,7 +106,7 @@ struct CategoryStepperView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 30)
+        .frame(height: 44)
         .onAppear {
             if categories.isEmpty {
                 categoryFilter = nil

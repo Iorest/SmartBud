@@ -43,6 +43,7 @@ struct InsightsAIAnalysisView: View {
                     .foregroundStyle(Color.SubtitleText.opacity(0.7))
             }
             .accessibilityLabel(Text(String.appLocalized("关闭")))
+            .accessibilityHint(Text(String.appLocalized("Close AI analysis")))
         }
     }
 

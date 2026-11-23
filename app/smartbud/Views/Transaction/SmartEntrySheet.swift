@@ -63,6 +63,7 @@ struct SmartEntrySheet: View {
                     .foregroundStyle(Color.SubtitleText.opacity(0.7))
             }
             .accessibilityLabel(Text(String.appLocalized("关闭")))
+            .accessibilityHint(Text(String.appLocalized("Close the smart entry panel")))
             .accessibilityIdentifier(AccessibilityID.smartEntryClose)
         }
     }
@@ -85,6 +86,7 @@ struct SmartEntrySheet: View {
                     .foregroundStyle(Color.PrimaryText)
             }
             .accessibilityLabel(Text(String.appLocalized("解析")))
+            .accessibilityHint(Text(String.appLocalized("Generate a transaction from text")))
             .disabled(text.trimmingCharacters(in: .whitespaces).isEmpty)
         }
     }

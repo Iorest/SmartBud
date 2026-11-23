@@ -32,6 +32,7 @@ struct SBSaveErrorBanner: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("关闭")))
+            .accessibilityHint(Text(String.appLocalized("Close the save error message")))
         }
         .padding(SBSpace.small)
         .background(

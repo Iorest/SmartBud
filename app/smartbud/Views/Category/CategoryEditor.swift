@@ -130,7 +130,7 @@ extension CategoryEditor {
                 VStack {
                     if showToast {
                         SBToast(title: toastTitle, systemImage: toastImage, positive: positive)
-                            .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                            .appTransition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     } else if let editing {
                         Text(LocalizedStringKey(editing.income ? "Income" : "Expense"))
                             .font(.body.weight(.semibold))
@@ -186,6 +186,7 @@ extension CategoryEditor {
                                 .contentShape(Rectangle())
                         }
                         .accessibilityLabel(String.appLocalized("Delete"))
+                        .accessibilityHint(Text(String.appLocalized("Delete this category")))
                     }
                 }
 

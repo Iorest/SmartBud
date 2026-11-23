@@ -128,6 +128,7 @@ struct ActualBudgetView: View {
                         Image(systemName: "plus")
                     }
                     .accessibilityLabel(String.appLocalized("New Budget"))
+                    .accessibilityHint(Text(String.appLocalized("Create a new budget")))
                     .accessibilityIdentifier(AccessibilityID.budgetAddButton)
                 }
             }

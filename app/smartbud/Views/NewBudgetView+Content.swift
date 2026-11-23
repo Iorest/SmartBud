@@ -12,11 +12,13 @@ extension BrandNewBudgetView {
             HStack {
                     Button {
                         if showBackButton {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                            AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                                 if progress > 1 {
                                     progress = 1
                                 }
                             }
+                        } else if hasUnsavedInput {
+                            showDiscardConfirm = true
                         } else {
                             dismiss()
                         }
@@ -28,6 +30,7 @@ extension BrandNewBudgetView {
                             .padding(8)
                             .background(Color.SecondaryBackground, in: Circle())
                     }
+                    .accessibilityLabel(showBackButton ? String.appLocalized("Back") : String.appLocalized("Close"))
                     .contentTransition(.symbolEffect(.replace.downUp.wholeSymbol))
 
                 Spacer()
@@ -53,7 +56,7 @@ extension BrandNewBudgetView {
                         Color.AlertRed.opacity(0.23),
                         in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                     )
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .appTransition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .frame(width: 250)
                 }
             }
@@ -105,6 +108,14 @@ extension BrandNewBudgetView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
         .appBackground()
+        .guardModalDismiss(isDirty: hasUnsavedInput)
+        .confirmationDialog(
+            String.appLocalized("Discard unsaved changes?"),
+            isPresented: $showDiscardConfirm
+        ) {
+            Button(String.appLocalized("Discard"), role: .destructive) { dismiss() }
+            Button(String.appLocalized("Cancel"), role: .cancel) {}
+        }
         .onAppear {
             // Sync the pad VM with the AppStorage flags on first appearance.
             // Subsequent changes are picked up by the `onChange` below.

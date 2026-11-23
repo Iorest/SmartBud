@@ -202,7 +202,7 @@ PR #29 把 6 条 B 用例挂进剩余余量最大的分片后，四片实测变�
 | `.contrast` | 配色 token 还没做过 AA 对比度核验，属于设计侧整改，不在本次口径内 |
 | `.dynamicType` | 数字键盘、图表用的是固定字号（与系统计算器同一取舍），接 Dynamic Type 单独排期 |
 | `.textClipped` | 大字号下图表/标签截断，同上，跟着 dynamicType 一起做 |
-| `.hitRegion` | 账本徽标、筛选 pill 不足 44pt，需要一次布局整改 |
+| `.hitRegion` | TELE-25 已把筛选 pill / 色块等可点控件提到 44pt；剩下的 inline Picker 零尺寸 "Other" 行、图表柱条等装饰元素仍列入例外 |
 
 硬门槛保留 `.trait` 与 `.sufficientElementDescription`：交互元素有没有说明、trait 对不对，
 正好是本文件「元素怎么定位」那套 identifier 的地基。新增一个没有可访问性描述或 trait 的控件，
@@ -214,6 +214,11 @@ PR #29 把 6 条 B 用例挂进剩余余量最大的分片后，四片实测变�
 
 要放行某个具体元素（而不是整类问题），把它加进 `ignoredElementIdentifiers` 并写清原因——
 按 identifier 放行，不会因为文案改动而意外放宽到别的元素。
+
+TELE-25 另加了离线护栏：`python3 scripts/check_repo.py` 会检查 audit 忽略项没有被扩大
+（仍只是上面四类）、`.ignoresSafeArea(.keyboard)` 没有被重新引入、`AppMotion` /
+`guardModalDismiss` 钩子还在，以及 `accessibilityHint` / `accessibilityValue` 调用数不低于
+18 / 6。这条在 Linux 就能跑，挡的是「代码改动把无障碍契约悄悄删掉」，不替代 macOS 上的真机审计。
 
 ## 运行机约束
 

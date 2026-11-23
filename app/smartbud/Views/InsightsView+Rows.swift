@@ -35,6 +35,12 @@ struct InsightsDollarView: View {
         }
         .lineLimit(1)
         .minimumScaleFactor(0.7)
+        // TELE-25: one VoiceOver element per money figure, with the number
+        // exposed as its value (label stays semantic). Previously VoiceOver
+        // announced the currency symbol and the digits as two separate nodes.
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(String.appLocalized("Amount")))
+        .accessibilityValue("\(symbol)\(formattedAmount)")
     }
 }
 

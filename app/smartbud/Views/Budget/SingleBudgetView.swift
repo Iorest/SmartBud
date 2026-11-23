@@ -231,7 +231,7 @@ extension SingleBudgetView {
                         heavyHaptic &+= 1
                     }
                 }
-                .animation(.default, value: deletePopup)
+                .motionAnimation(.default, value: deletePopup)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($isDragging, body: { _, state, _ in
@@ -245,18 +245,18 @@ extension SingleBudgetView {
                             if deleteConfirm {
                                 // A full swipe never deletes directly; it
                                 // reuses the same confirmation as a short one.
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                AppMotion.withAnimation(.easeInOut(duration: 0.3)) {
                                     offset = 0
                                 }
                                 toDelete = budget
                             } else if deletePopup {
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                AppMotion.withAnimation(.easeInOut(duration: 0.3)) {
                                     offset = 0
                                 }
 
                                 toDelete = budget
                             } else {
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                AppMotion.withAnimation(.easeInOut(duration: 0.3)) {
                                     offset = 0
                                 }
                             }
@@ -264,7 +264,7 @@ extension SingleBudgetView {
                 )
                 .onChange(of: isDragging) { _, _ in
                     if !isDragging && !deleted {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        AppMotion.withAnimation(.easeInOut(duration: 0.3)) {
                             offset = 0
                         }
                     }

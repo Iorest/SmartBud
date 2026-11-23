@@ -77,6 +77,7 @@ extension TransactionView {
                     .contentShape(Rectangle())
             }
             .accessibilityLabel(Text(String.appLocalized("Cancel")))
+            .accessibilityHint(Text(String.appLocalized("Discard this edit")))
             .accessibilityIdentifier(AccessibilityID.entryCancel)
 
             Spacer()
@@ -90,6 +91,7 @@ extension TransactionView {
                     deleteButtonIcon
                 }
                 .accessibilityLabel(String.appLocalized("delete transaction"))
+                .accessibilityHint(Text(String.appLocalized("Permanently delete this transaction")))
             }
 
             TransactionRepeatButton(
@@ -106,7 +108,7 @@ extension TransactionView {
         VStack {
             if showToast {
                 SBToast(title: toastTitle, systemImage: toastImage)
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .appTransition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     // Sticky refusals stay until edited; tapping the message
                     // is the explicit "I read it" for users who want the
                     // income/expense picker back first.
@@ -142,6 +144,7 @@ extension TransactionView {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(String.appLocalized("智能记账")))
+        .accessibilityHint(Text(String.appLocalized("Generate a transaction from text")))
         .accessibilityIdentifier(AccessibilityID.entrySmartEntry)
     }
 
@@ -238,7 +241,7 @@ extension TransactionView {
                 income: income
             )
             .environment(categoryVM)
-            .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
+            .appTransition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
         } else if !textFieldFocused {
             // The system keyboard owns the bottom while the note is typed.
             NumberPad(
@@ -252,7 +255,7 @@ extension TransactionView {
                     submit()
                 }
             )
-            .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
+            .appTransition(AnyTransition.move(edge: .leading).combined(with: .opacity))
         }
     }
 

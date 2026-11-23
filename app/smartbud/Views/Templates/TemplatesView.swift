@@ -66,6 +66,7 @@ struct TemplatesView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel(Text(String.appLocalized("New Template")))
+                .accessibilityHint(Text(String.appLocalized("Create a new template")))
             }
             #if os(iOS)
             if !templates.isEmpty {

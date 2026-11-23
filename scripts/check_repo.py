@@ -263,6 +263,63 @@ def check_docs(root, problems):
                 problems.append(f"docs: {os.path.relpath(path, root)} links to missing {link}")
 
 
+def check_interaction_contract(root, problems):
+    """TELE-25: guard the interaction/accessibility contract that cannot be
+    verified on Linux. These are structural invariants — the macOS XCTest
+    audit still owns the visual/runtime side. No new ignored audit types, no
+    keyboard safe-area opt-outs, and the VoiceOver/motion hooks stay present.
+    """
+    app_root = os.path.join(root, "app", "smartbud")
+    swift_texts = []
+    for dirpath, _dirnames, filenames in os.walk(app_root):
+        for fname in filenames:
+            if fname.endswith(".swift"):
+                swift_texts.append(read(os.path.join(dirpath, fname)))
+    app_source = "\n".join(swift_texts)
+
+    if ".ignoresSafeArea(.keyboard" in app_source:
+        problems.append(
+            "interaction: .ignoresSafeArea(.keyboard) reintroduced "
+            "(TELE-25 removed all three sites; it hides focused text fields)"
+        )
+    if app_source.count("scrollDismissesKeyboard(.interactively)") < 2:
+        problems.append(
+            "interaction: fewer than 2 long-form scrolls dismiss the keyboard "
+            "interactively (TELE-25: settings/LLM + import steps)"
+        )
+    if "enum AppMotion" not in app_source or "func guardModalDismiss" not in app_source:
+        problems.append(
+            "interaction: AppMotion / guardModalDismiss helpers missing "
+            "(Reduce Motion gate or unsaved-modal guard was removed)"
+        )
+
+    uitest = os.path.join(root, UITEST_DIR, "SmartBudUITests.swift")
+    if os.path.exists(uitest):
+        policy = read(uitest)
+        block = re.search(r"ignoredTypes[^=]*=\s*\[(.*?)\]", policy, re.S)
+        if not block:
+            problems.append("interaction: cannot locate AccessibilityAuditPolicy.ignoredTypes")
+        else:
+            types = set(re.findall(r"\.\w+", block.group(1)))
+            allowed = {".contrast", ".dynamicType", ".textClipped", ".hitRegion"}
+            if types - allowed or types != allowed:
+                problems.append(
+                    f"interaction: audit ignoredTypes changed to {sorted(types)}; "
+                    f"expected exactly {sorted(allowed)} (do not disable audit rules wholesale)"
+                )
+
+    hints = app_source.count(".accessibilityHint(")
+    values = app_source.count(".accessibilityValue(")
+    if hints < 18:
+        problems.append(f"interaction: only {hints} accessibilityHint call sites (TELE-25 floor: 18)")
+    if values < 6:
+        problems.append(f"interaction: only {values} accessibilityValue call sites (TELE-25 floor: 6)")
+
+    design = os.path.join(root, "docs", "design.md")
+    if os.path.exists(design) and "已知不支持的场景" not in read(design):
+        problems.append("interaction: docs/design.md is missing the §9 已知不支持的场景 section")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
@@ -273,6 +330,7 @@ def main():
     check_pbxproj(root, problems)
     check_identifiers(root, problems, notes)
     check_docs(root, problems)
+    check_interaction_contract(root, problems)
 
     for note in notes:
         print(f"note: {note}")

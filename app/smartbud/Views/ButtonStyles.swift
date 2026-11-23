@@ -17,6 +17,6 @@ struct BouncyButton: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? scale : 1)
-            .animation(.easeOut(duration: duration), value: configuration.isPressed)
+            .motionAnimation(.easeOut(duration: duration), value: configuration.isPressed)
     }
 }

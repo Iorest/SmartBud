@@ -143,6 +143,7 @@ struct AccountEditor: View {
                     .onTapGesture { colour = hex }
                     .accessibilityLabel(Text(hex))
                     .accessibilityAddTraits(hex == colour ? .isSelected : [])
+                    .hitTarget44()
             }
         }
     }

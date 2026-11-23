@@ -48,6 +48,9 @@ struct SettingsLLMView: View {
                 .padding(.bottom, 60)
             }
             .scrollIndicators(.hidden)
+            #if os(iOS)
+            .scrollDismissesKeyboard(.interactively)
+            #endif
         }
         .modifier(SettingsSubviewModifier())
         .onAppear {

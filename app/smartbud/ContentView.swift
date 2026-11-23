@@ -66,12 +66,15 @@ struct ContentView: View {
                     .padding(.horizontal, SBSpace.medium)
                     .padding(.bottom, bottomEdge + 68)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .appTransition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .animation(.easeOut(duration: 0.2), value: dataRepo.lastSaveError != nil)
         }
-        .ignoresSafeArea(.keyboard)
+        // Do NOT ignore `.keyboard` here: this shell hosts the settings and
+        // import text fields, and a global override would lift their inputs
+        // under the system keyboard. Entry sheets are separate presentations
+        // and manage their own safe area (see TransactionView+Subviews.swift).
         .task {
             if appLockVM.isAppLockEnabled {
                 appLockVM.appLockValidation()
@@ -153,7 +156,7 @@ struct FallbackSyncBanner: View {
             RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                 .fill(Theme.Brand.warning.opacity(0.92))
         )
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .appTransition(.move(edge: .top).combined(with: .opacity))
     }
 }
 

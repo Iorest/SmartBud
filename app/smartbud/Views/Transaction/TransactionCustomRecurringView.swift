@@ -84,6 +84,7 @@ struct CustomRecurringView: View {
                             .opacity(holdingCoefficient == 30 ? 0.25 : 1)
                     }
                     .disabled(holdingCoefficient == 30)
+                    .accessibilityLabel(String.appLocalized("Increase"))
 
                     Text("\(holdingCoefficient)")
                         .font(.title2.weight(.medium))
@@ -113,6 +114,7 @@ struct CustomRecurringView: View {
                             .opacity(holdingCoefficient == 2 ? 0.25 : 1)
                     }
                     .disabled(holdingCoefficient == 2)
+                    .accessibilityLabel(String.appLocalized("Decrease"))
                 }
 
                 VStack {
@@ -135,6 +137,7 @@ struct CustomRecurringView: View {
                             .opacity(holdingType == 1 ? 0.25 : 1)
                     }
                     .disabled(holdingType == 1)
+                    .accessibilityLabel(String.appLocalized("Decrease"))
 
                     Group {
                         if holdingType == 1 {
@@ -172,6 +175,7 @@ struct CustomRecurringView: View {
                             .opacity(holdingType == 3 ? 0.25 : 1)
                     }
                     .disabled(holdingType == 3)
+                    .accessibilityLabel(String.appLocalized("Increase"))
                 }
             }
             .padding(.bottom, 20)

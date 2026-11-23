@@ -170,12 +170,12 @@ struct TransactionView: View {
                 categoryButtonBackgroundColor = Color.AlertRed.opacity(0.23)
                 categoryButtonOutlineColor = Color.AlertRed
             }
-            withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
+            AppMotion.withAnimation(.easeInOut(duration: 0.1).repeatCount(5)) {
                 shake = true
             }
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(500))
-                withAnimation(.easeInOut(duration: 0.1)) {
+                AppMotion.withAnimation(.easeInOut(duration: 0.1)) {
                     shake = false
                 }
                 withAnimation(.easeOut(duration: 0.6)) {
