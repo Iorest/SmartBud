@@ -203,7 +203,7 @@
 | 模拟器 iPhone 16 “见 SmartBud.xcscheme” | scheme 不含 destination/机型；iPhone 16 只出现在文档命令与 `jobs.test` / `jobs.ui-test` 的 `env.DESTINATION` | 文档错 | 已改：改为“命令与 CI 的 destination” |
 | 工程无 Swift Package 依赖 | 仓库无 `Package.resolved` / `Package.swift` | 一致 | — |
 | 构建/测试命令（iPhone 16、`-project app/...`） | `jobs.test` 的 `env` 与 xcodebuild 步骤和文档一致 | 一致 | — |
-| 当前 213 个逻辑测试、36 个 suite | `grep -r "@Test"` = 213、`@Suite` = 36 | 一致 | — |
+| 当前 263 个逻辑测试、42 个 suite | `grep -r "@Test"` = 263、`@Suite` = 42 | 一致 | — |
 | “当前 5 条 smoke”及用例表 | TELE-36 合并后有 8 条（`app/SmartBudUITests/SmartBudUITests.swift` 的 8 条 smoke 用例，从 `testCreateExpenseThenUndoDelete` 起） | 文档错 | 已改：补 3 条并改为 8 条 |
 | “每条用例末尾都跑 `performAccessibilityAudit`” | `assertAccessible(app, screen:)` 只在 smoke 段调用 5 处（`screen` 值 `log` / `tabs` / `smart-entry` / `settings` / `settings-after-import`），A/B E2E 未接入 | 文档错 | 已改：写明 5/8；同步改测试文件头注释；剩余缺口见 T7 |
 | `AccessibilityID.swift` 同时编进 app 与 UI 测试 target | `project.pbxproj:514-516` 三处 target membership（app/tests/UI tests） | 一致 | — |
@@ -234,7 +234,7 @@
 |---|---|---|---|
 | Documentation 索引 14 篇全部可达 | 脚本遍历 README + `docs/*.md` 相对链接：0 个断链 | 一致 | — |
 | 预览图 7 张存在 | `docs/assets/3.png`…`9.png` 均存在 | 一致 | — |
-| “run the 213 tests” | 逻辑测试静态计数 213 | 一致 | — |
+| “run the 263 tests” | 逻辑测试静态计数 263 | 一致 | — |
 | 核心功能免费、Pro 只含 AI 分析/图标/提醒，限免期全开 | `ProAccess.swift:39-45`、`SubscriptionManager.isLimitedTimeFree` | 一致 | — |
 | 快捷动作、生物识别、语音/截图记账、小组件 | `Info.plist:46-64`、`Utilities/Authentication.swift:99`、`Views/Transaction/SmartEntrySheet.swift:25,183,199`、`app/ExpenditureWidget/`（14 个 Swift 文件） | 一致 | — |
 | iPhone/iPad/Mac 三个构建目标 | `app/smartbud`、`app/SmartBudMac`、`app/ExpenditureWidget` | 一致 | — |

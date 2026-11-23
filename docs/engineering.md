@@ -55,8 +55,8 @@ xcodebuild test \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-现有用例在 `app/SmartBudTests/`，用的是 swift-testing（`@Test`），当前 213 个。
-跑完日志里会有 `Test run with 213 tests in 36 suites passed`。要看具体哪一条失败，把结果包存下来：
+现有用例在 `app/SmartBudTests/`，用的是 swift-testing（`@Test`），当前 263 个。
+跑完日志里会有 `Test run with 263 tests in 42 suites passed`。要看具体哪一条失败，把结果包存下来：
 
 ```bash
 xcodebuild test \
@@ -284,11 +284,12 @@ CI 的 `test` job 在「Select Xcode 26」之后跑它（那时 `swiftc` 一定�
 # 需要一个 Linux Swift 工具链（6.0+），装机后：
 export SMARTBUD_SWIFT_HOME=/opt/swift-6.4.2-RELEASE-ubuntu24.04   # 或把 swift 放进 PATH
 scripts/linux-tests.sh
-# 输出：✔ Test run with 89 tests in 11 suites passed after 0.014 seconds.
+# 输出：✔ Test run with 95 tests in 12 suites passed after 0.014 seconds.
 ```
 
-覆盖的 suite：`AppPeriod` / `CSVTable` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` /
-`MoneyFormatting` / `ProAccess` / `Refund policy` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
+覆盖的 suite：`AppPeriod` / `Bad debt policy` / `Balance adjustment invariant` / `CSVTable` /
+`CurrencyRateGate` / `DeepLinkRequest` / `LLMProvider` / `Merchant normalisation` / `MoneyFormatting` /
+`Pro access` / `Refund policy` / `TransactionValidation`。这些是「金额算错就是错账」的那一层。
 
 **不覆盖**：SwiftUI 视图、SwiftData 模型、CloudKit、StoreKit、`ExpenseTextParser` 的
 NaturalLanguage 商户抽取、本地化格式化（`AppLocale` / `AppLanguage` 用的是 Apple 专属 API，
