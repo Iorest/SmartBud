@@ -187,8 +187,9 @@ enum ReimbursementLedger {
                 share = proportional
                 left -= proportional
             }
-            row.baseAmount = Money.double(Money.rounded(share))
-            row.amount = ReimbursementPolicy.accountAmount(for: row.baseAmount,
+            let newBase = Money.double(Money.rounded(share))
+            row.baseAmount = newBase
+            row.amount = ReimbursementPolicy.accountAmount(for: newBase,
                                                           originalAmount: claim.amount,
                                                           originalBaseAmount: base) ?? row.amount
             row.account = claim.account
