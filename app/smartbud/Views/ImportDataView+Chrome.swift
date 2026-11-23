@@ -25,15 +25,15 @@ extension ImportDataView {
             HStack {
                     Button {
                         if progress == 2 {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                            AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                                 progress -= 1
                             }
                         } else if progress > 6 {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                            AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                                 progress -= 1
                             }
                         } else if progress > 2 {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                            AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                                 if let removedColumn = selectedColumns.popLast() {
                                     remainingColumns.append(removedColumn)
                                     remainingColumns.sort()
@@ -54,6 +54,7 @@ extension ImportDataView {
                             .padding(8)
                             .background(Color.SecondaryBackground, in: Circle())
                     }
+                    .accessibilityLabel(progress > 1 ? String.appLocalized("Back") : String.appLocalized("Close"))
                     .accessibilityIdentifier(AccessibilityID.importClose)
                     .contentTransition(.symbolEffect(.replace.downUp.wholeSymbol))
 
@@ -88,7 +89,7 @@ extension ImportDataView {
                         Color.AlertRed.opacity(0.23),
                         in: RoundedRectangle(cornerRadius: SBRadius.chip, style: .continuous)
                     )
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .appTransition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .frame(width: 250)
                 }
             }
@@ -134,6 +135,7 @@ extension ImportDataView {
                                     .frame(minWidth: 44, minHeight: 44)
                                     .contentShape(Rectangle())
                             }
+                            .accessibilityLabel(String.appLocalized("Add"))
                         }
 
                         Spacer()
@@ -198,7 +200,7 @@ extension ImportDataView {
                 Button {
                     if progress == 7 {
                         if numberOfLinkedCategories == uniqueCategories.count {
-                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                            AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                                 progress += 1
                             }
 
@@ -209,11 +211,11 @@ extension ImportDataView {
                         }
 
                     } else if progress > 5 {
-                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                        AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                             progress += 1
                         }
                     } else {
-                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
+                        AppMotion.withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8)) {
                             guard !remainingColumns.isEmpty else { return }
 
                             if progress == 4 {

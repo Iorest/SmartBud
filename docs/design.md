@@ -285,14 +285,18 @@ TemplateTransactionModel                 快捷记账模板
 
 - iPhone：TabView（记录 / 统计 / 预算 / 设置）+ 悬浮记账按钮。
 - iPad 常规宽度、Mac：`NavigationSplitView` 侧栏，详情列限宽 860。
-- 记账页是全屏计算器式布局；键盘避让由系统 safa area 负责；`dynamicType` 上限 accessibility1（Apple 计算器式例外，已注释）。
+- 记账页是全屏计算器式布局；键盘避让由系统 safe area 负责（TELE-25 已移除三处 `.ignoresSafeArea(.keyboard)`，输入框不再被键盘盖住）；长表单滚动容器在 iOS 上用 `.scrollDismissesKeyboard(.interactively)` 下滑收键盘；`dynamicType` 上限 accessibility1（Apple 计算器式例外，已注释）。
 - 破坏性操作：交易用 6 秒撤销条；账户/分类/清空/导入用 alert 说明后果。
 - 空态：`SBEmptyState`（`ContentUnavailableView`）+ 一个明确动作。
 - 流水搜索叠加当前筛选（不是只对"全部"生效）；UPCOMING 是独立分区，空态判断同时看两边。
 - 账户的隐藏与归档都有可展开分组，任何隐藏操作都必须能撤回；默认账户排除两者。
 - App Lock 期间所有「新建」入口（悬浮按钮、`⌘N`、`smartbud://newExpense`）排队，
   解锁后重放；解锁允许设备密码，避免生物识别锁定后无路可走。
-- 无障碍：所有图标按钮有 `accessibilityLabel`；金额行 `accessibilityElement(children: .combine)`。
+- 无障碍：所有图标按钮有 `accessibilityLabel`，破坏性/主要动作补 `accessibilityHint`；
+  金额行 `accessibilityElement(children: .combine)` 并把数值放进 `accessibilityValue`（如统计页金额块）。
+- 未保存的模态表单（如新建预算）用 `.interactiveDismissDisabled` 挡住误滑关闭，显式关闭走确认弹窗；
+  纯展示型 sheet 不加闸门。
+- 减弱动态效果（`AppMotion`）：位移/缩放动画与 `.transition` 降级为无动画/淡入淡出，保留纯透明度动画。
 - 动态字体：Log / 记账 / 设置 / 预算在 `accessibility-extra-large` 下实测无截断；
   记账页按计算器布局把字号上限压在 accessibility1。
 - RTL：App 只支持 en / zh-Hans / zh-Hant 三种 LTR 语言，界面不提供 RTL 布局；
@@ -315,6 +319,25 @@ TemplateTransactionModel                 快捷记账模板
 | 对比度 | 深色模式正文 ≥ 4.5:1（WCAG AA） | 夜间使用是记账高峰 |
 | 触感 | 只在成功、失败、删除三类事件触发 | 每个点击都震会让人关掉触感 |
 | 动效 | 开启"减弱动态效果"时去掉位移/缩放 | 前庭敏感用户会眩晕 |
+
+### 9.0.1 已知不支持的场景（TELE-25 收口）
+
+以下场景不是 bug，而是当前明确不承诺的支持范围。`scripts/check_repo.py`
+会守住「不新增 audit 忽略项、键盘安全区不被关掉、无障碍/动效钩子不被删」这几条底线。
+
+- **RTL**：只支持 en / zh-Hans / zh-Hant 三种 LTR 语言；阿拉伯语等 RTL 未适配，
+  图表方向、金额符号与返回箭头都需重做。
+- **记账页超大字号**：金额区按 Apple 计算器式例外把 `dynamicTypeSize` 上限压在
+  `accessibility1`，超出后按计算器布局缩放，不做流式重排。
+- **图表与筛选 chip 的截断**：辅助功能超大字号下图表标签、chip 文案仍可能截断；
+  audit 的 `.textClipped` 是已记录例外，不在这个收口范围内。
+- **命中区例外**：iOS 26 inline Picker 的零尺寸 "Other" 行、图表柱条等装饰元素的
+  `.hitRegion` 仍列入 audit 例外；可点控件本身按 44×44pt 门槛修正。
+- **品牌色对比度**：`.contrast` 仍是已记录例外，深色模式正文以外的品牌色未全量 AA 验证。
+- **数字键盘按键 hint**：数字键不加 `accessibilityHint`——逐键朗读是 VoiceOver 噪音；
+  提交键有 hint。
+- **macOS 命中区/动效**：`AppMotion` 走 AppKit 分支读取减弱动态效果，但 macOS 真机
+  命中区与动效未验证（Linux 环境无法编译 XCUITest），由 PR 的人工清单跟踪。
 
 ## 9.1 Pro 功能与闸门
 

@@ -36,6 +36,9 @@ extension ImportDataView {
                         pointerView(number: index + 1, text: pointers[index])
                     }
                 }
+                #if os(iOS)
+                .scrollDismissesKeyboard(.interactively)
+                #endif
             }
     }
 

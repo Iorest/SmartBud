@@ -69,7 +69,7 @@ struct WelcomeSheetView: View {
                                             .foregroundStyle(Color.SubtitleText)
                                     }
                                 }
-                                .transition(.opacity.combined(with: .move(edge: .leading)))
+                                .appTransition(.opacity.combined(with: .move(edge: .leading)))
                             }
                         }
                     }

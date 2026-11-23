@@ -161,6 +161,7 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(String.appLocalized("Undo")))
+            .accessibilityHint(Text(String.appLocalized("Undo the most recent transaction")))
             .accessibilityIdentifier(AccessibilityID.logUndoButton)
         }
         .padding(.horizontal, 14)
@@ -268,7 +269,7 @@ extension HomeView {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .padding(.bottom, 100)
                     .padding(.horizontal, SBSpace.medium)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .appTransition(.move(edge: .bottom).combined(with: .opacity))
             }
 
             if appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked {
@@ -297,11 +298,11 @@ extension HomeView {
                    role: .destructive) {
                 transactionManager.showPopup = false
                 if stopRecurringDelete {
-                    withAnimation(.easeInOut(duration: 0.5)) {
+                    AppMotion.withAnimation(.easeInOut(duration: 0.5)) {
                         transactionVM.stopRecurring(transaction)
                     }
                 } else {
-                    withAnimation(.easeInOut(duration: 0.5)) {
+                    AppMotion.withAnimation(.easeInOut(duration: 0.5)) {
                         transactionVM.stageDelete(transaction)
                     }
                 }

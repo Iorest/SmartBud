@@ -212,6 +212,7 @@ struct NumberPad: View {
         .buttonStyle(NumPadButton())
         .disabled(!canSubmit)
         .accessibilityLabel(Text("Submit"))
+        .accessibilityHint(Text(String.appLocalized("Save the transaction and close")))
         .accessibilityIdentifier(AccessibilityID.entrySave)
         .contextMenu {
             Button {

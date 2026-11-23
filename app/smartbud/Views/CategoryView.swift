@@ -107,7 +107,7 @@ struct CategoryView: View {
                     .presentationDetents([.medium, .large])
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .ignoresSafeArea(.keyboard, edges: .all)
+        // TELE-25: keyboard safe area kept so text fields stay visible.
         .background(.clear)
         .onAppear {
             categoryVM.load()

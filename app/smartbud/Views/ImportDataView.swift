@@ -211,7 +211,8 @@ struct ImportDataView: View {
         .padding(20)
 
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .ignoresSafeArea(.keyboard)
+        // TELE-25: keep the keyboard safe area active so the focused column
+        // field is never hidden; the wizard's scroll container dismisses it.
         .appBackground()
         .onAppear {
             categoryVM.load()

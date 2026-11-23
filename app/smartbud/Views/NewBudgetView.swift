@@ -59,6 +59,18 @@ struct BrandNewBudgetView: View {
 
     @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
 
+    /// TELE-25: shown when the user taps the close button with unsaved input.
+    /// The confirmation dialog lives in `NewBudgetView+Content.swift`, so this
+    /// state must be visible across files within the app target.
+    @State var showDiscardConfirm = false
+
+    /// A budget form counts as dirty once the user moved past the first step,
+    /// typed an amount or picked a category. Used to block the accidental
+    /// swipe-to-dismiss path and to confirm an explicit close.
+    var hasUnsavedInput: Bool {
+        progress > 1 || padVM.price > 0 || selectedCategory != nil
+    }
+
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
         return Locale.appCurrencySymbol(forCurrencyCode: currency)

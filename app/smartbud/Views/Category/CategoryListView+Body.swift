@@ -17,7 +17,7 @@ extension CategoryListView {
         VStack(spacing: 5) {
             if showToast {
                 SBToast(title: toastTitle, systemImage: toastImage, positive: positive)
-                    .transition(AnyTransition.opacity.combined(with: .move(edge: .top)))
+                    .appTransition(AnyTransition.opacity.combined(with: .move(edge: .top)))
                     .padding(20)
             } else {
                 if mode == .welcome {
@@ -312,6 +312,8 @@ extension CategoryListView {
                                             Image(systemName: "trash.fill")
                                         }
                                         .tint(Color.AlertRed)
+                                        .accessibilityLabel(String.appLocalized("Delete"))
+                                        .accessibilityHint(Text(String.appLocalized("Delete this category")))
                                     }
                                     .swipeActions(edge: .leading) {
                                         Button {
@@ -320,6 +322,7 @@ extension CategoryListView {
                                             Image(systemName: "pencil")
                                         }
                                         .tint(Color("Yellow"))
+                                        .accessibilityLabel(String.appLocalized("Edit"))
                                     }
                                 }
                                 .onMove(perform: moveItem)

@@ -30,5 +30,6 @@ struct StepperButtonView: View {
                 .contentShape(Rectangle())
         }
         .accessibilityLabel(left ? String.appLocalized("Previous") : String.appLocalized("Next"))
+        .accessibilityHint(Text(String.appLocalized(left ? "Switch to the previous period" : "Switch to the next period")))
     }
 }

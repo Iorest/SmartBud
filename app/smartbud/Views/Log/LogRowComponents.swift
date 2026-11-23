@@ -50,7 +50,7 @@ struct LogSelectionBar: View {
         .frame(maxWidth: .infinity)
         .background(.bar)
         .overlay(alignment: .top) { Divider() }
-        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .appTransition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private func categoryButton(_ category: CategoryModel) -> some View {

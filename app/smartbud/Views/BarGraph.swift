@@ -121,7 +121,7 @@ struct BarGraph: View {
         // Chart labels are graphics inside a fixed plot area; cap them at
         // the first accessibility size so they stay legible without colliding.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        .animation(animated ? .interactiveSpring(response: 0.6, dampingFraction: 0.8) : nil, value: data)
+        .animation(animated && !AppMotion.isReduced ? .interactiveSpring(response: 0.6, dampingFraction: 0.8) : nil, value: data)
     }
 
     // MARK: - Helpers

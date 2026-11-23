@@ -9,7 +9,74 @@ import Foundation
 import SwiftUI
 #if os(macOS)
 import AppKit
+#elseif os(iOS)
+import UIKit
 #endif
+
+/// Single source of truth for "Reduce Motion". Reads the system setting
+/// directly so it works inside `withAnimation` closures as well as SwiftUI
+/// view bodies (where `@Environment(\.accessibilityReduceMotion)` is available).
+/// Per design.md §9.0: drop position/scale motion, keep opacity fades.
+enum AppMotion {
+    static var isReduced: Bool {
+        #if os(macOS)
+        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        #elseif os(iOS)
+        UIAccessibility.isReduceMotionEnabled
+        #else
+        false
+        #endif
+    }
+
+    /// Returns `nil` (no animation) when the user asked to reduce motion.
+    static func animation(_ base: Animation?) -> Animation? {
+        isReduced ? nil : base
+    }
+
+    /// Collapses a move/scale transition to a plain fade when reducing motion.
+    static func transition(_ base: AnyTransition) -> AnyTransition {
+        isReduced ? .opacity : base
+    }
+
+    /// `withAnimation` equivalent that no-ops the animation under Reduce Motion
+    /// while still running the state change.
+    @MainActor
+    static func withAnimation<Result>(
+        _ animation: Animation? = .default,
+        _ body: () throws -> Result
+    ) rethrows -> Result {
+        if isReduced { return try body() }
+        return try SwiftUI.withAnimation(animation, body)
+    }
+}
+
+extension View {
+    /// Drop position/scale movement under Reduce Motion but keep fades.
+    func appTransition(_ transition: AnyTransition) -> some View {
+        self.transition(AppMotion.transition(transition))
+    }
+
+    /// Gate a value-driven animation on Reduce Motion (for the few scale/
+    /// geometry animations that are not attached to a transition).
+    func motionAnimation<V: Equatable>(_ animation: Animation?, value: V) -> some View {
+        self.animation(AppMotion.animation(animation), value: value)
+    }
+
+    /// TELE-25: expand a compact icon control's hit region to the 44×44pt
+    /// minimum from design.md §9.0 without changing its visual size.
+    func hitTarget44() -> some View {
+        self
+            .contentShape(Rectangle())
+            .frame(minWidth: 44, minHeight: 44)
+    }
+
+    /// TELE-25: block the accidental swipe-to-dismiss path on a modal while it
+    /// holds unsaved input. Explicit Cancel/Done buttons still call `dismiss()`
+    /// — `interactiveDismissDisabled` only removes the gesture.
+    func guardModalDismiss(isDirty: Bool) -> some View {
+        self.interactiveDismissDisabled(isDirty)
+    }
+}
 
 extension View {
     func hideKeyboard() {

@@ -64,7 +64,7 @@ struct LineGraph: View {
         .overlay(alignment: .topLeading) {
             tooltip
         }
-        .animation(.easeInOut(duration: 1.2), value: data)
+        .motionAnimation(.easeInOut(duration: 1.2), value: data)
         .onChange(of: selectedDate) { _, new in
             withAnimation(.easeInOut(duration: 0.2)) {
                 showPlot = new != nil
