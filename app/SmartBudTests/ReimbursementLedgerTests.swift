@@ -343,4 +343,20 @@ struct ReimbursementLedgerTests {
         #expect(rows.reduce(0) { $0 + $1.amount } == 200)
         #expect(txn.reimbursedAmount == 200)
     }
+
+    @Test("Editing one instalment does not redefine the original claim")
+    func editingInstalmentKeepsClaimAmount() throws {
+        let txn = claim(amount: 100)
+        let row = try #require(repay(txn, 40))
+
+        row.amount = 60
+        row.baseAmount = 60
+        ReimbursementLedger.syncClaim(from: row, in: context)
+
+        #expect(txn.amount == 100)
+        #expect(txn.baseAmount == 100)
+        #expect(txn.reimbursedAmount == 60)
+        #expect(txn.unreimbursedBaseAmount == 40)
+        #expect(txn.reimbursedAt == nil)
+    }
 }

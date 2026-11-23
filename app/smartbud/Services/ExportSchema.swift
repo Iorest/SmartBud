@@ -138,6 +138,7 @@ enum ExportSchema {
         var refundOf: UUID?
         /// On the expense row that pays a transfer's fee: the id of the transfer.
         var transferFeeOf: UUID?
+        var adjustment: Bool?
         /// On the expense row that writes off a claim (schema 8): the id of the
         /// claim. Optional so files written before 8 still decode — their
         /// unwritten-off claims simply stay claims.

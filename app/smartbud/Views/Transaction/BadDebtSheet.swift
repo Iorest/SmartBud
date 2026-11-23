@@ -31,7 +31,9 @@ struct BadDebtSheet: View {
     @State private var saveFailed = false
 
     private var amountText: String {
-        Money.format(claim.wrappedBaseAmount, currencyCode: AppBaseCurrency.code,
+        // Only the unpaid part can be lost: a partial repayment already came
+        // back and must not appear as a write-off.
+        Money.format(claim.unreimbursedBaseAmount, currencyCode: AppBaseCurrency.code,
                      showsCents: showCents, locale: .appLocale)
     }
 

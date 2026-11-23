@@ -142,6 +142,7 @@ struct BackupMerger {
                                                                              : transaction.wrappedBaseAmount),
                 baseAmount: transaction.wrappedBaseAmount)
             transaction.reimbursedAt = dto.reimbursedAt
+            transaction.badDebtAt = dto.badDebtAt
             if let day = dto.day { transaction.day = day }
             if let month = dto.month { transaction.month = month }
             context.insert(transaction)

@@ -169,8 +169,8 @@ enum ReimbursementLedger {
         let target = Money.cents(targetBase)
         let oldTotal = Money.sum(rows.map(\.wrappedBaseAmount))
         guard oldTotal > 0, rows.first != nil else {
-            rows.first?.baseAmount = capped
-            rows.first?.amount = ReimbursementPolicy.accountAmount(for: capped,
+            rows.first?.baseAmount = targetBase
+            rows.first?.amount = ReimbursementPolicy.accountAmount(for: targetBase,
                                                                   originalAmount: claim.amount,
                                                                   originalBaseAmount: base) ?? claim.amount
             rows.first?.account = claim.account
@@ -195,19 +195,31 @@ enum ReimbursementLedger {
         }
     }
 
-    /// The mirror image: editing a repayment row moves the claim's amount
-    /// with it, so the pair can never drift apart (an 88 expense paid back by
-    /// a 120 income row would quietly create 32 of profit). The account is
-    /// deliberately *not* copied: the money may land on another card.
+    /// Editing the single row that settled a whole claim still moves the
+    /// claim's amount with it, so the pair cannot drift apart. With several
+    /// instalments the edited row is only one part of the claim: it must not
+    /// redefine the original expense, so it is capped inside the claim and
+    /// the paid-back total is derived from all rows.
+    /// The account is deliberately *not* copied: the money may land on
+    /// another card.
     static func syncClaim(from repayment: TransactionModel, in context: ModelContext) {
         guard let originalID = repayment.reimbursementOf else { return }
         let descriptor = FetchDescriptor<TransactionModel>(
             predicate: #Predicate { $0.id == originalID })
         guard let claim = (try? context.fetch(descriptor))?.first else { return }
-        claim.amount = repayment.amount
-        claim.baseAmount = repayment.wrappedBaseAmount
 
         let rows = repayments(for: claim, in: context)
+        if rows.count == 1, claim.reimbursedAt != nil {
+            claim.amount = repayment.amount
+            claim.baseAmount = repayment.wrappedBaseAmount
+        } else {
+            repayment.amount = repayment.amount.isFinite
+                ? min(max(0, repayment.amount), claim.amount) : 0
+            repayment.baseAmount = ReimbursementPolicy.clamped(
+                reimbursed: repayment.wrappedBaseAmount,
+                baseAmount: claim.wrappedBaseAmount)
+        }
+
         let total = Money.double(Money.sum(rows.map(\.wrappedBaseAmount)))
         claim.reimbursedAmount = ReimbursementPolicy.clamped(reimbursed: total,
                                                              baseAmount: claim.wrappedBaseAmount)
