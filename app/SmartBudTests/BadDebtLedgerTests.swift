@@ -117,12 +117,17 @@ struct BadDebtLedgerTests {
         let claim = self.claim(account: account())
         let rows = { try self.context.fetch(FetchDescriptor<TransactionModel>()) }
 
-        #expect(Money.double(Money.sum(try rows().map(\.spendBaseAmount))) == 0)
+        // Until it is paid back, the outstanding claim is the user's own
+        // spending — the new partial-reimbursement contract. Write-off moves
+        // that amount to the loss row; the total must not change.
+        #expect(Money.double(Money.sum(try rows().map(\.spendBaseAmount))) == 100)
 
-        _ = try writeOff(claim).get()
+        let loss = try writeOff(claim).get()
 
         let all = try rows()
         #expect(Money.double(Money.sum(all.map(\.spendBaseAmount))) == 100)
+        #expect(claim.spendBaseAmount == 0)
+        #expect(loss.spendBaseAmount == 100)
         // Net-total maths sees the same loss, and income stays at zero.
         #expect(Money.double(Money.sum(all.map(\.signedBaseAmount))) == -100)
         #expect(all.filter(\.countsAsIncome).isEmpty)
@@ -166,7 +171,10 @@ struct BadDebtLedgerTests {
         #expect(claim.badDebtAt == nil)
         #expect(BadDebtLedger.allWriteOffs(in: context).isEmpty)
         let all = try context.fetch(FetchDescriptor<TransactionModel>())
-        #expect(Money.double(Money.sum(all.map(\.spendBaseAmount))) == 0)
+        // The loss row is gone, but the unpaid claim still counts as the
+        // user's spending until the money actually comes back.
+        #expect(Money.double(Money.sum(all.map(\.spendBaseAmount))) == 100)
+        #expect(claim.spendBaseAmount == 100)
     }
 
     @Test("Deleting the claim deletes its loss row")
