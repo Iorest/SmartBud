@@ -79,6 +79,7 @@ app_sources=(
 )
 
 test_sources=(
+    AccountBalanceTests.swift
     AppPeriodTests.swift
     BadDebtPolicyTests.swift
     CSVTableTests.swift

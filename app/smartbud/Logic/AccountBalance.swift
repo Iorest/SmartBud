@@ -24,4 +24,13 @@ enum AccountBalance {
         }
         return spent + transfersIn - transfersOut
     }
+
+    /// Signed row needed to move `current` to `target`, or nil when they
+    /// already match to the cent. Kept here so the adjustment invariant can
+    /// be tested without SwiftData or the rate store.
+    static func adjustmentDelta(target: Double, current: Double) -> Double? {
+        guard target.isFinite, current.isFinite else { return nil }
+        let delta = Money.double(Money.cents(target) - Money.cents(current))
+        return delta == 0 ? nil : delta
+    }
 }

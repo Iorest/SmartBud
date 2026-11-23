@@ -274,7 +274,7 @@
 | T2 | 明确并统一“未来记录是否计入账户余额” | P2 | 需产品确认口径 | `Logic/AccountBalance.swift:14-29` 计入全部记录，与统计的 `date <= now` 不一致；文档已按现状描述，需决定是否改实现 |
 | T3 | 基准币重述写审计记录 | P2 | 无 | `Services/CurrencyRebaseService.swift:50-91` 只折算不记录；`design.md` §12 P2、会计基础 §6 |
 | T4 | 多币种尾差归属 | P3 | 无（T1 口径已定） | `accounting-conventions.md` §6 要求尾差挂当期最大项，代码逐行折算后直接求和，无尾差分配 |
-| T5 | 余额调整不变量测试 | P3 | 无 | `ViewModels/AccountViewModel.swift:219-238`；补“调整后 `balance == target`”的用例（可用内存 container，参照现有 `MerchantMigrationTests`） |
+| T5 | 余额调整不变量测试 | P3 | 无 | 部分收口：差额公式已收敛到 `Logic/AccountBalance.swift` 的 `adjustmentDelta`，`SmartBudTests/AccountBalanceTests.swift` 用纯逻辑验证“调整后 `balance == target`”（含退款、浮点尾数、非有限值）；SwiftData 容器级用例仍待补 |
 | T6 | 余额调整原因字段 | P2 | 需先定枚举与迁移方案 | `design.md` §6.4、会计基础 §7 都标注缺失；新增可选字段 + 迁移说明 |
 | T7 | 26 条 A/B/C E2E 接入可访问性审计 | P3 | 无 | `app/SmartBudUITests/SmartBudUITests.swift` 中 `testA1_`–`testA10_`、`testB1_`–`testB6_` 与 10 条 `testC` 用例均未调用 `assertAccessible(app, screen:)`（PR #29 新增 6 条 B 用例，PR #31 又新增 10 条 C 用例）；只有 5 条 smoke 接入。逐条接入或写明豁免理由 |
 

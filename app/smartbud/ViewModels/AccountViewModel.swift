@@ -226,8 +226,8 @@ final class AccountViewModel {
         guard !CurrencyRateStore.shared.needsRate(for: account.resolvedCurrencyCode) else {
             return nil
         }
-        let delta = Money.double(Money.cents(target) - Money.cents(balance(for: account)))
-        guard delta != 0 else { return nil }
+        guard let delta = AccountBalance.adjustmentDelta(
+            target: target, current: balance(for: account)) else { return nil }
 
         let transaction = TransactionModel(
             note: String.appLocalized("Balance Adjustment"),
