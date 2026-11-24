@@ -115,9 +115,16 @@
     },
     "逐条核对金额、分类与备注，只有点“保存”才写入账本。" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "逐条核对金额、分类与备注，只有点“保存”才写入账本。" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review amount, category and note for each receipt. Nothing is written until you tap Save." } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "逐条核对金额、分类与备注，只有点“保存”才写入账本。" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "逐筆核對金額、分類與備註，只有點「儲存」才寫入帳本。" } }
+      }
+    },
+    "Only the first %lld files were imported." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only the first %lld files were imported." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "只导入了前 %lld 个文件。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "只匯入了前 %lld 個檔案。" } }
       }
     },
     "Receipt" : {

@@ -383,11 +383,16 @@ struct SmartEntrySheet: View {
 
     private func recognizeBatchFiles(_ urls: [URL]) async {
         guard requestBatchAccess() else { return }
-        guard !urls.isEmpty else { return }
+        let selected = Array(urls.prefix(BatchRecognitionLimits.maxSelection))
+        if selected.count < urls.count {
+            errorMessage = String.appFormatted("Only the first %lld files were imported.",
+                                               BatchRecognitionLimits.maxSelection)
+        }
+        guard !selected.isEmpty else { return }
         isRecognizingBatch = true
         defer { isRecognizingBatch = false }
         var drafts: [BatchReceiptDraft] = []
-        for (index, url) in urls.enumerated() {
+        for (index, url) in selected.enumerated() {
             let name = url.lastPathComponent.isEmpty ? "\(index + 1)" : url.lastPathComponent
             guard url.startAccessingSecurityScopedResource() else {
                 drafts.append(BatchReceiptDraft(sourceName: name, issue: .unreadableImage))

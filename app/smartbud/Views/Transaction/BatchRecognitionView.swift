@@ -61,8 +61,29 @@ struct BatchRecognitionView: View {
          incomeCategories: [CategoryModel]) {
         self.expenseCategories = expenseCategories
         self.incomeCategories = incomeCategories
-        _session = State(initialValue: BatchRecognitionSession(drafts))
+        let preResolved = drafts.map { draft -> BatchReceiptDraft in
+            var resolved = draft
+            if resolved.categoryID == nil {
+                resolved.categoryID = Self.categoryID(
+                    hint: resolved.categoryHint,
+                    isIncome: resolved.isIncome,
+                    expense: expenseCategories,
+                    income: incomeCategories
+                )
+            }
+            return resolved
+        }
+        _session = State(initialValue: BatchRecognitionSession(preResolved))
     }
+
+    /// The single-image path resolves the hint against real categories before
+    /// showing a preview; do the same here so an untouched row is saveable.
+    private static func categoryID(hint: String?, isIncome: Bool,
+                                   expense: [CategoryModel],
+                                   income: [CategoryModel]) -> UUID? {
+        ExpenseTextParser.resolveCategory(hint, from: isIncome ? income : expense)?.id
+    }
+
 
     private var pendingCount: Int {
         session.items.filter { !$0.isSaved }.count
@@ -112,15 +133,11 @@ struct BatchRecognitionView: View {
             .alert(String.appLocalized("Batch result"), isPresented: Binding(
                 get: { summary != nil },
                 set: { presented in
-                    if !presented {
-                        summary = nil
-                        dismiss()
-                    }
+                    if !presented { closeSummary() }
                 }
             )) {
                 Button(String.appLocalized("关闭"), role: .cancel) {
-                    summary = nil
-                    dismiss()
+                    closeSummary()
                 }
             } message: {
                 if let summary {
@@ -129,6 +146,14 @@ struct BatchRecognitionView: View {
                 }
             }
         }
+    }
+
+    /// A partial failure keeps the preview open so the user can fix the row
+    /// and use its Retry button. Only a clean batch closes the sheet.
+    private func closeSummary() {
+        let hadFailures = (summary?.failed ?? 0) > 0
+        summary = nil
+        if !hadFailures { dismiss() }
     }
 
     private func row(for draft: Binding<BatchReceiptDraft>) -> some View {
@@ -147,7 +172,12 @@ struct BatchRecognitionView: View {
                     get: { draft.wrappedValue.isIncome },
                     set: { newValue in
                         draft.wrappedValue.isIncome = newValue
-                        draft.wrappedValue.categoryID = nil
+                        draft.wrappedValue.categoryID = Self.categoryID(
+                            hint: draft.wrappedValue.categoryHint,
+                            isIncome: newValue,
+                            expense: expenseCategories,
+                            income: incomeCategories
+                        )
                     }
                 )) {
                     Text(String.appLocalized("支出")).tag(false)
