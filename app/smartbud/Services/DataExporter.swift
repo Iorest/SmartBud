@@ -260,8 +260,8 @@ enum DataExporter {
             accounts: accounts,
             transfers: transfers,
             rates: rates,
-            books: books,
-            settings: ExportSchema.SettingsDTO.current()
+            settings: ExportSchema.SettingsDTO.current(),
+            books: books
         )
     }
 

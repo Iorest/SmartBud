@@ -53,7 +53,7 @@ func payload(
         exportDate: .now, appVersion: "test", schemaVersion: ExportSchema.version,
         transactions: transactions, categories: categories, budgets: budgets,
         mainBudgets: mainBudgets, templates: templates, accounts: accounts,
-        transfers: transfers, rates: rates, books: books, settings: settings
+        transfers: transfers, rates: rates, settings: settings, books: books
     )
 }
 
@@ -432,8 +432,9 @@ struct BookMigrationTests {
         let expense = TransactionModel(note: "lunch", category: category, account: account,
                                        baseAmount: 42.5, amount: 42.5,
                                        date: calendar.date(byAdding: .day, value: 1, to: month)!)
-        let salary = TransactionModel(note: "salary", account: account, income: true,
-                                      baseAmount: 2_000, amount: 2_000, date: month)
+        let salary = TransactionModel(note: "salary", account: account,
+                                      baseAmount: 2_000, income: true,
+                                      amount: 2_000, date: month)
         let budget = BudgetModel(amount: 500, startDate: month, type: 3)
         let mainBudget = MainBudgetModel(amount: 2_500, startDate: month, type: 3)
         let template = TemplateTransactionModel(note: "coffee", amount: 10)
