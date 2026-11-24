@@ -7,7 +7,13 @@ import SwiftData
 import SwiftUI
 
 struct MonthStepperView: View {
-    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    /// Month navigation follows the active book's oldest month.
+    private var transactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     @Binding var showingDate: Date
 

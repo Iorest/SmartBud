@@ -129,6 +129,7 @@ enum SettingsKey {
 
     // MARK: - Row titles (Data)
 
+    static let rowBooks = "settings.row.books"
     static let rowCategories = "settings.row.categories"
     static let rowAccounts = "settings.row.accounts"
     static let rowTemplates = "settings.row.templates"
@@ -167,6 +168,16 @@ enum SettingsKey {
     static let iconSky = "settings.icon.sky"
     static let iconSunset = "settings.icon.sunset"
     static let iconAqua = "settings.icon.aqua"
+
+    // MARK: - Books management
+
+    static let booksNew = "settings.books.new"
+    static let booksRename = "settings.books.rename"
+    static let booksDuplicate = "settings.books.duplicate"
+    static let booksOpen = "settings.books.open"
+    static let booksCopyName = "settings.books.copyName"
+    static let booksArchiveTitle = "settings.books.archiveTitle"
+    static let booksArchiveMessage = "settings.books.archiveMessage"
 }
 
 /// Keys for smart-entry parsing: provenance labels, the first-use privacy

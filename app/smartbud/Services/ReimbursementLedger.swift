@@ -103,6 +103,8 @@ enum ReimbursementLedger {
         let full = ReimbursementPolicy.isFullyReimbursed(baseAmount: claim.wrappedBaseAmount,
                                                          reimbursed: total)
         let name = claim.wrappedNote.isEmpty ? claim.wrappedCategoryName : claim.wrappedNote
+        // Repayments follow the claim's ledger even when the active book
+        // changes between opening the claim and recording the money.
         let row = TransactionModel(
             note: String.appFormatted("Reimbursement · %@", name),
             category: nil,
@@ -111,7 +113,8 @@ enum ReimbursementLedger {
             income: true,
             amount: rowAmount,
             date: date,
-            reimbursementOf: claim.id
+            reimbursementOf: claim.id,
+            bookID: claim.bookID
         )
         claim.reimbursedAmount = total
         if full { claim.reimbursedAt = date }

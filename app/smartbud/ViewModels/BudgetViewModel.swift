@@ -12,12 +12,17 @@ final class BudgetViewModel {
     var mainBudgets: [MainBudgetModel] = []
 
     func load() {
-        budgets = repo.fetch(BudgetModel.self, sort: [SortDescriptor(\.dateCreated)])
-        mainBudgets = repo.fetch(MainBudgetModel.self)
+        let selected = BookSelection.current()
+        budgets = BookScope.scoped(
+            repo.fetch(BudgetModel.self, sort: [SortDescriptor(\.dateCreated)]),
+            \.bookID, selected: selected)
+        mainBudgets = BookScope.scoped(repo.fetch(MainBudgetModel.self),
+                                       \.bookID, selected: selected)
     }
 
     func create(amount: Double, startDate: Date, type: Int, category: CategoryModel) -> BudgetModel {
-        let budget = BudgetModel(amount: amount, startDate: startDate, type: type)
+        let budget = BudgetModel(amount: amount, startDate: startDate, type: type,
+                                 bookID: BookSelection.current())
         budget.category = category
         repo.insert(budget)
         repo.save()
@@ -36,7 +41,8 @@ final class BudgetViewModel {
     }
 
     func createMain(amount: Double, startDate: Date, type: Int) -> MainBudgetModel {
-        let budget = MainBudgetModel(amount: amount, startDate: startDate, type: type)
+        let budget = MainBudgetModel(amount: amount, startDate: startDate, type: type,
+                                     bookID: BookSelection.current())
         repo.insert(budget)
         repo.save()
         load()
@@ -114,6 +120,8 @@ final class BudgetViewModel {
         // refunded purchase gives the budget its money back in the period the
         // refund arrived (never the original period).
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
+            // A spend from another ledger must never reduce this book's budget.
+            guard BookScope.matches(txn.bookID, selected: BookSelection.current()) else { return false }
             let date = txn.date ?? .distantPast
             return date >= start && date <= Date.now
                 && (txn.countsAsSpend || txn.isRefund) && txn.category?.id == categoryID
@@ -125,6 +133,7 @@ final class BudgetViewModel {
         let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type)
             ?? budget.startDate
         let spent = Money.sum(repo.fetch(TransactionModel.self).filter { txn in
+            guard BookScope.matches(txn.bookID, selected: BookSelection.current()) else { return false }
             let date = txn.date ?? .distantPast
             return date >= start && date <= Date.now && (txn.countsAsSpend || txn.isRefund)
         }.map(\.spendBaseAmount))
@@ -153,14 +162,18 @@ final class BudgetViewModel {
     // MARK: Stateless queries (for App Intents / Shortcuts, which don't hold onto @Published state)
 
     func getAllBudgets() -> [BudgetModel] {
-        repo.fetch(BudgetModel.self, sort: [SortDescriptor(\.dateCreated)])
+        BookScope.scoped(repo.fetch(BudgetModel.self, sort: [SortDescriptor(\.dateCreated)]),
+                         \.bookID, selected: BookSelection.current())
     }
 
     func findBudget(id: UUID) -> BudgetModel? {
-        repo.fetchOne(BudgetModel.self, predicate: #Predicate { $0.id == id })
+        guard let budget = repo.fetchOne(BudgetModel.self, predicate: #Predicate { $0.id == id }),
+              BookScope.matches(budget.bookID, selected: BookSelection.current()) else { return nil }
+        return budget
     }
 
     func getMainBudget() -> MainBudgetModel? {
-        repo.fetch(MainBudgetModel.self).first
+        BookScope.scoped(repo.fetch(MainBudgetModel.self), \.bookID,
+                         selected: BookSelection.current()).first
     }
 }

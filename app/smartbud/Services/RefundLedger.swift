@@ -101,6 +101,8 @@ enum RefundLedger {
         }
 
         let name = original.wrappedNote.isEmpty ? original.wrappedCategoryName : original.wrappedNote
+        // Derived rows stay in the original's ledger even if the active book
+        // changed while the refund sheet was open.
         let row = TransactionModel(
             note: note.isEmpty ? String.appFormatted("Refund · %@", name) : note,
             category: original.category,
@@ -111,7 +113,8 @@ enum RefundLedger {
             date: date,
             refundOf: original.id,
             merchant: original.merchant,
-            merchantKey: original.merchantKey
+            merchantKey: original.merchantKey,
+            bookID: original.bookID
         )
         context.insert(row)
         return .success(row)

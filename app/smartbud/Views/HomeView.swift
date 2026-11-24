@@ -25,8 +25,35 @@ class OverallTransactionManager {
     var future: Bool = false
 }
 
+/// Reusable ledger picker. Switching here changes the single app-wide
+/// selection, so every screen follows at once (no per-tab book state).
+struct BookSwitcherMenu: View {
+    @Environment(BookState.self) private var bookState
+
+    var body: some View {
+        Menu {
+            ForEach(bookState.availableBooks.filter { !$0.archived }, id: \.id) { book in
+                Button {
+                    bookState.select(book.id)
+                } label: {
+                    HStack {
+                        Text(book.name)
+                        Spacer()
+                        if bookState.isCurrent(book.id) {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Label(bookState.currentName, systemImage: "book.closed")
+        }
+    }
+}
+
 struct HomeView: View {
     @Environment(AppLockViewModel.self) var appLockVM
+    @Environment(BookState.self) private var bookState
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
@@ -60,11 +87,17 @@ struct HomeView: View {
     // Floating add button (replaces the custom tab bar's centre button).
     @State var addTransaction = false
     @State private var transactionCountBeforeAdd = 0
-    @Query private var transactions: [TransactionModel]
+    @Query private var fetchedTransactions: [TransactionModel]
     @AppStorage("confetti", store: .appGroup) private var confetti: Bool = false
     @AppStorage("firstTransactionViewLaunch", store: .appGroup) private var firstLaunch: Bool = true
     /// "秒开": open the entry form straight after launch.
     @AppStorage("launchIntoEntry", store: .appGroup) private var launchIntoEntry: Bool = false
+
+    /// Confetti compares this book's count before and after the entry sheet;
+    /// another ledger's rows must not fire (or suppress) the celebration.
+    private var transactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     init(topEdge: CGFloat, isInFallbackMode: Bool = false) {
         self.topEdge = topEdge
@@ -84,6 +117,11 @@ struct HomeView: View {
     private var splitShell: some View {
         NavigationSplitView {
             List {
+                if !appLockVisible {
+                    Section {
+                        BookSwitcherMenu()
+                    }
+                }
                 ForEach(Self.sections) { section in
                     Button {
                         currentTab = section.id
@@ -122,6 +160,7 @@ struct HomeView: View {
             default:
                 LogView(launchSearch: launchSearch,
                         launchSearchQuery: launchSearchQuery,
+                        showsBookSwitcher: !isWideLayout && !appLockVisible,
                         onAdd: { addTransaction = true })
             }
         }
@@ -181,6 +220,7 @@ extension HomeView {
         TabView(selection: $currentTab) {
                 LogView(launchSearch: launchSearch,
                         launchSearchQuery: launchSearchQuery,
+                        showsBookSwitcher: !isWideLayout && !appLockVisible,
                         onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
@@ -226,6 +266,12 @@ extension HomeView {
         #else
         horizontalSizeClass == .regular
         #endif
+    }
+
+    /// The lock view covers the app; no book picker or sheet from the
+    /// previous ledger may remain interactive behind it.
+    var appLockVisible: Bool {
+        appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked
     }
 
     @ViewBuilder
@@ -356,6 +402,16 @@ extension HomeView {
                 return
             }
             closePresentedScreens()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .bookDidChange)) { _ in
+            // Staged edits, a queued add and the confetti baseline all refer
+            // to the ledger that was on screen before the switch.
+            closePresentedScreens()
+            pendingAddAfterUnlock = false
+            transactionManager.toRefund = nil
+            transactionManager.toBadDebt = nil
+            showConfetti = false
+            transactionCountBeforeAdd = transactions.count
         }
         .confettiOverlay(isActive: $showConfetti)
         .onChange(of: counter) { _, _ in showConfetti = true }

@@ -42,8 +42,8 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     public typealias Entry = LockBudgetWidgetEntry
 
     func placeholder(in _: Context) -> LockBudgetWidgetEntry {
-        let loaded = loadData(budgetId: "")
-
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: "", selected: selected)
         return LockBudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -54,8 +54,8 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> LockBudgetWidgetEntry {
-        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
-
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "", selected: selected)
         let entry = LockBudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -67,8 +67,10 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
-        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
-
+        // The selection is read once per entry, so the budget and its spend
+        // rows always come from the same book even if the user switches mid-load.
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "", selected: selected)
         let entry = LockBudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -82,7 +84,7 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         return timeline
     }
 
-    func loadData(budgetId: String) -> LockBudgetSnapshot {
+    func loadData(budgetId: String, selected: UUID) -> LockBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
@@ -94,7 +96,8 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
         // `fetchLimit = 1` + `first(where:)` used to return nil as soon as
         // the user had more than one budget; filter in the store instead.
         let budgetDesc = FetchDescriptor<BudgetModel>(predicate: #Predicate { $0.id == fetchId })
-        guard let budgetModel = (try? context.fetch(budgetDesc))?.first else {
+        guard let budgetModel = (try? context.fetch(budgetDesc))?.first,
+              BookScope.matches(budgetModel.bookID, selected: selected) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return LockBudgetSnapshot(total: 0, timeLeft: "", budget: budget)
         }
@@ -105,7 +108,8 @@ struct LockBudgetWidgetProvider: AppIntentTimelineProvider {
                                                   type: budgetModel.type) ?? budgetModel.startDate
         let budgetCategory = budgetModel.category
         let now = Date.now
-        let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+        let allTxns = BookScope.scoped(
+            (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? [], \.bookID, selected: selected)
         let filteredTxns = allTxns.filter {
             guard let categoryID = budgetCategory?.id else { return false }
             return ($0.countsAsSpend || $0.isRefund)

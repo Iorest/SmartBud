@@ -22,10 +22,21 @@ func signedAmount(_ value: Double, income: Bool, showCents: Bool) -> String {
     return sign + amountText(value, showCents: showCents)
 }
 
+/// Appends the active book to a widget's `smartbud://` link. Widgets run in
+/// another process, so they read the App Group selection directly. Old links
+/// without `book` still mean "whatever book is currently open".
+func widgetDeepLink(_ path: String) -> URL? {
+    guard var components = URLComponents(string: "smartbud://\(path)") else { return nil }
+    components.queryItems = (components.queryItems ?? []) + [
+        URLQueryItem(name: "book", value: BookSelection.current().uuidString)
+    ]
+    return components.url
+}
+
 /// Deep link to a budget detail screen, percent-encoding the name.
 func budgetDeepLink(_ name: String) -> URL? {
     let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-    return URL(string: "smartbud://budget?budget=\(encoded)")
+    return widgetDeepLink("budget?budget=\(encoded)")
 }
 
 /// Period label shared by the budget widgets ("today" … "this year").

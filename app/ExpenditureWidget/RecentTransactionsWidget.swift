@@ -37,33 +37,37 @@ struct Provider: AppIntentTimelineProvider {
     public typealias Entry = RecentWidgetEntry
 
     func placeholder(in _: Context) -> RecentWidgetEntry {
-        makeEntry(duration: .week, type: .net)
+        let selected = BookSelection.current()
+        return makeEntry(duration: .week, type: .net, selected: selected)
     }
 
-    private func makeEntry(duration: TimePeriod, type: InsightsType) -> RecentWidgetEntry {
+    private func makeEntry(duration: TimePeriod, type: InsightsType, selected: UUID) -> RecentWidgetEntry {
         RecentWidgetEntry(
             date: Date(),
-            amount: loadAmount(type: duration, insightsType: type),
-            transactions: loadTransactions(type: duration, count: 9),
+            amount: loadAmount(type: duration, insightsType: type, selected: selected),
+            transactions: loadTransactions(type: duration, count: 9, selected: selected),
             duration: duration,
             type: type
         )
     }
 
     func snapshot(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> RecentWidgetEntry {
-        let entry = makeEntry(duration: configuration.duration, type: configuration.insightsType)
-        return entry
+        // The widget process reads the selection from the App Group defaults,
+        // so it stays in step with the app without an extra notification.
+        let selected = BookSelection.current()
+        return makeEntry(duration: configuration.duration, type: configuration.insightsType, selected: selected)
     }
 
     func timeline(for configuration: RecentWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
-        let entry = makeEntry(duration: configuration.duration, type: configuration.insightsType)
+        let selected = BookSelection.current()
+        let entry = makeEntry(duration: configuration.duration, type: configuration.insightsType, selected: selected)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
 
         return timeline
     }
 
-    func loadAmount(type: TimePeriod, insightsType: InsightsType) -> Double {
+    func loadAmount(type: TimePeriod, insightsType: InsightsType, selected: UUID) -> Double {
         let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
         let calendar = Calendar(identifier: .gregorian)
@@ -93,19 +97,22 @@ struct Provider: AppIntentTimelineProvider {
 
         switch insightsType {
         case .net:
-            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let allTxns = BookScope.scoped(
+                (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? [], \.bookID, selected: selected)
             let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
             return Money.double(Money.sum(filtered.map(\.signedBaseAmount)))
 
         case .income:
-            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let allTxns = BookScope.scoped(
+                (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? [], \.bookID, selected: selected)
             // `income` alone includes reimbursement repayments, which the app
             // deliberately keeps out of earnings.
             let filtered = allTxns.filter { $0.countsAsIncome && $0.wrappedDate >= startDate && $0.wrappedDate <= now }
             return Money.double(Money.sum(filtered.map(\.wrappedBaseAmount)))
 
         case .expense:
-            let allTxns = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let allTxns = BookScope.scoped(
+                (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? [], \.bookID, selected: selected)
             let filtered = allTxns.filter {
                 ($0.countsAsSpend || $0.isRefund) && $0.wrappedDate >= startDate && $0.wrappedDate <= now
             }
@@ -116,7 +123,7 @@ struct Provider: AppIntentTimelineProvider {
         }
     }
 
-    func loadTransactions(type: TimePeriod, count: Int) -> [HoldingTransaction] {
+    func loadTransactions(type: TimePeriod, count: Int, selected: UUID) -> [HoldingTransaction] {
         let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
 
@@ -141,7 +148,8 @@ struct Provider: AppIntentTimelineProvider {
         let descriptor = FetchDescriptor<TransactionModel>(
             sortBy: [SortDescriptor(\TransactionModel.date, order: .reverse)]
         )
-        let allTxns = (try? context.fetch(descriptor)) ?? []
+        let allTxns = BookScope.scoped(
+            (try? context.fetch(descriptor)) ?? [], \.bookID, selected: selected)
         let filtered = allTxns.filter { $0.wrappedDate >= startDate && $0.wrappedDate <= now }
         let limited = Array(filtered.prefix(count))
 

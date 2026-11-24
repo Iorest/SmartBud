@@ -3,7 +3,13 @@ import SwiftUI
 import SwiftData
 
 struct BudgetStepperView: View {
-    @Query private var transactions: [TransactionModel]
+    @Query private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    // The stepper's lower bound comes from this book's oldest entry only.
+    private var transactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     @Binding var date: Date
     var firstDate: Date {
@@ -94,11 +100,11 @@ struct BudgetStepperView: View {
     init(category: CategoryModel?, date: Binding<Date>, startDate: Date, budgetType: Int) {
         if let unwrappedCategory = category {
             let categoryId = unwrappedCategory.id
-            _transactions = Query(filter: #Predicate<TransactionModel> {
+            _fetchedTransactions = Query(filter: #Predicate<TransactionModel> {
                 $0.category?.id == categoryId
             }, sort: [SortDescriptor(\.day)])
         } else {
-            _transactions = Query(sort: [SortDescriptor(\.day)])
+            _fetchedTransactions = Query(sort: [SortDescriptor(\.day)])
         }
 
         _date = date

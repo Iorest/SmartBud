@@ -9,6 +9,8 @@ import AppIntents
 import Foundation
 import SwiftUI
 
+/// No explicit book parameter: the transaction uses the device's current
+/// book, which `TransactionViewModel.create` stamps on the new row.
 struct NewTransactionIntent: AppIntent {
     static let title: LocalizedStringResource = "New Transaction"
 
@@ -87,7 +89,8 @@ struct NewTransactionIntent: AppIntent {
     @MainActor
     private func log(id: UUID?, isExpense: Bool,
                      repeatType: Int) throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
-        guard let id, let category = CategoryViewModel.shared.findCategory(id: id) else {
+        guard let id, let category = CategoryViewModel.shared.findCategory(id: id),
+              ShortcutBookScope.current.contains(category.bookID) else {
             throw isExpense ? $expenseCategory.needsValueError() : $incomeCategory.needsValueError()
         }
 
