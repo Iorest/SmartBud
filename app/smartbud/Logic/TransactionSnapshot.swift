@@ -14,6 +14,7 @@ import Foundation
 /// the account, the frozen base amount or the claim flag would change the
 /// account balance and the statistics behind the user's back.
 struct TransactionSnapshot {
+    let id: UUID
     let bookID: UUID?
     let note: String
     let amount: Double
