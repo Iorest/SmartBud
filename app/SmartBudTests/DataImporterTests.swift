@@ -624,9 +624,15 @@ struct BookManagementTests {
         let transaction = TransactionModel(
             note: "airport", category: category, account: account,
             baseAmount: 12, amount: 12, date: .now, bookID: source.id)
-        for row in [source, category, account, budget, mainBudget, template, transaction] {
-            fixture.context.insert(row)
-        }
+        // Insert individually: a heterogeneous array would infer an
+        // existential element type that `ModelContext.insert` cannot accept.
+        fixture.context.insert(source)
+        fixture.context.insert(category)
+        fixture.context.insert(account)
+        fixture.context.insert(budget)
+        fixture.context.insert(mainBudget)
+        fixture.context.insert(template)
+        fixture.context.insert(transaction)
         try fixture.context.save()
 
         let copy = BookManager.duplicate(source, name: "Travel 2", in: fixture.context)
