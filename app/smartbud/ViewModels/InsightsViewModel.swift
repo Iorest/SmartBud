@@ -149,14 +149,14 @@ final class InsightsViewModel {
         refreshPendingReimbursements(all)
     }
 
-    /// Claims the user has paid for but not been paid back for. Kept out of
-    /// the period totals, so the insights sheet reads them from here.
+    /// Claims still owed to the user. The outstanding part is in the spend
+    /// card, so this sheet only shows the money that could still come back.
     private func refreshPendingReimbursements(_ all: [TransactionModel]) {
         pendingReimbursements = all
             .filter(\.isPendingReimbursement)
             .sorted { $0.wrappedDate > $1.wrappedDate }
         pendingReimbursementTotal = Money.double(
-            Money.sum(pendingReimbursements.map(\.wrappedBaseAmount)))
+            Money.sum(pendingReimbursements.map(\.unreimbursedBaseAmount)))
     }
 
     /// Bar-chart buckets for the period. Week: 7 daily buckets, single-letter M T W T F S S labels.

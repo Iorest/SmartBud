@@ -63,22 +63,24 @@ struct TransactionClassificationTests {
         #expect(txn.signedBaseAmount == -20)
     }
 
-    @Test("A reimbursable claim stays out of spend and of net")
-    func reimbursableIsPassThrough() {
+    @Test("An unpaid claim counts as the user's own spending until it is paid back")
+    func reimbursableIsSelfPay() {
         let txn = expense(20)
         txn.reimbursable = true
-        #expect(!txn.countsAsSpend)
-        #expect(txn.signedBaseAmount == 0)
+        #expect(txn.countsAsSpend)
+        #expect(txn.signedBaseAmount == -20)
         #expect(txn.isPendingReimbursement)
     }
 
-    @Test("Settling a claim still keeps it out of spend")
+    @Test("Settling a claim in full takes it out of spend")
     func settledClaim() {
         let txn = expense(20)
         txn.reimbursable = true
         txn.reimbursedAt = .now
+        txn.reimbursedAmount = 20
         #expect(!txn.isPendingReimbursement)
         #expect(!txn.countsAsSpend)
+        #expect(txn.spendBaseAmount == 0)
     }
 
     @Test("A balance adjustment is neither income nor spend")

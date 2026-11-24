@@ -134,6 +134,13 @@ struct BackupMerger {
             )
             transaction.id = dto.id
             transaction.onceRecurring = dto.onceRecurring
+            // A backup written before schema 9 has no paid-back amount. A
+            // settlement date from those files means the whole claim came
+            // back; deriving it here keeps old statistics unchanged.
+            transaction.reimbursedAmount = ReimbursementPolicy.clamped(
+                reimbursed: dto.reimbursedAmount ?? (dto.reimbursedAt == nil ? 0
+                                                                             : transaction.wrappedBaseAmount),
+                baseAmount: transaction.wrappedBaseAmount)
             transaction.reimbursedAt = dto.reimbursedAt
             transaction.badDebtAt = dto.badDebtAt
             if let day = dto.day { transaction.day = day }

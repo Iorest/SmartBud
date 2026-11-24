@@ -47,36 +47,38 @@ enum BadDebtLedger {
     // MARK: - Writing
 
     /// Writes the loss row for a claim (not saved; the caller commits). The
-    /// amount is the claim's base amount — the write-off has no account, so it
-    /// is recorded in the base currency and matches what the claim would have
-    /// added to spend had it not been a claim.
+    /// amount is the claim's **outstanding** base amount — money already paid
+    /// back must not be written off a second time. The write-off has no
+    /// account, so it is recorded in the base currency and matches what the
+    /// claim would have added to spend had it not been a claim.
     static func writeOff(_ claim: TransactionModel,
                          reason: BadDebtPolicy.Reason,
                          date: Date,
                          in context: ModelContext) -> Result<TransactionModel, BadDebtPolicy.Failure> {
+        let outstanding = ReimbursementPolicy.remaining(baseAmount: claim.wrappedBaseAmount,
+                                                        reimbursed: claim.reimbursedAmount)
         if let failure = BadDebtPolicy.validate(
             isClaim: claim.reimbursable && !claim.income && claim.badDebtOf == nil,
             isSettled: claim.reimbursedAt != nil,
             isWrittenOff: claim.badDebtAt != nil,
             claimDate: claim.wrappedDate,
             now: date,
-            amount: claim.amount
+            amount: outstanding
         ) {
             return .failure(failure)
         }
 
         claim.badDebtAt = date
         let name = claim.wrappedNote.isEmpty ? claim.wrappedCategoryName : claim.wrappedNote
-        let loss = claim.wrappedBaseAmount
         let row = TransactionModel(
             note: String.appFormatted("Bad debt · %@", name),
             category: claim.category,
             // No account: nothing left an account the day the money was given
             // up on. Keeping it empty is what keeps the balance unchanged.
             account: nil,
-            baseAmount: loss,
+            baseAmount: outstanding,
             income: false,
-            amount: loss,
+            amount: outstanding,
             date: date,
             badDebtOf: claim.id,
             badDebtReason: reason.rawValue,
@@ -89,12 +91,14 @@ enum BadDebtLedger {
 
     /// Keeps the loss row in step when the claim's amount changes. The date
     /// stays where the loss was booked: moving it would rewrite the period the
-    /// money was given up on.
+    /// money was given up on. Only the still-unpaid part can be lost.
     static func sync(_ claim: TransactionModel, in context: ModelContext) {
         guard claim.badDebtAt != nil else { return }
+        let outstanding = ReimbursementPolicy.remaining(baseAmount: claim.wrappedBaseAmount,
+                                                        reimbursed: claim.reimbursedAmount)
         for row in writeOffs(of: claim, in: context) {
-            row.amount = claim.wrappedBaseAmount
-            row.baseAmount = claim.wrappedBaseAmount
+            row.amount = outstanding
+            row.baseAmount = outstanding
             row.category = claim.category
         }
     }

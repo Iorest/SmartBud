@@ -12,8 +12,9 @@ extension InsightsView {
 
     // MARK: - Pending reimbursement
 
-    /// Claims the user is still owed. They are excluded from the expense card
-    /// above, so this is the only place that number appears.
+    /// Claims the user is still owed. The unpaid part also appears in the
+    /// expense card; this card is the only place the *outstanding* total
+    /// appears on its own.
     var pendingReimbursementCard: some View {
         Button {
             showPendingReimbursements = true

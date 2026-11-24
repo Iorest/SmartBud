@@ -34,12 +34,21 @@ final class TransactionModel {
     /// Discount applied at entry time. `amount` already holds the net total,
     /// so this is display-only ("原价 = amount + discount").
     var discount: Double = 0
-    /// Expense the user will claim back. Reimbursable rows are pass-through
-    /// money: they stay in the ledger and in the account balance, but never
-    /// count towards spend statistics or budgets.
+    /// Expense the user will claim back. The part that has not come back is
+    /// money the user is out of pocket for, so it counts as spend; each
+    /// repayment moves that part back out of the spend figure.
     var reimbursable: Bool = false
-    /// Set when the money actually came back.
+    /// Set when the claim has been reimbursed **in full**. A partial repayment
+    /// only changes `reimbursedAmount`; the date stays nil until nothing is
+    /// owed, which keeps the pending list and the write-off rule unchanged.
     var reimbursedAt: Date?
+    /// Total paid back so far, in the base currency (never in the account's
+    /// currency). Invariants: `0 <= reimbursedAmount <= wrappedBaseAmount`;
+    /// it is non-zero only on a claim (`reimbursable && !income &&
+    /// reimbursementOf == nil`); `reimbursedAt != nil` exactly when it has
+    /// reached the full base amount. Old rows default to 0 and are backfilled
+    /// from `reimbursedAt` on first launch (`ReimbursementLedger.migrate`).
+    var reimbursedAmount: Double = 0
     /// On the income row that pays a claim back: the id of the expense it
     /// settles. The pair moves money back into the account without either
     /// side counting as spend or income.
@@ -99,6 +108,7 @@ final class TransactionModel {
         repeatCoefficient: Int = 0,
         discount: Double = 0,
         reimbursable: Bool = false,
+        reimbursedAmount: Double = 0,
         reimbursementOf: UUID? = nil,
         refundOf: UUID? = nil,
         badDebtOf: UUID? = nil,
@@ -115,6 +125,7 @@ final class TransactionModel {
         self.baseAmount = baseAmount
         self.discount = discount
         self.reimbursable = reimbursable
+        self.reimbursedAmount = reimbursedAmount
         self.reimbursementOf = reimbursementOf
         self.refundOf = refundOf
         self.badDebtOf = badDebtOf
@@ -149,11 +160,27 @@ extension TransactionModel {
     /// Price before the discount, when one was recorded.
     @Transient var grossAmount: Double { amount + discount }
 
-    /// Still waiting for the money to come back. A repayment row carries the
-    /// same account but is income, so it never shows up as pending; a claim
-    /// that was written off is no longer expected back.
+    /// Still waiting for money. Written off claims are no longer expected
+    /// back; a fully reimbursed claim has no remainder to wait for.
     @Transient var isPendingReimbursement: Bool {
-        reimbursable && !income && reimbursedAt == nil && badDebtAt == nil
+        reimbursable && !income && badDebtAt == nil && unreimbursedBaseAmount > 0
+    }
+
+    /// Base-currency amount still owed on this claim; zero for every other
+    /// row and for a claim that has been paid back in full.
+    @Transient var unreimbursedBaseAmount: Double {
+        guard reimbursable, !income else { return 0 }
+        return ReimbursementPolicy.remaining(baseAmount: wrappedBaseAmount,
+                                             reimbursed: reimbursedAmount)
+    }
+
+    /// The same remainder in the account's currency, for the ledger and the
+    /// pending sheet: the user reads and enters amounts in that currency.
+    @Transient var unreimbursedAmount: Double {
+        guard reimbursable, !income else { return 0 }
+        return ReimbursementPolicy.accountRemaining(amount: amount,
+                                                   baseAmount: wrappedBaseAmount,
+                                                   reimbursed: reimbursedAmount)
     }
 
     /// The expense row that writes off a claim: the money is gone, so it is
@@ -181,39 +208,45 @@ extension TransactionModel {
         !income && !adjustment && !reimbursable && !isRefund && !isBadDebt
     }
 
-    /// Counts towards "spent" in insights and budgets. Reimbursable rows are
-    /// pass-through, balance adjustments and refunds are not spend at all
-    /// (a refund *reduces* spend through `spendBaseAmount`).
+    /// Counts towards "spent" in insights and budgets. A claim contributes
+    /// its unreimbursed remainder (the self-paid part) until the money comes
+    /// back; adjustments and refunds are not spend at all (a refund *reduces*
+    /// spend through `spendBaseAmount`).
     @Transient var countsAsSpend: Bool {
-        !income && !adjustment && !reimbursable && !isRefund
+        if income || adjustment || isRefund { return false }
+        if reimbursable { return badDebtAt == nil && unreimbursedBaseAmount > 0 }
+        return true
     }
 
     /// Counts towards "earned" in insights.
     @Transient var countsAsIncome: Bool { income && !adjustment && !isReimbursementIncome }
 
-    /// A row that belongs in income/spend totals. Adjustments and
-    /// reimbursable claims are pass-through money and stay out of both; a
-    /// refund does belong in them, on the spend side.
+    /// A row that belongs in income/spend totals. A claim with an outstanding
+    /// balance counts as spend; a fully reimbursed one is pass-through. An
+    /// adjustment counts as neither; a refund belongs on the spend side.
     @Transient var countsInTotals: Bool { countsAsSpend || countsAsIncome || isRefund }
 
     /// Contribution to the **spend** figure: a normal expense adds its base
-    /// amount, a refund subtracts it, everything else adds nothing. Every
-    /// place that answers "how much was spent" must sum this instead of
-    /// filtering on `countsAsSpend` and adding `wrappedBaseAmount` — otherwise
-    /// refunded money silently keeps counting as spend.
+    /// amount, a claim adds what is still owed, a refund subtracts it,
+    /// everything else adds nothing. Every place that answers "how much was
+    /// spent" must sum this instead of filtering on `countsAsSpend` and
+    /// adding `wrappedBaseAmount` — otherwise partial repayments silently
+    /// keep counting as spend.
     @Transient var spendBaseAmount: Double {
         if isRefund { return -wrappedBaseAmount }
+        if reimbursable && !income {
+            return badDebtAt == nil ? unreimbursedBaseAmount : 0
+        }
         return countsAsSpend ? wrappedBaseAmount : 0
     }
 
-    /// Signed amount in the base currency for net-total maths. Pass-through
-    /// rows (balance adjustments and reimbursable claims) count as zero so
-    /// "net" always equals income minus the spend figure shown next to it.
-    /// A refund returns money, so it is positive.
+    /// Signed amount in the base currency for net-total maths. A claim's
+    /// outstanding part is negative spend; a full repayment makes both sides
+    /// zero. A refund returns money, so it is positive.
     @Transient var signedBaseAmount: Double {
         if isRefund { return wrappedBaseAmount }
         if countsAsIncome { return wrappedBaseAmount }
-        if countsAsSpend { return -wrappedBaseAmount }
+        if countsAsSpend { return -spendBaseAmount }
         return 0
     }
 

@@ -6,11 +6,10 @@
 //  compile and run on Linux (`scripts/linux-tests.sh`) — see
 //  `docs/accounting-conventions.md` §2.
 //
-//  A claim is pass-through money: it left the account, but it never counts as
-//  spend because it is expected back. When it is never paid back, the money is
-//  gone and the expense becomes real. The original row is *not* touched: a
-//  separate expense row carries the loss (`badDebtOf`), so the claim keeps its
-//  own history and deleting the write-off restores the pending state.
+//  A claim's unpaid part is the user's own spending until the money arrives.
+//  When it never does, the remaining loss becomes a real expense in its own
+//  row (`badDebtOf`); the original row is *not* touched, so its history stays
+//  readable and deleting the write-off restores the pending state.
 //
 //  The write-off does not move money — no account is involved — so it must not
 //  change any account balance. Only the spend side changes.

@@ -43,6 +43,15 @@ struct ReimbursementLedgerTests {
         return txn
     }
 
+    @discardableResult
+    private func repay(_ claim: TransactionModel, _ amount: Double,
+                       date: Date = .now) -> TransactionModel? {
+        switch ReimbursementLedger.repay(claim, amount: amount, date: date, in: context) {
+        case .success(let row): return row
+        case .failure: return nil
+        }
+    }
+
     @Test("Settling writes one income row linked to the claim")
     func settleWritesRepayment() throws {
         let txn = claim()
@@ -207,5 +216,147 @@ struct ReimbursementLedgerTests {
 
         #expect(ReimbursementLedger.settle(row, in: context) == nil)
         #expect(!row.isPendingReimbursement)
+    }
+
+    @Test("A partial repayment leaves the self-paid part in spend")
+    func partialRepaymentCountsAsSelfPay() throws {
+        let txn = claim(amount: 100)
+        let row = try #require(repay(txn, 40))
+
+        #expect(txn.reimbursedAmount == 40)
+        #expect(txn.reimbursedAt == nil)
+        #expect(txn.isPendingReimbursement)
+        #expect(txn.countsAsSpend)
+        #expect(txn.spendBaseAmount == 60)
+        #expect(txn.signedBaseAmount == -60)
+        #expect(row.amount == 40)
+        #expect(row.baseAmount == 40)
+        #expect(row.reimbursementOf == txn.id)
+    }
+
+    @Test("Several repayments accumulate and full settlement clears spend")
+    func repeatedRepayments() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 30))
+        _ = try #require(repay(txn, 70))
+
+        #expect(ReimbursementLedger.repayments(for: txn, in: context).count == 2)
+        #expect(txn.reimbursedAmount == 100)
+        #expect(txn.reimbursedAt != nil)
+        #expect(!txn.isPendingReimbursement)
+        #expect(txn.spendBaseAmount == 0)
+        #expect(txn.signedBaseAmount == 0)
+    }
+
+    @Test("A repayment past the balance is refused without writing a row")
+    func excessRepaymentIsRefused() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 60))
+
+        switch ReimbursementLedger.repay(txn, amount: 50, in: context) {
+        case .failure(let failure):
+            #expect(failure == .exceedsRemaining(remaining: 40))
+        case .success:
+            #expect(Bool(false), "An overpayment must not be written")
+        }
+        #expect(ReimbursementLedger.repayments(for: txn, in: context).count == 1)
+        #expect(txn.reimbursedAmount == 60)
+    }
+
+    @Test("Undoing a partial settlement removes all instalments")
+    func unsettleRemovesEveryRow() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 40))
+        _ = try #require(repay(txn, 30))
+
+        ReimbursementLedger.unsettle(txn, in: context)
+
+        #expect(txn.reimbursedAmount == 0)
+        #expect(txn.reimbursedAt == nil)
+        #expect(ReimbursementLedger.repayments(for: txn, in: context).isEmpty)
+        #expect(txn.spendBaseAmount == 100)
+    }
+
+    @Test("Deleting one instalment puts only that part back into the balance")
+    func deletingOneRepaymentReopensPartOfClaim() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 40))
+        let second = try #require(repay(txn, 30))
+
+        ReimbursementLedger.prepareForDeletion(of: second, in: context)
+        context.delete(second)
+
+        #expect(txn.reimbursedAmount == 40)
+        #expect(txn.reimbursedAt == nil)
+        #expect(txn.unreimbursedBaseAmount == 60)
+    }
+
+    @Test("Editing a partially reimbursed claim keeps the rows within the new amount")
+    func editingPartialClaimKeepsRowsInStep() throws {
+        let txn = claim(amount: 100)
+        let row = try #require(repay(txn, 50))
+
+        txn.amount = 200
+        txn.baseAmount = 200
+        ReimbursementLedger.sync(txn, in: context)
+
+        #expect(txn.reimbursedAmount == 50)
+        #expect(row.baseAmount == 50)
+        #expect(txn.unreimbursedBaseAmount == 150)
+    }
+
+    @Test("An undo snapshot keeps the paid-back amount of a partial claim")
+    func snapshotKeepsPartialAmount() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 40))
+
+        let restored = TransactionSnapshot(txn).makeTransaction()
+
+        #expect(restored.reimbursedAmount == 40)
+        #expect(restored.unreimbursedBaseAmount == 60)
+        #expect(restored.reimbursedAt == nil)
+    }
+
+    @Test("Old settled claims get their paid-back amount backfilled")
+    func legacySettlementIsBackfilled() {
+        let txn = claim(amount: 88)
+        txn.reimbursedAt = .now
+
+        #expect(ReimbursementLedger.migrate(in: context) == 1)
+        #expect(txn.reimbursedAmount == 88)
+        #expect(txn.spendBaseAmount == 0)
+        #expect(ReimbursementLedger.migrate(in: context) == 0)
+    }
+
+    @Test("Editing a fully settled claim with instalments does not multiply the money")
+    func editingFullClaimKeepsRowSum() throws {
+        let txn = claim(amount: 100)
+        _ = try #require(repay(txn, 40))
+        _ = try #require(repay(txn, 60))
+
+        txn.amount = 200
+        txn.baseAmount = 200
+        ReimbursementLedger.sync(txn, in: context)
+
+        let rows = ReimbursementLedger.repayments(for: txn, in: context)
+        #expect(Money.double(Money.sum(rows.map(\.wrappedBaseAmount))) == 200)
+        #expect(rows.reduce(0) { $0 + $1.amount } == 200)
+        #expect(txn.reimbursedAmount == 200)
+    }
+
+    @Test("Editing one instalment does not redefine the original claim")
+    func editingInstalmentKeepsClaimAmount() throws {
+        let txn = claim(amount: 100)
+        let row = try #require(repay(txn, 40))
+
+        row.amount = 60
+        row.baseAmount = 60
+        ReimbursementLedger.syncClaim(from: row, in: context)
+
+        #expect(txn.amount == 100)
+        #expect(txn.baseAmount == 100)
+        #expect(txn.reimbursedAmount == 60)
+        #expect(txn.unreimbursedBaseAmount == 40)
+        #expect(txn.reimbursedAt == nil)
     }
 }

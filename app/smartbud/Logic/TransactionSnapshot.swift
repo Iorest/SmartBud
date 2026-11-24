@@ -27,6 +27,10 @@ struct TransactionSnapshot {
     let onceRecurring: Bool
     let discount: Double
     let reimbursable: Bool
+    /// Paid-back total. Without it an undo of a partially reimbursed claim
+    /// would bring the row back as fully owed while its repayment rows are
+    /// gone — spend and pending totals would jump by the settled part.
+    let reimbursedAmount: Double
     let reimbursedAt: Date?
     /// Links that decide how the row is counted: a repayment row is not
     /// income and a fee row belongs to its transfer. Dropping them on restore
@@ -66,6 +70,7 @@ struct TransactionSnapshot {
         onceRecurring = txn.onceRecurring
         discount = txn.discount
         reimbursable = txn.reimbursable
+        reimbursedAmount = txn.reimbursedAmount
         reimbursedAt = txn.reimbursedAt
         reimbursementOf = txn.reimbursementOf
         refundOf = txn.refundOf
@@ -94,6 +99,7 @@ struct TransactionSnapshot {
             repeatCoefficient: repeatCoefficient,
             discount: discount,
             reimbursable: reimbursable,
+            reimbursedAmount: reimbursedAmount,
             reimbursementOf: reimbursementOf,
             refundOf: refundOf,
             badDebtOf: badDebtOf,
