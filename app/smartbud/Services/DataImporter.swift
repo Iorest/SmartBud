@@ -295,20 +295,18 @@ enum BillImportError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedFormat:
-            String.appLocalized("This is not an Alipay or WeChat Pay bill CSV.")
+        case .unsupportedFormat, .missingColumns:
+            String.appLocalized("Invalid File")
         case .badEncoding:
-            String.appLocalized("This file's text encoding is not supported.")
-        case .tooLarge:
-            String.appLocalized("This bill file is too large to import.")
-        case .missingColumns(let names):
-            String.appFormatted("The bill is missing these columns: %@", names.joined(separator: "、"))
-        case .unmappedPaymentMethods(let names):
-            String.appFormatted("Choose an account for: %@", names.joined(separator: "、"))
+            String.appLocalized("This file's text encoding is not supported. Save it as a UTF-8 CSV and try again.")
+        case .tooLarge, .unmappedPaymentMethods:
+            String.appLocalized("Import Failed")
         case .missingRate(let code):
-            String.appFormatted("No exchange rate for %@. Add one in Settings → Currency first.", code)
+            String.appFormatted(
+                "“%@” has no exchange rate yet, so this CSV cannot be imported. Add one in Settings → Currency → Exchange Rates first.",
+                code)
         case .writeFailed:
-            String.appLocalized("The import could not be saved. Try again.")
+            String.appLocalized("导入失败，未写入任何数据。")
         }
     }
 }
