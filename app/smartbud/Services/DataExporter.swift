@@ -179,7 +179,8 @@ enum DataExporter {
             .sorted { $0.order < $1.order }
             .map { book in
                 BookDTO(id: book.id, name: book.name, icon: book.icon,
-                        type: book.type, order: book.order, archived: book.archived)
+                        type: book.type, order: book.order, archived: book.archived,
+                        dateCreated: book.dateCreated)
             }
     }
 

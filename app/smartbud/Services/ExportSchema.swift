@@ -258,5 +258,7 @@ enum ExportSchema {
         var type: Int
         var order: Int
         var archived: Bool
+        /// Optional so backups written before books existed still decode.
+        var dateCreated: Date?
     }
 }

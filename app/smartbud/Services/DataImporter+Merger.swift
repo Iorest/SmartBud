@@ -47,6 +47,7 @@ struct BackupMerger {
             let book = BookModel(name: dto.name, icon: dto.icon, type: dto.type,
                                  order: dto.order, archived: dto.archived)
             book.id = dto.id
+            book.dateCreated = dto.dateCreated ?? .now
             context.insert(book)
             booksByID[dto.id] = book
             summary.books += 1
@@ -298,10 +299,6 @@ struct BackupMerger {
 
     private func fetch<T: PersistentModel>(_ type: T.Type) -> [T] {
         (try? context.fetch(FetchDescriptor<T>())) ?? []
-    }
-
-    private func key(amount: Double, start: Date, type: Int) -> String {
-        "\(Money.cents(amount))|\(Int(start.timeIntervalSince1970))|\(type)"
     }
 
     // MARK: Validation

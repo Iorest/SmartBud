@@ -523,13 +523,15 @@ struct BookMigrationTests {
 
     @Test("A multi-book backup restores its whole book structure")
     func multiBookRoundTrip() throws {
+        let travelCreated = Date(timeIntervalSince1970: 1_700_000_000)
         let travelID = UUID()
         let categoryID = UUID()
         let defaultBook = ExportSchema.BookDTO(id: BookModel.defaultID,
                                                name: BookModel.defaultName, icon: "",
                                                type: 0, order: 0, archived: false)
         let travel = ExportSchema.BookDTO(id: travelID, name: "Travel", icon: "airplane",
-                                          type: 1, order: 1, archived: false)
+                                          type: 1, order: 1, archived: false,
+                                          dateCreated: travelCreated)
         let category = ExportSchema.CategoryDTO(id: categoryID, name: "Transport",
                                                 emoji: "✈️", colour: "#00FF00",
                                                 income: false, order: 1,
@@ -560,6 +562,7 @@ struct BookMigrationTests {
         #expect(books.last?.name == "Travel")
         #expect(books.last?.icon == "airplane")
         #expect(books.last?.type == 1)
+        #expect(books.last?.dateCreated == travelCreated)
         #expect(books.last?.archived == false)
 
         let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())

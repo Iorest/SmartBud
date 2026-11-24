@@ -80,8 +80,8 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 
 CloudKit 的 schema 只增不减：不要试图删除 `CD_BookModel` 或 `bookID` 字段。回退客户端到 3.x 时，
 旧版本会忽略未知 record type 与字段，本地金额、统计和账户余额不变；新建的账本在旧版本里不可见，
-其交易会混进默认账本视图。重新升级后 `BookMigration` 会再次确认默认账本存在、把残留 `nil` 补齐，
-账本结构原样恢复。回退前用「导出我的数据」留一份带 `books` 的备份。
+其交易会混进默认账本视图。重新升级后 `BookMigration` 只会确认默认账本存在、把残留 `nil` 补齐；
+若 3.x 客户端期间写过数据，非默认账本的归属无法从库里推断，必须用回退前带 `books` 的备份恢复。
 
 ## 已知限制
 
