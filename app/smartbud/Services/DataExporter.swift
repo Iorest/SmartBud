@@ -271,6 +271,7 @@ enum DataExporter {
         let transfers = transfersDTOs(repo)
 
         let rates = ratesDTOs(repo)
+        let books = booksDTOs(repo)
         let installmentPlans = installmentPlansDTOs(repo)
 
         return ExportPayload(
