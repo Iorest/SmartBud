@@ -8,6 +8,7 @@
 
 
 import SwiftUI
+import UniformTypeIdentifiers
 import PhotosUI
 
 struct SmartEntrySheet: View {
@@ -23,6 +24,14 @@ struct SmartEntrySheet: View {
     @State private var errorMessage: String?
     @State private var isParsingImage = false
     @State private var photoItem: PhotosPickerItem?
+    @State private var subscription = SubscriptionManager.shared
+    @State private var showProUpsell = false
+    @State private var showBatchPhotos = false
+    @State private var batchPhotoItems: [PhotosPickerItem] = []
+    @State private var showBatchFiles = false
+    @State private var isRecognizingBatch = false
+    @State private var batchDrafts: [BatchReceiptDraft] = []
+    @State private var showBatchRecognition = false
     @State private var speech = SpeechService()
     @State private var isParsing = false
     @State private var showLLMConsent = false
@@ -33,6 +42,7 @@ struct SmartEntrySheet: View {
             header
             inputRow
             actionRow
+            batchRow
             if let parsed { preview(parsed) }
             if let errorMessage {
                 Text(errorMessage)
@@ -70,6 +80,27 @@ struct SmartEntrySheet: View {
         } message: {
             Text(String.appLocalized(SmartEntryKey.consentMessage))
         }
+        .onChange(of: batchPhotoItems) { _, items in
+            guard !items.isEmpty else { return }
+            Task { await recognizeBatchPhotos(items) }
+        }
+        .photosPicker(isPresented: $showBatchPhotos, selection: $batchPhotoItems,
+                      maxSelectionCount: BatchRecognitionLimits.maxSelection, matching: .images)
+        .fileImporter(isPresented: $showBatchFiles, allowedContentTypes: [.image],
+                      allowsMultipleSelection: true) { result in
+            switch result {
+            case .success(let urls):
+                Task { await recognizeBatchFiles(urls) }
+            case .failure(let error):
+                errorMessage = error.localizedDescription
+            }
+        }
+        .sheet(isPresented: $showBatchRecognition) {
+            BatchRecognitionView(drafts: batchDrafts,
+                                 expenseCategories: expenseCategories,
+                                 incomeCategories: incomeCategories)
+        }
+        .proUpsell(isPresented: $showProUpsell)
     }
 
     private var header: some View {
@@ -140,6 +171,42 @@ struct SmartEntrySheet: View {
             if isParsingImage || isParsing {
                 ProgressView()
             }
+        }
+    }
+    /// Pro-gated batch entry. The gate runs before either system picker is
+    /// presented, so a free user cannot stage an import or write a row.
+    private var batchRow: some View {
+        let unlocked = subscription.isUnlocked(.batchRecognition)
+        return HStack(spacing: 10) {
+            Button {
+                guard requestBatchAccess() else { return }
+                showBatchPhotos = true
+            } label: {
+                Label(String.appLocalized("批量识别"),
+                      systemImage: unlocked ? "rectangle.on.rectangle.angled" : "lock.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+            }
+            .buttonStyle(.bordered)
+            .tint(unlocked ? Color.PrimaryText : Color.SubtitleText)
+            .accessibilityIdentifier(AccessibilityID.smartEntryBatch)
+
+            Button {
+                guard requestBatchAccess() else { return }
+                showBatchFiles = true
+            } label: {
+                Label(String.appLocalized("从文件导入"),
+                      systemImage: unlocked ? "folder.badge.plus" : "lock.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+            }
+            .buttonStyle(.bordered)
+            .tint(unlocked ? Color.PrimaryText : Color.SubtitleText)
+            .accessibilityIdentifier(AccessibilityID.smartEntryBatchFiles)
+
+            if isRecognizingBatch { ProgressView() }
         }
     }
 
@@ -257,21 +324,96 @@ struct SmartEntrySheet: View {
                 return
             }
             let result = try await OCRService.shared.recognize(from: image)
-            let hintFromText = ExpenseTextParser.parse(result.allText)
-            guard let amount = result.amounts.first ?? hintFromText?.amount else {
+            let draft = BatchRecognitionSupport.draft(from: result, sourceName: "")
+            guard draft.issue == nil else {
                 errorMessage = String.appLocalized("图片里没有识别到金额。")
                 return
             }
             errorMessage = nil
-            parsed = ParsedExpense(
-                amount: amount,
-                isIncome: hintFromText?.isIncome ?? false,
-                merchant: result.merchant ?? hintFromText?.merchant,
-                categoryHint: hintFromText?.categoryHint
-            )
+            parsed = ParsedExpense(amount: draft.amount, isIncome: draft.isIncome,
+                                   merchant: draft.merchant, categoryHint: draft.categoryHint,
+                                   source: .ocr)
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    // MARK: - Batch recognition
+
+    /// One gate for both pickers. It is called again when the asynchronous
+    /// selection completes so a rights change mid-pick cannot bypass it.
+    private func requestBatchAccess() -> Bool {
+        if subscription.isUnlocked(.batchRecognition) { return true }
+        showProUpsell = true
+        return false
+    }
+
+    /// Images are decoded and recognised one at a time; only the resulting
+    /// text drafts are retained, so ten photos do not stay in memory.
+    private func recognizeBatchPhotos(_ items: [PhotosPickerItem]) async {
+        guard requestBatchAccess() else {
+            batchPhotoItems = []
+            return
+        }
+        guard !items.isEmpty else { return }
+        isRecognizingBatch = true
+        defer {
+            isRecognizingBatch = false
+            batchPhotoItems = []
+        }
+        var drafts: [BatchReceiptDraft] = []
+        for (index, item) in items.enumerated() {
+            let name = item.itemIdentifier ?? "\(String.appLocalized("Receipt")) \(index + 1)"
+            do {
+                guard let data = try await item.loadTransferable(type: Data.self),
+                      let image = UIImage(data: data) else {
+                    drafts.append(BatchReceiptDraft(sourceName: name, issue: .unreadableImage))
+                    continue
+                }
+                let result = try await OCRService.shared.recognize(from: image)
+                drafts.append(BatchRecognitionSupport.draft(from: result, sourceName: name))
+            } catch {
+                drafts.append(BatchReceiptDraft(sourceName: name,
+                                                issue: .ocrFailed(error.localizedDescription)))
+            }
+        }
+        batchDrafts = drafts
+        showBatchRecognition = true
+    }
+
+    private func recognizeBatchFiles(_ urls: [URL]) async {
+        guard requestBatchAccess() else { return }
+        let selected = Array(urls.prefix(BatchRecognitionLimits.maxSelection))
+        if selected.count < urls.count {
+            errorMessage = String.appFormatted("Only the first %lld files were imported.",
+                                               BatchRecognitionLimits.maxSelection)
+        }
+        guard !selected.isEmpty else { return }
+        isRecognizingBatch = true
+        defer { isRecognizingBatch = false }
+        var drafts: [BatchReceiptDraft] = []
+        for (index, url) in selected.enumerated() {
+            let name = url.lastPathComponent.isEmpty ? "\(index + 1)" : url.lastPathComponent
+            guard url.startAccessingSecurityScopedResource() else {
+                drafts.append(BatchReceiptDraft(sourceName: name, issue: .unreadableImage))
+                continue
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+            do {
+                let data = try Data(contentsOf: url)
+                guard let image = UIImage(data: data) else {
+                    drafts.append(BatchReceiptDraft(sourceName: name, issue: .unreadableImage))
+                    continue
+                }
+                let result = try await OCRService.shared.recognize(from: image)
+                drafts.append(BatchRecognitionSupport.draft(from: result, sourceName: name))
+            } catch {
+                drafts.append(BatchReceiptDraft(sourceName: name,
+                                                issue: .ocrFailed(error.localizedDescription)))
+            }
+        }
+        batchDrafts = drafts
+        showBatchRecognition = true
     }
 
     private func resolvedCategory(_ parsed: ParsedExpense) -> CategoryModel? {

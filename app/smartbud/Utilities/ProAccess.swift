@@ -19,6 +19,8 @@ enum ProFeature: String, CaseIterable, Identifiable {
     case customAppIcons
     /// A custom time for the daily reminder (morning/evening stay free).
     case customReminderTime
+    /// Recognise several receipt images in one preview-and-confirm pass.
+    case batchRecognition
 
     var id: String { rawValue }
 
@@ -28,6 +30,7 @@ enum ProFeature: String, CaseIterable, Identifiable {
         case .aiAnalysis: return "Advanced Insights"
         case .customAppIcons: return "Exclusive Themes"
         case .customReminderTime: return "Smart Reminders"
+        case .batchRecognition: return "Batch Recognition"
         }
     }
 }
@@ -38,7 +41,7 @@ enum ProAccess {
     /// goes through here.
     static func isUnlocked(_ feature: ProFeature, promo: Bool, entitled: Bool) -> Bool {
         switch feature {
-        case .aiAnalysis, .customAppIcons, .customReminderTime:
+        case .aiAnalysis, .customAppIcons, .customReminderTime, .batchRecognition:
             return promo || entitled
         }
     }

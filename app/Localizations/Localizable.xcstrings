@@ -113,6 +113,160 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟後，規則無法辨識的原話會在一次性告知後傳送至上方的 AI 服務。模型只提供候選，不計算金額，也不會直接寫入帳本。" } }
       }
     },
+    "逐条核对金额、分类与备注，只有点“保存”才写入账本。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review amount, category and note for each receipt. Nothing is written until you tap Save." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "逐条核对金额、分类与备注，只有点“保存”才写入账本。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "逐筆核對金額、分類與備註，只有點「儲存」才寫入帳本。" } }
+      }
+    },
+    "Only the first %lld files were imported." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Only the first %lld files were imported." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "只导入了前 %lld 个文件。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "只匯入了前 %lld 個檔案。" } }
+      }
+    },
+    "Receipt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Receipt" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "票据" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "票據" } }
+      }
+    },
+    "Batch result" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Batch result" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "批量识别结果" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "批次辨識結果" } }
+      }
+    },
+    "Save %lld" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save %lld" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存 %lld 笔" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存 %lld 筆" } }
+      }
+    },
+    "Saved %lld receipts, %lld failed." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved %lld receipts, %lld failed." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已保存 %lld 张，失败 %lld 张。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已儲存 %lld 張，失敗 %lld 張。" } }
+      }
+    },
+    "Recognize several receipt photos at once." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recognize several receipt photos at once." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "一次识别多张票据照片。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "一次辨識多張票據照片。" } }
+      }
+    },
+    "批量识别" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Batch Scan" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "批量识别" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "批次辨識" } }
+      }
+    },
+    "从文件导入" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Import Files" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从文件导入" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "從檔案匯入" } }
+      }
+    },
+    "金额" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Amount" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "金额" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "金額" } }
+      }
+    },
+    "收支" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Direction" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "收支" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "收支" } }
+      }
+    },
+    "支出" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expense" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "支出" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "支出" } }
+      }
+    },
+    "收入" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Income" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "收入" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "收入" } }
+      }
+    },
+    "商户 / 备注" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Merchant / Note" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "商户 / 备注" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "商戶 / 備註" } }
+      }
+    },
+    "分类" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Category" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "分类" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "分類" } }
+      }
+    },
+    "未分类" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Uncategorized" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未分类" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "未分類" } }
+      }
+    },
+    "已保存" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已保存" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已儲存" } }
+      }
+    },
+    "重试" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Retry" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重試" } }
+      }
+    },
+    "删除" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "刪除" } }
+      }
+    },
+    "金额超出上限。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Amount exceeds the limit." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "金额超出上限。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "金額超出上限。" } }
+      }
+    },
+    "这张票据识别失败，请重试。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Could not recognize this receipt. Please retry." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这张票据识别失败，请重试。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "這張票據辨識失敗，請重試。" } }
+      }
+    },
+    "保存失败，请重试。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Could not save. Please retry." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存失败，请重试。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存失敗，請重試。" } }
+      }
+    },
     "Discard unsaved changes?" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard unsaved changes?" } },
