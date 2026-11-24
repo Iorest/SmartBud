@@ -28,7 +28,8 @@ struct ParsedAmountTests {
     @Test("Labeled and separated amounts keep their exact value")
     func labelledAmounts() {
         #expect(ParsedAmount.extract(from: "支付 ¥12,000.50") == Decimal(string: "12000.50"))
-        #expect(ParsedAmount.extract(from: "满100减20 实付80") == 100) // first bare match
+        #expect(ParsedAmount.extract(from: "满100减20 实付80") == 80) // "实付" wins over the discount
+        #expect(ParsedAmount.extract(from: "原价120 优惠券20 实付100 火锅") == 100)
     }
 }
 
