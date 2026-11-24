@@ -33,7 +33,7 @@ struct InstallmentPolicyTests {
         #expect(Money.sum(rows.map(\.fee)) == Money.cents(96.30))
         #expect(rows.allSatisfy { Money.cents($0.principal) == Money.cents(100) })
         #expect(rows.dropLast().allSatisfy { Money.cents($0.fee) == Money.cents(8.02) })
-        #expect(rows.last.map(Money.cents) == Money.cents(8.08))
+        #expect(rows.last.map { Money.cents($0.fee) } == Money.cents(8.08))
     }
 
     @Test("The last period absorbs the whole remainder")
