@@ -1750,7 +1750,7 @@ final class SmartBudUITests: XCTestCase {
 
     func testC2_proGate_threeSurfacesBlockWrite() throws {
         // `-proEnforced` forces the free state: ProAccess.isUnlocked returns
-        // false for every ProFeature. Each of the three gated surfaces must
+        // false for every ProFeature. Each of the four gated surfaces must
         // raise the Pro page instead of running the feature, and the free
         // ledger must stay empty. One fresh launch per surface keeps navigation
         // state independent (B6 already launches several apps in one case).
@@ -1806,6 +1806,24 @@ final class SmartBudUITests: XCTestCase {
                           "The Pro page must expose its back button so we can reach the ledger.")
             back.tap()
             assertNoLedgerWrite(app, "custom-reminder gate")
+        }
+
+        // (4) Batch OCR, from the Smart Entry sheet. The test name stays
+        // unchanged so the CI shard lists keep referencing it.
+        do {
+            let app = launchC(["-proEnforced"])
+            require(app, AccessibilityID.logAddButton).tap()
+            require(app, AccessibilityID.entrySmartEntry).tap()
+            require(app, AccessibilityID.smartEntryBatch).tap()
+            XCTAssertTrue(element(app, AccessibilityID.proTitle).waitForExistence(timeout: 20),
+                          "The batch OCR gate must raise the Pro page.")
+            let back = element(app, AccessibilityID.proBack)
+            XCTAssertTrue(back.waitForExistence(timeout: 10),
+                          "The Pro page must expose its back button so we can reach the ledger.")
+            back.tap()
+            require(app, AccessibilityID.smartEntryClose).tap()
+            cancelEntryForm(app)
+            assertNoLedgerWrite(app, "batch OCR gate")
         }
     }
 

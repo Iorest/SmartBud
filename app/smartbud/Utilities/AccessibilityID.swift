@@ -101,6 +101,12 @@ enum AccessibilityID {
 
     static let smartEntryClose = "sb.smartEntry.close"
     static let smartEntryField = "sb.smartEntry.field"
+    /// Batch OCR is a separate Pro-gated entry inside the smart-entry sheet.
+    static let smartEntryBatch = "sb.smartEntry.batch"
+    static let smartEntryBatchFiles = "sb.smartEntry.batchFiles"
+    static let batchClose = "sb.batch.close"
+    static let batchSave = "sb.batch.save"
+    static func batchRow(_ id: String) -> String { "sb.batch.row.\(id)" }
 
     // MARK: - Settings
 

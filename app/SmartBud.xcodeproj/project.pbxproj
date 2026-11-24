@@ -58,6 +58,12 @@
 		E1A2B3C4000000000000C063 /* ProAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C060 /* ProAccess.swift */; };
 		E1A2B3C4000000000000C065 /* ProAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C064 /* ProAccessTests.swift */; };
 		E1A2B3C4000000000000C091 /* WipeOutcomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C090 /* WipeOutcomeTests.swift */; };
+		F23A00020000000000000001 /* BatchRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000001 /* BatchRecognition.swift */; };
+		F23A00020000000000000002 /* BatchRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000001 /* BatchRecognition.swift */; };
+		F23A00020000000000000003 /* BatchRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000001 /* BatchRecognition.swift */; };
+		F23A00020000000000000004 /* BatchRecognitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000002 /* BatchRecognitionView.swift */; };
+		F23A00020000000000000005 /* BatchRecognitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000002 /* BatchRecognitionView.swift */; };
+		F23A00020000000000000006 /* BatchRecognitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23A00010000000000000003 /* BatchRecognitionTests.swift */; };
 		E1A2B3C4000000000000C051 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
 		E1A2B3C4000000000000C052 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
 		E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000C050 /* ImportAmount.swift */; };
@@ -726,6 +732,9 @@
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C060 /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/ProAccess.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/WipeOutcome.swift; sourceTree = SOURCE_ROOT; };
+		F23A00010000000000000001 /* BatchRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BatchRecognition.swift; sourceTree = SOURCE_ROOT; };
+		F23A00010000000000000002 /* BatchRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/BatchRecognitionView.swift; sourceTree = SOURCE_ROOT; };
+		F23A00010000000000000003 /* BatchRecognitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BatchRecognitionTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C0B0 /* SmartBud.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = SmartBud.storekit; sourceTree = "<group>"; };
 		E1A2B3C4000000000000C080 /* AppLockGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/AppLockGate.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C066 /* ProUpsell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/ProUpsell.swift; sourceTree = SOURCE_ROOT; };
@@ -916,6 +925,7 @@
 				E1A2B3C4000000000000C0F1 /* ParsingMetricsTests.swift */,
 				F18E0000000000000000A002 /* SmartEntryParsingTests.swift */,
 				E1A2B3C4000000000000C064 /* ProAccessTests.swift */,
+				F23A00010000000000000003 /* BatchRecognitionTests.swift */,
 				E1A2B3C4000000000000C090 /* WipeOutcomeTests.swift */,
 				E1A2B3C4000000000000B111 /* DeepLinkTests.swift */,
 				E1A2B3C4000000000000B101 /* DataPortabilityTests.swift */,
@@ -1046,6 +1056,8 @@
 				E1A2B3C4000000000000F231 /* BadDebtSheet.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
+				F23A00010000000000000001 /* BatchRecognition.swift */,
+				F23A00010000000000000002 /* BatchRecognitionView.swift */,
 				E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */,
 				E1A2B3C4000000000000C0B0 /* SmartBud.storekit */,
 				E1A2B3C4000000000000C080 /* AppLockGate.swift */,
@@ -1673,6 +1685,8 @@
 				B0A0F0000000000000000206 /* OCRService.swift in Sources */,
 				B0A0F0000000000000000208 /* SpeechService.swift in Sources */,
 				B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */,
+				F23A00020000000000000001 /* BatchRecognition.swift in Sources */,
+				F23A00020000000000000004 /* BatchRecognitionView.swift in Sources */,
 				B0A0F0000000000000000301 /* CategoryListViews.swift in Sources */,
 				E1A2B3C4000000000000061B /* CategoryListView+Body.swift in Sources */,
 				B0A0F0000000000000000303 /* CategoryEditorViews.swift in Sources */,
@@ -1921,6 +1935,8 @@
 				E1A2B3C4000000000000C063 /* ProAccess.swift in Sources */,
 				E1A2B3C4000000000000C0A3 /* WipeOutcome.swift in Sources */,
 				E1A2B3C4000000000000C065 /* ProAccessTests.swift in Sources */,
+				F23A00020000000000000002 /* BatchRecognition.swift in Sources */,
+				F23A00020000000000000006 /* BatchRecognitionTests.swift in Sources */,
 				E1A2B3C4000000000000C091 /* WipeOutcomeTests.swift in Sources */,
 				E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */,
 				E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */,
@@ -1969,6 +1985,8 @@
 				D0C0FFEE0000000000000127 /* OCRService.swift in Sources */,
 				D0C0FFEE0000000000000128 /* SpeechService.swift in Sources */,
 				D0C0FFEE0000000000000129 /* SmartEntrySheet.swift in Sources */,
+				F23A00020000000000000003 /* BatchRecognition.swift in Sources */,
+				F23A00020000000000000005 /* BatchRecognitionView.swift in Sources */,
 				D0C0FFEE000000000000012A /* CategoryListViews.swift in Sources */,
 				E1A2B3C4000000000000061C /* CategoryListView+Body.swift in Sources */,
 				D0C0FFEE000000000000012B /* CategoryEditorViews.swift in Sources */,
