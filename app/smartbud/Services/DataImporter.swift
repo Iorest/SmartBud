@@ -37,6 +37,9 @@ enum DataImporter {
         var mainBudgets = 0
         var templates = 0
         var rates = 0
+        /// Ledgers restored from the file. The structural default book is
+        /// not counted here — it is created locally, not imported.
+        var books = 0
         /// Rows already on this device (same id) that were left alone.
         var skipped = 0
         /// Settings from the backup that still have to be written to the app
@@ -46,7 +49,7 @@ enum DataImporter {
         /// Records the user thinks of as "data". Rates are configuration and
         /// stay out of the count.
         var imported: Int {
-            categories + accounts + transactions + transfers + budgets + mainBudgets + templates
+            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books
         }
 
         var isEmpty: Bool { imported == 0 }
@@ -106,6 +109,7 @@ enum DataImporter {
         summary.mainBudgets = payload.mainBudgets.count
         summary.templates = payload.templates.count
         summary.rates = payload.rates.count
+        summary.books = payload.books.count
         return summary
     }
 
@@ -138,7 +142,11 @@ enum DataImporter {
         context: ModelContext
     ) throws -> Summary {
         let settingsToApply = try resolveSettings(payload, context: context)
+        // A restore can run before the first bootstrap. Create the structural
+        // default book inside this same save/rollback boundary.
+        BookMigration.ensureDefaultBook(in: context)
         var merger = BackupMerger(context: context)
+        merger.importBooks(payload.books)
 
         merger.importCategories(payload.categories)
         merger.importAccounts(payload.accounts)
