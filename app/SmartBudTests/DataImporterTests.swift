@@ -712,7 +712,8 @@ struct PlatformBillImportTests {
             Issue.record("Expected a missingColumns error")
         } catch let error as BillImportError {
             guard case .missingColumns(let names) = error else {
-                return Issue.record("Wrong error: \(error)")
+                Issue.record("Wrong error: \(error)")
+                return
             }
             #expect(names.contains("收/支"))
         }
@@ -727,7 +728,8 @@ struct PlatformBillImportTests {
             Issue.record("Expected an unmappedPaymentMethods error")
         } catch let error as BillImportError {
             guard case .unmappedPaymentMethods(let names) = error else {
-                return Issue.record("Wrong error: \(error)")
+                Issue.record("Wrong error: \(error)")
+                return
             }
             #expect(names.count == 3)
         }
@@ -828,7 +830,10 @@ struct PlatformBillImportTests {
             _ = try DataImporter.previewBill(raw, context: fixture.context)
             Issue.record("Expected a tooLarge error")
         } catch let error as BillImportError {
-            guard case .tooLarge = error else { return Issue.record("Wrong error: \(error)") }
+            guard case .tooLarge = error else {
+                Issue.record("Wrong error: \(error)")
+                return
+            }
         }
     }
 }
