@@ -17,6 +17,7 @@ struct SettingsLLMView: View {
     @State private var baseURL = ""
     @State private var model = ""
     @State private var apiKey = ""
+    @State private var parseFallbackEnabled = LLMParsePreferences.enabled
     @State private var status: Status = .idle
 
     private enum Status: Equatable {
@@ -44,6 +45,7 @@ struct SettingsLLMView: View {
                     actions
                     statusView
                     privacyNote
+                    parseFallbackToggle
                 }
                 .padding(.bottom, 60)
             }
@@ -262,6 +264,22 @@ struct SettingsLLMView: View {
         Text(String.appLocalized("AI 分析只会发送汇总数据（总收支、分类占比），不会上传逐笔交易明细。密钥仅保存在本机钥匙串。"))
             .font(.caption)
             .foregroundStyle(Color.SubtitleText)
+    }
+
+    private var parseFallbackToggle: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle(String.appLocalized(SmartEntryKey.settingToggle), isOn: $parseFallbackEnabled)
+                .onChange(of: parseFallbackEnabled) { _, value in
+                    LLMParsePreferences.setEnabled(value)
+                }
+            Text(String.appLocalized(SmartEntryKey.settingNote))
+                .font(.caption)
+                .foregroundStyle(Color.SubtitleText)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 15)
+        .padding(.vertical, 10)
+        .background(Color.SettingsBackground, in: RoundedRectangle(cornerRadius: SBRadius.chip))
     }
 
     func test() async {

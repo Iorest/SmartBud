@@ -1,6 +1,118 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "smart.parse.source.history" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "From your history" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按历史商户推断" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "依歷史商戶推斷" } }
+      }
+    },
+    "smart.parse.source.llm" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI candidate — confirm before saving" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 候选，请确认后再保存" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 候選，請確認後再儲存" } }
+      }
+    },
+    "smart.parse.consent.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send this phrase to your AI service?" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "把这句话发送给你的 AI 服务？" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "把這句話傳送給你的 AI 服務？" } }
+      }
+    },
+    "smart.parse.consent.message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rules and your history could not recognise this phrase. To try an AI candidate, the text you typed will be sent to the AI service you configured in Settings. The model never calculates amounts or writes to the ledger, and nothing is saved until you confirm the form. You can turn this off in Settings → AI Service." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "规则和历史记录都没能识别这句话。若尝试 AI 候选，你输入的原话会发送到你在「设置 → AI 服务」中配置的服务。模型不计算金额，也不会写账本；任何结果都只是候选，仍需你在表单里确认后才会保存。你可以随时在设置中关闭。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "規則與歷史紀錄都無法辨識這句話。若嘗試 AI 候選，你輸入的原話會傳送至你在「設定 → AI 服務」中設定的服務。模型不計算金額，也不會寫入帳本；任何結果都只是候選，仍需你在表單中確認後才會儲存。你可以隨時在設定中關閉。" } }
+      }
+    },
+    "smart.parse.consent.accept" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send and try" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发送并尝试" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "傳送並嘗試" } }
+      }
+    },
+    "smart.parse.consent.decline" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Don't send" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不发送" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "不傳送" } }
+      }
+    },
+    "smart.parse.error.noAmount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No amount found. Include one, e.g. Lunch 35." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有识别到金额，请说明金额，例如「午餐 35 元」。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "沒有辨識到金額，請說明金額，例如「午餐 35 元」。" } }
+      }
+    },
+    "smart.parse.error.unavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI fallback unavailable. Please enter the amount manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 兜底暂不可用，请手动填写金额。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 備援暫不可用，請手動填寫金額。" } }
+      }
+    },
+    "smart.parse.error.invalidResponse" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI returned an unusable result. Please enter it manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 返回的候选无法使用，请手动填写。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 回傳的候選無法使用，請手動填寫。" } }
+      }
+    },
+    "smart.parse.error.missingAmount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI did not return an amount. Please enter it manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 没有给出金额，请手动填写。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 沒有給出金額，請手動填寫。" } }
+      }
+    },
+    "smart.parse.error.ambiguousAmount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "More than one amount in the phrase. Please enter the right one manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这句话里有多个金额，请手动填写正确的一个。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "這句話中有多個金額，請手動填寫正確的一個。" } }
+      }
+    },
+    "smart.parse.error.amountNotInPhrase" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI returned an amount not present in your phrase. Please enter it manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 给出的金额不在原话里，请手动填写。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 給出的金額不在原話中，請手動填寫。" } }
+      }
+    },
+    "smart.parse.error.unknownCategory" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI returned an unknown category. Please enter it manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 给出的分类不在你的分类里，请手动填写。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 給出的分類不在你的分類中，請手動填寫。" } }
+      }
+    },
+    "smart.parse.error.rejectedByValidation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "AI candidate failed validation. Please enter it manually." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "AI 候选未通过校验，请手动填写。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "AI 候選未通過驗證，請手動填寫。" } }
+      }
+    },
+    "settings.llm.parse.toggle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use AI when text cannot be parsed" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法识别时使用 AI 兜底" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法辨識時使用 AI 備援" } }
+      }
+    },
+    "settings.llm.parse.note" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "When enabled, a phrase rules cannot parse is sent to the AI service above after a one-time notice. The model only suggests a candidate; it never calculates amounts or writes to the ledger." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开启后，规则无法识别的原话会在一次性告知后发送到上面的 AI 服务。模型只提供候选，不计算金额，也不会直接写入账本。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開啟後，規則無法辨識的原話會在一次性告知後傳送至上方的 AI 服務。模型只提供候選，不計算金額，也不會直接寫入帳本。" } }
+      }
+    },
     "Discard unsaved changes?" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Discard unsaved changes?" } },

@@ -297,6 +297,27 @@ final class TransactionViewModel {
         }
     }
 
+    /// Confirmed merchant → category pairs for smart-entry learning. Refunds,
+    /// balance adjustments and reimbursements are not spending decisions, so
+    /// they must not teach the parser a category.
+    func parseHistory(limit: Int = 500) -> [ParseHistoryEntry] {
+        repo.fetch(TransactionModel.self,
+                   sort: [SortDescriptor(\.date, order: .reverse)])
+            .prefix(max(0, limit))
+            .compactMap { txn in
+                guard let name = txn.merchant, let key = txn.merchantKey,
+                      let category = txn.category?.name,
+                      !txn.isRefund, !txn.adjustment, !txn.reimbursable
+                else { return nil }
+                return ParseHistoryEntry(
+                    merchantName: name,
+                    merchantKey: key,
+                    categoryName: category,
+                    isIncome: txn.income
+                )
+            }
+    }
+
     // MARK: Budget Dates
 
     // MARK: Editing / Deletion

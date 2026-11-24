@@ -10,15 +10,9 @@
 import Foundation
 import NaturalLanguage
 
-/// Structured parse output shared by text, speech, OCR and LLM parsing.
-struct ParsedExpense {
-    var amount: Decimal
-    var isIncome: Bool
-    var merchant: String?
-    /// Category "bucket" name (e.g. "餐饮"). Resolve to a real `CategoryModel`
-    /// with `ExpenseTextParser.resolveCategory(_:from:)`.
-    var categoryHint: String?
-}
+// ParsedExpense and amount extraction live in SmartEntryParsing.swift: the
+// learning/LLM layers and the Linux tests need the same types without
+// pulling in NaturalLanguage.
 
 enum ExpenseTextParser {
 
@@ -55,7 +49,7 @@ enum ExpenseTextParser {
 
     static func parse(_ text: String) -> ParsedExpense? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, let amount = extractAmount(from: trimmed), amount > 0 else {
+        guard !trimmed.isEmpty, let amount = ParsedAmount.extract(from: trimmed), amount > 0 else {
             return nil
         }
         let isIncome = detectIncome(in: trimmed)
@@ -65,59 +59,6 @@ enum ExpenseTextParser {
             merchant: extractMerchant(from: trimmed),
             categoryHint: matchBucket(in: trimmed)
         )
-    }
-
-    /// First amount found: ¥/￥ prefix, "N 元", or labelled amounts.
-    /// Accepts thousands separators ("12,000 元").
-    static func extractAmount(from text: String) -> Decimal? {
-        let number = #"(\d[\d,]*(?:\.\d+)?)"#
-        let patterns = [
-            "¥\\s*" + number,
-            "￥\\s*" + number,
-            number + "\\s*元",
-            "金额[:：]?\\s*" + number,
-            "消费[:：]?\\s*" + number,
-            "支付[:：]?\\s*" + number,
-            "花费[:：]?\\s*" + number,
-            "扣款[:：]?\\s*" + number
-        ]
-        for pattern in patterns {
-            if let regex = try? NSRegularExpression(pattern: pattern),
-               let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-               match.numberOfRanges > 1,
-               let range = Range(match.range(at: 1), in: text),
-               let value = amount(from: String(text[range])) {
-                return value
-            }
-        }
-
-        // Last resort: the first bare number, but only after removing the
-        // numbers that are dates, times or counters. "10月25日 午饭 35" used to
-        // pre-fill 10, and "打车 3 个人 88" pre-filled 3.
-        let stripped = text
-            .replacingOccurrences(of: #"\d{4}[-/年]\d{1,2}[-/月]\d{1,2}日?"#,
-                                  with: " ", options: .regularExpression)
-            .replacingOccurrences(of: #"\d{1,2}月\d{1,2}[日号]"#,
-                                  with: " ", options: .regularExpression)
-            .replacingOccurrences(of: #"\d{1,2}[:：]\d{2}"#,
-                                  with: " ", options: .regularExpression)
-            .replacingOccurrences(of: #"\d+\s*(个|人|件|份|杯|次|张|斤|克|公斤|公里|km|g|kg)"#,
-                                  with: " ", options: .regularExpression)
-        if let range = stripped.range(of: number, options: .regularExpression),
-           let value = amount(from: String(stripped[range])) {
-            return value
-        }
-        return nil
-    }
-
-    /// Parses a matched number, dropping separators and refusing values the
-    /// number pad would not accept either.
-    private static func amount(from raw: String) -> Decimal? {
-        let cleaned = raw.replacingOccurrences(of: ",", with: "")
-        guard let value = Decimal(string: cleaned), value > 0, value <= Decimal(Money.maxAmount) else {
-            return nil
-        }
-        return value
     }
 
     /// Resolves a bucket hint against the user's actual categories.

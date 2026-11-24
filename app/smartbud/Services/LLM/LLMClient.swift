@@ -69,6 +69,35 @@ struct LLMConfig: Equatable {
     }
 }
 
+// MARK: - Parsing opt-in
+
+/// Sending the user's own phrase to their LLM service is opt-in and separate
+/// from the ledger-analysis configuration. The first-use notice is shown by
+/// the smart-entry sheet; Settings can turn the fallback off at any time.
+enum LLMParsePreferences {
+    private static let enabledKey = "llmParseEnabled"
+    private static let noticeKey = "llmParseNoticeShown"
+
+    static var enabled: Bool { UserDefaults.appGroup.bool(forKey: enabledKey) }
+    static var noticeShown: Bool { UserDefaults.appGroup.bool(forKey: noticeKey) }
+
+    static func accept() {
+        UserDefaults.appGroup.set(true, forKey: enabledKey)
+        UserDefaults.appGroup.set(true, forKey: noticeKey)
+    }
+
+    static func decline() {
+        UserDefaults.appGroup.set(false, forKey: enabledKey)
+        UserDefaults.appGroup.set(true, forKey: noticeKey)
+    }
+
+    static func setEnabled(_ value: Bool) {
+        UserDefaults.appGroup.set(value, forKey: enabledKey)
+        if value { UserDefaults.appGroup.set(true, forKey: noticeKey) }
+    }
+}
+
+
 // MARK: - Aggregate payload
 
 /// Everything the model sees. Amounts are pre-formatted strings so the model
@@ -95,7 +124,7 @@ struct LedgerSummary: Codable {
 
 // MARK: - Client
 
-struct LLMClient {
+struct LLMClient: LLMCandidateParsing {
     let config: LLMConfig
 
     enum Failure: LocalizedError {
@@ -142,10 +171,10 @@ struct LLMClient {
     }
 
     /// One non-streaming chat completion.
-    func complete(system: String, user: String) async throws -> String {
+    func complete(system: String, user: String, timeout: TimeInterval = 45) async throws -> String {
         guard config.isConfigured else { throw Failure.notConfigured }
 
-        let request = try makeRequest(system: system, user: user)
+        let request = try makeRequest(system: system, user: user, timeout: timeout)
         let data: Data
         let response: URLResponse
         do {
@@ -184,14 +213,14 @@ struct LLMClient {
         return text
     }
 
-    private func makeRequest(system: String, user: String) throws -> URLRequest {
+    private func makeRequest(system: String, user: String, timeout: TimeInterval) throws -> URLRequest {
         guard let url = config.provider.endpoint(baseURL: config.baseURL) else {
             throw Failure.invalidURL
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 45
+        request.timeoutInterval = timeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let key = config.apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -239,6 +268,19 @@ struct LLMClient {
         case 500...599: return .server(status)
         default: return .http(status, body)
         }
+    }
+
+    /// Parsing fallback: the model may only copy one amount from the phrase.
+    /// A 3s cap keeps a stalled service from blocking the entry sheet.
+    func parseCandidate(text: String, allowedCategories: [String]) async throws -> ParsedExpense {
+        let raw = try await complete(
+            system: LLMCandidateValidator.systemPrompt(allowedCategories: allowedCategories),
+            user: LLMCandidateValidator.userPrompt(text: text),
+            timeout: 3
+        )
+        return try LLMCandidateValidator.validate(
+            raw, originalText: text, allowedCategories: allowedCategories
+        )
     }
 
     /// Analyze aggregated ledger figures and return localized prose.

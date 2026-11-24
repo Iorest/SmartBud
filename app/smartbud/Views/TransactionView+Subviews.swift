@@ -109,6 +109,7 @@ extension TransactionView {
             // moment the view first appears. Subsequent changes are picked up
             // by the `.onChange(of: numberEntryType)` modifier above.
             padVM.numberEntryType = numberEntryType
+            smartHistory = transactionVM.parseHistory()
             DispatchQueue.main.async {
                 if let transaction = toEdit {
                     repeatType = Int(transaction.recurringType)
@@ -138,7 +139,8 @@ extension TransactionView {
         .sheet(isPresented: $showSmartEntry) {
             SmartEntrySheet(
                 expenseCategories: categoryVM.expenseCategories,
-                incomeCategories: categoryVM.incomeCategories
+                incomeCategories: categoryVM.incomeCategories,
+                history: smartHistory
             ) { parsed in
                 applyParsed(parsed)
             }
@@ -189,7 +191,10 @@ extension TransactionView {
             note = merchant
         }
         let pool = parsed.isIncome ? categoryVM.incomeCategories : categoryVM.expenseCategories
-        if let match = ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool) {
+        if let name = parsed.categoryName,
+           let match = pool.first(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
+            category = match
+        } else if let match = ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool) {
             category = match
         }
     }
