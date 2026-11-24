@@ -169,6 +169,27 @@ enum SettingsKey {
     static let iconAqua = "settings.icon.aqua"
 }
 
+/// Keys for smart-entry parsing: provenance labels, the first-use privacy
+/// notice, and the readable fallbacks when the LLM layer cannot help.
+enum SmartEntryKey {
+    static let sourceHistory = "smart.parse.source.history"
+    static let sourceLLM = "smart.parse.source.llm"
+    static let consentTitle = "smart.parse.consent.title"
+    static let consentMessage = "smart.parse.consent.message"
+    static let consentAccept = "smart.parse.consent.accept"
+    static let consentDecline = "smart.parse.consent.decline"
+    static let noAmount = "smart.parse.error.noAmount"
+    static let llmUnavailable = "smart.parse.error.unavailable"
+    static let llmInvalidResponse = "smart.parse.error.invalidResponse"
+    static let llmMissingAmount = "smart.parse.error.missingAmount"
+    static let llmAmbiguousAmount = "smart.parse.error.ambiguousAmount"
+    static let llmAmountNotInPhrase = "smart.parse.error.amountNotInPhrase"
+    static let llmUnknownCategory = "smart.parse.error.unknownCategory"
+    static let llmRejectedByValidation = "smart.parse.error.rejectedByValidation"
+    static let settingToggle = "settings.llm.parse.toggle"
+    static let settingNote = "settings.llm.parse.note"
+}
+
 enum L10n {
     // MARK: - Language picker (used by SettingsViewModel.displayName(for:))
 

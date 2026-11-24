@@ -1,14 +1,14 @@
 {
-  "measured_at": "2026-10-30",
+  "measured_at": "2026-11-24",
   "sample": {
     "text": 600,
     "receipts": 200
   },
   "floors": {
-    "text_amount": 0.885,
+    "text_amount": 0.995,
     "text_direction": 0.8766,
     "text_category": 0.435,
-    "text_end_to_end": 0.39,
+    "text_end_to_end": 0.47,
     "receipt_amount": 0.7
   },
   "targets": {

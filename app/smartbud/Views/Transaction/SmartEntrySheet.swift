@@ -3,9 +3,9 @@
 //  smartbud
 //
 //  One-sheet smart entry: typed phrase, dictated phrase, or receipt screenshot.
-//  Always shows a preview and only fills the form on confirmation — nothing is
-//  saved without the user submitting the normal form.
-//
+//  Rules → confirmed merchant history → an opt-in LLM candidate. Always shows
+//  a preview and only fills the form on confirmation — nothing is saved here.
+
 
 import SwiftUI
 import PhotosUI
@@ -16,6 +16,7 @@ struct SmartEntrySheet: View {
     let expenseCategories: [CategoryModel]
     let incomeCategories: [CategoryModel]
     let onApply: (ParsedExpense) -> Void
+    let history: [ParseHistoryEntry]
 
     @State private var text = ""
     @State private var parsed: ParsedExpense?
@@ -23,6 +24,9 @@ struct SmartEntrySheet: View {
     @State private var isParsingImage = false
     @State private var photoItem: PhotosPickerItem?
     @State private var speech = SpeechService()
+    @State private var isParsing = false
+    @State private var showLLMConsent = false
+    @State private var pendingLLMText: String?
 
     var body: some View {
         VStack(spacing: 14) {
@@ -48,6 +52,23 @@ struct SmartEntrySheet: View {
         .onChange(of: photoItem) { _, item in
             guard let item else { return }
             Task { await parseImage(item) }
+        }
+        .alert(String.appLocalized(SmartEntryKey.consentTitle), isPresented: $showLLMConsent) {
+            Button(String.appLocalized(SmartEntryKey.consentAccept)) {
+                LLMParsePreferences.accept()
+                let input = pendingLLMText
+                pendingLLMText = nil
+                if let input {
+                    Task { await apply(nil, text: input, config: LLMConfig.load(), allowLLM: true) }
+                }
+            }
+            Button(String.appLocalized(SmartEntryKey.consentDecline), role: .cancel) {
+                LLMParsePreferences.decline()
+                pendingLLMText = nil
+                errorMessage = String.appLocalized(SmartEntryKey.noAmount)
+            }
+        } message: {
+            Text(String.appLocalized(SmartEntryKey.consentMessage))
         }
     }
 
@@ -116,7 +137,7 @@ struct SmartEntrySheet: View {
             .buttonStyle(.bordered)
             .tint(Color.PrimaryText)
 
-            if isParsingImage {
+            if isParsingImage || isParsing {
                 ProgressView()
             }
         }
@@ -143,6 +164,13 @@ struct SmartEntrySheet: View {
                     .font(.subheadline)
                     .foregroundStyle(Color.SubtitleText)
             }
+            if parsed.source != .rule && parsed.source != .ocr {
+                Text(String.appLocalized(
+                    parsed.source == .llm ? SmartEntryKey.sourceLLM : SmartEntryKey.sourceHistory
+                ))
+                .font(.caption2)
+                .foregroundStyle(Color.SubtitleText)
+            }
             Button {
                 onApply(parsed)
                 dismiss()
@@ -162,13 +190,43 @@ struct SmartEntrySheet: View {
     // MARK: - Actions
 
     private func parseText() {
-        guard let result = ExpenseTextParser.parse(text) else {
-            errorMessage = String.appLocalized("没有识别到金额，请说明金额，例如「午餐 35 元」。")
-            parsed = nil
+        let input = text
+        guard !input.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        Task { await parse(input) }
+    }
+
+    private func parse(_ input: String) async {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let rule = ExpenseTextParser.parse(trimmed)
+        let config = LLMConfig.load()
+        let optedIn = LLMParsePreferences.enabled && config.isConfigured
+        // The rule path is unchanged: only a failed parse can reach the LLM,
+        // and the first use of that path needs an explicit, informed opt-in.
+        if rule == nil, optedIn, !LLMParsePreferences.noticeShown {
+            pendingLLMText = trimmed
+            showLLMConsent = true
             return
         }
-        errorMessage = nil
-        parsed = result
+        await apply(rule, text: trimmed, config: config, allowLLM: optedIn)
+    }
+
+    private func apply(
+        _ rule: ParsedExpense?,
+        text: String,
+        config: LLMConfig,
+        allowLLM: Bool
+    ) async {
+        isParsing = true
+        defer { isParsing = false }
+        let llm: (any LLMCandidateParsing)? = allowLLM ? LLMClient(config: config) : nil
+        let outcome = await SmartEntryParser(llm: llm).parse(
+            text: text,
+            rule: rule,
+            history: history,
+            allowedCategories: (expenseCategories + incomeCategories).map(\.name)
+        )
+        parsed = outcome.candidate
+        errorMessage = outcome.failureKey.map { String.appLocalized($0) }
     }
 
     private func toggleSpeech() {
@@ -217,9 +275,11 @@ struct SmartEntrySheet: View {
     }
 
     private func resolvedCategory(_ parsed: ParsedExpense) -> CategoryModel? {
-        ExpenseTextParser.resolveCategory(
-            parsed.categoryHint,
-            from: parsed.isIncome ? incomeCategories : expenseCategories
-        )
+        let pool = parsed.isIncome ? incomeCategories : expenseCategories
+        if let name = parsed.categoryName,
+           let match = pool.first(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
+            return match
+        }
+        return ExpenseTextParser.resolveCategory(parsed.categoryHint, from: pool)
     }
 }

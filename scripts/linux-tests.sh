@@ -72,6 +72,7 @@ app_sources=(
     Services/ExportSchema.swift
     Services/Import/CSVTable.swift
     Services/LLM/LLMProvider.swift
+    Services/Parsing/SmartEntryParsing.swift
     Utilities/AmountFormatting.swift
     Utilities/DeepLink.swift
     Utilities/ProAccess.swift
@@ -90,6 +91,7 @@ test_sources=(
     RefundPolicyTests.swift
     ProAccessTests.swift
     TransactionValidationTests.swift
+    SmartEntryParsingTests.swift
 )
 
 rm -rf "$out"

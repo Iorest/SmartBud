@@ -34,6 +34,7 @@ struct ParsingMetricsTests {
         let amount: Double
         let direction: String
         let category: String
+        let merchant: String?
     }
 
     private struct ReceiptCase: Decodable {
@@ -229,8 +230,80 @@ struct ParsingMetricsTests {
         )
     }
 
+    /// Before/after on the same corpus and the same binary: "before" is the
+    /// rule-only parse currently shipped; "after" adds the user's confirmed
+    /// merchant history. The LLM is deliberately absent — it needs a network
+    /// and a user key, so it cannot be a CI gate.
+    @Test("Merchant history lifts end-to-end without moving amounts")
+    func smartChainMetrics() async throws {
+        let textCases = try load([TextCase].self, from: "corpus_text.json")
+        let baseline = try load(Baseline.self, from: "metrics_baseline.json")
+        let store = try Store(bucketNames: Self.bucketNames)
+        let categories = store.categories
+        let history = textCases.compactMap { entry -> ParseHistoryEntry? in
+            guard let merchant = entry.merchant else { return nil }
+            return ParseHistoryEntry(
+                merchantName: merchant,
+                merchantKey: MerchantNormalizer.normalize(merchant)?.key ?? merchant,
+                categoryName: entry.category,
+                isIncome: entry.direction == "income"
+            )
+        }
+        let parser = SmartEntryParser(llm: nil)
+
+        var baselineE2E = 0
+        var smartE2E = 0
+        var baselineAmount = 0
+        var smartAmount = 0
+        for entry in textCases {
+            let expectedAmount = Money.cents(entry.amount)
+            let expectedIncome = entry.direction == "income"
+            let rule = ExpenseTextParser.parse(entry.text)
+            let outcome = await parser.parse(
+                text: entry.text,
+                rule: rule,
+                history: history,
+                allowedCategories: Self.bucketNames
+            )
+            let beforeCategory = ExpenseTextParser.resolveCategory(
+                rule?.categoryHint, from: categories)?.name
+            let afterCategory = outcome.candidate.flatMap {
+                resolvedName($0, from: categories)
+            }
+            let amountOK = rule?.amount == expectedAmount
+            let directionOK = rule?.isIncome == expectedIncome
+            let smartAmountOK = outcome.candidate?.amount == expectedAmount
+            let smartDirectionOK = outcome.candidate?.isIncome == expectedIncome
+            if amountOK { baselineAmount += 1 }
+            if smartAmountOK { smartAmount += 1 }
+            if amountOK && directionOK && beforeCategory == entry.category { baselineE2E += 1 }
+            if smartAmountOK && smartDirectionOK && afterCategory == entry.category { smartE2E += 1 }
+        }
+
+        let before = rate(baselineE2E, of: textCases.count)
+        let after = rate(smartE2E, of: textCases.count)
+        let amountBefore = rate(baselineAmount, of: textCases.count)
+        let amountAfter = rate(smartAmount, of: textCases.count)
+        print("METRICS_SMART e2e_before=\(percent(before))/floor \(percent(baseline.floors.textEndToEnd)) e2e_after=\(percent(after)) delta_pp=\(String(format: "%.2f", (after - before) * 100)) amount_before=\(percent(amountBefore)) amount_after=\(percent(amountAfter))")
+
+        #expect(amountBefore >= baseline.targets.textAmount,
+                "金额准确率 \(percent(amountBefore))% 未达目标 \(percent(baseline.targets.textAmount))%")
+        #expect(amountAfter >= amountBefore,
+                "学习层不能改变金额：\(percent(amountBefore))% → \(percent(amountAfter))%")
+        #expect(after - before >= 0.10,
+                "端到端一次通过率只提升 \(String(format: "%.2f", (after - before) * 100)) pp，低于 10 pp 门槛")
+    }
+
     // MARK: - Helpers
 
+
+    private func resolvedName(_ candidate: ParsedExpense, from categories: [CategoryModel]) -> String? {
+        if let name = candidate.categoryName,
+           let match = categories.first(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame }) {
+            return match.name
+        }
+        return ExpenseTextParser.resolveCategory(candidate.categoryHint, from: categories)?.name
+    }
     private func load<T: Decodable>(_ type: T.Type, from file: String) throws -> T {
         let url = Self.fixturesDirectory.appending(path: file)
         let data = try Data(contentsOf: url)

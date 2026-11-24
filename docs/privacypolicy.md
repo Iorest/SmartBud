@@ -40,6 +40,19 @@ SmartBud uses the following Apple-provided services, which are governed by Apple
 
 We do not embed any third-party analytics, advertising, or crash-reporting SDK. We do not use cookies, web beacons, tracking pixels, or fingerprinting.
 
+### Optional, user-configured AI service
+
+Settings → AI Service lets you point SmartBud at an OpenAI-compatible or
+Anthropic-compatible endpoint you choose, with the key stored in the device
+Keychain. Ledger analysis sends aggregate figures only. The smart-entry
+fallback stays off until you accept a one-time in-app notice: when it is on
+and rules cannot parse a phrase, the text you typed is sent verbatim to that
+endpoint so the model can suggest a category candidate. The model never
+calculates amounts and never writes to your ledger — the filled form still
+needs your confirmation. Turning the toggle off stops these requests.
+SmartBud operates no server of its own and never receives the content of
+these requests.
+
 ## 5. Permissions the app requests
 
 The app asks for the following iOS permissions. Each is optional and the app works without it:

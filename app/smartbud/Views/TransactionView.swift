@@ -21,6 +21,8 @@ struct TransactionView: View {
     @State var category: CategoryModel?
     @State var date = Date.now
     @State var showSmartEntry = false
+    /// Confirmed merchant → category pairs used by smart-entry learning.
+    @State var smartHistory: [ParseHistoryEntry] = []
     /// Non-empty draft → Cancel asks before discarding (HIG error tolerance).
     @State var showDiscardConfirmation = false
 
