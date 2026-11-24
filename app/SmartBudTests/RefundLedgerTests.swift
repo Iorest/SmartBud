@@ -222,10 +222,13 @@ struct RefundLedgerTests {
     func snapshotKeepsLink() throws {
         let original = purchase(account: account())
         let row = try refund(original, amount: 25).get()
+        let travelBook = UUID()
+        row.bookID = travelBook
 
         let snapshot = TransactionSnapshot(row)
         let restored = snapshot.makeTransaction()
 
+        #expect(restored.bookID == travelBook)
         #expect(restored.refundOf == original.id)
         #expect(restored.spendBaseAmount == -25)
         #expect(restored.id == row.id)

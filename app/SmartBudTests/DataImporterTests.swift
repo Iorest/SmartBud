@@ -331,21 +331,23 @@ struct DataImporterTests {
 
     @Test("Undo snapshots keep every field the editor can write")
     func snapshotRoundTripsEverything() throws {
-        let category = CategoryModel(name: "餐饮", emoji: "🍜", colour: "#FF0000")
+        let travelBook = UUID()
+        let category = CategoryModel(name: "餐饮", emoji: "🍜", colour: "#FF0000", bookID: travelBook)
         fixture.context.insert(category)
-        let account = AccountModel(name: "招行", currencyCode: "CNY", openingBalance: 100)
-        fixture.context.insert(account)
+        let account = AccountModel(name: "招行", currencyCode: "CNY", openingBalance: 100,
+                                   bookID: travelBook)
 
         let original = TransactionModel(
             note: "午餐", category: category, account: account, baseAmount: 42.5,
             income: false, amount: 42.5, date: .now,
-            discount: 5, reimbursable: true, adjustment: false
+            discount: 5, reimbursable: true, adjustment: false, bookID: travelBook
         )
         original.reimbursedAt = Date(timeIntervalSince1970: 1_700_000_000)
         fixture.context.insert(original)
 
         let restored = TransactionSnapshot(original).makeTransaction()
 
+        #expect(restored.bookID == travelBook)
         #expect(restored.account?.id == account.id)
         #expect(restored.baseAmount == 42.5)
         #expect(restored.discount == 5)
