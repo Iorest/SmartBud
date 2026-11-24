@@ -23,6 +23,7 @@ var context: ModelContext { container.mainContext }
 init() throws {
     container = try ModelContainer(
         for: Schema([
+            BookModel.self,
             TransactionModel.self,
             CategoryModel.self,
             AccountModel.self,
@@ -45,13 +46,14 @@ func payload(
     mainBudgets: [ExportSchema.MainBudgetDTO] = [],
     templates: [ExportSchema.TemplateTransactionDTO] = [],
     rates: [ExportSchema.RateDTO] = [],
+    books: [ExportSchema.BookDTO] = [],
     settings: ExportSchema.SettingsDTO? = nil
 ) -> ExportSchema.Payload {
     ExportSchema.Payload(
         exportDate: .now, appVersion: "test", schemaVersion: ExportSchema.version,
         transactions: transactions, categories: categories, budgets: budgets,
         mainBudgets: mainBudgets, templates: templates, accounts: accounts,
-        transfers: transfers, rates: rates, settings: settings
+        transfers: transfers, rates: rates, books: books, settings: settings
     )
 }
 
@@ -393,5 +395,205 @@ struct ImportRateMergeTests {
         #expect(rates.first { $0.code == "EUR" }?.rate == 7.8)
         #expect(summary.rates == 1)
         #expect(summary.skipped == 1)
+    }
+}
+
+// MARK: - Books (TELE-20)
+
+@MainActor
+@Suite("Book model and migration")
+struct BookMigrationTests {
+    private let fixture: ImportFixture
+
+    init() throws { fixture = try ImportFixture() }
+
+    /// The current book lives in shared defaults; do not leak a test value
+    /// into the next suite.
+    private func withCleanSelection(_ body: () throws -> Void) rethrows {
+        let defaults = UserDefaults.appGroup
+        let previous = defaults.string(forKey: BookSelection.key)
+        defaults.removeObject(forKey: BookSelection.key)
+        defer {
+            if let previous {
+                defaults.set(previous, forKey: BookSelection.key)
+            } else {
+                defaults.removeObject(forKey: BookSelection.key)
+            }
+        }
+        try body()
+    }
+
+    @Test("Legacy single-book data keeps its monthly, budget and balance numbers")
+    func legacyNumbersUnchanged() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let month = calendar.date(from: DateComponents(year: 2026, month: 11, day: 1))!
+        let account = AccountModel(name: "Cash", currencyCode: "CNY", openingBalance: 1_000)
+        let category = CategoryModel(name: "Food", emoji: "🍜", colour: "#FF0000")
+        let expense = TransactionModel(note: "lunch", category: category, account: account,
+                                       baseAmount: 42.5, amount: 42.5,
+                                       date: calendar.date(byAdding: .day, value: 1, to: month)!)
+        let salary = TransactionModel(note: "salary", account: account, income: true,
+                                      baseAmount: 2_000, amount: 2_000, date: month)
+        let budget = BudgetModel(amount: 500, startDate: month, type: 3)
+        let mainBudget = MainBudgetModel(amount: 2_500, startDate: month, type: 3)
+        let template = TemplateTransactionModel(note: "coffee", amount: 10)
+
+        // Exactly what a pre-book build left behind: no book id anywhere.
+        account.bookID = nil
+        category.bookID = nil
+        expense.bookID = nil
+        salary.bookID = nil
+        budget.bookID = nil
+        mainBudget.bookID = nil
+        template.bookID = nil
+        fixture.context.insert(account)
+        fixture.context.insert(category)
+        fixture.context.insert(expense)
+        fixture.context.insert(salary)
+        fixture.context.insert(budget)
+        fixture.context.insert(mainBudget)
+        fixture.context.insert(template)
+        try fixture.context.save()
+
+        func snapshot() -> (spend: Double, income: Double, budgetLeft: Double, balance: Double) {
+            let rows = (try? fixture.context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+            let range = AppPeriod.monthRange(containing: month, startDay: 1, calendar: calendar)
+            let monthly = rows.filter { $0.wrappedDate >= range.start && $0.wrappedDate < range.end }
+            let spend = monthly.reduce(0) { $0 + $1.spendBaseAmount }
+            let income = monthly.reduce(0) { $0 + ($1.countsAsIncome ? $1.wrappedBaseAmount : 0) }
+            let balance = AccountBalance.current(
+                opening: account.openingBalance,
+                transactions: rows.map { (amount: $0.amount, income: $0.income, isRefund: $0.isRefund) })
+            return (spend, income, budget.amount - spend, balance)
+        }
+
+        let before = snapshot()
+        try withCleanSelection {
+            let written = BookMigration.migrate(in: fixture.context)
+            #expect(written == 8)  // the default book plus seven legacy rows
+            #expect(BookMigration.migrate(in: fixture.context) == 0)
+            #expect(BookSelection.current() == BookModel.defaultID)
+        }
+        let after = snapshot()
+
+        #expect(before.spend == 42.5)
+        #expect(before.income == 2_000)
+        #expect(before.budgetLeft == 457.5)
+        #expect(before.balance == 2_957.5)
+        #expect(after.spend == before.spend)
+        #expect(after.income == before.income)
+        #expect(after.budgetLeft == before.budgetLeft)
+        #expect(after.balance == before.balance)
+
+        let books = try fixture.context.fetch(FetchDescriptor<BookModel>())
+        #expect(books.count == 1)
+        #expect(books.first?.id == BookModel.defaultID)
+        #expect(books.first?.name == BookModel.defaultName)
+        #expect(expense.bookID == BookModel.defaultID)
+        #expect(salary.bookID == BookModel.defaultID)
+        #expect(budget.bookID == BookModel.defaultID)
+        #expect(mainBudget.bookID == BookModel.defaultID)
+        #expect(template.bookID == BookModel.defaultID)
+        #expect(category.bookID == BookModel.defaultID)
+        #expect(account.bookID == BookModel.defaultID)
+    }
+
+    @Test("Two books are isolated by a bookID query")
+    func booksAreIsolated() throws {
+        let firstBook = UUID()
+        let secondBook = UUID()
+        let first = TransactionModel(note: "first", amount: 10, bookID: firstBook)
+        let second = TransactionModel(note: "second", amount: 20, bookID: secondBook)
+        fixture.context.insert(first)
+        fixture.context.insert(second)
+        try fixture.context.save()
+
+        let inFirst = try fixture.context.fetch(
+            FetchDescriptor<TransactionModel>(predicate: #Predicate { $0.bookID == firstBook }))
+        let inSecond = try fixture.context.fetch(
+            FetchDescriptor<TransactionModel>(predicate: #Predicate { $0.bookID == secondBook }))
+
+        #expect(inFirst.map(\.note) == ["first"])
+        #expect(inSecond.map(\.note) == ["second"])
+        #expect(BookScope.matches(first.bookID, selected: firstBook))
+        #expect(!BookScope.matches(first.bookID, selected: secondBook))
+        #expect(BookScope.matches(nil, selected: BookModel.defaultID))  // legacy row
+        #expect(!BookScope.matches(nil, selected: secondBook))
+    }
+
+    @Test("A multi-book backup restores its whole book structure")
+    func multiBookRoundTrip() throws {
+        let travelID = UUID()
+        let categoryID = UUID()
+        let defaultBook = ExportSchema.BookDTO(id: BookModel.defaultID,
+                                               name: BookModel.defaultName, icon: "",
+                                               type: 0, order: 0, archived: false)
+        let travel = ExportSchema.BookDTO(id: travelID, name: "Travel", icon: "airplane",
+                                          type: 1, order: 1, archived: false)
+        let category = ExportSchema.CategoryDTO(id: categoryID, name: "Transport",
+                                                emoji: "✈️", colour: "#00FF00",
+                                                income: false, order: 1,
+                                                dateCreated: .now, bookID: travelID)
+        let transaction = ExportSchema.TransactionDTO(
+            id: UUID(), amount: 25, date: .now, day: nil, month: nil, note: "train",
+            income: false, recurringType: 0, recurringCoefficient: 0, onceRecurring: false,
+            categoryId: categoryID, categoryName: "Transport", accountId: nil, accountName: nil,
+            baseAmount: 25, accountCurrency: nil, discount: nil, reimbursable: nil,
+            reimbursedAt: nil, adjustment: false, bookID: travelID)
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let file = try encoder.encode(fixture.payload(
+            categories: [category], transactions: [transaction],
+            books: [defaultBook, travel]))
+        let decoded = try DataImporter.decode(file)
+        #expect(decoded.books.count == 2)
+
+        let summary = try DataImporter.apply(decoded, context: fixture.context)
+        #expect(summary.books == 1)  // the default book already exists locally
+
+        let books = try fixture.context.fetch(FetchDescriptor<BookModel>())
+            .sorted { $0.order < $1.order }
+        #expect(books.count == 2)
+        #expect(books.first?.id == BookModel.defaultID)
+        #expect(books.last?.id == travelID)
+        #expect(books.last?.name == "Travel")
+        #expect(books.last?.icon == "airplane")
+        #expect(books.last?.type == 1)
+        #expect(books.last?.archived == false)
+
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(stored.count == 1)
+        #expect(stored.first?.bookID == travelID)
+        let storedCategory = try #require(
+            fixture.context.fetch(FetchDescriptor<CategoryModel>()).first)
+        #expect(storedCategory.bookID == travelID)
+    }
+
+    @Test("A backup with no books still lands in the default book")
+    func oldBackupUsesDefaultBook() throws {
+        let legacyID = UUID().uuidString
+        let json = """
+        {
+          "exportDate": "2026-01-02T03:04:05Z",
+          "appVersion": "3.0",
+          "schemaVersion": 8,
+          "transactions": [
+            {"id": "\(legacyID)", "amount": 10, "income": false,
+             "recurringType": 0, "recurringCoefficient": 0, "onceRecurring": false}
+          ],
+          "categories": [], "accounts": []
+        }
+        """
+        let payload = try DataImporter.decode(Data(json.utf8))
+        #expect(payload.books.isEmpty)
+        #expect(payload.transactions.first?.bookID == nil)
+
+        _ = try DataImporter.apply(payload, context: fixture.context)
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(stored.first?.bookID == BookModel.defaultID)
+        let books = try fixture.context.fetch(FetchDescriptor<BookModel>())
+        #expect(books.count == 1)
+        #expect(books.first?.name == BookModel.defaultName)
     }
 }

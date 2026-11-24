@@ -23,6 +23,10 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 | `AccountModel` | 1.1 | 新增实体，`transactions` / `outgoingTransfers` / `incomingTransfers` 必须是可选数组（CloudKit 限制 to-many 可空） |
 | `TransferModel` | 1.1 | 新增实体，`source` / `destination` 指向 `AccountModel` |
 | `CurrencyRate` | 1.2 | 新增实体，每个外币一行（code / rate / updatedAt） |
+| `BookModel` | 4.x (TELE-20) | 新增实体：名称、图标、类型、order、archived；默认账本用固定 id `00000000-0000-0000-0000-000000000001` |
+
+4.x（多账本，TELE-20）新增 `BookModel` 实体和六个实体上的 `bookID`。本轮只有数据结构与迁移，
+账本切换 UI/统计过滤（TELE-21）尚未上线，但云端 schema 必须先部署，否则升级后写入会失败。
 
 ### 1.3 新增的普通字段（同样需要部署）
 
@@ -37,6 +41,22 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 | `AccountModel` | `archived` | 归档账户：不在默认列表、不计入总资产，但历史记录照常可查 |
 | `TransferModel` | `fee` | 转账手续费，从转出账户额外扣除 |
 
+
+### 4.x 新增的账本字段（同样需要部署）
+
+`bookID` 是普通可空 UUID，**不是关系**，不会给 CloudKit 增加 to-many 约束。
+旧行迁移后为默认账本 id；启动时 `BookMigration` 会把残留的 `nil` 补成同一个 id。
+
+| 实体 | 字段 | 说明 |
+|---|---|---|
+| `TransactionModel` | `bookID` | 交易所属账本 |
+| `CategoryModel` | `bookID` | 分类所属账本 |
+| `AccountModel` | `bookID` | 账户所属账本 |
+| `BudgetModel` | `bookID` | 分类预算所属账本 |
+| `MainBudgetModel` | `bookID` | 总预算所属账本 |
+| `TemplateTransactionModel` | `bookID` | 模板所属账本 |
+| `BookModel` | 整个实体 | `CD_BookModel` 必须先部署，再部署上面的 `CD_*bookID` 字段 |
+
 `AccountModel.currencyCode`、`TransactionModel.baseAmount`、`TransferModel.destinationAmount` 都是普通字段（非关系），CloudKit 可直接兼容。
 
 ## 每次改 schema 后要做的四步
@@ -45,13 +65,23 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
    在模拟器或真机上：新建账户、记一笔、做一次转账、改一次分类。目的不是测 UI，而是让 CloudKit
    在 Development 环境把新表/新字段建出来。
 2. **CloudKit Dashboard → Schema → Deploy Schema Changes**
-   逐条确认 `AccountModel`、`TransferModel` 及其 `CD_*` 字段、关系都被列出，然后 Deploy 到 Production。
+   多账本这一轮要**先 Deploy `CD_BookModel` 实体，再 Deploy 六个实体的 `CD_*bookID` 字段**；
+   顺序反了会让新客户端写入带 `bookID` 的行时找不到字段。然后逐条确认 `AccountModel`、`TransferModel`
+   及其 `CD_*` 字段、关系都被列出，再 Deploy 到 Production。
 3. **验证生产环境**
    用 TestFlight 包（不是 Debug 包）在已登录 iCloud 的设备上记一笔，确认 Dashboard → Data →
    Records 能看到新记录。
 4. **旧版本兼容**
-   已发布版本的客户端不认识新实体，CloudKit 会忽略未知 record type，因此**不需要**强制升级；
-   但反向（新客户端写、旧客户端读）会出现"看不到账户"的现象，发布说明里要写清楚。
+   已发布客户端不认识 `BookModel` 和 `bookID`，CloudKit 会忽略未知 record type 与字段，
+   因此读取升级前的单账本数据不需要强制升级；但旧客户端会把所有账本的行都当默认账本显示，
+   金额、日期、关系不变。多账本 UI 上线后不要让用户回退到 3.x 客户端编辑多账本数据。
+
+### 回滚说明
+
+CloudKit 的 schema 只增不减：不要试图删除 `CD_BookModel` 或 `bookID` 字段。回退客户端到 3.x 时，
+旧版本会忽略未知 record type 与字段，本地金额、统计和账户余额不变；新建的账本在旧版本里不可见，
+其交易会混进默认账本视图。重新升级后 `BookMigration` 会再次确认默认账本存在、把残留 `nil` 补齐，
+账本结构原样恢复。回退前用「导出我的数据」留一份带 `books` 的备份。
 
 ## 已知限制
 
@@ -71,6 +101,8 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
   两者都不会作为新记账的默认账户，也不计入总资产。
 - 「余额调整」不修改 `openingBalance`，而是写一条 `adjustment = true` 的交易，
   这样历史可以追溯，也不会把期初金额改成看起来"对不上"的数字。
+- 升级前的单账本数据全部落在固定 id 的默认账本上，金额与统计口径不变；`BookMigration` 可重入，
+  第二次启动不再写库。「清除数据」会删除所有账本，下次启动重新创建默认账本。
 
 ## 上线前：Production 部署与新字段核对
 
@@ -83,11 +115,13 @@ Development 环境只要在本机跑一遍写入就会自动建表；**Productio
 
    | Record Type | 必须存在的字段 |
    |---|---|
-   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey` |
-   | `CD_AccountModel` | `currencyCode`、`archived` |
+   | `CD_BookModel` | 整个实体（先于其它账本字段部署） |
+   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey`、`bookID` |
+   | `CD_AccountModel` | `currencyCode`、`archived`、`bookID` |
    | `CD_TransferModel` | `destinationAmount`、`fee` |
    | `CD_CurrencyRate` | `code`、`rate`、`updatedAt` |
-   | `CD_TemplateTransactionModel` | 整个实体（小组件与主 App 共用 schema） |
+   | `CD_TemplateTransactionModel` | 整个实体（小组件与主 App 共用 schema）、`bookID` |
+   | `CD_CategoryModel` / `CD_BudgetModel` / `CD_MainBudgetModel` | `bookID` |
 
 3. Deploy 后用 **TestFlight 包**（不是 Debug）在已登录 iCloud 的机器上记一笔，
    Dashboard → Data → Records 应能看到记录。

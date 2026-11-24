@@ -368,13 +368,18 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 - App 内数据迁移：新字段一律带默认值，依赖 SwiftData 轻量迁移；不允许"改字段类型"。
 - 商户字段（`merchant` / `merchantKey`）是可选普通字段：轻量迁移后为 `nil`，由 `MerchantMigration` 在启动与导入后从备注回填，可重入。JSON 备份不携带这两个字段（避免为一个可推导值升 schemaVersion），恢复后同样靠回填补齐。
 - 报销额字段（`reimbursedAmount`）默认 0，轻量迁移后旧行有日期无金额；`ReimbursementLedger.migrate` 在启动时把这些整笔报销补成全额，可重入，保证升级前后统计一致。
+- 多账本（TELE-20）：新增 `BookModel`（名称、图标、类型、order、archived）与固定 id 的默认账本；
+  `bookID` 是可空普通 UUID，贯穿交易/分类/账户/预算/总预算/模板。轻量迁移后旧行为空，
+  `BookMigration` 在启动时把它们补成默认账本，可重入且不动金额。当前账本只存设备设置
+  `currentBookID`，切换与过滤留给 TELE-21。备份新增 `books` 段与各 DTO 的可选 `bookID`，
+  旧备份没有这些键时按默认账本导入；导出 schema 版本号由统筹按合并顺序分配，本轮不自行抢号。
 - 废弃策略：字段先保留、停止写入，至少一个大版本后再删（CloudKit 上删字段同样要部署）。
 
 ## 11. 未实现功能的模型影响
 
 | 功能 | 模型改动 | 影响面 |
 |---|---|---|
-| 多账本 | `bookID` 贯穿交易/分类/账户/预算/模板 + 当前账本设置 | 所有查询、统计、小组件、导入导出；属于结构性改动 |
+| 多账本 | ✅ 模型和迁移已实现（TELE-20）：`BookModel` + 六处 `bookID` + 固定默认账本 + 备份带账本 | 查询/统计/小组件过滤与切换 UI 待 TELE-21；跨账本转账不做 |
 | 存钱目标 | 新实体 `SavingsGoalModel`（目标额、截止日、关联账户或独立余额） | 账户页/统计页新增区块；不影响现有口径 |
 | 分期 | 新实体 `InstallmentPlanModel` + 生成计划交易（本金/手续费拆分） | 与报销类似，需要"计划支出"这种新身份，先改口径表 |
 | Apple Watch | 新 target + App Group 只读 + 极简记账 Intent | 不改变模型，但要同步 schema 与本地化 |
