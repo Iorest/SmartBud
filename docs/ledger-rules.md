@@ -20,10 +20,13 @@
 | 余额调整 | `adjustment = true` | 只是把账面数字改对，不是消费 |
 | 坏账核销 | `badDebtOf = <待报销支出 id>`，`income = false`，**`account = nil`** | 承认垫付的钱回不来了：记成费用，但钱当天没动 |
 | 已核销的报销支出 | `reimbursable = true` + `badDebtAt != nil` | 仍是垫付行，只是不再出现在待报销列表 |
+| 分期手续费 | `installmentOf != nil` + `installmentKind = 1`，`income = false` | 利息/手续费，计入当期支出与分类 |
+| 分期本金 | `installmentOf != nil` + `installmentKind = 2`，`income = true` | 只减少负债、恢复额度；**不是收入也不是支出** |
 
-待实现的身份只剩分期（本金不进费用、利息进费用），规则见
-[accounting-conventions.md](accounting-conventions.md) 第 2 节。退款（`RefundLedger`）与坏账
-（`BadDebtLedger`）已按第 2 节实现，不要再用"记一笔收入"或"删行"来模拟。
+分期已按第 2 节实现：`InstallmentPolicy` 逐分拆本金与手续费、末期余数归集，
+`InstallmentLedger` 只为已执行期生成账单；本金不进费用也不进收入，只把关联账户余额
+往 0 推（这就是本应用现有的"额度恢复"）。退款（`RefundLedger`）与坏账
+（`BadDebtLedger`）同样已按第 2 节实现，不要再用"记一笔收入"或"删行"来模拟。
 
 **报销是一对多：一笔支出可以有多条回款。** 只标记「已报销」而不记账，账户余额会永远少那笔钱；
 只记一笔收入而不标记，收入会凭空多出来。所以每次核销都由 `ReimbursementLedger` 写入一条
@@ -63,6 +66,7 @@ countsAsIncome   // income && !adjustment && !isReimbursementIncome
 isPendingReimbursement // 报销支出 && 未回款 > 0 && badDebtAt == nil
 spendBaseAmount  // 普通支出 +base，报销支出 +未回款，退款 -base，其余 0
 signedBaseAmount // 收入 +base，退款 +base，支出 -spendBaseAmount，其余 0
+isInstallmentPrincipal // installmentKind == 2；本金行不计费用、不计收入
 ```
 
 坏账核销行不需要任何新的判定分支：它是一条 `income = false`、没有账户的普通费用行，
@@ -77,9 +81,30 @@ signedBaseAmount // 收入 +base，退款 +base，支出 -spendBaseAmount，其�
 内存里按 `reimbursementOf` 分组；预算、统计与小组件同样先取行、再用上面的计算属性过滤，
 不要再手写 `!$0.income` 或 `!$0.reimbursable`。
 
+## 分期账单
+
+`InstallmentPlanModel` 存本金、手续费、期数、首期日与已执行期数；`InstallmentPolicy`
+把两者逐分拆到各期，余数全部归最后一期，保证 Σ本金 = 计划本金、Σ手续费 = 计划手续费。
+`InstallmentLedger.sync` 只为 `index <= executedPeriods` 的期生成两行：
+
+| 生成的行 | `income` | 费用 / 分类占比 / 预算 | 收入 | 账户余额 |
+|---|---|---|---|---|
+| 手续费 `installmentKind = 1` | false | 计入当期 | 不计 | 减少 |
+| 本金 `installmentKind = 2` | true | 不计 | 不计 | 增加（额度恢复） |
+
+本金行的 `income = true` 只是把信用卡余额从负数往 0 推，不是新赚的钱：
+`countsAsSpend`、`countsAsIncome`、`spendBaseAmount`、`signedBaseAmount` 都把它排除。
+生成行带 `installmentOf` + `installmentPeriod` + `installmentKind`，三者构成幂等键；
+改计划只影响还没入账的期，已入账的期不重写。未来期不预生成——`AccountBalance`
+会把未来日期的行算进余额，预生成的本金会提前恢复额度。
+
 旧数据兼容：`reimbursedAmount` 是新字段，旧行默认 0。启动迁移
 （`ReimbursementLedger.migrate`）把旧备份里只有 `reimbursedAt` 的整笔报销补成全额，
 所以升级前后数字不变；旧备份导入时按同一规则推导。
+
+分期字段旧行默认 `installmentOf = nil` / `installmentPeriod = 0` /
+`installmentKind = 0`，按普通行处理。备份里的 `installmentPlans` 是可选段，
+旧备份导入时按"无计划"处理；本段是纯新增，无需迁移，也不占 schema 版本号。
 
 ## 金额的两个版本
 

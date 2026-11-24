@@ -46,6 +46,7 @@ enum WidgetModelContainer {
             CategoryModel.self,
             AccountModel.self,
             TransferModel.self,
+            InstallmentPlanModel.self,
             CurrencyRate.self,
             BudgetModel.self,
             MainBudgetModel.self,

@@ -223,4 +223,56 @@ struct ImportRoundTripTests {
         #expect(restoredLegacy.reimbursedAmount == 100)
         #expect(restoredLegacy.spendBaseAmount == 0)
     }
+
+    @Test("A plan and its generated bills survive export and import together")
+    func installmentPlanRoundTrip() throws {
+        let planID = UUID()
+        let plan = ExportSchema.InstallmentPlanDTO(
+            id: planID, bookID: BookModel.defaultID, principal: 100, fee: 0.30,
+            periods: 3, firstDate: .now, executedPeriods: 2,
+            accountId: fixture.accountID, accountName: "招行",
+            categoryId: nil, categoryName: nil, note: "phone", dateCreated: .now
+        )
+        func bill(_ period: Int, _ kind: Int) -> ExportSchema.TransactionDTO {
+            ExportSchema.TransactionDTO(
+                id: UUID(), amount: kind == 1 ? 0.10 : 33.33, date: .now, day: nil, month: nil,
+                note: "", income: kind == 2, recurringType: 0, recurringCoefficient: 0,
+                onceRecurring: false, categoryId: nil, categoryName: nil,
+                accountId: fixture.accountID, accountName: "招行",
+                baseAmount: kind == 1 ? 0.10 : 33.33, accountCurrency: "CNY",
+                discount: 0, reimbursable: false, reimbursedAt: nil,
+                reimbursementOf: nil, refundOf: nil, transferFeeOf: nil,
+                adjustment: false, badDebtOf: nil, badDebtReason: nil, badDebtAt: nil,
+                bookID: BookModel.defaultID,
+                installmentOf: planID, installmentPeriod: period, installmentKind: kind
+            )
+        }
+
+        _ = try DataImporter.apply(
+            fixture.payload(accounts: [fixture.sampleAccount],
+                            transactions: [bill(1, 1), bill(1, 2), bill(2, 1), bill(2, 2)],
+                            installmentPlans: [plan]),
+            context: fixture.context
+        )
+
+        let plans = try fixture.context.fetch(FetchDescriptor<InstallmentPlanModel>())
+        let storedPlan = try #require(plans.first)
+        #expect(storedPlan.id == planID)
+        #expect(storedPlan.principal == 100)
+        #expect(storedPlan.fee == 0.30)
+        #expect(storedPlan.periods == 3)
+        #expect(storedPlan.executedPeriods == 2)
+        #expect(storedPlan.account?.id == fixture.accountID)
+
+        let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(rows.count == 4)
+        #expect(rows.allSatisfy { $0.installmentOf == planID })
+        #expect(Set(rows.map(\.installmentPeriod)) == [1, 2])
+        #expect(rows.filter { $0.installmentKind == 2 }.allSatisfy {
+            !$0.countsAsSpend && !$0.countsAsIncome
+        })
+        #expect(rows.filter { $0.installmentKind == 1 }.allSatisfy {
+            $0.countsAsSpend && !$0.countsAsIncome
+        })
+    }
 }

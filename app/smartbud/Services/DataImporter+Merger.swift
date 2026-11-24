@@ -24,6 +24,7 @@ struct BackupMerger {
     var accountsByID: [UUID: AccountModel] = [:]
     var accountsByName: [String: AccountModel] = [:]
     var booksByID: [UUID: BookModel] = [:]
+    var installmentPlansByID: [UUID: InstallmentPlanModel] = [:]
 
     init(context: ModelContext) {
         self.context = context
@@ -51,6 +52,35 @@ struct BackupMerger {
             context.insert(book)
             booksByID[dto.id] = book
             summary.books += 1
+        }
+    }
+
+    /// Plans are restored after categories and accounts so their relationships
+    /// resolve. Generated bills are ordinary rows carrying `installmentOf`, so
+    /// the plan-to-bill relation survives a round trip without a second store.
+    mutating func importInstallmentPlans(_ dtos: [ExportSchema.InstallmentPlanDTO]) {
+        var existing = Set(fetch(InstallmentPlanModel.self).map(\.id))
+        for dto in dtos {
+            guard existing.insert(dto.id).inserted else {
+                summary.skipped += 1
+                continue
+            }
+            let plan = InstallmentPlanModel(
+                principal: amount(dto.principal),
+                fee: amount(dto.fee),
+                periods: max(0, dto.periods),
+                firstDate: dto.firstDate,
+                note: dto.note,
+                account: resolveAccount(id: dto.accountId, name: dto.accountName),
+                category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
+                bookID: resolveBook(dto.bookID)
+            )
+            plan.id = dto.id
+            plan.executedPeriods = max(0, min(dto.executedPeriods, plan.periods))
+            if let created = dto.dateCreated { plan.dateCreated = created }
+            context.insert(plan)
+            installmentPlansByID[dto.id] = plan
+            summary.installmentPlans += 1
         }
     }
 
@@ -150,6 +180,9 @@ struct BackupMerger {
                 badDebtOf: dto.badDebtOf,
                 badDebtReason: dto.badDebtReason,
                 transferFeeOf: dto.transferFeeOf,
+                installmentOf: dto.installmentOf,
+                installmentPeriod: dto.installmentPeriod ?? 0,
+                installmentKind: dto.installmentKind ?? 0,
                 adjustment: dto.adjustment ?? false
             )
             transaction.bookID = resolveBook(dto.bookID)

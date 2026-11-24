@@ -31,7 +31,8 @@ init() throws {
             CurrencyRate.self,
             BudgetModel.self,
             MainBudgetModel.self,
-            TemplateTransactionModel.self
+            TemplateTransactionModel.self,
+            InstallmentPlanModel.self
         ]),
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
@@ -47,13 +48,15 @@ func payload(
     templates: [ExportSchema.TemplateTransactionDTO] = [],
     rates: [ExportSchema.RateDTO] = [],
     books: [ExportSchema.BookDTO] = [],
+    installmentPlans: [ExportSchema.InstallmentPlanDTO] = [],
     settings: ExportSchema.SettingsDTO? = nil
 ) -> ExportSchema.Payload {
     ExportSchema.Payload(
         exportDate: .now, appVersion: "test", schemaVersion: ExportSchema.version,
         transactions: transactions, categories: categories, budgets: budgets,
         mainBudgets: mainBudgets, templates: templates, accounts: accounts,
-        transfers: transfers, rates: rates, settings: settings, books: books
+        transfers: transfers, rates: rates, settings: settings, books: books,
+        installmentPlans: installmentPlans
     )
 }
 
