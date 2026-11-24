@@ -15,8 +15,8 @@ struct SmartEntrySheet: View {
 
     let expenseCategories: [CategoryModel]
     let incomeCategories: [CategoryModel]
-    let onApply: (ParsedExpense) -> Void
     let history: [ParseHistoryEntry]
+    let onApply: (ParsedExpense) -> Void
 
     @State private var text = ""
     @State private var parsed: ParsedExpense?
