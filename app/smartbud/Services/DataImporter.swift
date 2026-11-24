@@ -447,19 +447,17 @@ extension DataImporter {
 
         let categories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
         let base = AppBaseCurrency.code.uppercased()
+        // Pure conversion from the store being written to. The app-wide
+        // `CurrencyRateStore` is not linked into the test target, which
+        // compiles this file too.
+        let rates = Self.billRates(context)
         for account in resolved.values {
             let code = account.currencyCode.uppercased()
-            if !code.isEmpty, code != base, CurrencyRateStore.shared.needsRate(for: code) {
+            if CurrencyConversion.needsRate(for: code, base: base, rates: rates) {
                 throw BillImportError.missingRate(code)
             }
         }
 
-        if resolved.values.contains(where: {
-            let code = $0.currencyCode.uppercased()
-            return !code.isEmpty && code != base
-        }) {
-            CurrencyRateStore.shared.load()
-        }
         var keys = existingBillKeys(context)
         var imported = 0
         var skipped = 0
@@ -479,7 +477,8 @@ extension DataImporter {
             let code = account.currencyCode.uppercased()
             let conversion = code.isEmpty || code == base
                 ? row.amount
-                : CurrencyRateStore.shared.convertToBase(row.amount, from: code)
+                : CurrencyConversion.convertRounded(
+                    row.amount, from: code, to: base, rates: rates)
 
             let identity = MerchantNormalizer.normalize(row.counterparty)
             let txn = TransactionModel(
@@ -586,6 +585,18 @@ extension DataImporter {
             return billFingerprint(date: date, amount: txn.amount,
                                    merchantKey: key, income: txn.income)
         })
+    }
+
+    /// Rates from the store being written to. `DataImporter.swift` is also
+    /// compiled into the test target, which does not link the app-wide
+    /// `CurrencyRateStore` singleton.
+    private static func billRates(_ context: ModelContext) -> [String: Double] {
+        let records = (try? context.fetch(FetchDescriptor<CurrencyRate>())) ?? []
+        var rates: [String: Double] = [:]
+        for record in records where !record.code.isEmpty {
+            rates[record.code.uppercased()] = record.rate
+        }
+        return rates
     }
 
     private static func billCategory(for row: BillRow,
