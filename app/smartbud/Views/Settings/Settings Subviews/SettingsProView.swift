@@ -34,11 +34,6 @@ struct SettingsProView: View {
     // already get it for free via the CloudKit-backed SwiftData store
     // (`SwiftDataCore.swift`). Charging for it as a Pro feature is
     // misleading advertising and a likely 3.1.1 reviewer flag.
-    //
-    // Note: `Batch Recognition` (OCR import from receipt photos) is
-    // also not in this list — the underlying Vision pipeline is not
-    // shipped yet, so advertising it would be a 3.1.1 violation
-    // (misleading). Add it back here when the implementation lands.
     struct ProFeature {
         let icon: String
         let color: String
@@ -47,14 +42,18 @@ struct SettingsProView: View {
     }
 
     // Keep this list to features that are actually gated by `ProAccess`;
-    // advertising more than the app enforces is a 3.1.1 problem.
+    // advertising more than the app enforces is a 3.1.1 problem. Batch
+    // Recognition shipped with the Vision pipeline and is gated by
+    // `ProFeature.batchRecognition`, so it belongs here too.
     private var features: [ProFeature] = [
         ProFeature(icon: "chart.bar.xaxis", color: "103", titleKey: "Advanced Insights",
                    subtitleKey: "AI analysis of this period with concrete suggestions."),
         ProFeature(icon: "paintpalette.fill", color: "100", titleKey: "Exclusive Themes",
                    subtitleKey: "Six additional app icons."),
         ProFeature(icon: "bell.badge.fill", color: "102", titleKey: "Smart Reminders",
-                   subtitleKey: "Choose a custom time for the daily reminder.")
+                   subtitleKey: "Choose a custom time for the daily reminder."),
+        ProFeature(icon: "rectangle.on.rectangle.angled", color: "101", titleKey: "Batch Recognition",
+                   subtitleKey: "Recognize several receipt photos at once.")
     ]
 
     // MARK: - Header
