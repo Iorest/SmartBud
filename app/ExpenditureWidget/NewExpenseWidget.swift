@@ -69,7 +69,7 @@ struct NewExpenseWidgetEntryView: View {
                 .background(Color.white, in: RoundedRectangle(cornerRadius: SBRadius.pill, style: .continuous))
                 .padding(.horizontal, 9)
         }
-        .widgetURL(URL(string: "smartbud://newExpense"))
+        .widgetURL(widgetDeepLink("newExpense"))
         .containerBackground(for: .widget) {
             AccessoryWidgetBackground()
         }

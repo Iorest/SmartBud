@@ -20,16 +20,17 @@ final class CategoryViewModel {
     var expenseCategories: [CategoryModel] = []
 
     func load() {
-        incomeCategories = repo.fetch(
+        let selected = BookSelection.current()
+        incomeCategories = BookScope.scoped(repo.fetch(
             CategoryModel.self,
             predicate: #Predicate { $0.income == true },
             sort: [SortDescriptor(\.order)]
-        )
-        expenseCategories = repo.fetch(
+        ), \.bookID, selected: selected)
+        expenseCategories = BookScope.scoped(repo.fetch(
             CategoryModel.self,
             predicate: #Predicate { $0.income == false },
             sort: [SortDescriptor(\.order)]
-        )
+        ), \.bookID, selected: selected)
     }
 
     /// Starter categories for a fresh install. Without these the picker has
@@ -68,7 +69,8 @@ final class CategoryViewModel {
                 emoji: starter.emoji,
                 colour: starter.colour,
                 income: starter.income,
-                order: pool.count
+                order: pool.count,
+                bookID: BookSelection.current()
             )
             repo.insert(cat)
         }
@@ -77,7 +79,8 @@ final class CategoryViewModel {
     }
 
     func create(name: String, emoji: String, colour: String, income: Bool, order: Int) -> CategoryModel {
-        let cat = CategoryModel(name: name, emoji: emoji, colour: colour, income: income, order: order)
+        let cat = CategoryModel(name: name, emoji: emoji, colour: colour, income: income,
+                                order: order, bookID: BookSelection.current())
         repo.insert(cat)
         repo.save()
         load()
@@ -101,7 +104,7 @@ final class CategoryViewModel {
         let affected = repo.fetch(
             TransactionModel.self,
             predicate: #Predicate { $0.category?.id == id }
-        )
+        ).filter { BookScope.matches($0.bookID, selected: BookSelection.current()) }
         for transaction in affected {
             transaction.category = nil
         }
@@ -112,7 +115,7 @@ final class CategoryViewModel {
         let attachedBudgets = repo.fetch(
             BudgetModel.self,
             predicate: #Predicate { $0.category?.id == id }
-        )
+        ).filter { BookScope.matches($0.bookID, selected: BookSelection.current()) }
         for budget in attachedBudgets {
             repo.delete(budget)
         }
@@ -133,11 +136,17 @@ final class CategoryViewModel {
     // MARK: Stateless queries (for App Intents / Shortcuts, which don't hold onto @Published state)
 
     func getAllCategories(income: Bool) -> [CategoryModel] {
-        repo.fetch(CategoryModel.self, predicate: #Predicate { $0.income == income }, sort: [SortDescriptor(\.order)])
+        BookScope.scoped(
+            repo.fetch(CategoryModel.self,
+                       predicate: #Predicate { $0.income == income },
+                       sort: [SortDescriptor(\.order)]),
+            \.bookID, selected: BookSelection.current())
     }
 
     func findCategory(id: UUID) -> CategoryModel? {
-        repo.fetchOne(CategoryModel.self, predicate: #Predicate { $0.id == id })
+        guard let category = repo.fetchOne(CategoryModel.self, predicate: #Predicate { $0.id == id }),
+              BookScope.matches(category.bookID, selected: BookSelection.current()) else { return nil }
+        return category
     }
 
     // Validation

@@ -46,7 +46,14 @@ struct ImportDataView: View {
     /// The wizard writes one batch, so one account. Rows used to be written
     /// with no account at all: they counted in the totals but moved no
     /// balance, and every account total disagreed with the ledger.
-    @Query(sort: [SortDescriptor(\AccountModel.order)]) var accounts: [AccountModel]
+    @Query(sort: [SortDescriptor(\AccountModel.order)]) private var fetchedAccounts: [AccountModel]
+    @Environment(BookState.self) private var bookState
+
+    /// The wizard writes into the active book, so it must only offer that
+    /// book's accounts (including after a switch mid-wizard).
+    var accounts: [AccountModel] {
+        BookScope.scoped(fetchedAccounts, \.bookID, selected: bookState.currentID)
+    }
     /// Picked by id: `AccountModel` is not `Hashable`, and the picker only
     /// needs a stable selection.
     @State var importAccountID: UUID?
@@ -234,6 +241,11 @@ struct ImportDataView: View {
                 processCSV()
             }
             #endif
+        }
+        .onChange(of: bookState.currentID) { _, _ in
+            // The previously picked account belongs to the old book.
+            importAccountID = AccountViewModel.shared.defaultAccount(
+                lastUsedID: UserDefaults.appGroup.string(forKey: "lastAccountID"))?.id
         }
         .fileImporter(
             isPresented: $importing,

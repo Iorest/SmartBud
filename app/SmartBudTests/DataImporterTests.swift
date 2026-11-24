@@ -601,3 +601,102 @@ struct BookMigrationTests {
         #expect(books.first?.name == BookModel.defaultName)
     }
 }
+
+// MARK: - Book management (TELE-21)
+
+@MainActor
+@Suite("Book management")
+struct BookManagementTests {
+    private let fixture: ImportFixture
+
+    init() throws { fixture = try ImportFixture() }
+
+    @Test("Duplicating a book copies structure and categories, never transactions")
+    func duplicateCopiesStructureOnly() throws {
+        let source = BookModel(name: "Travel")
+        let category = CategoryModel(name: "Transport", emoji: "✈️", bookID: source.id)
+        let account = AccountModel(name: "Cash", currencyCode: "USD", bookID: source.id)
+        let budget = BudgetModel(amount: 300, startDate: .now, type: 3, bookID: source.id)
+        budget.category = category
+        let mainBudget = MainBudgetModel(amount: 500, bookID: source.id)
+        let template = TemplateTransactionModel(
+            note: "taxi", category: category, amount: 12, bookID: source.id)
+        let transaction = TransactionModel(
+            note: "airport", category: category, account: account,
+            amount: 12, baseAmount: 12, date: .now, bookID: source.id)
+        for row in [source, category, account, budget, mainBudget, template, transaction] {
+            fixture.context.insert(row)
+        }
+        try fixture.context.save()
+
+        let copy = BookManager.duplicate(source, name: "Travel 2", in: fixture.context)
+        #expect(copy.id != source.id)
+        try fixture.context.save()
+
+        func rows<T: PersistentModel & BookScoped>(_ type: T.Type, book: UUID) -> [T] {
+            let all = (try? fixture.context.fetch(FetchDescriptor<T>())) ?? []
+            return all.filter { BookScope.matches($0.bookID, selected: book) }
+        }
+
+        #expect(rows(CategoryModel.self, book: copy.id).map(\.name) == ["Transport"])
+        #expect(rows(AccountModel.self, book: copy.id).map(\.name) == ["Cash"])
+        #expect(rows(BudgetModel.self, book: copy.id).map(\.amount) == [300])
+        #expect(rows(MainBudgetModel.self, book: copy.id).map(\.amount) == [500])
+        #expect(rows(TemplateTransactionModel.self, book: copy.id).map(\.note) == ["taxi"])
+        #expect(rows(TransactionModel.self, book: copy.id).isEmpty)
+        #expect(rows(TransactionModel.self, book: source.id).map(\.note) == ["airport"])
+
+        // The copied category budget must point at the copied category, not
+        // back at the source book's category.
+        let copiedBudget = rows(BudgetModel.self, book: copy.id).first
+        let copiedCategory = rows(CategoryModel.self, book: copy.id).first
+        #expect(copiedBudget?.category?.id == copiedCategory?.id)
+    }
+
+    @Test("The default book cannot be archived")
+    func defaultBookStaysAvailable() throws {
+        let book = BookModel(name: BookModel.defaultName)
+        book.id = BookModel.defaultID
+        fixture.context.insert(book)
+        try fixture.context.save()
+
+        #expect(!BookManager.setArchived(book, archived: true))
+        #expect(!book.archived)
+
+        let other = BookModel(name: "Travel")
+        #expect(BookManager.setArchived(other, archived: true))
+        #expect(other.archived)
+        #expect(!BookManager.setArchived(other, archived: false))
+        #expect(!other.archived)
+    }
+
+    @Test("Transfers follow the book of their source account")
+    func transfersFollowSourceBook() {
+        let first = UUID()
+        let second = UUID()
+        let source = AccountModel(name: "Cash", bookID: first)
+        let destination = AccountModel(name: "Bank", bookID: second)
+        let transfer = TransferModel(source: source, destination: destination)
+        #expect(BookScope.matches(transfer, selected: first))
+        #expect(!BookScope.matches(transfer, selected: second))
+        #expect(BookScope.scoped([source, destination], \.bookID, selected: first).map(\.id) == [source.id])
+    }
+
+    @Test("A corrupt selection falls back to the default book")
+    func corruptSelectionFallsBack() {
+        let defaults = UserDefaults.appGroup
+        let previous = defaults.string(forKey: BookSelection.key)
+        defer {
+            if let previous {
+                defaults.set(previous, forKey: BookSelection.key)
+            } else {
+                defaults.removeObject(forKey: BookSelection.key)
+            }
+        }
+        let chosen = UUID()
+        BookSelection.select(chosen)
+        #expect(BookSelection.current() == chosen)
+        defaults.set("not-a-uuid", forKey: BookSelection.key)
+        #expect(BookSelection.current() == BookModel.defaultID)
+    }
+}
