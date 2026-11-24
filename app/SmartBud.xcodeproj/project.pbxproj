@@ -494,6 +494,7 @@
 		F18E0000000000000000B002 /* SmartEntryParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E0000000000000000A001 /* SmartEntryParsing.swift */; };
 		F18E0000000000000000B003 /* SmartEntryParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E0000000000000000A001 /* SmartEntryParsing.swift */; };
 		F18E0000000000000000B004 /* SmartEntryParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18E0000000000000000A002 /* SmartEntryParsingTests.swift */; };
+		F18E0000000000000000B005 /* SettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A4148028B7C70D008C30E7 /* SettingsKeys.swift */; };
 		E1A2B3C400000000000002A2 /* TransactionValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A0 /* TransactionValidation.swift */; };
 		E1A2B3C400000000000002A5 /* TransactionValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */; };
 		E1A2B3C400000000000002A6 /* AccountBalanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C400000000000002A7 /* AccountBalanceTests.swift */; };
@@ -1887,6 +1888,7 @@
 				E1A2B3C4000000000000C010 /* ExpenseTextParser.swift in Sources */,
 				F18E0000000000000000B003 /* SmartEntryParsing.swift in Sources */,
 				F18E0000000000000000B004 /* SmartEntryParsingTests.swift in Sources */,
+				F18E0000000000000000B005 /* SettingsKeys.swift in Sources */,
 				E1A2B3C4000000000000C011 /* AlipayWechatParser.swift in Sources */,
 				E1A2B3C4000000000000C021 /* ParsingTests.swift in Sources */,
 				E1A2B3C4000000000000C0F2 /* ParsingMetricsTests.swift in Sources */,
