@@ -289,4 +289,5 @@ extension DataExporter {
     typealias BudgetDTO = ExportSchema.BudgetDTO
     typealias MainBudgetDTO = ExportSchema.MainBudgetDTO
     typealias TemplateTransactionDTO = ExportSchema.TemplateTransactionDTO
+    typealias BookDTO = ExportSchema.BookDTO
 }

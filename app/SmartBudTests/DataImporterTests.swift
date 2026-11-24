@@ -469,7 +469,7 @@ struct BookMigrationTests {
         }
 
         let before = snapshot()
-        try withCleanSelection {
+        withCleanSelection {
             let written = BookMigration.migrate(in: fixture.context)
             #expect(written == 8)  // the default book plus seven legacy rows
             #expect(BookMigration.migrate(in: fixture.context) == 0)
