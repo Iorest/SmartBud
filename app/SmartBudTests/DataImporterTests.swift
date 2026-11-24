@@ -395,3 +395,186 @@ struct ImportRateMergeTests {
         #expect(summary.skipped == 1)
     }
 }
+
+/// Alipay / WeChat bill CSV: real-shaped, sanitised fixtures in `Fixtures/`.
+/// The assertions pin row counts and totals, so a header or encoding change
+/// cannot quietly drop half a bill.
+@MainActor
+@Suite("Platform bill import")
+struct PlatformBillImportTests {
+    private let fixture: ImportFixture
+
+    init() throws { fixture = try ImportFixture() }
+
+    private static var fixturesDirectory: URL {
+        URL(filePath: #filePath).deletingLastPathComponent().appending(path: "Fixtures")
+    }
+
+    private func sample(_ name: String) throws -> Data {
+        try Data(contentsOf: Self.fixturesDirectory.appending(path: name))
+    }
+
+    /// Three accounts mirror the payment methods in both fixtures: two wallet
+    /// balances and one card whose name carries the last four digits.
+    @discardableResult
+    private func seed() -> [String: UUID] {
+        let names = ["零钱", "余额", "招商银行(1234)"]
+        let accounts = names.enumerated().map {
+            AccountModel(name: $0.element, kind: 0, currencyCode: "CNY", order: $0.offset)
+        }
+        accounts.forEach { fixture.context.insert($0) }
+        [
+            CategoryModel(name: "餐饮", emoji: "🍜", income: false, order: 0),
+            CategoryModel(name: "购物", emoji: "🛍️", income: false, order: 1),
+            CategoryModel(name: "其他收入", emoji: "💰", income: true, order: 2)
+        ].forEach { fixture.context.insert($0) }
+        return Dictionary(uniqueKeysWithValues: accounts.map { ($0.name, $0.id) })
+    }
+
+    @Test("WeChat sample: UTF-8 BOM, preamble, 52 rows, totals match")
+    func wechatSample() throws {
+        let preview = try DataImporter.previewBill(
+            sample("wechat_bill_sample.csv"), context: fixture.context)
+        #expect(preview.platform == .wechat)
+        #expect(preview.added == 52)
+        #expect(preview.skipped == 0)
+        #expect(preview.failures.isEmpty)
+        #expect(abs(preview.addedTotal - 1334.54) < 0.01)
+        #expect(Set(preview.paymentMethods) == Set(["零钱", "余额", "招商银行(1234)"]))
+    }
+
+    @Test("Alipay sample: GB18030 bytes, reordered columns, 52 rows")
+    func alipaySample() throws {
+        let raw = try sample("alipay_bill_sample.csv")
+        #expect(String(data: raw, encoding: .utf8) == nil)
+        let preview = try DataImporter.previewBill(raw, context: fixture.context)
+        #expect(preview.platform == .alipay)
+        #expect(preview.added == 52)
+        #expect(preview.failures.isEmpty)
+        #expect(abs(preview.addedTotal - 1334.54) < 0.01)
+    }
+
+    @Test("The same file imported twice adds nothing the second time")
+    func sameFileTwice() throws {
+        try fixture.withBaseCurrency("CNY") {
+            let mappings = seed()
+            let raw = try sample("wechat_bill_sample.csv")
+
+            let first = try DataImporter.previewBill(raw, context: fixture.context)
+            let firstResult = try DataImporter.applyBill(
+                first, accountIDs: mappings, context: fixture.context)
+            #expect(firstResult.imported == 52)
+            #expect(firstResult.skipped == 0)
+
+            let second = try DataImporter.previewBill(raw, context: fixture.context)
+            #expect(second.added == 0)
+            #expect(second.skipped == 52)
+            let secondResult = try DataImporter.applyBill(
+                second, accountIDs: mappings, context: fixture.context)
+            #expect(secondResult.imported == 0)
+
+            let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+            #expect(stored.count == 52)
+        }
+    }
+
+    @Test("Bad rows are reported; blank and summary rows are ignored")
+    func badRowsAreReported() throws {
+        let csv = """
+        支付宝交易明细
+        昵称：[脱敏用户]
+        交易号,交易对方,金额（元）,收/支,商品名称,交易创建时间,付款方式,交易状态,备注
+        1,星巴克,12.50,支出,咖啡,2026-03-01 09:00:00,余额,交易成功,
+
+        2,瑞幸,not-a-number,支出,咖啡,2026-03-01 10:00:00,余额,交易成功,
+        3,便利店,8.00,不明,水,2026-03-01 11:00:00,余额,交易成功,
+        合计,3笔
+        """
+        let preview = try DataImporter.previewBill(Data(csv.utf8), context: fixture.context)
+        #expect(preview.added == 1)
+        #expect(preview.failures.count == 2)
+        #expect(preview.failures.map(\.line) == [2, 3])
+        #expect(preview.failures[0].reason.contains("金额"))
+        #expect(preview.failures[1].reason.contains("收/支"))
+    }
+
+    @Test("A header missing required columns names what is missing")
+    func missingColumnsAreNamed() throws {
+        let csv = "微信支付账单明细\n交易时间,交易对方,金额(元)\n"
+        do {
+            _ = try DataImporter.previewBill(Data(csv.utf8), context: fixture.context)
+            Issue.record("Expected a missingColumns error")
+        } catch let error as BillImportError {
+            guard case .missingColumns(let names) = error else {
+                return Issue.record("Wrong error: \(error)")
+            }
+            #expect(names.contains("收/支"))
+        }
+    }
+
+    @Test("An unmapped payment method refuses the whole batch")
+    func unmappedMethodIsRefused() throws {
+        let preview = try DataImporter.previewBill(
+            sample("wechat_bill_sample.csv"), context: fixture.context)
+        do {
+            _ = try DataImporter.applyBill(preview, accountIDs: [:], context: fixture.context)
+            Issue.record("Expected an unmappedPaymentMethods error")
+        } catch let error as BillImportError {
+            guard case .unmappedPaymentMethods(let names) = error else {
+                return Issue.record("Wrong error: \(error)")
+            }
+            #expect(names.count == 3)
+        }
+        let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(stored.isEmpty)
+    }
+
+    @Test("Account suggestions match exact names and bank aliases")
+    func accountSuggestions() throws {
+        let mappings = seed()
+        let accounts = try fixture.context.fetch(FetchDescriptor<AccountModel>())
+        #expect(DataImporter.suggestedAccountID(for: "招商银行(1234)", accounts: accounts)
+                == mappings["招商银行(1234)"])
+        #expect(DataImporter.suggestedAccountID(for: "零钱", accounts: accounts)
+                == mappings["零钱"])
+        #expect(DataImporter.suggestedAccountID(for: "某未知钱包", accounts: accounts) == nil)
+
+        let aliasOnly = [AccountModel(name: "招行", currencyCode: "CNY")]
+        #expect(DataImporter.suggestedAccountID(for: "招商银行(1234)", accounts: aliasOnly)
+                == aliasOnly[0].id)
+    }
+
+    @Test("Imported rows carry the same fields as manual entries")
+    func statisticsFieldsMatchManualEntry() throws {
+        try fixture.withBaseCurrency("CNY") {
+            let mappings = seed()
+            let preview = try DataImporter.previewBill(
+                sample("alipay_bill_sample.csv"), context: fixture.context)
+            let result = try DataImporter.applyBill(
+                preview, accountIDs: mappings, context: fixture.context)
+            #expect(result.imported == 52)
+
+            let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+            #expect(rows.count == 52)
+            #expect(rows.allSatisfy { $0.account != nil && $0.category != nil })
+            #expect(rows.allSatisfy { $0.baseAmount == $0.amount })
+            #expect(rows.filter { $0.income }.count == 4)
+            #expect(abs(rows.reduce(0) { $0 + $1.amount } - 1334.54) < 0.01)
+        }
+    }
+
+    @Test("Failure report is a quoted CSV file")
+    func failureReport() throws {
+        let result = BillImportResult(imported: 1, failures: [
+            BillFailure(line: 6, reason: "金额无法解析", raw: "2,瑞幸,\"坏,值\",支出")
+        ])
+        let url = URL.temporaryDirectory
+            .appending(path: "bill-report-\(UUID().uuidString).csv")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        try result.writeReport(to: url)
+        let written = try String(contentsOf: url, encoding: .utf8)
+        #expect(written.hasPrefix("line,reason,source_row\r\n"))
+        #expect(written.contains("\"2,瑞幸,\"\"坏,值\"\",支出\""))
+    }
+}
