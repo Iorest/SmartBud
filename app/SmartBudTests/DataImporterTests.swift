@@ -672,7 +672,9 @@ struct BookManagementTests {
         let other = BookModel(name: "Travel")
         #expect(BookManager.setArchived(other, archived: true))
         #expect(other.archived)
-        #expect(!BookManager.setArchived(other, archived: false))
+        // Unarchiving is the only way back from Settings → Archived, so it
+        // must be allowed for a non-default book.
+        #expect(BookManager.setArchived(other, archived: false))
         #expect(!other.archived)
     }
 
