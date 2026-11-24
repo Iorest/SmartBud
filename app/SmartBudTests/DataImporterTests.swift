@@ -623,7 +623,7 @@ struct BookManagementTests {
             note: "taxi", category: category, amount: 12, bookID: source.id)
         let transaction = TransactionModel(
             note: "airport", category: category, account: account,
-            amount: 12, baseAmount: 12, date: .now, bookID: source.id)
+            baseAmount: 12, amount: 12, date: .now, bookID: source.id)
         for row in [source, category, account, budget, mainBudget, template, transaction] {
             fixture.context.insert(row)
         }
