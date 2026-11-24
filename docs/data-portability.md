@@ -88,6 +88,29 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 - 成功页不再自动关闭，提供「完成」与「撤销本次导入」：撤销只删除本次写入的行，
   不会碰导入前就存在的记录。
 
+## 支付宝 / 微信账单 CSV（Services/DataImporter.swift）
+
+`DataImporter.previewBill` / `DataImporter.applyBill` 处理两家平台导出的
+"账单 / 交易明细" CSV，表头自带列名，不需要在向导里手工选列；`ImportDataView`
+仍是其它银行 CSV 的通用兜底路径。
+
+- 编码：UTF-8（含 BOM）→ UTF-16 → GB18030；表头按列名识别，列顺序变化不影响映射。
+  文件开头的昵称 / 筛选条件与结尾的合计行会被跳过。
+- 字段：`交易时间` / `交易创建时间` → `date`，`收/支` → `income`，`金额(元)` → `amount`，
+  `交易对方` → 商户与备注，`商品名称` → 备注，`支付方式` → 账户。金额取绝对值，
+  方向单独存 `income`，不靠正负号猜。
+- 去重：秒级时间 + 金额 + 对方（归一化键）+ 收支方向一致视为重复；同一文件第二次
+  预览显示"新增 0 / 跳过 N"。写库时复查一次，防止预览后又落了别的导入。
+- 账户：`accountMappings(for:accounts:)` 先按支付方式名匹配现有账户（支持
+  "招商银行(1234)" ↔ "招行"这类别名）；匹配不到的必须用户选，`applyBill`
+  在写库前直接拒绝，不会静默写一条没有账户的账。
+- 写库：逐行校验，坏行进失败报告（`BillImportResult.writeReport(to:)`，
+  `line,reason,source_row`），不连累其它行；整批只在最后保存一次，保存失败才回滚。
+- 样例：`app/SmartBudTests/Fixtures/wechat_bill_sample.csv`（UTF-8 BOM）与
+  `alipay_bill_sample.csv`（GB18030），各 52 行、金额合计 1334.54 元。
+
+这里不改 JSON 备份格式，也不从账单生成转账 / 退款等关联记录：每一行只写成普通交易，
+分类取用户现有分类中名字匹配的一个（否则按收支方向取默认分类），与手工记账同一套字段。
 
 ## 导入规则：只合并，不覆盖
 
@@ -121,8 +144,9 @@ date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbur
 - 日期是 `yyyy-MM-dd HH:mm:ss`（设备本地时区），金额固定两位小数
 - 按 RFC 4180 转义：含逗号、引号或换行的字段加引号，内部引号翻倍
 
-导出的 CSV 不是备份格式，没有"选它就能整份导回"的路径。CSV 导入向导面向银行/支付
-账单，需要在界面上手工映射列（见上一节）；要能原样导回请用 JSON。
+导出的 CSV 不是备份格式，没有"选它就能整份导回"的路径。支付宝 / 微信的原始账单
+可以走上面的自动映射导入；其它银行文件继续用 `ImportDataView` 手工映射列。
+要能原样导回请用 JSON。
 
 ## 导入之后
 
