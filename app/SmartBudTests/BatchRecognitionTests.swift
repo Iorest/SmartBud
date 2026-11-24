@@ -51,7 +51,8 @@ struct BatchRecognitionTests {
         }
         #expect(retry.succeeded == 1)
         #expect(retry.failed == 0)
-        #expect(session.items.allSatisfy(\.isSaved))
+        let allSaved = session.items.allSatisfy { $0.isSaved }
+        #expect(allSaved)
         #expect(attempts.count == 11)
 
         // Calling confirm twice must not write the same receipt twice.
