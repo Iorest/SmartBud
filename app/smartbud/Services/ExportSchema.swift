@@ -14,6 +14,9 @@ enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
     /// Old values are never reused.
     static let version: Int = 9
+    /// Book fields added for multi-ledger support are optional, so old
+    /// backups still decode. The next version number is allocated by the
+    /// coordinator when the multi-ledger PR merges; do not take one here.
 
     struct Payload: Codable {
         var exportDate: Date
@@ -27,6 +30,10 @@ enum ExportSchema {
         var accounts: [AccountDTO]
         var transfers: [TransferDTO]
         var rates: [RateDTO]
+        /// Ledgers in the backup. Empty in files written before multi-ledger
+        /// support; their rows decode with a nil `bookID` and land in the
+        /// default book.
+        var books: [BookDTO]
         /// App settings that decide how the numbers are read. Optional so
         /// files written before this field still decode.
         var settings: SettingsDTO?
@@ -43,7 +50,8 @@ enum ExportSchema {
             accounts: [AccountDTO],
             transfers: [TransferDTO],
             rates: [RateDTO],
-            settings: SettingsDTO? = nil
+            settings: SettingsDTO? = nil,
+            books: [BookDTO] = []
         ) {
             self.exportDate = exportDate
             self.appVersion = appVersion
@@ -57,6 +65,7 @@ enum ExportSchema {
             self.transfers = transfers
             self.rates = rates
             self.settings = settings
+            self.books = books
         }
 
         /// Lenient on purpose: a file written by an older build can be missing
@@ -75,6 +84,7 @@ enum ExportSchema {
             accounts = try container.decodeIfPresent([AccountDTO].self, forKey: .accounts) ?? []
             transfers = try container.decodeIfPresent([TransferDTO].self, forKey: .transfers) ?? []
             rates = try container.decodeIfPresent([RateDTO].self, forKey: .rates) ?? []
+            books = try container.decodeIfPresent([BookDTO].self, forKey: .books) ?? []
             settings = try container.decodeIfPresent(SettingsDTO.self, forKey: .settings)
         }
 
@@ -147,6 +157,8 @@ enum ExportSchema {
         var badDebtReason: String?
         /// On a written-off claim: the day the money was given up on.
         var badDebtAt: Date?
+        /// Ledger this row belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
     }
 
     struct AccountDTO: Codable {
@@ -162,6 +174,8 @@ enum ExportSchema {
         var currencyCode: String
         // Schema 4. Optional so older files still decode.
         var archived: Bool?
+        /// Ledger this account belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
     }
 
     struct RateDTO: Codable {
@@ -192,6 +206,8 @@ enum ExportSchema {
         var income: Bool
         var order: Int
         var dateCreated: Date
+        /// Ledger this category belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
     }
 
     struct BudgetDTO: Codable {
@@ -203,6 +219,8 @@ enum ExportSchema {
         var green: Bool
         var categoryId: UUID?
         var categoryName: String?
+        /// Ledger this budget belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
     }
 
     struct MainBudgetDTO: Codable {
@@ -211,6 +229,8 @@ enum ExportSchema {
         var dateCreated: Date
         var type: Int
         var green: Bool
+        /// Ledger this budget belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
     }
 
     struct TemplateTransactionDTO: Codable {
@@ -223,5 +243,22 @@ enum ExportSchema {
         var recurringCoefficient: Int
         var categoryId: UUID?
         var categoryName: String?
+        /// Ledger this template belongs to. Nil in pre-book backups.
+        var bookID: UUID? = nil
+    }
+
+    /// One ledger. Unknown fields in a newer file are ignored by Codable, so
+    /// restoring a multi-ledger backup into an older build drops the extra
+    /// books — the coordinator-assigned version bump must land with the UI
+    /// release that exposes more than one book.
+    struct BookDTO: Codable {
+        var id: UUID
+        var name: String
+        var icon: String
+        var type: Int
+        var order: Int
+        var archived: Bool
+        /// Optional so backups written before books existed still decode.
+        var dateCreated: Date?
     }
 }

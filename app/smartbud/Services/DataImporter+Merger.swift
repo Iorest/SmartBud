@@ -23,6 +23,7 @@ struct BackupMerger {
     var categoriesByName: [String: CategoryModel] = [:]
     var accountsByID: [UUID: AccountModel] = [:]
     var accountsByName: [String: AccountModel] = [:]
+    var booksByID: [UUID: BookModel] = [:]
 
     init(context: ModelContext) {
         self.context = context
@@ -33,6 +34,23 @@ struct BackupMerger {
         for account in fetch(AccountModel.self) {
             accountsByID[account.id] = account
             accountsByName[account.name] = account
+        }
+        for book in fetch(BookModel.self) { booksByID[book.id] = book }
+    }
+
+    mutating func importBooks(_ dtos: [ExportSchema.BookDTO]) {
+        for dto in dtos {
+            guard booksByID[dto.id] == nil else {
+                summary.skipped += 1
+                continue
+            }
+            let book = BookModel(name: dto.name, icon: dto.icon, type: dto.type,
+                                 order: dto.order, archived: dto.archived)
+            book.id = dto.id
+            book.dateCreated = dto.dateCreated ?? .now
+            context.insert(book)
+            booksByID[dto.id] = book
+            summary.books += 1
         }
     }
 
@@ -46,7 +64,8 @@ struct BackupMerger {
             }
             let category = CategoryModel(
                 name: dto.name, emoji: dto.emoji, colour: dto.colour,
-                income: dto.income, order: dto.order
+                income: dto.income, order: dto.order,
+                bookID: resolveBook(dto.bookID)
             )
             category.id = dto.id
             category.dateCreated = dto.dateCreated
@@ -71,6 +90,7 @@ struct BackupMerger {
             account.id = dto.id
             account.hidden = dto.hidden
             account.archived = dto.archived ?? false
+            account.bookID = resolveBook(dto.bookID)
             account.dateCreated = dto.dateCreated
             context.insert(account)
             accountsByID[dto.id] = account
@@ -132,6 +152,7 @@ struct BackupMerger {
                 transferFeeOf: dto.transferFeeOf,
                 adjustment: dto.adjustment ?? false
             )
+            transaction.bookID = resolveBook(dto.bookID)
             transaction.id = dto.id
             transaction.onceRecurring = dto.onceRecurring
             // A backup written before schema 9 has no paid-back amount. A
@@ -198,6 +219,7 @@ struct BackupMerger {
             budget.dateCreated = dto.dateCreated
             budget.green = dto.green
             budget.category = resolveCategory(id: dto.categoryId, name: dto.categoryName)
+            budget.bookID = resolveBook(dto.bookID)
             context.insert(budget)
             summary.budgets += 1
         }
@@ -206,11 +228,13 @@ struct BackupMerger {
     /// Main budgets carry no id, so dedupe on the values that identify one.
     mutating func importMainBudgets(_ dtos: [ExportSchema.MainBudgetDTO]) {
         var keys = Set(fetch(MainBudgetModel.self).map {
-            key(amount: $0.amount, start: $0.startDate, type: $0.type)
+            key(amount: $0.amount, start: $0.startDate, type: $0.type, bookID: $0.bookID)
         })
 
         for dto in dtos {
-            guard keys.insert(key(amount: dto.amount, start: dto.startDate, type: dto.type)).inserted else {
+            let bookID = resolveBook(dto.bookID)
+            guard keys.insert(key(amount: dto.amount, start: dto.startDate, type: dto.type,
+                                   bookID: bookID)).inserted else {
                 summary.skipped += 1
                 continue
             }
@@ -218,9 +242,14 @@ struct BackupMerger {
                 amount: amount(dto.amount), startDate: dto.startDate, type: dto.type)
             mainBudget.dateCreated = dto.dateCreated
             mainBudget.green = dto.green
+            mainBudget.bookID = bookID
             context.insert(mainBudget)
             summary.mainBudgets += 1
         }
+    }
+
+    private func key(amount: Double, start: Date, type: Int, bookID: UUID?) -> String {
+        "\(Money.cents(amount))|\(Int(start.timeIntervalSince1970))|\(type)|\(bookID?.uuidString ?? "")"
     }
 
     mutating func importTemplates(_ dtos: [ExportSchema.TemplateTransactionDTO]) {
@@ -237,6 +266,7 @@ struct BackupMerger {
                 repeatType: dto.recurringType, repeatCoefficient: dto.recurringCoefficient
             )
             template.id = dto.id
+            template.bookID = resolveBook(dto.bookID)
             context.insert(template)
             summary.templates += 1
         }
@@ -250,6 +280,17 @@ struct BackupMerger {
         return nil
     }
 
+    /// An unknown book id in a hand-edited backup must not create orphan
+    /// rows: they fall into the default book, which always exists after
+    /// `BookMigration.ensureDefaultBook`.
+    private func resolveBook(_ id: UUID?) -> UUID? {
+        let candidate = id ?? BookModel.defaultID
+        guard candidate != BookModel.defaultID, booksByID[candidate] == nil else {
+            return candidate
+        }
+        return BookModel.defaultID
+    }
+
     private func resolveAccount(id: UUID?, name: String?) -> AccountModel? {
         if let id, let match = accountsByID[id] { return match }
         if let name, let match = accountsByName[name] { return match }
@@ -258,10 +299,6 @@ struct BackupMerger {
 
     private func fetch<T: PersistentModel>(_ type: T.Type) -> [T] {
         (try? context.fetch(FetchDescriptor<T>())) ?? []
-    }
-
-    private func key(amount: Double, start: Date, type: Int) -> String {
-        "\(Money.cents(amount))|\(Int(start.timeIntervalSince1970))|\(type)"
     }
 
     // MARK: Validation

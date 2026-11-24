@@ -21,6 +21,8 @@ final class TemplateTransactionModel {
     var recurringCoefficient: Int = 0
     var recurringType: Int = 0
     var category: CategoryModel?
+    /// Ledger this template belongs to; see `TransactionModel.bookID`.
+    var bookID: UUID? = BookModel.defaultID
 
     init(
         note: String = "",
@@ -29,7 +31,8 @@ final class TemplateTransactionModel {
         amount: Double = 0,
         order: Int = 0,
         repeatType: Int = 0,
-        repeatCoefficient: Int = 0
+        repeatCoefficient: Int = 0,
+        bookID: UUID? = BookModel.defaultID
     ) {
         self.id = UUID()
         self.note = note
@@ -39,6 +42,7 @@ final class TemplateTransactionModel {
         self.order = order
         self.recurringType = repeatType
         self.recurringCoefficient = repeatCoefficient
+        self.bookID = bookID
     }
 }
 

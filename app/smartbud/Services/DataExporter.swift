@@ -91,7 +91,8 @@ enum DataExporter {
         .map { cat in
             CategoryDTO(
                 id: cat.id, name: cat.name, emoji: cat.emoji, colour: cat.colour,
-                income: cat.income, order: cat.order, dateCreated: cat.dateCreated
+                income: cat.income, order: cat.order, dateCreated: cat.dateCreated,
+                bookID: cat.bookID
             )
         }
 
@@ -128,7 +129,8 @@ enum DataExporter {
                 adjustment: txn.adjustment,
                 badDebtOf: txn.badDebtOf,
                 badDebtReason: txn.badDebtReason,
-                badDebtAt: txn.badDebtAt
+                badDebtAt: txn.badDebtAt,
+                bookID: txn.bookID
             )
         }
 
@@ -144,7 +146,8 @@ enum DataExporter {
                     openingBalance: account.openingBalance, hidden: account.hidden,
                     order: account.order, dateCreated: account.dateCreated,
                     currencyCode: account.currencyCode,
-                    archived: account.archived
+                    archived: account.archived,
+                    bookID: account.bookID
                 )
             }
     }
@@ -171,6 +174,16 @@ enum DataExporter {
             .map { RateDTO(code: $0.code, rate: $0.rate, updatedAt: $0.updatedAt) }
     }
 
+    private static func booksDTOs(_ repo: DataRepository) -> [BookDTO] {
+        repo.fetch(BookModel.self)
+            .sorted { $0.order < $1.order }
+            .map { book in
+                BookDTO(id: book.id, name: book.name, icon: book.icon,
+                        type: book.type, order: book.order, archived: book.archived,
+                        dateCreated: book.dateCreated)
+            }
+    }
+
     private static func budgetsDTOs(_ repo: DataRepository) -> [BudgetDTO] {
     repo.fetch(BudgetModel.self)
         .sorted { $0.startDate < $1.startDate }
@@ -178,7 +191,8 @@ enum DataExporter {
             BudgetDTO(
                 id: budget.id, amount: budget.amount, startDate: budget.startDate,
                 dateCreated: budget.dateCreated, type: budget.type, green: budget.green,
-                categoryId: budget.category?.id, categoryName: budget.category?.name
+                categoryId: budget.category?.id, categoryName: budget.category?.name,
+                bookID: budget.bookID
             )
         }
 
@@ -190,7 +204,8 @@ enum DataExporter {
         .map { mainBudget in
             MainBudgetDTO(
                 amount: mainBudget.amount, startDate: mainBudget.startDate,
-                dateCreated: mainBudget.dateCreated, type: mainBudget.type, green: mainBudget.green
+                dateCreated: mainBudget.dateCreated, type: mainBudget.type, green: mainBudget.green,
+                bookID: mainBudget.bookID
             )
         }
 
@@ -205,7 +220,8 @@ enum DataExporter {
                 income: template.income, order: template.order,
                 recurringType: template.recurringType,
                 recurringCoefficient: template.recurringCoefficient,
-                categoryId: template.category?.id, categoryName: template.category?.name
+                categoryId: template.category?.id, categoryName: template.category?.name,
+                bookID: template.bookID
             )
         }
 
@@ -230,6 +246,7 @@ enum DataExporter {
         let transfers = transfersDTOs(repo)
 
         let rates = ratesDTOs(repo)
+        let books = booksDTOs(repo)
 
         return ExportPayload(
             exportDate: exportDate,
@@ -243,7 +260,8 @@ enum DataExporter {
             accounts: accounts,
             transfers: transfers,
             rates: rates,
-            settings: ExportSchema.SettingsDTO.current()
+            settings: ExportSchema.SettingsDTO.current(),
+            books: books
         )
     }
 
@@ -271,4 +289,5 @@ extension DataExporter {
     typealias BudgetDTO = ExportSchema.BudgetDTO
     typealias MainBudgetDTO = ExportSchema.MainBudgetDTO
     typealias TemplateTransactionDTO = ExportSchema.TemplateTransactionDTO
+    typealias BookDTO = ExportSchema.BookDTO
 }

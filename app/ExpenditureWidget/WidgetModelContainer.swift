@@ -41,6 +41,7 @@ enum WidgetModelContainer {
         // and drop their tables — the templates table was being truncated on
         // every widget refresh.
         let schema = Schema([
+            BookModel.self,
             TransactionModel.self,
             CategoryModel.self,
             AccountModel.self,
