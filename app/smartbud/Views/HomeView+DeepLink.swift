@@ -44,7 +44,11 @@ extension HomeView {
         // before switching so a stale link cannot strand the user in an empty
         // ledger; an unknown id is ignored and the current book is kept.
         // Archived books stay valid because their data must remain readable.
-        if let requested = request.bookID,
+        // A locked session must not change books either: the write is refused
+        // below, and switching behind the lock would prepare a hidden ledger.
+        let sessionLocked = appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked
+        if !sessionLocked,
+           let requested = request.bookID,
            DataRepository.shared.fetch(BookModel.self).contains(where: { $0.id == requested }) {
             BookState.shared.reloadBooks()
             BookState.shared.select(requested)

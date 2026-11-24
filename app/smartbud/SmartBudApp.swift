@@ -18,6 +18,7 @@ import AppKit
 struct SmartBudApp: App {
     @State private var dataRepository = DataRepository.shared
     @State private var bookState = BookState.shared
+    @State private var transactionVM = TransactionViewModel.shared
     @State private var appLockVM = AppLockViewModel()
     @State private var categoryVM = CategoryViewModel.shared
     @State private var accountVM = AccountViewModel.shared
@@ -69,6 +70,7 @@ struct SmartBudApp: App {
             ContentView()
                 .modelContainer(dataRepository.modelContainer)
                 .environment(bookState)
+                .environment(transactionVM)
                 .environment(appLockVM)
                 .environment(categoryVM)
                 .environment(accountVM)
