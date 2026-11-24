@@ -251,13 +251,21 @@ struct BillImportResult: Equatable, Sendable {
         var lines = ["line,reason,source_row"]
         for failure in failures {
             lines.append([String(failure.line), failure.reason, failure.raw]
-                .map(Self.quoted).joined(separator: ","))
+                .map { Self.quoted(Self.sanitized($0)) }.joined(separator: ","))
         }
         return lines.joined(separator: "\r\n") + "\r\n"
     }
 
     func writeReport(to url: URL) throws {
         try Data(reportCSV.utf8).write(to: url)
+    }
+
+    /// A leading formula character is executed by spreadsheet apps even when
+    /// the field is quoted. Prefixing an apostrophe keeps the raw text readable
+    /// without letting a rejected bill row become a live formula in the report.
+    private static func sanitized(_ value: String) -> String {
+        guard let first = value.first, "=+-@\t".contains(first) else { return value }
+        return "'" + value
     }
 
     private static func quoted(_ value: String) -> String {
@@ -273,6 +281,7 @@ enum BillImportError: LocalizedError {
     case badEncoding
     case missingColumns([String])
     case unmappedPaymentMethods([String])
+    case tooLarge
     case missingRate(String)
     case writeFailed
 
@@ -282,6 +291,8 @@ enum BillImportError: LocalizedError {
             String.appLocalized("This is not an Alipay or WeChat Pay bill CSV.")
         case .badEncoding:
             String.appLocalized("This file's text encoding is not supported.")
+        case .tooLarge:
+            String.appLocalized("This bill file is too large to import.")
         case .missingColumns(let names):
             String.appFormatted("The bill is missing these columns: %@", names.joined(separator: "、"))
         case .unmappedPaymentMethods(let names):
@@ -296,9 +307,13 @@ enum BillImportError: LocalizedError {
 
 extension DataImporter {
 
+    /// A crafted single field can otherwise hold the entire file in memory.
+    private static let billSizeLimit = 20 * 1024 * 1024
+
     /// Reads a platform bill without writing anything. Used by the preview
     /// step so the user sees "added N / skipped M" before committing.
     static func previewBill(_ data: Data, context: ModelContext) throws -> BillPreview {
+        guard data.count <= Self.billSizeLimit else { throw BillImportError.tooLarge }
         let table = try CSVTable(text: try decodeBillText(data))
         guard let header = table.rows.firstIndex(where: { BillColumns.looksLikeHeader($0) }) else {
             throw BillImportError.unsupportedFormat
@@ -496,10 +511,13 @@ extension DataImporter {
 
     private static func decodeBillText(_ data: Data) throws -> String {
         let decoded: String
-        if let utf8 = String(data: data, encoding: .utf8) {
-            decoded = utf8
-        } else if let utf16 = String(data: data, encoding: .utf16) {
+        // Foundation accepts most GB18030 byte strings as UTF-16, so trying
+        // UTF-16 without a BOM silently turns Chinese headers into mojibake.
+        let hasUTF16BOM = data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF])
+        if hasUTF16BOM, let utf16 = String(data: data, encoding: .utf16) {
             decoded = utf16
+        } else if !hasUTF16BOM, let utf8 = String(data: data, encoding: .utf8) {
+            decoded = utf8
         } else {
             let encoding = CFStringConvertEncodingToNSStringEncoding(
                 CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue))
@@ -574,7 +592,9 @@ extension DataImporter {
                                      categories: [CategoryModel]) -> CategoryModel? {
         let haystack = "\(row.item) \(row.counterparty)".lowercased()
         if let direct = categories.first(where: {
-            !$0.name.isEmpty && haystack.contains($0.name.lowercased())
+            $0.income == row.income
+                && !$0.name.isEmpty
+                && haystack.contains($0.name.lowercased())
         }) { return direct }
         return categories.first { $0.income == row.income }
     }
@@ -622,12 +642,14 @@ private struct BillColumns {
 
     var width: Int { max(date, amount, direction, counterparty) + 1 }
 
-    /// Preamble rows mention a nickname or a date range, never a header name.
+    /// Preamble rows mention a nickname or a date range; a real header carries
+    /// at least three of the four required names.
     static func looksLikeHeader(_ row: [String]) -> Bool {
         let headers = Set(row.map(normalizeHeader))
-        return requiredGroups.contains { group in
+        let matched = requiredGroups.filter { group in
             group.contains { headers.contains(normalizeHeader($0)) }
-        }
+        }.count
+        return matched >= 3
     }
 
     static func missingFields(in row: [String]) -> [String] {

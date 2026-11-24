@@ -566,7 +566,8 @@ struct PlatformBillImportTests {
     @Test("Failure report is a quoted CSV file")
     func failureReport() throws {
         let result = BillImportResult(imported: 1, failures: [
-            BillFailure(line: 6, reason: "金额无法解析", raw: "2,瑞幸,\"坏,值\",支出")
+            BillFailure(line: 6, reason: "金额无法解析", raw: "2,瑞幸,\"坏,值\",支出"),
+            BillFailure(line: 7, reason: "金额无法解析", raw: "=HYPERLINK(\"https://example.com\")")
         ])
         let url = URL.temporaryDirectory
             .appending(path: "bill-report-\(UUID().uuidString).csv")
@@ -576,5 +577,52 @@ struct PlatformBillImportTests {
         let written = try String(contentsOf: url, encoding: .utf8)
         #expect(written.hasPrefix("line,reason,source_row\r\n"))
         #expect(written.contains("\"2,瑞幸,\"\"坏,值\"\",支出\""))
+        #expect(written.contains("'=HYPERLINK"))
+    }
+
+    @Test("GB18030 without a BOM is decoded as GB18030, not UTF-16")
+    func gb18030WithoutIllegalBytes() throws {
+        let encoding = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(
+            CFStringEncoding(CFStringEncodings.GB_18030_2000.rawValue)))
+        let csv = """
+        支付宝交易明细
+        交易号,交易对方,金额（元）,收/支,商品名称,交易创建时间,付款方式,交易状态,备注
+        1,测试商户,12.34,支出,咖啡,2026-03-01 09:00:00,余额,交易成功,
+        """
+        let raw = try #require(csv.data(using: encoding))
+        let preview = try DataImporter.previewBill(raw, context: fixture.context)
+        #expect(preview.added == 1)
+        #expect(preview.failures.isEmpty)
+    }
+
+    @Test("A category must match the row's income direction")
+    func categoryDirectionIsPreserved() throws {
+        try fixture.withBaseCurrency("CNY") {
+            let mappings = seed()
+            fixture.context.insert(CategoryModel(name: "工资", emoji: "💼", income: true, order: 4))
+            let csv = """
+            微信支付账单明细
+            交易时间,交易对方,商品,收/支,金额(元),支付方式
+            2026-03-01 09:00:00,某商户,工资相关,支出,12.34,零钱
+            """
+            let preview = try DataImporter.previewBill(Data(csv.utf8), context: fixture.context)
+            let result = try DataImporter.applyBill(
+                preview, accountIDs: mappings, context: fixture.context)
+            #expect(result.imported == 1)
+            let stored = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+            #expect(stored.first?.category?.name != "工资")
+            #expect(stored.first?.category?.income == false)
+        }
+    }
+
+    @Test("An oversized bill is refused before decoding")
+    func oversizedBillIsRefused() throws {
+        let raw = Data(repeating: 0x20, count: 21 * 1024 * 1024)
+        do {
+            _ = try DataImporter.previewBill(raw, context: fixture.context)
+            Issue.record("Expected a tooLarge error")
+        } catch let error as BillImportError {
+            guard case .tooLarge = error else { return Issue.record("Wrong error: \(error)") }
+        }
     }
 }
