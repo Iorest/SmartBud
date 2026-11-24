@@ -149,12 +149,20 @@ private struct FakeLLM: LLMCandidateParsing {
 struct SmartEntryParserTests {
     private let categories = ["餐饮", "交通"]
     private let parser = SmartEntryParser(llm: nil)
+    /// The test target compiles without SettingsKeys.swift, so keep the
+    /// production keys here as plain values instead of importing UI files.
+    private enum Key {
+        static let noAmount = "smart.parse.error.noAmount"
+        static let unavailable = "smart.parse.error.unavailable"
+        static let ambiguous = "smart.parse.error.ambiguousAmount"
+        static let invalid = "smart.parse.error.invalidResponse"
+    }
 
     @Test("No opt-in service keeps the current no-amount behaviour")
     func noService() async {
         let outcome = await parser.parse(text: "午饭 35", rule: nil, history: [], allowedCategories: categories)
         #expect(outcome.candidate == nil)
-        #expect(outcome.failureKey == SmartEntryKey.noAmount)
+        #expect(outcome.failureKey == Key.noAmount)
     }
 
     @Test("No service means the rule result is used without changes")
@@ -167,11 +175,12 @@ struct SmartEntryParserTests {
 
     @Test("Timeout and invalid candidate degrade to a readable prompt")
     func degradation() async {
-        for (error, key) in [
-            (FakeLLMError.timeout, SmartEntryKey.llmUnavailable),
-            (LLMCandidateError.ambiguousAmount, SmartEntryKey.llmAmbiguousAmount),
-            (LLMCandidateError.invalidJSON, SmartEntryKey.llmInvalidResponse)
-        ] {
+        let cases: [(any Error, String)] = [
+            (FakeLLMError.timeout, Key.unavailable),
+            (LLMCandidateError.ambiguousAmount, Key.ambiguous),
+            (LLMCandidateError.invalidJSON, Key.invalid)
+        ]
+        for (error, key) in cases {
             let outcome = await SmartEntryParser(llm: FakeLLM(result: .failure(error)))
                 .parse(text: "午饭 35 饮料 20", rule: nil, history: [], allowedCategories: categories)
             #expect(outcome.candidate == nil)
