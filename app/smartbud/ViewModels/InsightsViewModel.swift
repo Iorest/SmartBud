@@ -77,6 +77,13 @@ final class InsightsViewModel {
         }
     }
 
+    /// Every aggregation starts from the active ledger. A raw fetch would fold
+    /// other books' rows into this book's totals, charts and pending claims.
+    func bookScopedTransactions() -> [TransactionModel] {
+        BookScope.scoped(repo.fetch(TransactionModel.self), \.bookID,
+                         selected: BookState.shared.currentID)
+    }
+
     /// Recomputes every new `@Published` property above for the current `selectedPeriod`.
     /// Also refreshes today / yesterday transaction lists.
     func refreshAll() {
@@ -89,7 +96,7 @@ final class InsightsViewModel {
         currencySymbol = Locale.appCurrencySymbol(forCurrencyCode: currency)
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)
-        let all = repo.fetch(TransactionModel.self)
+        let all = bookScopedTransactions()
         // Future-dated rows are "upcoming": Log lists them separately, the
         // budget ignores them, and the totals here must too — otherwise one
         // planned expense changes this period's spend, share and average.
@@ -165,7 +172,7 @@ final class InsightsViewModel {
     func getBarChartData(for period: Int) -> [BarChartPoint] {
         let cal = configuredCalendar
         let (start, _) = getPeriodDateRange(for: period)
-        let all = repo.fetch(TransactionModel.self)
+        let all = bookScopedTransactions()
 
         let count: Int
         let step: Calendar.Component
@@ -221,10 +228,11 @@ final class InsightsViewModel {
     /// Percent is share of total spend (capped at 1.0).
     func getCategoryBreakdown(for period: Int) -> [PowerCategory] {
         let (periodStart, periodEnd) = getPeriodDateRange(for: period)
-        let txns = repo.fetch(TransactionModel.self).filter { txn in
+        let txns = bookScopedTransactions().filter { txn in
             guard let date = txn.date, let category = txn.category else { return false }
             guard txn.countsAsSpend || txn.isRefund else { return false }
             return date >= periodStart && date < periodEnd && date <= .now && !category.income
+                && BookScope.matches(category.bookID, selected: BookState.shared.currentID)
         }
         var amounts = [UUID: Decimal]()
         var categories = [UUID: CategoryModel]()

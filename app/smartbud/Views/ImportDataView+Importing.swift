@@ -142,6 +142,9 @@ extension ImportDataView {
             return
         }
 
+        // A CSV import is a write to the active ledger; refresh every cached
+        // view of it before the success state renders.
+        DataRefreshCenter.refreshAll()
         // Remember this exact file so a second pick can warn instead of
         // silently doubling the ledger.
         if let pendingDigest {
@@ -184,7 +187,8 @@ extension ImportDataView {
                 amount: draft.amount,
                 date: draft.date,
                 merchant: merchant?.name,
-                merchantKey: merchant?.key
+                merchantKey: merchant?.key,
+                bookID: BookState.shared.currentID
             )
             DataRepository.shared.insert(txn)
             ids.append(txn.id)

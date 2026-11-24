@@ -39,6 +39,7 @@ enum SettingsRoute: Hashable {
     case numberEntry
     case categories
     case accounts
+    case books
     case templates
     case llm
 
@@ -63,6 +64,7 @@ enum SettingsRoute: Hashable {
         case .numberEntry: return "numberEntry"
         case .categories: return "categories"
         case .accounts: return "accounts"
+        case .books: return "books"
         case .templates: return "templates"
         case .llm: return "llm"
         }
@@ -256,6 +258,7 @@ struct SettingsView: View {
           }
 
           Section(String.appLocalized(SettingsKey.sectionData)) {
+            settingsLink(.books, "book.fill", 115, SettingsKey.rowBooks, nil)
             settingsLink(.categories, "rectangle.grid.2x2.fill", 110, SettingsKey.rowCategories, nil)
             settingsLink(.accounts, "creditcard.fill", 108, SettingsKey.rowAccounts, nil)
             settingsLink(.templates, "square.on.square", 122, SettingsKey.rowTemplates, nil)
@@ -347,6 +350,7 @@ struct SettingsView: View {
           case .categories: SettingsCategoryView()
           case .accounts: AccountListView()
           case .templates: TemplatesView()
+          case .books: BookManagementView()
           }
         }
         .onChange(of: appLockVM.isAppUnLocked) { _, unlocked in
@@ -413,6 +417,216 @@ struct SettingsRowView: View {
             }
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Books
+
+/// Which editor is open. Carrying the book in the enum keeps the presented
+/// sheet and the row it edits from drifting apart.
+private enum BookEditor: Identifiable {
+    case create
+    case rename(BookModel)
+    case duplicate(BookModel)
+
+    var id: String {
+        switch self {
+        case .create: return "create"
+        case .rename(let book): return "rename.\(book.id.uuidString)"
+        case .duplicate(let book): return "duplicate.\(book.id.uuidString)"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .create: return String.appLocalized(SettingsKey.booksNew)
+        case .rename: return String.appLocalized(SettingsKey.booksRename)
+        case .duplicate: return String.appLocalized(SettingsKey.booksDuplicate)
+        }
+    }
+
+    var initialName: String {
+        switch self {
+        case .create: return ""
+        case .rename(let book): return book.name
+        case .duplicate(let book): return String.appFormatted(SettingsKey.booksCopyName, book.name)
+        }
+    }
+}
+
+/// Ledger management. Books are never deleted: archiving only removes them
+/// from the switcher, and every mutation goes through `BookManager` followed
+/// by the one save/refresh path below.
+struct BookManagementView: View {
+    @Environment(BookState.self) private var bookState
+    @Environment(\.modelContext) private var modelContext
+
+    @State private var editor: BookEditor?
+    @State private var draftName = ""
+    @State private var pendingArchive: BookModel?
+    @State private var showArchived = false
+
+    private var activeBooks: [BookModel] { bookState.availableBooks.filter { !$0.archived } }
+    private var archivedBooks: [BookModel] { bookState.availableBooks.filter(\.archived) }
+    private var trimmedName: String {
+        draftName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        List {
+            Section(String.appLocalized(SettingsKey.rowBooks)) {
+                ForEach(activeBooks) { book in
+                    bookRow(book, archived: false)
+                }
+            }
+
+            if !archivedBooks.isEmpty {
+                Section {
+                    if showArchived {
+                        ForEach(archivedBooks) { book in
+                            bookRow(book, archived: true)
+                        }
+                    }
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) { showArchived.toggle() }
+                    } label: {
+                        Text(showArchived
+                             ? String.appLocalized("Hide")
+                             : String.appLocalized("Show"))
+                    }
+                } header: {
+                    Text(String.appLocalized("Archived"))
+                }
+            }
+        }
+        .navigationTitle(String.appLocalized(SettingsKey.rowBooks))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    openEditor(.create)
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel(String.appLocalized(SettingsKey.booksNew))
+            }
+        }
+        .sheet(item: $editor) { mode in
+            NavigationStack {
+                Form {
+                    TextField(String.appLocalized("Name"), text: $draftName)
+                }
+                .navigationTitle(mode.title)
+                #if os(iOS)
+                .navigationBarTitleDisplayMode(.inline)
+                #endif
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(String.appLocalized("Cancel")) { closeEditor() }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(String.appLocalized("Save")) { saveEditor(mode) }
+                            .disabled(trimmedName.isEmpty)
+                    }
+                }
+            }
+        }
+        .alert(String.appLocalized(SettingsKey.booksArchiveTitle), isPresented: Binding(
+            get: { pendingArchive != nil },
+            set: { if !$0 { pendingArchive = nil } }
+        )) {
+            Button(String.appLocalized("Archive")) {
+                if let pendingArchive { setArchived(pendingArchive, true) }
+            }
+            Button(String.appLocalized("Cancel"), role: .cancel) { pendingArchive = nil }
+        } message: {
+            Text(String.appLocalized(SettingsKey.booksArchiveMessage))
+        }
+    }
+
+    @ViewBuilder
+    private func bookRow(_ book: BookModel, archived: Bool) -> some View {
+        let current = bookState.currentID == book.id
+        HStack(spacing: 8) {
+            Button {
+                // The one switch path: it also drops cached data, updates
+                // widgets and notifies observers of the selection change.
+                BookState.shared.select(book.id)
+            } label: {
+                HStack {
+                    Text(book.name.isEmpty ? BookModel.defaultName : book.name)
+                        .foregroundStyle(Color.PrimaryText)
+                        .lineLimit(1)
+                    Spacer(minLength: SBSpace.extraSmall)
+                    if current {
+                        Image(systemName: "checkmark")
+                            .foregroundStyle(Color.accentColor)
+                            .accessibilityHidden(true)
+                    } else {
+                        Text(String.appLocalized(archived ? SettingsKey.booksOpen : "Switch"))
+                            .font(.footnote)
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(current ? AccessibilityTraits.isSelected : [])
+
+            Menu {
+                Button(String.appLocalized(SettingsKey.booksRename)) { openEditor(.rename(book)) }
+                Button(String.appLocalized(SettingsKey.booksDuplicate)) { openEditor(.duplicate(book)) }
+                if archived {
+                    Button(String.appLocalized("Unarchive")) { setArchived(book, false) }
+                } else if book.id != BookModel.defaultID {
+                    // Legacy rows fall back to this book, so there is no
+                    // archive action for it (BookManager guards this too).
+                    Button(String.appLocalized("Archive")) { pendingArchive = book }
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .foregroundStyle(Color.SubtitleText)
+            }
+        }
+    }
+
+    private func openEditor(_ mode: BookEditor) {
+        draftName = mode.initialName
+        editor = mode
+    }
+
+    private func closeEditor() {
+        editor = nil
+        draftName = ""
+    }
+
+    private func saveEditor(_ mode: BookEditor) {
+        let name = trimmedName
+        guard !name.isEmpty else { return }
+        switch mode {
+        case .create: BookManager.create(name: name, in: modelContext)
+        case .rename(let book): BookManager.rename(book, to: name)
+        case .duplicate(let book): BookManager.duplicate(book, name: name, in: modelContext)
+        }
+        finishMutation()
+    }
+
+    private func setArchived(_ book: BookModel, _ archived: Bool) {
+        // A rejected write means the default book: nothing changed to refresh.
+        guard BookManager.setArchived(book, archived: archived) else { return }
+        finishMutation()
+    }
+
+    /// Every book mutation ends here: persist first, then rebuild cached view
+    /// models and the book list, repaint widgets, and dismiss/reset the editor.
+    private func finishMutation() {
+        guard DataRepository.shared.save() else { return }
+        DataRefreshCenter.refreshAll()
+        WidgetCenter.shared.reloadAllTimelines()
+        closeEditor()
+        pendingArchive = nil
     }
 }
 

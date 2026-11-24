@@ -65,18 +65,24 @@ struct InsightsProvider: AppIntentTimelineProvider {
     public typealias Entry = InsightsWidgetEntry
 
     func placeholder(in _: Context) -> InsightsWidgetEntry {
-        makeEntry(from: loadData(type: .week, income: true), duration: .week, income: true)
+        let selected = BookSelection.current()
+        return makeEntry(from: loadData(type: .week, income: true, selected: selected),
+                         duration: .week, income: true)
     }
 
     func snapshot(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> InsightsWidgetEntry {
         let income = configuration.income == .income
-        return makeEntry(from: loadData(type: configuration.duration, income: income),
+        // Widgets live outside the app process: read the App Group selection
+        // once per entry so every series in this snapshot uses one book.
+        let selected = BookSelection.current()
+        return makeEntry(from: loadData(type: configuration.duration, income: income, selected: selected),
                          duration: configuration.duration, income: income)
     }
 
     func timeline(for configuration: InsightsWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
         let income = configuration.income == .income
-        let entry = makeEntry(from: loadData(type: configuration.duration, income: income),
+        let selected = BookSelection.current()
+        let entry = makeEntry(from: loadData(type: configuration.duration, income: income, selected: selected),
                               duration: configuration.duration, income: income)
         return Timeline(entries: [entry], policy: .atEnd)
     }
@@ -98,7 +104,7 @@ struct InsightsProvider: AppIntentTimelineProvider {
         )
     }
 
-    func loadData(type: InsightsTimePeriod, income: Bool) -> InsightsSnapshot {
+    func loadData(type: InsightsTimePeriod, income: Bool, selected: UUID) -> InsightsSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
         let now = Date.now
         var calendar = Calendar(identifier: .gregorian)
@@ -109,12 +115,14 @@ struct InsightsProvider: AppIntentTimelineProvider {
             return .empty
         }
 
-        let allTransactions = (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? []
+        let allTransactions = BookScope.scoped(
+            (try? context.fetch(FetchDescriptor<TransactionModel>())) ?? [], \.bookID, selected: selected)
         let transactions = allTransactions.filter {
             let counted = income ? $0.countsAsIncome : ($0.countsAsSpend || $0.isRefund)
             return counted && $0.wrappedDate >= period.startDate && $0.wrappedDate <= now
         }
-        let allCategories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
+        let allCategories = BookScope.scoped(
+            (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? [], \.bookID, selected: selected)
         let categories = allCategories.filter { $0.income == income }
 
         let series = bucketSeries(for: transactions, period: period, calendar: calendar, income: income)

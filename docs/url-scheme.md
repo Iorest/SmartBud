@@ -20,6 +20,11 @@ smartbud://add?amount=12.5&type=expense&category=餐饮&note=午饭
 | `date` | 否 | `yyyy-MM-dd`、完整 ISO 8601，或无时区的 `yyyy-MM-ddTHH:mm[:ss]`（按设备时区解释）；缺省为现在，给了但解析失败会回 `invalid_date` |
 | `reimbursable` | 否 | `1` / `true` 表示这是待报销支出 |
 | `discount` | 否 | 优惠金额，只作展示（`amount` 仍是你实际付的钱） |
+| `book` | 否 | 账本 UUID。存在则先切到该账本再写入；缺省（旧链接）保持当前账本 |
+
+所有路由都接受可选的 `book` 参数（例如 `smartbud://open?tab=insights&book=<UUID>`），
+小组件的跳转链接会自动带上它。传入不存在的 UUID 会忽略该参数，继续按当前账本处理；
+已归档账本的 UUID 有效，因为归档数据仍然可以查看。
 
 ## 其它路由
 

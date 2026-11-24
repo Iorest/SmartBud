@@ -71,6 +71,20 @@ enum BookScope {
     static func matches(_ rowBookID: UUID?, selected: UUID) -> Bool {
         (rowBookID ?? BookModel.defaultID) == selected
     }
+
+    /// Transfers have no book column of their own: they follow the account
+    /// they were made from (or into, if the source is gone).
+    static func matches(_ transfer: TransferModel, selected: UUID) -> Bool {
+        matches(transfer.source?.bookID ?? transfer.destination?.bookID, selected: selected)
+    }
+
+    /// Generic filter for the many screens that hold an unscoped `@Query`
+    /// array. Keeping the rule here makes "nil means default book" uniform.
+    static func scoped<T>(
+        _ rows: [T], _ bookID: KeyPath<T, UUID?>, selected: UUID
+    ) -> [T] {
+        rows.filter { matches($0[keyPath: bookID], selected: selected) }
+    }
 }
 
 // MARK: - Transaction
@@ -639,3 +653,114 @@ enum BookMigration {
         return written
     }
 }
+
+// MARK: - Book management
+
+/// Structural operations on books. All methods only touch `ModelContext`;
+/// callers decide when to save, so a failed save rolls the whole operation
+/// back instead of leaving half a copied book behind.
+@MainActor
+enum BookManager {
+
+    @discardableResult
+    static func create(name: String, icon: String = "", in context: ModelContext) -> BookModel {
+        let book = BookModel(name: name, icon: icon, order: nextOrder(in: context))
+        context.insert(book)
+        return book
+    }
+
+    static func rename(_ book: BookModel, to name: String) {
+        book.name = name
+    }
+
+    /// The default book is the fallback for legacy rows and old backups;
+    /// archiving it would strand those rows with no way back.
+    @discardableResult
+    static func setArchived(_ book: BookModel, archived: Bool) -> Bool {
+        guard book.id != BookModel.defaultID || !archived else { return false }
+        book.archived = archived
+        return true
+    }
+
+    /// Copies the *structure* of a book (categories, accounts, budgets and
+    /// templates) into a new one. Transactions and transfers are deliberately
+    /// not copied, matching the reference product: a new book starts empty.
+    @discardableResult
+    static func duplicate(_ source: BookModel, name: String, in context: ModelContext) -> BookModel {
+        let target = BookModel(
+            name: name, icon: source.icon, type: source.type, order: nextOrder(in: context))
+        context.insert(target)
+        let bookID = target.id
+
+        var categoryMap: [UUID: CategoryModel] = [:]
+        for category in rows(CategoryModel.self, in: context, book: source.id) {
+            let copy = CategoryModel(
+                name: category.name, emoji: category.emoji, colour: category.colour,
+                income: category.income, order: category.order, bookID: bookID)
+            context.insert(copy)
+            categoryMap[category.id] = copy
+        }
+
+        for account in rows(AccountModel.self, in: context, book: source.id) {
+            let copy = AccountModel(
+                name: account.name, emoji: account.emoji, colour: account.colour,
+                kind: account.kind, currencyCode: account.currencyCode,
+                openingBalance: account.openingBalance, order: account.order, bookID: bookID)
+            copy.hidden = account.hidden
+            copy.archived = account.archived
+            context.insert(copy)
+        }
+
+        for budget in rows(BudgetModel.self, in: context, book: source.id) {
+            let copy = BudgetModel(
+                amount: budget.amount, startDate: budget.startDate,
+                type: budget.type, bookID: bookID)
+            copy.green = budget.green
+            copy.category = budget.category.flatMap { categoryMap[$0.id] }
+            context.insert(copy)
+        }
+
+        for mainBudget in rows(MainBudgetModel.self, in: context, book: source.id) {
+            let copy = MainBudgetModel(
+                amount: mainBudget.amount, startDate: mainBudget.startDate,
+                type: mainBudget.type, bookID: bookID)
+            copy.green = mainBudget.green
+            context.insert(copy)
+        }
+
+        for template in rows(TemplateTransactionModel.self, in: context, book: source.id) {
+            let copy = TemplateTransactionModel(
+                note: template.note ?? "",
+                category: template.category.flatMap { categoryMap[$0.id] },
+                income: template.income, amount: template.amount, order: template.order,
+                repeatType: template.recurringType,
+                repeatCoefficient: template.recurringCoefficient, bookID: bookID)
+            context.insert(copy)
+        }
+        return target
+    }
+
+    private static func nextOrder(in context: ModelContext) -> Int {
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        return (books.map(\.order).max() ?? -1) + 1
+    }
+
+    private static func rows<T: PersistentModel>(
+        _ type: T.Type, in context: ModelContext, book: UUID
+    ) -> [T] where T: BookScoped {
+        let all = (try? context.fetch(FetchDescriptor<T>())) ?? []
+        return all.filter { BookScope.matches($0.bookID, selected: book) }
+    }
+}
+
+/// Models carrying a `bookID` scalar, used by `BookManager.rows`.
+protocol BookScoped {
+    var bookID: UUID? { get set }
+}
+
+extension TransactionModel: BookScoped {}
+extension CategoryModel: BookScoped {}
+extension AccountModel: BookScoped {}
+extension BudgetModel: BookScoped {}
+extension MainBudgetModel: BookScoped {}
+extension TemplateTransactionModel: BookScoped {}

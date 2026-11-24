@@ -9,6 +9,8 @@ import AppIntents
 import Foundation
 import SwiftUI
 
+/// No explicit book parameter: insights and category filters resolve against
+/// the device's current book.
 struct GetInsightsIntent: AppIntent {
     static let title: LocalizedStringResource = "Get Insights"
 
@@ -52,10 +54,10 @@ struct GetInsightsIntent: AppIntent {
     func perform() async throws -> some ReturnsValue<Double> & ShowsSnippetView & ProvidesDialog {
         guard !AppLockGate.isLocked else { throw AppLockError.locked }
 
+        let scope = ShortcutBookScope.current
         let categories: [CategoryModel]
         let optionalIncome: Bool?
         let typeInt: Int
-
         switch type {
         case .net:
             categories = []
@@ -64,7 +66,9 @@ struct GetInsightsIntent: AppIntent {
         case .income:
             if let unwrappedCategories = incomeCategories {
                 categories = unwrappedCategories.compactMap { category in
-                    CategoryViewModel.shared.findCategory(id: category.id)
+                    guard let match = CategoryViewModel.shared.findCategory(id: category.id),
+                          scope.contains(match.bookID) else { return nil }
+                    return match
                 }
             } else {
                 categories = []
@@ -75,7 +79,9 @@ struct GetInsightsIntent: AppIntent {
         case .spent:
             if let unwrappedCategories = expenseCategories {
                 categories = unwrappedCategories.compactMap { category in
-                    CategoryViewModel.shared.findCategory(id: category.id)
+                    guard let match = CategoryViewModel.shared.findCategory(id: category.id),
+                          scope.contains(match.bookID) else { return nil }
+                    return match
                 }
             } else {
                 categories = []

@@ -9,8 +9,8 @@
 //  - `smartbud://add?amount=12.5&type=expense&category=餐饮&note=午饭`
 //    Creates one transaction. Optional: `type` (expense|income), `category`,
 //    `account` (name or uuid), `date` (yyyy-MM-dd or ISO 8601), `note`,
-//    `reimbursable` (1/true), `discount`.
-//  - `smartbud://search?q=coffee` — opens the log with search focused.
+//    `reimbursable` (1/true), `discount`, `book` (optional ledger UUID; old
+//    links without it keep the current book).
 //  - `smartbud://open?tab=insights` — switches tab (`log`/`insights`/
 //    `budget`/`settings`). `smartbud://insights` and `smartbud://budget`
 //    still work from the Shortcuts actions shipped earlier.
@@ -89,6 +89,13 @@ struct DeepLinkRequest: Equatable {
         let cleaned = raw.replacingOccurrences(of: ",", with: ".")
         guard let value = Double(cleaned), value.isFinite, value > 0 else { return 0 }
         return min(value, Money.maxAmount)
+    }
+
+    /// Optional ledger for this request. A malformed id is treated as absent
+    /// so a hand-written link still behaves like a legacy URL.
+    var bookID: UUID? {
+        guard let raw = parameters["book"], !raw.isEmpty else { return nil }
+        return UUID(uuidString: raw)
     }
 
     var isIncome: Bool {

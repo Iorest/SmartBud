@@ -14,6 +14,12 @@ import SwiftUI
 
 struct FutureListView: View {
     @Query private var fetchedResults: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    /// Upcoming rows from another book must never appear in this ledger.
+    private var scopedResults: [TransactionModel] {
+        BookScope.scoped(fetchedResults, \.bookID, selected: bookState.currentID)
+    }
 
     var filterMode: Bool
     var limitedMode: Bool
@@ -28,12 +34,12 @@ struct FutureListView: View {
             let startOfToday = calendar.startOfDay(for: Date.now)
             let horizon = calendar.date(byAdding: .weekOfYear, value: 2, to: startOfToday) ?? .distantFuture
 
-            items = fetchedResults.filter {
+            items = scopedResults.filter {
                 let date = $0.wrappedDate > Date.now ? $0.wrappedDate : $0.nextTransactionDate
                 return date < horizon
             }
         } else {
-            items = fetchedResults
+            items = scopedResults
         }
 
         return items.sorted {

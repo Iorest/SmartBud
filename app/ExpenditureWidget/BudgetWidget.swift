@@ -36,8 +36,8 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
     public typealias Entry = BudgetWidgetEntry
 
     func placeholder(in _: Context) -> BudgetWidgetEntry {
-        let loaded = loadData(budgetId: "")
-
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: "", selected: selected)
         return BudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -48,8 +48,8 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> BudgetWidgetEntry {
-        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
-
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "", selected: selected)
         return BudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -60,8 +60,10 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: BudgetWidgetConfigurationIntent, in _: Context) async -> Timeline<Entry> {
-        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "")
-
+        // Read the App Group selection once: a budget configured in another
+        // book must show "no longer exists" until it is reconfigured here.
+        let selected = BookSelection.current()
+        let loaded = loadData(budgetId: configuration.budget?.id.uuidString ?? "", selected: selected)
         let entry = BudgetWidgetEntry(
             date: Date(),
             totalSpent: loaded.total,
@@ -75,7 +77,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         return timeline
     }
 
-    func loadData(budgetId: String) -> WidgetBudgetSnapshot {
+    func loadData(budgetId: String, selected: UUID) -> WidgetBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         guard let uuid = UUID(uuidString: budgetId) else {
@@ -87,7 +89,8 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         // `fetchLimit = 1` + `first(where:)` used to return nil as soon as
         // the user had more than one budget; filter in the store instead.
         let budgetDesc = FetchDescriptor<BudgetModel>(predicate: #Predicate { $0.id == fetchId })
-        guard let budgetModel = (try? context.fetch(budgetDesc))?.first else {
+        guard let budgetModel = (try? context.fetch(budgetDesc))?.first,
+              BookScope.matches(budgetModel.bookID, selected: selected) else {
             let budget = HoldingBudget(type: 1, emoji: "failed", name: "", colour: "", budgetAmount: 0)
             return WidgetBudgetSnapshot(total: 0, percentage: 0, budget: budget)
         }
@@ -100,7 +103,7 @@ struct BudgetWidgetProvider: AppIntentTimelineProvider {
         let now = Date.now
 
         let txnDesc = FetchDescriptor<TransactionModel>()
-        let allTransactions = (try? context.fetch(txnDesc)) ?? []
+        let allTransactions = BookScope.scoped((try? context.fetch(txnDesc)) ?? [], \.bookID, selected: selected)
         let filtered = allTransactions.filter {
             guard let categoryID = budgetCategory?.id else { return false }
             return ($0.countsAsSpend || $0.isRefund)

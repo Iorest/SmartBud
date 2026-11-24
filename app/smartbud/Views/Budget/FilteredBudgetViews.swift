@@ -9,7 +9,15 @@ struct FilteredCategoryDayBudgetView: View {
     /// up. The rows are filtered below, in memory, through the same three
     /// rules every other spend view uses.
     @Query private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
     @Environment(OverallTransactionManager.self) private var transactionManager
+
+    /// Spend totals must not include another ledger's rows, even when the
+    /// day/category filters would otherwise match them.
+    private var scopedTransactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
+
     @Binding var totalSpent: Double
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     var currencySymbol: String {
@@ -22,7 +30,7 @@ struct FilteredCategoryDayBudgetView: View {
 
     /// Normal spend plus refunds (a refund reduces its category's spend).
     private var transactions: [TransactionModel] {
-        fetchedTransactions.filter { txn in
+        scopedTransactions.filter { txn in
             guard (txn.day ?? .distantPast) == date, txn.wrappedDate <= .now else {
                 return false
             }
@@ -95,6 +103,11 @@ struct FilteredBudgetView: View {
     /// Same split as the day view: the query stays unfiltered, the period and
     /// the spend/refund rule are applied below (see the comment there).
     @Query private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    private var scopedTransactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     @Binding var totalSpent: Double
     var date: Date
@@ -105,7 +118,7 @@ struct FilteredBudgetView: View {
     private let periodEnd: Date
 
     private var transactions: [TransactionModel] {
-        fetchedTransactions.filter { txn in
+        scopedTransactions.filter { txn in
             let when = txn.wrappedDate
             guard when >= periodStart, when < periodEnd else { return false }
             guard txn.countsAsSpend || txn.isRefund else { return false }

@@ -15,6 +15,7 @@ import Foundation
 /// account balance and the statistics behind the user's back.
 struct TransactionSnapshot {
     let id: UUID
+    let bookID: UUID?
     let note: String
     let amount: Double
     let date: Date
@@ -58,6 +59,7 @@ struct TransactionSnapshot {
     @MainActor
     init(_ txn: TransactionModel) {
         id = txn.id
+        bookID = txn.bookID
         note = txn.wrappedNote
         amount = txn.amount
         date = txn.wrappedDate
@@ -107,7 +109,8 @@ struct TransactionSnapshot {
             transferFeeOf: transferFeeOf,
             adjustment: adjustment,
             merchant: merchant,
-            merchantKey: merchantKey
+            merchantKey: merchantKey,
+            bookID: bookID
         )
         txn.id = id
         txn.onceRecurring = onceRecurring

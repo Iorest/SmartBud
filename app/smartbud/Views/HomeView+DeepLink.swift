@@ -40,6 +40,20 @@ extension HomeView {
     func handleDeepLink(_ url: URL) -> Bool {
         guard let request = DeepLinkRequest(url: url) else { return false }
 
+        // A widget link carries the book it was rendered for. Validate the id
+        // before switching so a stale link cannot strand the user in an empty
+        // ledger; an unknown id is ignored and the current book is kept.
+        // Archived books stay valid because their data must remain readable.
+        // A locked session must not change books either: the write is refused
+        // below, and switching behind the lock would prepare a hidden ledger.
+        let sessionLocked = appLockVM.isAppLockEnabled && !appLockVM.isAppUnLocked
+        if !sessionLocked,
+           let requested = request.bookID,
+           DataRepository.shared.fetch(BookModel.self).contains(where: { $0.id == requested }) {
+            BookState.shared.reloadBooks()
+            BookState.shared.select(requested)
+        }
+
         switch request.action {
         case .add:
             // Writing while the privacy lock is up would let a shortcut put
@@ -82,13 +96,16 @@ extension HomeView {
         categoryVM.load()
         accountVM.load()
 
+        let selected = BookState.shared.currentID
         let income = request.isIncome
-        let pool = income ? categoryVM.incomeCategories : categoryVM.expenseCategories
+        let pool = BookScope.scoped(
+            income ? categoryVM.incomeCategories : categoryVM.expenseCategories,
+            \.bookID, selected: selected)
         let category = request.categoryName.flatMap { name in
             pool.first { $0.name.localizedCaseInsensitiveCompare(name) == .orderedSame }
                 ?? pool.first { $0.name.localizedStandardContains(name) }
         }
-        let account = resolveAccount(request.accountHint)
+        let account = resolveAccount(request.accountHint, selected: selected)
         let note = request.note.isEmpty ? (category?.wrappedName ?? "") : request.note
 
         // Same rule as the entry form: no rate means no 1:1 guess frozen into
@@ -134,18 +151,23 @@ extension HomeView {
 
     /// Matches an account by name or uuid, falling back to the default one so
     /// an automation never has to know which account exists.
-    private func resolveAccount(_ hint: String?) -> AccountModel? {
-        guard let hint, !hint.isEmpty else {
-            return accountVM.defaultAccount(lastUsedID: nil)
+    private func resolveAccount(_ hint: String?, selected: UUID) -> AccountModel? {
+        // The view models are already book-scoped; this second pass keeps a
+        // saved `account=` hint from another book from becoming a cross-book
+        // write if a cached list was populated before a switch.
+        let candidates = BookScope.scoped(accountVM.accounts, \.bookID, selected: selected)
+        let fallback = accountVM.defaultAccount(lastUsedID: nil).flatMap { account in
+            candidates.first { $0.id == account.id }
         }
-        if let match = accountVM.accounts.first(where: {
+        guard let hint, !hint.isEmpty else { return fallback }
+        if let match = candidates.first(where: {
             $0.id.uuidString.caseInsensitiveCompare(hint) == .orderedSame
         }) {
             return match
         }
-        return accountVM.accounts.first {
+        return candidates.first {
             $0.name.localizedCaseInsensitiveCompare(hint) == .orderedSame
-        } ?? accountVM.defaultAccount(lastUsedID: nil)
+        } ?? fallback
     }
 
     private func fireCallback(_ base: URL?, items: [URLQueryItem]) {

@@ -61,8 +61,14 @@ final class AccountViewModel {
         // Balances and totals convert with the user's rates, so refresh them
         // alongside the accounts (cheap: one small fetch).
         CurrencyRateStore.shared.load()
-        accounts = repo.fetch(AccountModel.self, sort: [SortDescriptor(\.order)])
+        // Only the active ledger's rows belong on this screen. Transfers have
+        // no book column; `BookScope` resolves theirs through the accounts.
+        let selected = BookState.shared.currentID
+        accounts = BookScope.scoped(
+            repo.fetch(AccountModel.self, sort: [SortDescriptor(\.order)]),
+            \.bookID, selected: selected)
         transfers = repo.fetch(TransferModel.self, sort: [SortDescriptor(\.date, order: .reverse)])
+            .filter { BookScope.matches($0, selected: selected) }
     }
 
     var visibleAccounts: [AccountModel] {
@@ -95,11 +101,17 @@ final class AccountViewModel {
     func balance(for account: AccountModel) -> Double {
         AccountBalance.current(
             opening: account.openingBalance,
-            transactions: (account.transactions ?? []).map {
-                (amount: $0.amount, income: $0.income, isRefund: $0.isRefund)
-            },
-            transfersIn: (account.incomingTransfers ?? []).reduce(0) { $0 + $1.receivedAmount },
-            transfersOut: (account.outgoingTransfers ?? []).reduce(0) { $0 + $1.outgoingTotal }
+            transactions: (account.transactions ?? [])
+                .filter { BookScope.matches($0.bookID, selected: BookState.shared.currentID) }
+                .map {
+                    (amount: $0.amount, income: $0.income, isRefund: $0.isRefund)
+                },
+            transfersIn: (account.incomingTransfers ?? [])
+                .filter { BookScope.matches($0, selected: BookState.shared.currentID) }
+                .reduce(0) { $0 + $1.receivedAmount },
+            transfersOut: (account.outgoingTransfers ?? [])
+                .filter { BookScope.matches($0, selected: BookState.shared.currentID) }
+                .reduce(0) { $0 + $1.outgoingTotal }
         )
     }
 
@@ -118,6 +130,11 @@ final class AccountViewModel {
         date: Date,
         note: String
     ) -> TransferModel? {
+        // Both ends must be in the active ledger, or the fee row and the
+        // transfer could land in different books.
+        guard BookScope.matches(source.bookID, selected: BookState.shared.currentID),
+              BookScope.matches(destination.bookID, selected: BookState.shared.currentID)
+        else { return nil }
         guard source.id != destination.id, amount > 0, amount.isFinite else { return nil }
         guard fee >= 0, fee.isFinite else { return nil }
 
@@ -165,7 +182,8 @@ final class AccountViewModel {
             kind: draft.kind.rawValue,
             currencyCode: draft.currencyCode,
             openingBalance: draft.openingBalance,
-            order: (accounts.last?.order ?? 0) + 1
+            order: (accounts.last?.order ?? 0) + 1,
+            bookID: BookState.shared.currentID
         )
         repo.insert(account)
         repo.save()
@@ -237,7 +255,8 @@ final class AccountViewModel {
             income: delta > 0,
             amount: abs(delta),
             date: date,
-            adjustment: true
+            adjustment: true,
+            bookID: BookState.shared.currentID
         )
         repo.insert(transaction)
         repo.save()
@@ -251,6 +270,7 @@ final class AccountViewModel {
     func defaultAccount(lastUsedID: String?) -> AccountModel? {
         if let lastUsedID,
            let match = accounts.first(where: { $0.id.uuidString == lastUsedID }),
+           BookScope.matches(match.bookID, selected: BookState.shared.currentID),
            !match.archived, !match.hidden {
             return match
         }
@@ -262,7 +282,11 @@ extension AccountModel {
     @Transient var wrappedName: String { name }
     @Transient var wrappedEmoji: String { emoji }
     @Transient var wrappedColour: String { colour }
+    /// A linked transaction can still belong to another ledger (e.g. after an
+    /// import), so the relationship is scoped here too. `BookSelection` reads
+    /// the same persisted value `BookState` publishes on the main actor.
     @Transient var allTransactions: [TransactionModel] {
-        (transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate }
+        BookScope.scoped((transactions ?? []).sorted { $0.wrappedDate < $1.wrappedDate },
+                         \.bookID, selected: BookSelection.current())
     }
 }
