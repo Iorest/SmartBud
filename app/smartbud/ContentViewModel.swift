@@ -126,6 +126,11 @@ final class ContentViewModel {
         // launch after the update keeps the same numbers as the last one.
         ReimbursementLedger.migrate(in: DataRepository.shared.context)
 
+        // Books are structural: an upgrade always has a default book, and
+        // legacy rows without a book id are assigned to it before any
+        // statistics render, so the first launch keeps the old numbers.
+        BookMigration.migrate(in: DataRepository.shared.context)
+
         reconcileNotificationAuthorization()
     }
 

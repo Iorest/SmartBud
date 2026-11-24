@@ -11,6 +11,68 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+// MARK: - Book
+
+/// One ledger. `bookID` on scoped rows is a plain UUID rather than a
+/// relationship: it keeps CloudKit lightweight migration to a scalar field
+/// and lets later query filtering work without loading the book object.
+@Model
+final class BookModel {
+    /// Fixed id of the ledger every pre-multi-book row belongs to. Stable so
+    /// a backup restored on another device, and CloudKit rows arriving from
+    /// another device, resolve to the same book.
+    static let defaultID: UUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+    static let defaultName = "Default Book"
+
+    var id: UUID = UUID()
+    var name: String = ""
+    /// Asset name of the chosen icon; empty means the default icon.
+    var icon: String = ""
+    /// 0 = standard ledger. Other values are reserved for the reference
+    /// product's book types so adding one later is a data-only change.
+    var type: Int = 0
+    var order: Int = 0
+    var archived: Bool = false
+    var dateCreated: Date = Date.now
+
+    init(name: String = defaultName, icon: String = "", type: Int = 0,
+         order: Int = 0, archived: Bool = false) {
+        self.id = UUID()
+        self.name = name
+        self.icon = icon
+        self.type = type
+        self.order = order
+        self.archived = archived
+        self.dateCreated = .now
+    }
+}
+
+/// The device-local "which book am I looking at" setting. Stored as a string
+/// so a missing or corrupt value falls back to the default book without a
+/// migration of user defaults.
+enum BookSelection {
+    static let key = "currentBookID"
+
+    static func current(in defaults: UserDefaults = .appGroup) -> UUID {
+        guard let raw = defaults.string(forKey: key), let id = UUID(uuidString: raw) else {
+            return BookModel.defaultID
+        }
+        return id
+    }
+
+    static func select(_ id: UUID, in defaults: UserDefaults = .appGroup) {
+        defaults.set(id.uuidString, forKey: key)
+    }
+}
+
+/// Shared read rule until every screen filters on a book (TELE-21). A legacy
+/// row with no `bookID` belongs to the default book, not to "no book".
+enum BookScope {
+    static func matches(_ rowBookID: UUID?, selected: UUID) -> Bool {
+        (rowBookID ?? BookModel.defaultID) == selected
+    }
+}
+
 // MARK: - Transaction
 
 @Model
@@ -19,6 +81,9 @@ final class TransactionModel {
     var date: Date?
     var day: Date?
     var id: UUID = UUID()
+    /// Ledger this row belongs to. `nil` only on rows written before books
+    /// existed; `BookMigration` turns those into the default book.
+    var bookID: UUID? = BookModel.defaultID
     var income: Bool = false
     var month: Date?
     var note: String?
@@ -116,7 +181,8 @@ final class TransactionModel {
         transferFeeOf: UUID? = nil,
         adjustment: Bool = false,
         merchant: String? = nil,
-        merchantKey: String? = nil
+        merchantKey: String? = nil,
+        bookID: UUID? = BookModel.defaultID
     ) {
         self.id = UUID()
         self.note = note
@@ -134,6 +200,7 @@ final class TransactionModel {
         self.adjustment = adjustment
         self.merchant = merchant
         self.merchantKey = merchantKey
+        self.bookID = bookID
         self.income = income
         self.amount = amount
         self.date = date
@@ -272,6 +339,8 @@ final class CategoryModel {
     var income: Bool = false
     var order: Int = 0
     var dateCreated: Date = Date.now
+    /// Ledger this category belongs to; see `TransactionModel.bookID`.
+    var bookID: UUID? = BookModel.defaultID
     /// CloudKit requires all to-many relationships to be optional.
     var transactions: [TransactionModel]?
     var budget: BudgetModel?
@@ -283,7 +352,8 @@ final class CategoryModel {
         emoji: String = "",
         colour: String = "",
         income: Bool = false,
-        order: Int = 0
+        order: Int = 0,
+        bookID: UUID? = BookModel.defaultID
     ) {
         self.id = UUID()
         self.name = name
@@ -291,6 +361,7 @@ final class CategoryModel {
         self.colour = colour
         self.income = income
         self.order = order
+        self.bookID = bookID
         self.dateCreated = .now
     }
 }
@@ -329,6 +400,8 @@ final class AccountModel {
     var archived: Bool = false
     var order: Int = 0
     var dateCreated: Date = Date.now
+    /// Ledger this account belongs to; see `TransactionModel.bookID`.
+    var bookID: UUID? = BookModel.defaultID
     /// CloudKit requires all to-many relationships to be optional.
     var transactions: [TransactionModel]?
     var outgoingTransfers: [TransferModel]?
@@ -341,7 +414,8 @@ final class AccountModel {
         kind: Int = 0,
         currencyCode: String = "",
         openingBalance: Double = 0,
-        order: Int = 0
+        order: Int = 0,
+        bookID: UUID? = BookModel.defaultID
     ) {
         self.id = UUID()
         self.name = name
@@ -352,6 +426,7 @@ final class AccountModel {
         self.openingBalance = openingBalance
         self.order = order
         self.dateCreated = .now
+        self.bookID = bookID
     }
 }
 
@@ -449,13 +524,17 @@ final class BudgetModel {
     var type: Int = 0
     var green: Bool = false
     var category: CategoryModel?
+    /// Ledger this budget belongs to; see `TransactionModel.bookID`.
+    var bookID: UUID? = BookModel.defaultID
 
-    init(amount: Double = 0, startDate: Date = Date.now, type: Int = 3) {
+    init(amount: Double = 0, startDate: Date = Date.now, type: Int = 3,
+         bookID: UUID? = BookModel.defaultID) {
         self.id = UUID()
         self.amount = amount
         self.startDate = startDate
         self.dateCreated = Date.now
         self.type = type
+        self.bookID = bookID
     }
 }
 
@@ -479,13 +558,17 @@ final class MainBudgetModel {
     var startDate: Date = Date.now
     var dateCreated: Date = Date.now
     var type: Int = 0
+    /// Ledger this budget belongs to; see `TransactionModel.bookID`.
+    var bookID: UUID? = BookModel.defaultID
     var green: Bool = false
 
-    init(amount: Double = 0, startDate: Date = Date.now, type: Int = 3) {
+    init(amount: Double = 0, startDate: Date = Date.now, type: Int = 3,
+         bookID: UUID? = BookModel.defaultID) {
         self.amount = amount
         self.startDate = startDate
         self.dateCreated = .now
         self.type = type
+        self.bookID = bookID
     }
 }
 
@@ -494,5 +577,65 @@ extension MainBudgetModel {
 
     @Transient var endDate: Date {
         BudgetPeriod.endDate(from: startDate, type: type)
+    }
+}
+
+// MARK: - Book migration
+
+/// Runs on every launch. Creates the structural default book and converts
+/// legacy rows (whose `bookID` is nil after lightweight migration) to it.
+/// Reentrant: a second run writes nothing, so it is safe on every cold start
+/// and after an import.
+enum BookMigration {
+
+    @MainActor
+    @discardableResult
+    static func migrate(in context: ModelContext) -> Int {
+        var written = ensureDefaultBook(in: context) ? 1 : 0
+        written += backfillBookIDs(in: context)
+
+        let defaults = UserDefaults.appGroup
+        if defaults.string(forKey: BookSelection.key) == nil {
+            BookSelection.select(BookModel.defaultID, in: defaults)
+        }
+        if written > 0 { try? context.save() }
+        return written
+    }
+
+    /// Inserts the default book if missing. Does not save, so an import can
+    /// call it inside its own single save/rollback boundary.
+    @discardableResult
+    @MainActor
+    static func ensureDefaultBook(in context: ModelContext) -> Bool {
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        guard !books.contains(where: { $0.id == BookModel.defaultID }) else { return false }
+        let book = BookModel(name: BookModel.defaultName)
+        book.id = BookModel.defaultID
+        context.insert(book)
+        return true
+    }
+
+    /// Legacy rows have no book id. They all belong to the default book, and
+    /// assigning it never changes an amount, date or relationship.
+    @MainActor
+    @discardableResult
+    static func backfillBookIDs(in context: ModelContext) -> Int {
+        var written = 0
+        func fill<T: PersistentModel>(
+            _ type: T.Type, value: (T) -> UUID?, assign: (T, UUID) -> Void
+        ) {
+            let rows = (try? context.fetch(FetchDescriptor<T>())) ?? []
+            for row in rows where value(row) == nil {
+                assign(row, BookModel.defaultID)
+                written += 1
+            }
+        }
+        fill(TransactionModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        fill(CategoryModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        fill(AccountModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        fill(BudgetModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        fill(MainBudgetModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        fill(TemplateTransactionModel.self, value: { $0.bookID }) { $0.bookID = $1 }
+        return written
     }
 }

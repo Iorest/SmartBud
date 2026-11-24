@@ -78,6 +78,7 @@ final class DataRepository {
     /// set between a `for: schema` call and a `try? ModelContainer(...)`
     /// without restating each `@Model` type at every fallback level.
     static let schema = Schema([
+        BookModel.self,
         TransactionModel.self,
         CategoryModel.self,
         AccountModel.self,
@@ -290,6 +291,7 @@ final class DataRepository {
         for budget in fetch(BudgetModel.self) { context.delete(budget) }
         for mainBudget in fetch(MainBudgetModel.self) { context.delete(mainBudget) }
         for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
+        for book in fetch(BookModel.self) { context.delete(book) }
         return save()
     }
 
