@@ -127,6 +127,15 @@ struct TransactionView: View {
         dynamicTypeSize >= .xxLarge
     }
 
+    /// Cards warn but still allow the write. The projected balance uses the
+    /// amount currently on the pad, so the hint appears before saving.
+    private var creditWouldExceedLimit: Bool {
+        guard let account, !income,
+              let usage = accountVM.creditUsage(for: account) else { return false }
+        let limit = usage.used + usage.available
+        return accountVM.balance(for: account) - padVM.price < -limit
+    }
+
     @State var padVM = NumberPadViewModel(numberEntryType: 1, hapticType: 1)
     @AppStorage("numberEntryType", store: .appGroup)
     var numberEntryType: Int = 1

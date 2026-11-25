@@ -20,6 +20,9 @@ struct AccountDraft {
     let kind: AccountKind
     let currencyCode: String
     let openingBalance: Double
+    let creditLimit: Double?
+    let statementDay: Int?
+    let dueDay: Int?
 }
 
 /// The three account types the editor offers. Stored as `Int` on the model so
@@ -88,15 +91,33 @@ final class AccountViewModel {
         accounts.filter { $0.hidden && !$0.archived }
     }
 
-    /// Sum of every visible account, the number a "net worth" header shows.
-    /// Sum of visible accounts converted to the app's base currency, so a
-    /// mixed-currency list still yields one meaningful number.
-    var totalBalance: Double {
-        visibleAccounts.reduce(0) { total, account in
-            total + CurrencyRateStore.shared.convertToBase(
-                balance(for: account), from: account.resolvedCurrencyCode)
+    private var netWorthEntries: [NetWorth.Account] {
+        accounts.map { account in
+            NetWorth.Account(
+                balance: CurrencyRateStore.shared.convertToBase(
+                    balance(for: account), from: account.resolvedCurrencyCode),
+                isLiability: CreditCard.isCredit(kind: account.kind),
+                included: !account.hidden && !account.archived
+            )
         }
     }
+
+    /// Assets the user can actually spend: credit cards are liabilities even
+    /// when their balance is (temporarily) positive.
+    var totalAssets: Double {
+        netWorthEntries.reduce(0) { $0 + ($1.included && !$1.isLiability ? $1.balance : 0) }
+    }
+
+    /// Positive magnitudes of visible card debt.
+    var totalDebt: Double {
+        netWorthEntries.reduce(0) { $0 + ($1.included && $1.isLiability ? abs($1.balance) : 0) }
+    }
+
+    var netWorth: Double { NetWorth.total(netWorthEntries) }
+
+    /// The account-list header keeps its old name; the number is now net
+    /// worth (cash minus card debt) rather than a raw sum of all balances.
+    var totalBalance: Double { netWorth }
 
     func balance(for account: AccountModel) -> Double {
         AccountBalance.current(
@@ -113,6 +134,33 @@ final class AccountViewModel {
                 .filter { BookScope.matches($0, selected: BookState.shared.currentID) }
                 .reduce(0) { $0 + $1.outgoingTotal }
         )
+    }
+
+    /// Used / available credit and the amount due in the current statement
+    /// cycle. Nil when this is not a card or no limit is configured — an
+    /// unlimited card has no over-limit warning to show.
+    func creditUsage(for account: AccountModel) -> CreditUsage? {
+        guard CreditCard.isCredit(kind: account.kind) else { return nil }
+        let terms = CreditCard.sanitized(limit: account.creditLimit,
+                                         statementDay: account.statementDay,
+                                         dueDay: account.dueDay,
+                                         kind: account.kind)
+        guard let limit = terms.limit else { return nil }
+
+        var cycleSpend = 0.0
+        if let cycle = CreditCard.cycle(statementDay: terms.statementDay, at: .now) {
+            let now = Date.now
+            let rows = (account.transactions ?? []).filter { txn in
+                guard let date = txn.date else { return false }
+                return BookScope.matches(txn.bookID, selected: BookState.shared.currentID)
+                    && date >= cycle.start && date < cycle.end && date <= now
+                    && !txn.adjustment
+                    && (txn.isRefund || (!txn.income && txn.refundOf == nil))
+            }
+            cycleSpend = rows.reduce(0) { $0 + ($1.isRefund ? -$1.amount : $1.amount) }
+        }
+        return CreditCard.usage(limit: limit, balance: balance(for: account),
+                                cycleSpend: cycleSpend)
     }
 
     /// Transfers touching `account`, newest first.
@@ -175,6 +223,10 @@ final class AccountViewModel {
 
     @discardableResult
     func create(_ draft: AccountDraft) -> AccountModel {
+        let terms = CreditCard.sanitized(limit: draft.creditLimit,
+                                         statementDay: draft.statementDay,
+                                         dueDay: draft.dueDay,
+                                         kind: draft.kind.rawValue)
         let account = AccountModel(
             name: draft.name,
             emoji: draft.emoji,
@@ -183,7 +235,10 @@ final class AccountViewModel {
             currencyCode: draft.currencyCode,
             openingBalance: draft.openingBalance,
             order: (accounts.last?.order ?? 0) + 1,
-            bookID: BookState.shared.currentID
+            bookID: BookState.shared.currentID,
+            creditLimit: terms.limit,
+            statementDay: terms.statementDay,
+            dueDay: terms.dueDay
         )
         repo.insert(account)
         repo.save()
@@ -192,12 +247,19 @@ final class AccountViewModel {
     }
 
     func update(_ account: AccountModel, with draft: AccountDraft) {
+        let terms = CreditCard.sanitized(limit: draft.creditLimit,
+                                         statementDay: draft.statementDay,
+                                         dueDay: draft.dueDay,
+                                         kind: draft.kind.rawValue)
         account.name = draft.name
         account.emoji = draft.emoji
         account.colour = draft.colour
         account.kind = draft.kind.rawValue
         account.currencyCode = draft.currencyCode
         account.openingBalance = draft.openingBalance
+        account.creditLimit = terms.limit
+        account.statementDay = terms.statementDay
+        account.dueDay = terms.dueDay
         repo.save()
         load()
     }

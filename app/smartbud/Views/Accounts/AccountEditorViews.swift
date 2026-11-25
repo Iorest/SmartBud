@@ -29,6 +29,9 @@ struct AccountEditor: View {
     /// treats its amounts.
     @State private var followsBaseCurrency = false
     @State private var openingBalance = ""
+    @State private var creditLimit = ""
+    @State private var statementDay = 0
+    @State private var dueDay = 0
 
     @AppStorage("currency", store: .appGroup) private var baseCurrency: String =
         Locale.current.currency?.identifier ?? "USD"
@@ -99,6 +102,36 @@ struct AccountEditor: View {
                         "The balance before any transaction is recorded in this account."))
                 }
 
+
+                if kind == .credit {
+                    Section(String.appLocalized("Credit Card")) {
+                        HStack {
+                            Text(String.appLocalized("Credit Limit"))
+                            Spacer()
+                            TextField("0", text: $creditLimit)
+                                #if os(iOS)
+                                .keyboardType(.decimalPad)
+                                #endif
+                                .multilineTextAlignment(.trailing)
+                                .monospacedDigit()
+                        }
+                        Picker(String.appLocalized("Statement Day"), selection: $statementDay) {
+                            Text(String.appLocalized("None")).tag(0)
+                            ForEach(1...31, id: \.self) { day in
+                                Text("\(day)").tag(day)
+                            }
+                        }
+                        Picker(String.appLocalized("Due Day"), selection: $dueDay) {
+                            Text(String.appLocalized("None")).tag(0)
+                            ForEach(1...31, id: \.self) { day in
+                                Text("\(day)").tag(day)
+                            }
+                        }
+                    } footer: {
+                        Text(String.appLocalized(
+                            "Card debt is a liability. Repayments are transfers, not expenses."))
+                    }
+                }
                 Section(String.appLocalized("Colour")) {
                     colourGrid
                 }
@@ -151,6 +184,9 @@ struct AccountEditor: View {
     private func loadValues() {
         guard let account else {
             openingBalance = ""
+            creditLimit = ""
+            statementDay = 0
+            dueDay = 0
             currencyCode = baseCurrency
             followsBaseCurrency = false
             return
@@ -164,18 +200,25 @@ struct AccountEditor: View {
         openingBalance = account.openingBalance == 0
             ? ""
             : String(format: "%.2f", account.openingBalance)
+        creditLimit = account.creditLimit.map { String(format: "%.2f", $0) } ?? ""
+        statementDay = account.statementDay ?? 0
+        dueDay = account.dueDay ?? 0
     }
 
     private func save() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         let opening = Double(openingBalance.replacingOccurrences(of: ",", with: ".")) ?? 0
         guard opening.isFinite else { return }
+        let limit = Double(creditLimit.replacingOccurrences(of: ",", with: "."))
 
         let draft = AccountDraft(name: trimmedName, emoji: emoji, colour: colour,
                                  kind: kind,
                                  currencyCode: followsBaseCurrency && currencyCode == baseCurrency
                                      ? "" : currencyCode,
-                                 openingBalance: opening)
+                                 openingBalance: opening,
+                                 creditLimit: limit,
+                                 statementDay: statementDay == 0 ? nil : statementDay,
+                                 dueDay: dueDay == 0 ? nil : dueDay)
         if let account {
             accountVM.update(account, with: draft)
         } else {

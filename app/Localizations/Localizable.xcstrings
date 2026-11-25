@@ -16886,6 +16886,76 @@
         }
       }
     },
+    "Credit Limit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Credit Limit" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "信用额度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "信用額度" } }
+      }
+    },
+    "Statement Day" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Statement Day" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "账单日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳單日" } }
+      }
+    },
+    "Due Day" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Due Day" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还款日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "還款日" } }
+      }
+    },
+    "Card debt is a liability. Repayments are transfers, not expenses." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Card debt is a liability. Repayments are transfers, not expenses." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "信用卡欠款属于负债；还款是转账，不是支出。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "信用卡欠款屬於負債；還款是轉帳，不是支出。" } }
+      }
+    },
+    "Net Worth" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Net Worth" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "净资产" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "淨資產" } }
+      }
+    },
+    "Total Assets" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Total Assets" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "总资产" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "總資產" } }
+      }
+    },
+    "Total Debt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Total Debt" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "总负债" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "總負債" } }
+      }
+    },
+    "Used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Used" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已用" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已用" } }
+      }
+    },
+    "Available" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Available" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "可用" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "可用" } }
+      }
+    },
+    "Due this cycle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Due this cycle" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本期应还" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本期應還" } }
+      }
+    },
     "Hide" : {
       "localizations" : {
         "en" : {

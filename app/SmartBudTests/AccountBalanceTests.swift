@@ -70,3 +70,81 @@ struct BalanceAdjustmentInvariantTests {
         #expect(AccountBalance.adjustmentDelta(target: 100, current: .infinity) == nil)
     }
 }
+
+// MARK: - Credit cards and net worth
+
+@Suite("Credit card balance and net worth")
+struct CreditCardLedgerTests {
+    @Test("Card spend then transfer repayment returns to zero with one expense row")
+    func repaymentIsTransferNotExpense() {
+        let cardRows = [(amount: 100.0, income: false, isRefund: false)]
+        let afterSpend = AccountBalance.current(opening: 0, transactions: cardRows)
+        let afterRepayment = AccountBalance.current(opening: 0, transactions: cardRows,
+                                                    transfersIn: 100)
+        #expect(afterSpend == -100)
+        #expect(afterRepayment == 0)
+        #expect(cardRows.filter { !$0.income && !$0.isRefund }.count == 1)
+        #expect(Money.cents(cardRows.reduce(0) { $0 + $1.amount }) == Money.cents(100))
+    }
+
+    @Test("Available credit is the limit minus the absolute balance, over limit is flagged")
+    func availableCredit() throws {
+        let normal = try #require(CreditCard.usage(limit: 5000, balance: -100, cycleSpend: 100))
+        #expect(normal.used == 100)
+        #expect(normal.available == 4900)
+        #expect(normal.dueThisCycle == 100)
+        #expect(!normal.isOverLimit)
+
+        let over = try #require(CreditCard.usage(limit: 5000, balance: -6000, cycleSpend: 6000))
+        #expect(over.available == -1000)
+        #expect(over.isOverLimit)
+        #expect(CreditCard.usage(limit: nil, balance: -100, cycleSpend: 100) == nil)
+    }
+
+    @Test("The statement cycle starts on the statement day and rolls monthly")
+    func statementCycle() throws {
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        let formatter = ISO8601DateFormatter()
+        let before = try #require(formatter.date(from: "2026-11-24T12:00:00Z"))
+        let after = try #require(formatter.date(from: "2026-11-25T12:00:00Z"))
+
+        let previous = try #require(CreditCard.cycle(statementDay: 25, at: before, calendar: utc))
+        #expect(previous.start == formatter.date(from: "2026-10-25T00:00:00Z"))
+        #expect(previous.end == formatter.date(from: "2026-11-25T00:00:00Z"))
+
+        let current = try #require(CreditCard.cycle(statementDay: 25, at: after, calendar: utc))
+        #expect(current.start == formatter.date(from: "2026-11-25T00:00:00Z"))
+        #expect(current.end == formatter.date(from: "2026-12-25T00:00:00Z"))
+        #expect(CreditCard.cycle(statementDay: nil, at: after, calendar: utc) == nil)
+    }
+
+    @Test("Net worth excludes hidden and archived accounts and subtracts liabilities")
+    func netWorth() {
+        let accounts: [NetWorth.Account] = [
+            .init(balance: 1000, isLiability: false, included: true),
+            .init(balance: 500, isLiability: false, included: false), // hidden
+            .init(balance: -300, isLiability: true, included: true),
+            .init(balance: -200, isLiability: true, included: false)  // archived
+        ]
+        #expect(NetWorth.total(accounts) == 700)
+        #expect(NetWorth.total([]) == 0)
+    }
+
+    @Test("Credit fields are clamped and cleared on non-credit accounts")
+    func sanitizesTerms() {
+        let card = CreditCard.sanitized(limit: 5000, statementDay: 25, dueDay: 40, kind: 2)
+        #expect(card.limit == 5000)
+        #expect(card.statementDay == 25)
+        #expect(card.dueDay == nil)
+
+        let bad = CreditCard.sanitized(limit: -1, statementDay: 0, dueDay: 3, kind: 2)
+        #expect(bad.limit == nil)
+        #expect(bad.statementDay == nil)
+
+        let debit = CreditCard.sanitized(limit: 5000, statementDay: 25, dueDay: 3, kind: 1)
+        #expect(debit.limit == nil)
+        #expect(debit.statementDay == nil)
+        #expect(debit.dueDay == nil)
+    }
+}

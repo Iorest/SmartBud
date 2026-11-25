@@ -176,6 +176,12 @@ enum ExportSchema {
         var archived: Bool?
         /// Ledger this account belongs to. Nil in pre-book backups.
         var bookID: UUID? = nil
+        /// Credit-only terms. Optional: older backups and non-card accounts
+        /// leave them nil; the coordinator assigns the next schema number
+        /// when these fields ship.
+        var creditLimit: Double? = nil
+        var statementDay: Int? = nil
+        var dueDay: Int? = nil
     }
 
     struct RateDTO: Codable {

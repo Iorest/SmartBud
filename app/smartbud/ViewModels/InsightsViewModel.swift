@@ -43,6 +43,11 @@ final class InsightsViewModel {
     /// three months ago is still money the user is owed.
     var pendingReimbursements: [TransactionModel] = []
     var pendingReimbursementTotal: Double = 0
+    /// Point-in-time totals, not period figures. Card debt is a liability, so
+    /// it is excluded from assets and subtracted from net worth.
+    var netWorth: Double = 0
+    var totalAssets: Double = 0
+    var totalDebt: Double = 0
     var currency: String = Locale.current.currency?.identifier ?? "USD"
     var showCents: Bool = true
     var currencySymbol: String = Locale.appLocale.currencySymbol ?? "$"
@@ -94,6 +99,15 @@ final class InsightsViewModel {
         showCents = defaults.object(forKey: "showCents") as? Bool ?? true
         currency = AppBaseCurrency.code(in: defaults)
         currencySymbol = Locale.appCurrencySymbol(forCurrencyCode: currency)
+
+        // Net worth is point-in-time and lives on the account view model.
+        // A direct refresh (tab appearance, period change) does not go through
+        // DataRefreshCenter, so load here instead of showing a stale snapshot.
+        let accounts = AccountViewModel.shared
+        accounts.load()
+        netWorth = accounts.netWorth
+        totalAssets = accounts.totalAssets
+        totalDebt = accounts.totalDebt
 
         let (periodStart, periodEnd) = getPeriodDateRange(for: selectedPeriod)
         let all = bookScopedTransactions()
