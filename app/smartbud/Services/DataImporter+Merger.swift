@@ -24,7 +24,6 @@ struct BackupMerger {
     var accountsByID: [UUID: AccountModel] = [:]
     var accountsByName: [String: AccountModel] = [:]
     var booksByID: [UUID: BookModel] = [:]
-    var installmentPlansByID: [UUID: InstallmentPlanModel] = [:]
 
     init(context: ModelContext) {
         self.context = context
@@ -79,7 +78,6 @@ struct BackupMerger {
             plan.executedPeriods = max(0, min(dto.executedPeriods, plan.periods))
             if let created = dto.dateCreated { plan.dateCreated = created }
             context.insert(plan)
-            installmentPlansByID[dto.id] = plan
             summary.installmentPlans += 1
         }
     }

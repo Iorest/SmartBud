@@ -37,12 +37,19 @@ enum InstallmentLedger {
     /// Bring a plan's generated rows in line with its current terms.
     ///
     /// Booked periods (`index <= executedPeriods`) are immutable: editing an
-    /// amount or a date after the fact must not rewrite a bill the user has
-    /// already recorded. Future periods have no rows until they are booked,
-    /// so editing the plan simply changes the shape of the next bill.
+    /// amount, a date or even the term must never rewrite or delete a bill the
+    /// user has already recorded. Only missing non-zero rows are created.
+    /// `sync` never deletes a row — `prepareForDeletion` is the only path that
+    /// removes generated bills, and it runs when the plan itself is deleted.
     /// Calling this twice never creates a second row for the same period.
     @discardableResult
     static func sync(_ plan: InstallmentPlanModel, in context: ModelContext) -> SyncResult {
+        // A plan cannot have fewer periods than it has already booked. An
+        // imported or hand-edited value otherwise leaves an out-of-range
+        // counter that changes on the next export/import round trip.
+        if plan.periods < plan.executedPeriods {
+            plan.periods = plan.executedPeriods
+        }
         let schedule = InstallmentPolicy.schedule(principal: plan.principal, fee: plan.fee,
                                                   periods: plan.periods, firstDate: plan.firstDate)
         guard !schedule.isEmpty else { return SyncResult() }
@@ -54,6 +61,10 @@ enum InstallmentLedger {
 
         for period in schedule where period.index <= booked {
             for kind in [1, 2] {
+                let amount = kind == 2 ? period.principal : period.fee
+                // A zero-amount bill is not a transaction: the app rejects
+                // ¥0 rows on entry, and interest-free plans have no fee row.
+                guard Money.cents(amount) > 0 else { continue }
                 let key = "\(period.index)-\(kind)"
                 if keys.contains(key) {
                     result.kept += 1
@@ -63,11 +74,6 @@ enum InstallmentLedger {
                 keys.insert(key)
                 result.created += 1
             }
-        }
-        // A shorter term or a rewound counter must not leave stale rows behind.
-        for row in existing where row.installmentPeriod > booked {
-            context.delete(row)
-            result.removed += 1
         }
         return result
     }

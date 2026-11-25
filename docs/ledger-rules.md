@@ -103,8 +103,9 @@ isInstallmentPrincipal // installmentKind == 2；本金行不计费用、不计�
 所以升级前后数字不变；旧备份导入时按同一规则推导。
 
 分期字段旧行默认 `installmentOf = nil` / `installmentPeriod = 0` /
-`installmentKind = 0`，按普通行处理。备份里的 `installmentPlans` 是可选段，
-旧备份导入时按"无计划"处理；本段是纯新增，无需迁移，也不占 schema 版本号。
+`installmentKind = 0`，按普通行处理。备份的 **schema 10** 新增 `installmentPlans` 段与
+三个 `installment*` 交易字段；v9 备份没有这些字段，导入时按"无计划"处理，仍可读取。
+旧版 App（schema 9）遇到 v10 备份会按 `newerVersion` 拒绝导入，避免静默丢弃计划数据。
 
 ## 金额的两个版本
 

@@ -64,6 +64,47 @@ struct InstallmentLedgerTests {
         #expect(InstallmentLedger.rows(for: result, in: context).count == 6)
     }
 
+    @Test("Shrinking the term never deletes a booked bill")
+    func shrinkingTermKeepsBookedBills() throws {
+        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
+        #expect(InstallmentLedger.sync(result, in: context).created == 6)
+
+        result.periods = 2
+        InstallmentLedger.sync(result, in: context)
+        #expect(result.periods == 3)
+        #expect(result.executedPeriods == 3)
+        #expect(InstallmentLedger.rows(for: result, in: context).count == 6)
+    }
+
+    @Test("Rewinding the counter never deletes a booked bill")
+    func rewindingCounterKeepsBookedBills() throws {
+        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
+        #expect(InstallmentLedger.sync(result, in: context).created == 6)
+
+        result.executedPeriods = 2
+        InstallmentLedger.sync(result, in: context)
+        #expect(InstallmentLedger.rows(for: result, in: context).count == 6)
+    }
+
+    @Test("An interest-free plan writes no zero-yuan fee rows")
+    func interestFreePlanHasNoFeeRows() throws {
+        let result = plan(principal: 100, fee: 0, periods: 3, executed: 3)
+        #expect(InstallmentLedger.sync(result, in: context).created == 3)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        #expect(rows.count == 3)
+        #expect(rows.allSatisfy { $0.installmentKind == 2 && $0.amount > 0 })
+    }
+
+    @Test("A cent-scale plan writes no zero-yuan principal rows")
+    func tinyPlanSkipsZeroRows() throws {
+        let result = plan(principal: 0.02, fee: 0, periods: 3, executed: 3)
+        #expect(InstallmentLedger.sync(result, in: context).created == 1)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        #expect(rows.count == 1)
+        #expect(rows.first?.installmentPeriod == 3)
+        #expect(Money.cents(rows.first?.amount ?? 0) == Money.cents(0.02))
+    }
+
     @Test("Editing a plan re-prices only unbooked periods")
     func bookedRowsImmutable() throws {
         let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
