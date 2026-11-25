@@ -46,6 +46,9 @@ struct CreditTerms: Equatable {
 }
 
 struct CreditUsage: Equatable {
+    /// Real limit. Do not reconstruct it from `used + available`: overpayment
+    /// makes that sum larger and widens the over-limit warning band.
+    let limit: Double
     /// Outstanding debt only: a positive (overpaid) card balance uses 0.
     let used: Double
     /// `limit - debt + overpayment`, i.e. `limit + balance`. Negative means
@@ -79,6 +82,7 @@ enum CreditCard {
         // Overpayment raises available credit; it is not "used" credit.
         let available = Money.double(Money.cents(limit + balance))
         return CreditUsage(
+            limit: limit,
             used: used,
             available: available,
             dueThisCycle: min(debt, spend),

@@ -132,7 +132,7 @@ struct TransactionView: View {
     var creditWouldExceedLimit: Bool {
         guard let account, !income,
               let usage = accountVM.creditUsage(for: account) else { return false }
-        let limit = usage.used + usage.available
+        let limit = usage.limit
         return accountVM.balance(for: account) - padVM.price < -limit
     }
 

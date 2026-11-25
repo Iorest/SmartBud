@@ -110,6 +110,25 @@ struct CreditCardLedgerTests {
         #expect(CreditCard.usage(limit: nil, balance: -100, cycleSpend: 100) == nil)
     }
 
+    @Test("An overpaid card warns at its real limit, not limit plus twice the overpayment")
+    func overpaidCardWarningUsesRealLimit() throws {
+        let balance = 1000.0
+        let usage = try #require(CreditCard.usage(limit: 5000, balance: balance, cycleSpend: 0))
+        #expect(usage.limit == 5000)
+        #expect(usage.available == 6000)
+        // Reconstructing the limit from used + available yields 6000 here,
+        // which moves the warning threshold to 7000 and misses 6001.
+        #expect(usage.used + usage.available == 6000)
+
+        func legacyWouldExceed(_ amount: Double) -> Bool {
+            balance - amount < -(usage.used + usage.available)
+        }
+        func wouldExceed(_ amount: Double) -> Bool { balance - amount < -usage.limit }
+        #expect(!legacyWouldExceed(6001))
+        #expect(!wouldExceed(6000))
+        #expect(wouldExceed(6001))
+    }
+
     @Test("The statement cycle starts on the statement day and rolls monthly")
     func statementCycle() throws {
         var utc = Calendar(identifier: .gregorian)
