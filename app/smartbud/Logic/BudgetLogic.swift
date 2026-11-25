@@ -217,6 +217,10 @@ enum SubscriptionDetector {
     static let minimumOccurrences = 3
     static let amountTolerance = 0.10
     static let gapTolerance = 0.20
+    /// A merchant whose last charge is older than this many cadence periods
+    /// is treated as stopped. Adoption backfills from that last charge, so a
+    /// stale suggestion could otherwise write years of phantom expenses.
+    static let freshnessPeriods = 2
     /// Average days per calendar month; February's 28 and March's 31 both fit.
     private static let daysPerMonth = 30.44
 
@@ -224,8 +228,10 @@ enum SubscriptionDetector {
         _ entries: [SubscriptionEntry],
         now: Date = .now,
         excluding: Set<String> = [],
+        activeWithinPeriods: Int? = nil,
         calendar: Calendar = .current
     ) -> [SubscriptionSuggestion] {
+        let activePeriods = activeWithinPeriods ?? freshnessPeriods
         let candidates = entries.filter {
             !$0.merchantKey.isEmpty && !$0.isRecurring && !excluding.contains($0.merchantKey)
                 && $0.amount.isFinite && $0.amount > 0 && $0.date <= now
@@ -253,6 +259,13 @@ enum SubscriptionDetector {
             guard let best, let cadence = stableCadence(best, calendar: calendar) else { continue }
 
             let last = best[best.count - 1]
+            // Two monthly periods means a one-tap adoption backfills at most
+            // one or two missed charges, not years of invented spending.
+            if activePeriods > 0,
+               let deadline = calendar.date(byAdding: .month,
+                                            value: cadence.months * activePeriods,
+                                            to: last.date),
+               now > deadline { continue }
             suggestions.append(SubscriptionSuggestion(
                 merchantKey: key,
                 merchantName: last.merchantName,

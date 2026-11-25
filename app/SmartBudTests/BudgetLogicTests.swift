@@ -341,7 +341,12 @@ struct SubscriptionDetectionTests {
     }
 
     private var anchor: Date {
-        calendar.date(from: DateComponents(year: 2025, month: 1, day: 5,
+        calendar.date(from: DateComponents(year: 2027, month: 3, day: 5,
+                                           hour: 12, minute: 0, second: 0))!
+    }
+
+    private var nowDate: Date {
+        calendar.date(from: DateComponents(year: 2027, month: 4, day: 1,
                                            hour: 12, minute: 0, second: 0))!
     }
 
@@ -378,44 +383,42 @@ struct SubscriptionDetectionTests {
     /// is printed so the PR can quote actual counts instead of a percentage.
     private var fixture: [Group] {
         [
-            group("p1_month_plain", [30, 30, 30], months: [0, 1, 2], positive: true),
-            group("p2_month_jitter", [29.5, 30.4, 30], months: [0, 1, 2],
+            group("p1_month_plain", [30, 30, 30], months: [-2, -1, 0], positive: true),
+            group("p2_month_jitter", [29.5, 30.4, 30], months: [-2, -1, 0],
                   shifts: [-1, 1, 0], positive: true),
-            group("p3_month_four", [12, 12.5, 11.8, 12.1], months: [0, 1, 2, 3], positive: true),
-            group("p4_month_noise", [20, 20, 20, 75, 20, 20], months: [0, 1, 2, 3, 4, 5],
+            group("p3_month_four", [12, 12.5, 11.8, 12.1], months: [-3, -2, -1, 0], positive: true),
+            group("p4_month_noise", [75, 20, 20, 20, 20, 20], months: [-5, -4, -3, -2, -1, 0],
                   positive: true),
-            group("p5_quarter_plain", [90, 90, 90], months: [0, 3, 6], positive: true),
-            group("p6_quarter_jitter", [88, 92, 90.5], months: [0, 3, 6],
+            group("p5_quarter_plain", [90, 90, 90], months: [-6, -3, 0], positive: true),
+            group("p6_quarter_jitter", [88, 92, 90.5], months: [-6, -3, 0],
                   shifts: [2, -1, 0], positive: true),
-            group("p7_quarter_four", [45, 45.5, 44.8, 45.2], months: [0, 3, 6, 9], positive: true),
-            group("p8_year_plain", [360, 360, 360], months: [0, 12, 24], positive: true),
-            group("p9_year_jitter", [355, 366, 360], months: [0, 12, 24],
+            group("p7_quarter_four", [45, 45.5, 44.8, 45.2], months: [-9, -6, -3, 0], positive: true),
+            group("p8_year_plain", [360, 360, 360], months: [-24, -12, 0], positive: true),
+            group("p9_year_jitter", [355, 366, 360], months: [-24, -12, 0],
                   shifts: [0, 1, -1], positive: true),
-            group("p10_month_long", [15, 15.2, 14.9, 15.1, 15], months: [0, 1, 2, 3, 4],
+            group("p10_month_long", [15, 15.2, 14.9, 15.1, 15], months: [-4, -3, -2, -1, 0],
                   positive: true),
 
-            group("n1_two_only", [20, 20], months: [0, 1], positive: false),
-            group("n2_irregular", [20, 20, 20], months: [0, 1, 5], positive: false),
-            group("n3_amount_drift", [20, 25, 32], months: [0, 1, 2], positive: false),
+            group("n1_two_only", [20, 20], months: [-1, 0], positive: false),
+            group("n2_irregular", [20, 20, 20], months: [-6, -5, -1], positive: false),
+            group("n3_amount_drift", [20, 25, 32], months: [-2, -1, 0], positive: false),
             Group(key: "n4_weekly",
                   rows: rows("n4_weekly", amounts: [10, 10, 10, 10],
-                             dates: [0, 7, 14, 21].map(dayDate)), isPositive: false),
-            group("n5_already_recurring", [30, 30, 30], months: [0, 1, 2],
+                             dates: [-21, -14, -7, 0].map(dayDate)), isPositive: false),
+            group("n5_already_recurring", [30, 30, 30], months: [-2, -1, 0],
                   recurring: true, positive: false),
-            group("", [30, 30, 30], months: [0, 1, 2], positive: false),
-            group("n7_bimonthly", [30, 30, 30], months: [0, 2, 4], positive: false),
-            group("n8_amount_spread", [20, 20, 26], months: [0, 1, 2], positive: false),
-            Group(key: "n9_sixty_days",
-                  rows: rows("n9_sixty_days", amounts: [30, 30, 30],
-                             dates: [0, 60, 120].map(dayDate)), isPositive: false),
-            group("n10_adopted", [30, 30, 30], months: [0, 1, 2], positive: false)
+            group("", [30, 30, 30], months: [-2, -1, 0], positive: false),
+            group("n7_bimonthly", [30, 30, 30], months: [-4, -2, 0], positive: false),
+            group("n8_amount_spread", [20, 20, 26], months: [-2, -1, 0], positive: false),
+            group("n9_stale_monthly", [30, 30, 30], months: [-30, -29, -28], positive: false),
+            group("n10_adopted", [30, 30, 30], months: [-2, -1, 0], positive: false)
         ]
     }
 
     @Test("20 groups: recall >= 80%, false positives <= 10%")
     func confusionMatrix() {
         let groups = fixture
-        let now = calendar.date(from: DateComponents(year: 2028, month: 1, day: 1))!
+        let now = nowDate
         let detected = Set(SubscriptionDetector.detect(
             groups.flatMap(\.rows), now: now,
             excluding: ["n10_adopted"], calendar: calendar).map(\.merchantKey))
@@ -436,7 +439,7 @@ struct SubscriptionDetectionTests {
     @Test("Cadence maps to the recurring coefficient used by the ledger")
     func cadences() {
         let groups = fixture
-        let now = calendar.date(from: DateComponents(year: 2028, month: 1, day: 1))!
+        let now = nowDate
         let suggestions = SubscriptionDetector.detect(groups.flatMap(\.rows),
                                                       now: now, calendar: calendar)
         let byKey = Dictionary(uniqueKeysWithValues: suggestions.map { ($0.merchantKey, $0) })
@@ -444,6 +447,16 @@ struct SubscriptionDetectionTests {
         #expect(byKey["p5_quarter_plain"]?.cadence.months == 3)
         #expect(byKey["p8_year_plain"]?.cadence.months == 12)
         #expect(byKey["p10_month_long"]?.occurrenceCount == 5)
+    }
+
+    @Test("A stopped merchant is not suggested even with a stable history")
+    func staleMerchantIsRejected() {
+        let stale = group("stale", [30, 30, 30], months: [-30, -29, -28],
+                          positive: false).rows
+        let fresh = group("fresh", [30, 30, 30], months: [-2, -1, 0],
+                          positive: true).rows
+        #expect(SubscriptionDetector.detect(stale, now: nowDate, calendar: calendar).isEmpty)
+        #expect(SubscriptionDetector.detect(fresh, now: nowDate, calendar: calendar).count == 1)
     }
 }
 
