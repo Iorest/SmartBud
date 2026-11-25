@@ -353,8 +353,9 @@ final class InsightsViewModel {
     /// the newest matching row becomes the source and missed periods are
     /// backfilled by the same catch-up path used by the editor.
     func adoptSubscription(_ suggestion: SubscriptionSuggestion) {
+        let id = suggestion.lastTransactionID
         guard let txn = repo.fetchOne(TransactionModel.self,
-                                      predicate: #Predicate { $0.id == suggestion.lastTransactionID }),
+                                      predicate: #Predicate { $0.id == id }),
               BookScope.matches(txn.bookID, selected: BookState.shared.currentID) else { return }
         txn.recurringType = 3
         txn.recurringCoefficient = suggestion.cadence.months
