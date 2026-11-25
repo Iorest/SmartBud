@@ -46,6 +46,16 @@ extension AccountListView {
         return code == currency ? kind : "\(kind) · \(code)"
     }
 
+    func creditUsageText(for account: AccountModel, usage: CreditUsage) -> String {
+        let code = account.resolvedCurrencyCode
+        let amount: (Double) -> String = {
+            Money.format($0, currencyCode: code, showsCents: showCents, locale: .appLocale)
+        }
+        return "\(String.appLocalized("Used")) \(amount(usage.used)) · "
+            + "\(String.appLocalized("Available")) \(amount(usage.available)) · "
+            + "\(String.appLocalized("Due this cycle")) \(amount(usage.dueThisCycle))"
+    }
+
     func transferRow(_ transfer: TransferModel) -> some View {
         HStack(spacing: SBSpace.small) {
             Image(systemName: "arrow.left.arrow.right")
@@ -97,6 +107,18 @@ extension AccountListView {
                 Text(kindLabel(account))
                     .font(.caption)
                     .foregroundStyle(Color.SubtitleText)
+                if let usage = accountVM.creditUsage(for: account) {
+                    HStack(spacing: 4) {
+                        Text(creditUsageText(for: account, usage: usage))
+                        if usage.isOverLimit {
+                            Text(String.appLocalized("Limit Exceeded"))
+                                .foregroundStyle(Color.AlertRed)
+                        }
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(Color.SubtitleText)
+                    .lineLimit(1)
+                }
             }
 
             Spacer(minLength: SBSpace.extraSmall)

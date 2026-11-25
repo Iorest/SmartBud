@@ -34,6 +34,8 @@ enum AccessibilityID {
     /// ("Expenses, $12.50"), which is what the E2E cases read back.
     static let insightsIncomeCard = "sb.insights.incomeCard"
     static let insightsExpenseCard = "sb.insights.expenseCard"
+    /// Point-in-time cash minus card debt. Separate from the period cards.
+    static let insightsNetWorthCard = "sb.insights.netWorthCard"
     static let budgetAddButton = "sb.budget.addButton"
     /// "Continue" on the new-budget sheet's first page.
     static let budgetContinue = "sb.budget.continueButton"
@@ -76,6 +78,8 @@ enum AccessibilityID {
     static let entryToast = "sb.entry.toast"
     /// Optional extras row.
     static let entryAccountChip = "sb.entry.accountChip"
+    /// Non-blocking warning shown when a card purchase would exceed its limit.
+    static let entryCreditLimitWarning = "sb.entry.creditLimitWarning"
     static let entryDiscountChip = "sb.entry.discountChip"
     static let entryClaimChip = "sb.entry.claimChip"
     static let entryDateButton = "sb.entry.dateButton"

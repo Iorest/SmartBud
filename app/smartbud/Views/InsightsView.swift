@@ -47,6 +47,14 @@ struct InsightsView: View {
                     header
                     dateRangeRow
 
+
+                    // Net worth is a balance-sheet figure, not a period
+                    // total, so it stays visible even in an empty period.
+                    if insightsVM.totalAssets != 0 || insightsVM.totalDebt != 0 {
+                        netWorthCard
+                            .padding(.horizontal, 30)
+                            .padding(.bottom, 13)
+                    }
                     // Claims are excluded from income and spend, so a period
                     // with nothing but claims would otherwise fall into the
                     // "no entries" state and hide the money the user is owed.
@@ -190,6 +198,35 @@ struct InsightsView: View {
         }
         .padding(.horizontal, 30)
         .padding(.bottom, 18)
+    }
+
+    private var netWorthCard: some View {
+        SBCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(String.appLocalized("Net Worth"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.SubtitleText)
+                Text(format(insightsVM.netWorth))
+                    .font(.title2.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(insightsVM.netWorth < 0 ? Color.AlertRed : Color.PrimaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                HStack(spacing: SBSpace.medium) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String.appLocalized("Total Assets"))
+                        Text(format(insightsVM.totalAssets)).monospacedDigit()
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String.appLocalized("Total Debt"))
+                        Text(format(insightsVM.totalDebt)).monospacedDigit()
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(Color.SubtitleText)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.insightsNetWorthCard)
     }
 
     // MARK: - Summary cards

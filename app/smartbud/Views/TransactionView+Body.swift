@@ -212,6 +212,16 @@ extension TransactionView {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 6)
+            if creditWouldExceedLimit {
+                HStack(spacing: 5) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text(String.appLocalized("Limit Exceeded"))
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.AlertRed)
+                .padding(.bottom, 6)
+                .accessibilityIdentifier(AccessibilityID.entryCreditLimitWarning)
+            }
 
             if usesLargeTextLayout {
                 // Large text: two chips side by side would truncate the date.
