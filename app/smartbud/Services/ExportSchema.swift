@@ -12,11 +12,11 @@ import Foundation
 
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
-    /// Old values are never reused.
-    static let version: Int = 9
-    /// Book fields added for multi-ledger support are optional, so old
-    /// backups still decode. The next version number is allocated by the
-    /// coordinator when the multi-ledger PR merges; do not take one here.
+    /// Old values are never reused. Schema 10 adds `installmentPlans` and the
+    /// three `installment*` fields on a transaction; v9 files have none of
+    /// them and still decode with an empty plan list. Number allocated by the
+    /// coordinator — do not take one here.
+    static let version: Int = 10
 
     struct Payload: Codable {
         var exportDate: Date

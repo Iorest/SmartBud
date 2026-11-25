@@ -242,6 +242,42 @@ struct DataImporterTests {
         #expect(file.rates.isEmpty)
     }
 
+    @Test("A schema 9 backup without plans still imports on schema 10")
+    func importsV9BackupWithoutInstallments() throws {
+        let json = """
+        {
+          "exportDate": "2026-01-02T03:04:05Z",
+          "appVersion": "9.0",
+          "schemaVersion": 9,
+          "transactions": [{
+            "id": "11111111-1111-1111-1111-111111111111",
+            "amount": 12.5,
+            "date": "2026-01-02T03:04:05Z",
+            "note": "lunch",
+            "income": false,
+            "recurringType": 0,
+            "recurringCoefficient": 0,
+            "onceRecurring": false
+          }],
+          "categories": [], "budgets": [], "mainBudgets": [],
+          "templates": [], "accounts": []
+        }
+        """
+        let file = try DataImporter.decode(Data(json.utf8))
+        #expect(file.schemaVersion == 9)
+        #expect(file.installmentPlans.isEmpty)
+
+        let summary = try DataImporter.apply(file, context: fixture.context)
+        #expect(summary.transactions == 1)
+        #expect(summary.installmentPlans == 0)
+
+        let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(rows.count == 1)
+        #expect(rows.first?.installmentOf == nil)
+        let plans = try fixture.context.fetch(FetchDescriptor<InstallmentPlanModel>())
+        #expect(plans.isEmpty)
+    }
+
     @Test("An empty device adopts the backup's settings")
     func adoptsSettingsWhenEmpty() throws {
         try fixture.withBaseCurrency("USD") {
