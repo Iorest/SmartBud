@@ -133,6 +133,7 @@ final class ContentViewModel {
         BookState.shared.reloadBooks()
 
         reconcileNotificationAuthorization()
+        refreshBudgetAlerts()
     }
 
     /// Called by `ContentView` when the scene transitions back to
@@ -140,6 +141,7 @@ final class ContentViewModel {
     /// `getNotificationSettings` block in two places.
     func handleSceneBecameActive() {
         reconcileNotificationAuthorization()
+        refreshBudgetAlerts()
         // Catches anything the remote-change notifications missed while the
         // app was suspended.
         DataRefreshCenter.refreshAll()
