@@ -165,6 +165,7 @@ struct ActualBudgetView: View {
             .onAppear {
                 budgetVM.load()
                 budgetVM.updateDates()
+                refreshBudgetAlerts()
             }
             .sheet(isPresented: $newBudget) {
                 BrandNewBudgetView(overallBudgetCreated: !mainBudget.isEmpty)

@@ -35,6 +35,11 @@ final class InsightsViewModel {
     /// Spend by merchant, largest first. Grouped on `merchantKey`, so the
     /// three spellings of one shop are one row.
     var merchantBreakdown: [MerchantSlice] = []
+    /// Period-end spend forecast for the active main budget. `nil` means the
+    /// feature is off or no usable budget exists — the UI hides the card.
+    var budgetForecast: BudgetForecast.Result?
+    /// Merchant groups with a stable monthly / quarterly / yearly charge.
+    var subscriptionSuggestions: [SubscriptionSuggestion] = []
     var todayTotal: Double = 0
     var todayTransactions: [TransactionModel] = []
     var yesterdayTotal: Double = 0
@@ -147,6 +152,7 @@ final class InsightsViewModel {
         // Same window as the totals above: `inPeriod` already drops future
         // rows, so a planned purchase never enters the merchant ranking.
         merchantBreakdown = MerchantSummary.breakdown(of: inPeriod)
+        refreshForecastAndSubscriptionSuggestions(all, now: now)
 
         let cal = configuredCalendar
         let today = cal.startOfDay(for: .now)
@@ -312,5 +318,68 @@ final class InsightsViewModel {
             let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
             return "\(formatRange(start)) - \(formatRange(endInclusive))"
         }
+    }
+
+    /// Forecasts and subscription suggestions share one switch and one ledger
+    /// snapshot. Both are derived data: nothing here is persisted.
+    private func refreshForecastAndSubscriptionSuggestions(_ all: [TransactionModel], now: Date) {
+        let defaults = UserDefaults.appGroup
+        budgetForecast = nil
+        subscriptionSuggestions = []
+        guard defaults.object(forKey: "budgetForecastEnabled") as? Bool ?? true else { return }
+
+        let budgetVM = BudgetViewModel.shared
+        budgetVM.load()
+        if let main = budgetVM.mainBudgets.first {
+            let start = BudgetRollover.roll(startDate: main.startDate, type: main.type) ?? main.startDate
+            let end = BudgetPeriod.endDate(from: start, type: main.type)
+            let entries = all.compactMap { txn -> BudgetForecastEntry? in
+                guard let date = txn.date, date >= start, date <= now else { return nil }
+                return BudgetForecastEntry(date: date, spend: txn.spendBaseAmount)
+            }
+            budgetForecast = BudgetForecast.estimate(
+                entries: entries,
+                budget: main.amount,
+                periodStart: start,
+                periodEnd: end,
+                excludeOutliers: defaults.object(forKey: "forecastExcludeOutliers") as? Bool ?? true,
+                now: now,
+                calendar: configuredCalendar)
+        }
+
+        let adopted = Set(defaults.array(forKey: "adoptedSubscriptionKeys") as? [String] ?? [])
+        subscriptionSuggestions = SubscriptionDetector.detect(
+            all.compactMap { txn -> SubscriptionEntry? in
+                guard txn.countsAsSpend, txn.spendBaseAmount > 0,
+                      let key = txn.merchantKey, !key.isEmpty else { return nil }
+                return SubscriptionEntry(id: txn.id, merchantKey: key,
+                                         merchantName: txn.merchant ?? key,
+                                         amount: txn.spendBaseAmount,
+                                         date: txn.wrappedDate,
+                                         isRecurring: txn.recurringType > 0)
+            },
+            now: now,
+            excluding: adopted,
+            calendar: configuredCalendar)
+    }
+
+    /// Turns a suggestion into the app's existing recurring-entry mechanism:
+    /// the newest matching row becomes the source and missed periods are
+    /// backfilled by the same catch-up path used by the editor.
+    func adoptSubscription(_ suggestion: SubscriptionSuggestion) {
+        let id = suggestion.lastTransactionID
+        guard let txn = repo.fetchOne(TransactionModel.self,
+                                      predicate: #Predicate { $0.id == id }),
+              BookScope.matches(txn.bookID, selected: BookState.shared.currentID) else { return }
+        txn.recurringType = 3
+        txn.recurringCoefficient = suggestion.cadence.months
+        txn.onceRecurring = true
+        TransactionViewModel.shared.processRecurring(txn)
+
+        var adopted = Set(UserDefaults.appGroup.array(forKey: "adoptedSubscriptionKeys")
+            as? [String] ?? [])
+        adopted.insert(suggestion.merchantKey)
+        UserDefaults.appGroup.set(Array(adopted), forKey: "adoptedSubscriptionKeys")
+        refreshAll()
     }
 }
