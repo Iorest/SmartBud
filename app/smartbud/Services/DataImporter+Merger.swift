@@ -70,8 +70,8 @@ struct BackupMerger {
                 periods: max(0, dto.periods),
                 firstDate: dto.firstDate,
                 note: dto.note,
-                account: resolveAccount(id: dto.accountId, name: dto.accountName),
-                category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
+                accountID: dto.accountId,
+                categoryID: dto.categoryID,
                 bookID: resolveBook(dto.bookID)
             )
             plan.id = dto.id

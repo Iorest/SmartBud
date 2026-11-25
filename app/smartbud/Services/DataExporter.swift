@@ -245,10 +245,10 @@ enum DataExporter {
                     periods: plan.periods,
                     firstDate: plan.firstDate,
                     executedPeriods: plan.executedPeriods,
-                    accountId: plan.account?.id,
-                    accountName: plan.account?.name,
-                    categoryId: plan.category?.id,
-                    categoryName: plan.category?.name,
+                    accountId: plan.accountID,
+                    accountName: nil,
+                    categoryId: plan.categoryID,
+                    categoryName: nil,
                     note: plan.note,
                     dateCreated: plan.dateCreated
                 )

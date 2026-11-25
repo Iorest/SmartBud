@@ -584,15 +584,15 @@ final class InstallmentPlanModel {
     var executedPeriods: Int = 0
     var note: String?
     var dateCreated: Date = Date.now
-    /// Card the plan hangs off. Each principal row raises its balance towards
-    /// zero, which is the only "used limit" model this app has.
-    var account: AccountModel?
-    /// Category applied to fee rows so they land in the right spend bucket.
-    var category: CategoryModel?
+    /// Card the plan hangs off, stored as an id so the model needs no
+    /// relationship to the shared ledger entities.
+    var accountID: UUID?
+    /// Category applied to fee rows, also stored as an id.
+    var categoryID: UUID?
 
     init(principal: Double = 0, fee: Double = 0, periods: Int = 0,
          firstDate: Date = .now, note: String? = nil,
-         account: AccountModel? = nil, category: CategoryModel? = nil,
+         accountID: UUID? = nil, categoryID: UUID? = nil,
          bookID: UUID? = BookModel.defaultID) {
         self.id = UUID()
         self.principal = principal
@@ -600,8 +600,8 @@ final class InstallmentPlanModel {
         self.periods = periods
         self.firstDate = firstDate
         self.note = note
-        self.account = account
-        self.category = category
+        self.accountID = accountID
+        self.categoryID = categoryID
         self.bookID = bookID
         self.dateCreated = .now
     }

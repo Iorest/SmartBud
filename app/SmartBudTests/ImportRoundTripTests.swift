@@ -262,7 +262,7 @@ struct ImportRoundTripTests {
         #expect(storedPlan.fee == 0.30)
         #expect(storedPlan.periods == 3)
         #expect(storedPlan.executedPeriods == 2)
-        #expect(storedPlan.account?.id == fixture.accountID)
+        #expect(storedPlan.accountID == fixture.accountID)
 
         let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
         #expect(rows.count == 4)
