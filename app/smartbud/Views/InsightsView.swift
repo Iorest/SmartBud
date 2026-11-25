@@ -58,6 +58,13 @@ struct InsightsView: View {
                         forecastCard
                             .padding(.bottom, 13)
                     }
+                    // Suggestions come from the whole ledger, not this
+                    // period, so they stay visible even on an empty month.
+                    if !insightsVM.subscriptionSuggestions.isEmpty {
+                        subscriptionSuggestionsSection
+                            .padding(.horizontal, 30)
+                            .padding(.bottom, 18)
+                    }
 
                     if insightsVM.periodTotalIncome == 0 && insightsVM.periodTotalSpent == 0 {
                         // Nothing to chart this period: one explicit empty
@@ -85,11 +92,6 @@ struct InsightsView: View {
                                 .padding(.horizontal, 30)
                                 .padding(.bottom, 18)
                         }
-                    if !insightsVM.subscriptionSuggestions.isEmpty {
-                        subscriptionSuggestionsSection
-                            .padding(.horizontal, 30)
-                            .padding(.bottom, 18)
-                    }
                         if !insightsVM.todayTransactions.isEmpty {
                             todaySection
                         }

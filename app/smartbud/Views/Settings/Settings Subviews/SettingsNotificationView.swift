@@ -107,6 +107,13 @@ struct SettingsNotificationsView: View {
 
         if budgetForecastEnabled {
           Divider()
+          Toggle(isOn: $excludeOutliers) {
+            Text(String.appLocalized("Exclude one-off large entries"))
+              .font(.footnote)
+          }
+          .padding(.vertical, 4)
+
+          Divider()
           Toggle(isOn: $budgetAlertsEnabled) {
             Text(String.appLocalized("Budget alerts"))
               .font(.body)
@@ -115,12 +122,6 @@ struct SettingsNotificationsView: View {
           .padding(.vertical, 4)
 
           if budgetAlertsEnabled {
-            Divider()
-            Toggle(isOn: $excludeOutliers) {
-              Text(String.appLocalized("Exclude one-off large entries"))
-                .font(.footnote)
-            }
-            .padding(.vertical, 4)
             Picker(String.appLocalized("Alert frequency"), selection: $alertFrequency) {
               Text(String.appLocalized("Once per budget period")).tag(0)
               Text(String.appLocalized("At most once a day")).tag(1)
