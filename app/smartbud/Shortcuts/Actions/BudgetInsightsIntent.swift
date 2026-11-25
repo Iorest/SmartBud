@@ -9,6 +9,8 @@ import AppIntents
 import Foundation
 import SwiftUI
 
+/// No explicit book parameter: the budget (and every spend row behind it)
+/// comes from the device's current book.
 struct BudgetIntent: AppIntent {
     static let title: LocalizedStringResource = "Get Budget Insights"
 
@@ -41,16 +43,17 @@ struct BudgetIntent: AppIntent {
 
         switch type {
         case .overall:
-            if let mainBudget = BudgetViewModel.shared.getMainBudget() {
+            if let mainBudget = BudgetViewModel.shared.getMainBudget(),
+               ShortcutBookScope.current.contains(mainBudget.bookID) {
                 amount = BudgetViewModel.shared.leftoverOverall(mainBudget)
                 budgetType = mainBudget.type
             }
         case .category:
-            if let unwrappedBudget = budget {
-                if let categoryBudget = BudgetViewModel.shared.findBudget(id: unwrappedBudget.id) {
-                    amount = BudgetViewModel.shared.leftover(categoryBudget)
-                    budgetType = categoryBudget.type
-                }
+            if let unwrappedBudget = budget,
+               let categoryBudget = BudgetViewModel.shared.findBudget(id: unwrappedBudget.id),
+               ShortcutBookScope.current.contains(categoryBudget.bookID) {
+                amount = BudgetViewModel.shared.leftover(categoryBudget)
+                budgetType = categoryBudget.type
             }
         }
 

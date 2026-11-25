@@ -286,7 +286,7 @@ extension ExpenditureWidgetEntryView {
             }
             // Always open the ledger. With fewer than two rows this used to
             // open the entry form, so tapping a transaction started a new one.
-            .widgetURL(URL(string: "smartbud://open?tab=log"))
+            .widgetURL(widgetDeepLink("open?tab=log"))
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
         case .systemLarge:
@@ -316,7 +316,7 @@ extension ExpenditureWidgetEntryView {
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color.SubtitleText)
 
-                            Link(destination: URL(string: "smartbud://newExpense")!) {
+                            Link(destination: widgetDeepLink("newExpense")!) {
                                 HStack(spacing: 4) {
                                     Image(systemName: "plus")
                                         .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -368,7 +368,7 @@ extension ExpenditureWidgetEntryView {
                             }
 
                             if entry.transactions.count < 5 {
-                                Link(destination: URL(string: "smartbud://newExpense")!) {
+                                Link(destination: widgetDeepLink("newExpense")!) {
                                     HStack(spacing: 4) {
                                         Image(systemName: "plus")
                                             .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -391,7 +391,7 @@ extension ExpenditureWidgetEntryView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .containerBackground(for: .widget) { WidgetGlassBackground() }
-            .widgetURL(URL(string: "smartbud://open?tab=log"))
+            .widgetURL(widgetDeepLink("open?tab=log"))
 
         default:
             EmptyView()

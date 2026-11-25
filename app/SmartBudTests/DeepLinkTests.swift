@@ -108,4 +108,18 @@ struct DeepLinkRequestTests {
         #expect(request.action == .search)
         #expect(request.searchQuery == "coffee")
     }
+
+    @Test("Book parameter is parsed")
+    func parsesBook() throws {
+        let id = UUID()
+        let request = try #require(link("smartbud://add?amount=1&book=\(id.uuidString)"))
+        #expect(request.bookID == id)
+    }
+
+    @Test("Absent or malformed book keeps the legacy behavior")
+    func ignoresInvalidBook() throws {
+        #expect(try #require(link("smartbud://add?amount=1")).bookID == nil)
+        #expect(try #require(link("smartbud://add?amount=1&book=not-a-uuid")).bookID == nil)
+        #expect(try #require(link("smartbud://open?tab=log&book=")).bookID == nil)
+    }
 }

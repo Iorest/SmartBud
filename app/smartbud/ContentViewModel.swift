@@ -130,6 +130,7 @@ final class ContentViewModel {
         // legacy rows without a book id are assigned to it before any
         // statistics render, so the first launch keeps the old numbers.
         BookMigration.migrate(in: DataRepository.shared.context)
+        BookState.shared.reloadBooks()
 
         reconcileNotificationAuthorization()
     }

@@ -14,7 +14,8 @@ struct InstructionHeadings {
 }
 
 struct BrandNewBudgetView: View {
-    @Query private var categories: [CategoryModel]
+    @Query private var fetchedCategories: [CategoryModel]
+    @Environment(BookState.self) private var bookState
 
     @AppStorage("firstWeekday", store: .appGroup) var firstWeekday: Int = 1
     @AppStorage("firstDayOfMonth", store: .appGroup) var firstDayOfMonth: Int = 1
@@ -142,6 +143,12 @@ struct BrandNewBudgetView: View {
         var calendar = Calendar.current
         calendar.locale = Locale.appLocale
         return calendar.weekdaySymbols
+    }
+
+    /// A new budget must only link to a category in the active book, and the
+    /// picker must not offer another book's categories.
+    private var categories: [CategoryModel] {
+        BookScope.scoped(fetchedCategories, \.bookID, selected: bookState.currentID)
     }
 
     /// Categories the picker offers: no budget yet, plus the category this
@@ -338,7 +345,7 @@ struct BrandNewBudgetView: View {
         // already have a budget, except the one being edited (that category
         // always owns a budget, so a `budget == nil` predicate hid the
         // current selection and left the row blank).
-        _categories = Query(
+        _fetchedCategories = Query(
             filter: #Predicate<CategoryModel> { $0.income == false },
             sort: [SortDescriptor(\.order)]
         )

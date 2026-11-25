@@ -13,14 +13,25 @@ import SwiftUI
 
 struct LogView: View {
     @Query(sort: [SortDescriptor(\TransactionModel.date, order: .reverse)])
-    private var allTransactions: [TransactionModel]
+    private var fetchedTransactions: [TransactionModel]
 
     @Query(sort: [SortDescriptor(\TransferModel.date, order: .reverse)])
-    var allTransfers: [TransferModel]
+    private var fetchedTransfers: [TransferModel]
 
+    @Environment(BookState.self) private var bookState
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(CategoryViewModel.self) private var categoryVM
     @Environment(\.scenePhase) private var scenePhase
+
+    // The queries cover the whole store; these computed arrays are the only
+    // rows the log (and its extensions) are allowed to render or mutate.
+    private var allTransactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
+
+    var allTransfers: [TransferModel] {
+        fetchedTransfers.filter { BookScope.matches($0, selected: bookState.currentID) }
+    }
 
     @AppStorage("currency", store: .appGroup) var currency: String = Locale.current.currency?.identifier ?? "USD"
     @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
@@ -31,6 +42,10 @@ struct LogView: View {
     /// Query carried by `smartbud://search?q=…`. Applied when it arrives, so a
     /// deep link does not just focus an empty field.
     var launchSearchQuery: String?
+
+    /// Compact layouts own the book picker in this toolbar; the wide layout
+    /// puts it in the sidebar instead, so it appears exactly once.
+    var showsBookSwitcher = true
     /// Invoked by the empty state's primary button ("Add Entry").
     var onAdd: () -> Void = {}
 
@@ -91,13 +106,17 @@ struct LogView: View {
         )
         #endif
         .toolbar {
-            if !allTransactions.isEmpty {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarLeading) { selectionToggle }
-                #else
-                ToolbarItem(placement: .navigation) { selectionToggle }
-                #endif
+            #if os(iOS)
+            ToolbarItemGroup(placement: .topBarLeading) {
+                if showsBookSwitcher { BookSwitcherMenu() }
+                if !allTransactions.isEmpty { selectionToggle }
             }
+            #else
+            ToolbarItemGroup(placement: .navigation) {
+                if showsBookSwitcher { BookSwitcherMenu() }
+                if !allTransactions.isEmpty { selectionToggle }
+            }
+            #endif
 
             ToolbarItemGroup(placement: .primaryAction) {
                 filterMenu
@@ -156,6 +175,13 @@ struct LogView: View {
             if !NSUbiquitousKeyValueStore.default.bool(forKey: "icloud_sync") {
                 transactionVM.updateAllRecurring()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .bookDidChange)) { _ in
+            // Search text and batch selection refer to rows in the old book.
+            searchText = ""
+            selectedIDs.removeAll()
+            isSelecting = false
+            categoryFilter = nil
         }
     }
 

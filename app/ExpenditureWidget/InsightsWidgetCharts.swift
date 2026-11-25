@@ -118,7 +118,7 @@ struct InsightsWidgetCategoryBreakdownView: View {
                     .frame(maxHeight: .infinity)
             }
 
-            Link(destination: URL(string: "smartbud://newExpense")!) {
+            Link(destination: widgetDeepLink("newExpense")!) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
@@ -288,7 +288,7 @@ extension InsightsWidgetEntryView {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .widgetURL(URL(string: "smartbud://insights"))
+        .widgetURL(widgetDeepLink("insights"))
         .containerBackground(for: .widget) {
             WidgetGlassBackground()
         }

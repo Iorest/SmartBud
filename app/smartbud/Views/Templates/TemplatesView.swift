@@ -12,7 +12,14 @@ import SwiftUI
 struct TemplatesView: View {
     @Environment(TransactionViewModel.self) private var transactionVM
     @Environment(CategoryViewModel.self) private var categoryVM
-    @Query(sort: [SortDescriptor(\TemplateTransactionModel.order)]) private var templates: [TemplateTransactionModel]
+    @Query(sort: [SortDescriptor(\TemplateTransactionModel.order)]) private var fetchedTemplates: [TemplateTransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    /// Template slots are numbered per book, so both the list and the next
+    /// free slot have to come from the active book's rows only.
+    private var templates: [TemplateTransactionModel] {
+        BookScope.scoped(fetchedTemplates, \.bookID, selected: bookState.currentID)
+    }
 
     @State private var showEditor = false
     @State private var editingTemplate: TemplateTransactionModel?

@@ -14,7 +14,7 @@ extension InsightsViewModel {
     // MARK: Summary
 
     func refreshSummary() {
-        let all = repo.fetch(TransactionModel.self)
+        let all = bookScopedTransactions()
         let cal = Calendar.current
         let now = Date.now
         let start: Date
@@ -43,7 +43,7 @@ extension InsightsViewModel {
     // MARK: Line Graph
 
     func refreshLineGraph() {
-        let all = repo.fetch(TransactionModel.self, sort: [SortDescriptor(\.date, order: .forward)])
+        let all = bookScopedTransactions().sorted { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date.now)
         let start: Date
@@ -101,7 +101,7 @@ extension InsightsViewModel {
     }
 
     private func logViewTransactions(type: Int, income: Bool?) -> [TransactionModel] {
-        var all = repo.fetch(TransactionModel.self).filter { ($0.date ?? .distantPast) <= .now }
+        var all = bookScopedTransactions().filter { ($0.date ?? .distantPast) <= .now }
         if let start = logViewPeriodStart(type: type) {
             all = all.filter { ($0.date ?? .distantPast) >= start }
         }
@@ -150,7 +150,7 @@ extension InsightsViewModel {
     func getLogLineGraphDataNet(type: Int) -> [LineGraphDataPoint] {
         guard let (dates, step) = logLineGraphBuckets(type: type), let start = dates.first else { return [] }
         let calendar = Calendar.current
-        let all = repo.fetch(TransactionModel.self)
+        let all = bookScopedTransactions()
         var runningTotal = Money.sum(all.filter { ($0.date ?? .distantPast) < start }
             .map(\.signedBaseAmount))
         return dates.map { bucketStart in
@@ -168,7 +168,7 @@ extension InsightsViewModel {
     func getLogLineGraphData(income: Bool, type: Int) -> [LineGraphDataPoint] {
         guard let (dates, step) = logLineGraphBuckets(type: type) else { return [] }
         let calendar = Calendar.current
-        let all = repo.fetch(TransactionModel.self).filter {
+        let all = bookScopedTransactions().filter {
             income ? $0.countsAsIncome : ($0.countsAsSpend || $0.isRefund)
         }
         return dates.map { bucketStart in
@@ -310,7 +310,11 @@ extension InsightsViewModel {
     func getShortcutInsights(type: Int, timeframe: Int, optionalIncome: Bool?, categories: [CategoryModel]) -> Double {
         var txns = logViewTransactions(type: timeframe, income: optionalIncome)
         if !categories.isEmpty {
-            let ids = Set(categories.map(\.id))
+            // A Shortcut may pass categories from any book; only this
+            // ledger's categories may filter this ledger's transactions.
+            let ids = Set(categories
+                .filter { BookScope.matches($0.bookID, selected: BookState.shared.currentID) }
+                .map(\.id))
             txns = txns.filter { $0.category.map { ids.contains($0.id) } ?? false }
         }
         if type == 1 {

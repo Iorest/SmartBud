@@ -5,7 +5,9 @@
 //  WidgetConfigurationIntent definitions for the four configurable widgets.
 //  Replaces the legacy `WidgetConfiguration.intentdefinition` and the
 //  `BudgetIntent` INExtension-based IntentHandler. AppEntity reuse comes
-//  from `ShortcutsEntities.swift` (BudgetEntity + BudgetQuery).
+//  from `ShortcutsEntities.swift` (BudgetEntity + BudgetQuery), so the
+//  budget picker follows the device's current book; widget data filters on
+//  the same book when it renders.
 //
 
 import AppIntents

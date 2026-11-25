@@ -70,6 +70,8 @@ enum BadDebtLedger {
 
         claim.badDebtAt = date
         let name = claim.wrappedNote.isEmpty ? claim.wrappedCategoryName : claim.wrappedNote
+        // The loss belongs to the claim's ledger, not to whichever book the
+        // user happens to be viewing when the write-off is recorded.
         let row = TransactionModel(
             note: String.appFormatted("Bad debt · %@", name),
             category: claim.category,
@@ -83,7 +85,8 @@ enum BadDebtLedger {
             badDebtOf: claim.id,
             badDebtReason: reason.rawValue,
             merchant: claim.merchant,
-            merchantKey: claim.merchantKey
+            merchantKey: claim.merchantKey,
+            bookID: claim.bookID
         )
         context.insert(row)
         return .success(row)

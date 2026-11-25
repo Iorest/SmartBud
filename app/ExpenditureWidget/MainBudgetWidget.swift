@@ -40,21 +40,23 @@ struct MainBudgetWidgetProvider: TimelineProvider {
     typealias Entry = MainBudgetWidgetEntry
 
     func placeholder(in _: Context) -> MainBudgetWidgetEntry {
-        let loaded = loadData()
-
+        let selected = BookSelection.current()
+        let loaded = loadData(selected: selected)
         return makeEntry(from: loaded)
     }
 
     func getSnapshot(in _: Context, completion: @escaping (MainBudgetWidgetEntry) -> Void) {
-        let loaded = loadData()
-
+        let selected = BookSelection.current()
+        let loaded = loadData(selected: selected)
         let entry = makeEntry(from: loaded)
         completion(entry)
     }
 
     func getTimeline(in _: Context, completion: @escaping (Timeline<MainBudgetWidgetEntry>) -> Void) {
-        let loaded = loadData()
-
+        // One selection per timeline keeps the overall budget and its spend
+        // rows in the same book, even if the app switches while we load.
+        let selected = BookSelection.current()
+        let loaded = loadData(selected: selected)
         let entry = makeEntry(from: loaded)
 
         let timeline = Timeline(entries: [entry], policy: .atEnd)
@@ -74,11 +76,12 @@ struct MainBudgetWidgetProvider: TimelineProvider {
         )
     }
 
-    func loadData() -> MainBudgetSnapshot {
+    func loadData(selected: UUID) -> MainBudgetSnapshot {
         let context = ModelContext(WidgetModelContainer.shared)
 
         let budgetDescriptor = FetchDescriptor<MainBudgetModel>()
-        guard let budget = try? context.fetch(budgetDescriptor).first else {
+        let budgets = (try? context.fetch(budgetDescriptor)) ?? []
+        guard let budget = budgets.first(where: { BookScope.matches($0.bookID, selected: selected) }) else {
             return MainBudgetSnapshot(
                 found: false,
                 totalSpent: 0,
@@ -96,7 +99,7 @@ struct MainBudgetWidgetProvider: TimelineProvider {
         let now = Date.now
 
         let descriptor = FetchDescriptor<TransactionModel>()
-        let allTransactions = (try? context.fetch(descriptor)) ?? []
+        let allTransactions = BookScope.scoped((try? context.fetch(descriptor)) ?? [], \.bookID, selected: selected)
         let filtered = allTransactions.filter {
             ($0.countsAsSpend || $0.isRefund) && $0.wrappedDate >= budgetStartDate && $0.wrappedDate <= now
         }

@@ -57,7 +57,8 @@ final class TransactionViewModel {
                                    discount: edit.discount,
                                    reimbursable: edit.reimbursable,
                                    merchant: merchant?.name,
-                                   merchantKey: merchant?.key)
+                                   merchantKey: merchant?.key,
+                                   bookID: BookState.shared.currentID)
         repo.insert(txn)
         if edit.repeatType > 0 { processRecurring(txn) }
         guard repo.save() else { return nil }
@@ -171,7 +172,8 @@ final class TransactionViewModel {
                                            account: txn.account, baseAmount: txn.wrappedBaseAmount,
                                            income: txn.income, amount: txn.amount, date: cursor,
                                            discount: txn.discount, reimbursable: txn.reimbursable,
-                                           merchant: txn.merchant, merchantKey: txn.merchantKey)
+                                           merchant: txn.merchant, merchantKey: txn.merchantKey,
+                                           bookID: txn.bookID)
                 repo.insert(new)
                 new.onceRecurring = true
                 cursor = next
@@ -184,7 +186,8 @@ final class TransactionViewModel {
                                        income: txn.income, amount: txn.amount,
                                        date: txn.nextTransactionDate,
                                        discount: txn.discount, reimbursable: txn.reimbursable,
-                                       merchant: txn.merchant, merchantKey: txn.merchantKey)
+                                       merchant: txn.merchant, merchantKey: txn.merchantKey,
+                                       bookID: txn.bookID)
             repo.insert(new)
             new.onceRecurring = true
             txn.recurringType = 0
@@ -195,7 +198,13 @@ final class TransactionViewModel {
     // MARK: Templates
 
     func getTemplate(_ order: Int) -> TemplateTransactionModel? {
-        repo.fetchOne(TemplateTransactionModel.self, predicate: #Predicate { $0.order == order })
+        // `order` is only unique inside one ledger: each book numbers its
+        // quick-add slots from zero. Fetch all matches before filtering,
+        // otherwise another book's slot can hide this book's template.
+        let matches = repo.fetch(TemplateTransactionModel.self,
+                                 predicate: #Predicate { $0.order == order })
+        return BookScope.scoped(matches, \.bookID,
+                                selected: BookState.shared.currentID).first
     }
 
     /// Logs a template as a real entry. The caller needs to tell "category
@@ -208,7 +217,10 @@ final class TransactionViewModel {
     }
 
     func applyTemplate(_ order: Int) -> ApplyTemplateResult {
-        guard let tmpl = getTemplate(order), let cat = tmpl.category else { return .missingCategory }
+        guard let tmpl = getTemplate(order), let cat = tmpl.category,
+              BookScope.matches(cat.bookID, selected: BookState.shared.currentID) else {
+            return .missingCategory
+        }
         // Templates carry no account of their own; without the default one the
         // entry would not move any balance and would be missing from the
         // account screens.
@@ -245,7 +257,8 @@ final class TransactionViewModel {
             let tmpl = TemplateTransactionModel(note: template.note, category: template.category,
                                                 income: template.income, amount: template.amount,
                                                 order: order, repeatType: template.repeatType,
-                                                repeatCoefficient: template.repeatCoefficient)
+                                                repeatCoefficient: template.repeatCoefficient,
+                                                bookID: BookState.shared.currentID)
             repo.insert(tmpl)
             repo.save()
             return tmpl
@@ -261,6 +274,7 @@ final class TransactionViewModel {
 
     /// Deletes the given template.
     func deleteTemplate(_ template: TemplateTransactionModel) {
+        guard BookState.shared.isCurrent(template.bookID) else { return }
         repo.delete(template)
         repo.save()
     }
@@ -269,6 +283,8 @@ final class TransactionViewModel {
     /// Used to persist drag-to-reorder results from the quick-add widget editor.
     func reorderTemplates(_ orderedTemplates: [TemplateTransactionModel]) {
         for (index, tmpl) in orderedTemplates.enumerated() {
+            // Another book's slot with the same index is a different template.
+            guard BookScope.matches(tmpl.bookID, selected: BookState.shared.currentID) else { continue }
             tmpl.order = index
         }
         repo.save()
@@ -285,9 +301,11 @@ final class TransactionViewModel {
         // NSInvalidArgumentException inside NSSQLGenerator and aborts the
         // app. Match by income in SQL, then filter the (small) result set
         // in memory.
-        let txns = repo.fetch(TransactionModel.self,
-            predicate: #Predicate { $0.income == income },
-            sort: [SortDescriptor(\.date, order: .reverse)])
+        let txns = BookScope.scoped(
+            repo.fetch(TransactionModel.self,
+                       predicate: #Predicate { $0.income == income },
+                       sort: [SortDescriptor(\.date, order: .reverse)]),
+            \.bookID, selected: BookState.shared.currentID)
         let filtered = category.map { cat in txns.filter { $0.category?.id == cat.id } } ?? txns
 
         var seen = Set<String>()
@@ -437,6 +455,17 @@ final class TransactionViewModel {
         guard pendingDelete != nil else { return }
         pendingDelete = nil
         repo.save()
+    }
+
+    /// Drops an uncommitted delete when the active book changes. The staged
+    /// row belonged to the old book; letting its timer commit after the switch
+    /// would delete a row the user can no longer see.
+    func discardPendingDelete() {
+        guard pendingDelete != nil else { return }
+        pendingDeleteTask?.cancel()
+        pendingDeleteTask = nil
+        pendingDelete = nil
+        repo.rollback()
     }
 
     /// Restores the staged row. `rollback()` normally brings the original

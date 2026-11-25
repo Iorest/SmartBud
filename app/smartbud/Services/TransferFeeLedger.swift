@@ -42,17 +42,21 @@ enum TransferFeeLedger {
         guard transfer.fee > 0, transfer.fee.isFinite else { return nil }
         if let existing = feeRow(for: transfer, in: context) { return existing }
 
+        // Transfers have no book column: their ledger is the source account's
+        // (or the destination's if the source was deleted).
         let account = transfer.source
+        let bookID = account?.bookID ?? transfer.destination?.bookID
         let base = baseAmount ?? transfer.fee
         let row = TransactionModel(
             note: "",
-            category: feeCategory(in: context),
+            category: feeCategory(in: context, bookID: bookID),
             account: account,
             baseAmount: base,
             income: false,
             amount: transfer.fee,
             date: transfer.date,
-            transferFeeOf: transfer.id
+            transferFeeOf: transfer.id,
+            bookID: bookID
         )
         context.insert(row)
         return row
@@ -80,11 +84,16 @@ enum TransferFeeLedger {
 
     /// Finds (or creates) the "Transfer Fee" expense category, so the row shows
     /// up in the category breakdown instead of as an uncategorised expense.
-    static func feeCategory(in context: ModelContext) -> CategoryModel? {
+    static func feeCategory(in context: ModelContext, bookID: UUID? = BookModel.defaultID) -> CategoryModel? {
         let name = String.appLocalized(categoryNameKey)
         let descriptor = FetchDescriptor<CategoryModel>(
             predicate: #Predicate { $0.income == false })
-        let expense = (try? context.fetch(descriptor)) ?? []
+        let allExpenses = (try? context.fetch(descriptor)) ?? []
+        // Never borrow a category from another book: the fee row inherits the
+        // transfer's ledger, so its category must be in the same one.
+        let expense = allExpenses.filter {
+            BookScope.matches($0.bookID, selected: bookID ?? BookModel.defaultID)
+        }
 
         // Match on the name in the current language *or* on the icon/colour we
         // create it with: switching the app language must not leave a second
@@ -99,7 +108,8 @@ enum TransferFeeLedger {
             emoji: "🧾",
             colour: "#8E8E93",
             income: false,
-            order: (expense.map(\.order).max() ?? 0) + 1
+            order: (expense.map(\.order).max() ?? 0) + 1,
+            bookID: bookID
         )
         context.insert(category)
         return category

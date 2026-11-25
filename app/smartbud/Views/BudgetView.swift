@@ -10,9 +10,22 @@ import SwiftUI
 import SwiftData
 
 struct BudgetView: View {
-    @Query private var categories: [CategoryModel]
-    @Query private var budgets: [BudgetModel]
-    @Query private var mainBudget: [MainBudgetModel]
+    @Query private var fetchedCategories: [CategoryModel]
+    @Query private var fetchedBudgets: [BudgetModel]
+    @Query private var fetchedMainBudget: [MainBudgetModel]
+    @Environment(BookState.self) private var bookState
+
+    // A query cannot read the device-local book id; scope after fetching so
+    // the empty state and the list only ever describe the active ledger.
+    private var categories: [CategoryModel] {
+        BookScope.scoped(fetchedCategories, \.bookID, selected: bookState.currentID)
+    }
+    private var budgets: [BudgetModel] {
+        BookScope.scoped(fetchedBudgets, \.bookID, selected: bookState.currentID)
+    }
+    private var mainBudget: [MainBudgetModel] {
+        BookScope.scoped(fetchedMainBudget, \.bookID, selected: bookState.currentID)
+    }
 
     @State private var showNewBudget = false
 
@@ -37,9 +50,17 @@ struct BudgetView: View {
 
 struct ActualBudgetView: View {
 
-    @Query(sort: [SortDescriptor(\BudgetModel.dateCreated)]) private var budgets: [BudgetModel]
-    @Query private var mainBudget: [MainBudgetModel]
+    @Query(sort: [SortDescriptor(\BudgetModel.dateCreated)]) private var fetchedBudgets: [BudgetModel]
+    @Query private var fetchedMainBudget: [MainBudgetModel]
+    @Environment(BookState.self) private var bookState
     @Environment(BudgetViewModel.self) var budgetVM
+
+    private var budgets: [BudgetModel] {
+        BookScope.scoped(fetchedBudgets, \.bookID, selected: bookState.currentID)
+    }
+    private var mainBudget: [MainBudgetModel] {
+        BookScope.scoped(fetchedMainBudget, \.bookID, selected: bookState.currentID)
+    }
 
     @State var newBudget = false
 

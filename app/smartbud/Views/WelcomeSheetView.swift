@@ -19,7 +19,14 @@ struct WelcomeSheetFeatureRow: Hashable {
 struct WelcomeSheetView: View {
 
     @Query(sort: [SortDescriptor(\CategoryModel.dateCreated)])
-    private var categories: [CategoryModel]
+    private var fetchedCategories: [CategoryModel]
+    @Environment(BookState.self) private var bookState
+
+    /// Seeding/onboarding checks must only see the active book's categories;
+    /// another ledger's seed rows are not a reason to skip setup here.
+    private var categories: [CategoryModel] {
+        BookScope.scoped(fetchedCategories, \.bookID, selected: bookState.currentID)
+    }
 
     @State var firstPage = true
     @State var visibleLines: Int = 0

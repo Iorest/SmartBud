@@ -7,9 +7,17 @@ struct CategoryStepperView: View {
     @State var income = false
 
     @Query(filter: #Predicate<CategoryModel> { $0.income == false },
-        sort: [SortDescriptor(\CategoryModel.order)]) private var expenseCategories: [CategoryModel]
+        sort: [SortDescriptor(\CategoryModel.order)]) private var fetchedExpenseCategories: [CategoryModel]
     @Query(filter: #Predicate<CategoryModel> { $0.income == true },
-        sort: [SortDescriptor(\CategoryModel.order)]) private var incomeCategories: [CategoryModel]
+        sort: [SortDescriptor(\CategoryModel.order)]) private var fetchedIncomeCategories: [CategoryModel]
+    @Environment(BookState.self) private var bookState
+
+    private var expenseCategories: [CategoryModel] {
+        BookScope.scoped(fetchedExpenseCategories, \.bookID, selected: bookState.currentID)
+    }
+    private var incomeCategories: [CategoryModel] {
+        BookScope.scoped(fetchedIncomeCategories, \.bookID, selected: bookState.currentID)
+    }
 
     var categories: [CategoryModel] {
         income ? incomeCategories : expenseCategories
@@ -155,7 +163,13 @@ struct IncomeFilterToggleView: View {
 }
 
 struct DateStepperView: View {
-    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    /// The lower date bound is the oldest entry in the active book only.
+    private var transactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     @Binding var date: Date
     var endDate: Date {
@@ -210,7 +224,13 @@ struct DateStepperView: View {
 }
 
 struct WeekStepperView: View {
-    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var transactions: [TransactionModel]
+    @Query(sort: [SortDescriptor(\TransactionModel.day)]) private var fetchedTransactions: [TransactionModel]
+    @Environment(BookState.self) private var bookState
+
+    /// The week range must start at this book's oldest row, not another's.
+    private var transactions: [TransactionModel] {
+        BookScope.scoped(fetchedTransactions, \.bookID, selected: bookState.currentID)
+    }
 
     @Binding var showingDate: Date
 
