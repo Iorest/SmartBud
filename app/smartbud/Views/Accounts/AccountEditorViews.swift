@@ -104,7 +104,7 @@ struct AccountEditor: View {
 
 
                 if kind == .credit {
-                    Section(String.appLocalized("Credit Card")) {
+                    Section {
                         HStack {
                             Text(String.appLocalized("Credit Limit"))
                             Spacer()
@@ -127,6 +127,8 @@ struct AccountEditor: View {
                                 Text("\(day)").tag(day)
                             }
                         }
+                    } header: {
+                        Text(String.appLocalized("Credit Card"))
                     } footer: {
                         Text(String.appLocalized(
                             "Card debt is a liability. Repayments are transfers, not expenses."))
