@@ -46,11 +46,10 @@ struct CreditTerms: Equatable {
 }
 
 struct CreditUsage: Equatable {
-    /// Magnitude of the card balance: negative balances are debt, positive
-    /// balances are overpayments.
+    /// Outstanding debt only: a positive (overpaid) card balance uses 0.
     let used: Double
-    /// `limit - |balance|`. Negative means the card is over its limit; the
-    /// write is still allowed, the UI only warns.
+    /// `limit - debt + overpayment`, i.e. `limit + balance`. Negative means
+    /// the card is over its limit; the write is still allowed, the UI warns.
     let available: Double
     /// Debt incurred in the current statement cycle, capped by the balance.
     let dueThisCycle: Double
@@ -58,7 +57,7 @@ struct CreditUsage: Equatable {
 }
 
 enum CreditCard {
-    static func isCredit(kind: Int) -> Bool { kind == 2 }
+    static func isCredit(kind: Int) -> Bool { kind == 2 }  // AccountKind.credit.rawValue
 
     static func sanitized(limit: Double?, statementDay: Int?, dueDay: Int?,
                           kind: Int) -> CreditTerms {
@@ -75,9 +74,10 @@ enum CreditCard {
     static func usage(limit: Double?, balance: Double, cycleSpend: Double) -> CreditUsage? {
         guard let limit = validLimit(limit), balance.isFinite else { return nil }
         let spend = cycleSpend.isFinite ? max(0, cycleSpend) : 0
-        let used = abs(balance)
-        let available = Money.double(Money.cents(limit - used))
         let debt = max(0, -balance)
+        let used = debt
+        // Overpayment raises available credit; it is not "used" credit.
+        let available = Money.double(Money.cents(limit + balance))
         return CreditUsage(
             used: used,
             available: available,
@@ -135,24 +135,38 @@ enum CreditCard {
 enum NetWorth {
     /// One already base-converted account. `included` is false for hidden and
     /// archived accounts: their history stays, but they are not money the user
-    /// can see or spend today.
+    /// can see or spend today. The signed balance is the only input: a card
+    /// overpayment is an asset, card debt reduces net worth, and a negative
+    /// cash balance is debt too.
     struct Account: Equatable {
         let balance: Double
-        let isLiability: Bool
         let included: Bool
 
-        init(balance: Double, isLiability: Bool, included: Bool = true) {
+        init(balance: Double, included: Bool = true) {
             self.balance = balance
-            self.isLiability = isLiability
             self.included = included
         }
     }
 
-    static func total(_ accounts: [Account]) -> Double {
-        let cents: Decimal = accounts.filter(\.included).reduce(0) { sum, account in
-            let value = account.isLiability ? -abs(account.balance) : account.balance
+    private static func cents(_ accounts: [Account],
+                              _ part: (Double) -> Double) -> Decimal {
+        accounts.filter(\.included).reduce(0) { sum, account in
+            let value = part(account.balance)
             return sum + (value.isFinite ? Money.cents(value) : 0)
         }
-        return Money.double(cents)
+    }
+
+    static func assets(_ accounts: [Account]) -> Double {
+        Money.double(cents(accounts) { max(0, $0) })
+    }
+
+    static func debt(_ accounts: [Account]) -> Double {
+        Money.double(cents(accounts) { max(0, -$0) })
+    }
+
+    /// Assets − liabilities, evaluated in cents so the three figures cannot
+    /// disagree by a rounding tail.
+    static func total(_ accounts: [Account]) -> Double {
+        Money.double(cents(accounts) { $0 })
     }
 }

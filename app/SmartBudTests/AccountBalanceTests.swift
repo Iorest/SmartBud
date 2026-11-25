@@ -87,7 +87,7 @@ struct CreditCardLedgerTests {
         #expect(Money.cents(cardRows.reduce(0) { $0 + $1.amount }) == Money.cents(100))
     }
 
-    @Test("Available credit is the limit minus the absolute balance, over limit is flagged")
+    @Test("Available credit follows the signed balance; overpayment is not usage")
     func availableCredit() throws {
         let normal = try #require(CreditCard.usage(limit: 5000, balance: -100, cycleSpend: 100))
         #expect(normal.used == 100)
@@ -96,8 +96,17 @@ struct CreditCardLedgerTests {
         #expect(!normal.isOverLimit)
 
         let over = try #require(CreditCard.usage(limit: 5000, balance: -6000, cycleSpend: 6000))
+        #expect(over.used == 6000)
         #expect(over.available == -1000)
         #expect(over.isOverLimit)
+
+        // Overpaid card: no usage, more headroom, nothing to pay this cycle.
+        let overpaid = try #require(CreditCard.usage(limit: 5000, balance: 100, cycleSpend: 100))
+        #expect(overpaid.used == 0)
+        #expect(overpaid.available == 5100)
+        #expect(overpaid.dueThisCycle == 0)
+        #expect(!overpaid.isOverLimit)
+
         #expect(CreditCard.usage(limit: nil, balance: -100, cycleSpend: 100) == nil)
     }
 
@@ -119,16 +128,32 @@ struct CreditCardLedgerTests {
         #expect(CreditCard.cycle(statementDay: nil, at: after, calendar: utc) == nil)
     }
 
-    @Test("Net worth excludes hidden and archived accounts and subtracts liabilities")
+    @Test("Net worth counts overpaid cards as assets and excludes hidden/archived")
     func netWorth() {
-        let accounts: [NetWorth.Account] = [
-            .init(balance: 1000, isLiability: false, included: true),
-            .init(balance: 500, isLiability: false, included: false), // hidden
-            .init(balance: -300, isLiability: true, included: true),
-            .init(balance: -200, isLiability: true, included: false)  // archived
+        let mixed: [NetWorth.Account] = [
+            .init(balance: 1000),                  // cash
+            .init(balance: 500, included: false),  // hidden cash
+            .init(balance: -300),                  // card debt
+            .init(balance: -200, included: false)  // archived card debt
         ]
-        #expect(NetWorth.total(accounts) == 700)
+        #expect(NetWorth.assets(mixed) == 1000)
+        #expect(NetWorth.debt(mixed) == 300)
+        #expect(NetWorth.total(mixed) == 700)
+
+        // 100 overpaid on a card is an asset, not negative debt.
+        let overpaid: [NetWorth.Account] = [
+            .init(balance: 1000),
+            .init(balance: 100)
+        ]
+        #expect(NetWorth.assets(overpaid) == 1100)
+        #expect(NetWorth.debt(overpaid) == 0)
+        #expect(NetWorth.total(overpaid) == 1100)
+
+        // A single card with a positive balance used to report -100.
+        let onlyCard: [NetWorth.Account] = [.init(balance: 100)]
+        #expect(NetWorth.total(onlyCard) == 100)
         #expect(NetWorth.total([]) == 0)
+        #expect(NetWorth.assets(mixed) - NetWorth.debt(mixed) == NetWorth.total(mixed))
     }
 
     @Test("Credit fields are clamped and cleared on non-credit accounts")

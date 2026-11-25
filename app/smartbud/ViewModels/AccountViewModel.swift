@@ -96,27 +96,22 @@ final class AccountViewModel {
             NetWorth.Account(
                 balance: CurrencyRateStore.shared.convertToBase(
                     balance(for: account), from: account.resolvedCurrencyCode),
-                isLiability: CreditCard.isCredit(kind: account.kind),
                 included: !account.hidden && !account.archived
             )
         }
     }
 
-    /// Assets the user can actually spend: credit cards are liabilities even
-    /// when their balance is (temporarily) positive.
-    var totalAssets: Double {
-        netWorthEntries.reduce(0) { $0 + ($1.included && !$1.isLiability ? $1.balance : 0) }
-    }
+    /// Positive balances across every visible account, including a credit
+    /// card's overpayment. All three figures share the same cent rounding.
+    var totalAssets: Double { NetWorth.assets(netWorthEntries) }
 
-    /// Positive magnitudes of visible card debt.
-    var totalDebt: Double {
-        netWorthEntries.reduce(0) { $0 + ($1.included && $1.isLiability ? abs($1.balance) : 0) }
-    }
+    /// Outstanding debt: the magnitude of negative visible balances.
+    var totalDebt: Double { NetWorth.debt(netWorthEntries) }
 
     var netWorth: Double { NetWorth.total(netWorthEntries) }
 
-    /// The account-list header keeps its old name; the number is now net
-    /// worth (cash minus card debt) rather than a raw sum of all balances.
+    /// The account-list header keeps its old name; the number is net worth
+    /// (assets minus debt) rather than a raw sum of all balances.
     var totalBalance: Double { netWorth }
 
     func balance(for account: AccountModel) -> Double {
