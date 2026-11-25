@@ -110,10 +110,15 @@ struct BackupMerger {
                 summary.skipped += 1
                 continue
             }
+            let terms = CreditCard.sanitized(limit: dto.creditLimit,
+                                             statementDay: dto.statementDay,
+                                             dueDay: dto.dueDay,
+                                             kind: dto.kind)
             let account = AccountModel(
                 name: dto.name, emoji: dto.emoji, colour: dto.colour,
                 kind: dto.kind, currencyCode: dto.currencyCode,
-                openingBalance: signedAmount(dto.openingBalance), order: dto.order
+                openingBalance: signedAmount(dto.openingBalance), order: dto.order,
+                creditLimit: terms.limit, statementDay: terms.statementDay, dueDay: terms.dueDay
             )
             account.id = dto.id
             account.hidden = dto.hidden

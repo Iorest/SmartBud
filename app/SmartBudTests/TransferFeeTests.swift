@@ -171,4 +171,31 @@ struct TransferFeeTests {
 
         #expect(firstRow?.category?.id == secondRow?.category?.id)
     }
+    @Test("A card purchase is one expense; transfer repayment only moves the balance back")
+    func creditCardRepayment() throws {
+        let card = AccountModel(name: "Card", kind: 2, currencyCode: "CNY", openingBalance: 0)
+        let bank = AccountModel(name: "Bank", currencyCode: "CNY", openingBalance: 1000)
+        context.insert(card)
+        context.insert(bank)
+        let purchase = TransactionModel(note: "Card purchase", account: card,
+                                        baseAmount: 100, income: false, amount: 100, date: .now)
+        context.insert(purchase)
+        let repayment = TransferModel(amount: 100, destinationAmount: 0, fee: 0,
+                                      date: .now, note: nil, source: bank, destination: card)
+        context.insert(repayment)
+
+        let rows = try context.fetch(FetchDescriptor<TransactionModel>())
+        let cardBalance = AccountBalance.current(
+            opening: card.openingBalance,
+            transactions: rows
+                .filter { $0.account?.id == card.id }
+                .map { (amount: $0.amount, income: $0.income, isRefund: $0.isRefund) },
+            transfersIn: repayment.receivedAmount
+        )
+
+        #expect(cardBalance == 0)
+        #expect(rows.count == 1)          // repayment is a transfer, not a row
+        #expect(rows.first?.countsAsSpend == true)
+        #expect(Money.double(Money.sum(rows.map(\.spendBaseAmount))) == 100)
+    }
 }

@@ -47,6 +47,10 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 - schema 9 新增 `reimbursedAmount`（报销支出已回款的基准币累计额）。旧备份没有该键时，
   有 `reimbursedAt` 的整笔报销按全额推导、没有日期的按 0 导入，升级前后统计不变。
   导出端始终写该键；多次回款只合并累计额与各自的回款行，不会重复写入。
+
+- `accounts` 可携带 `creditLimit` / `statementDay` / `dueDay`（credit 账户的额度、账单日、
+  还款日）；三者可选，导入端按账户类型收敛：非 credit 或非法值一律按 nil 读入。
+  导出端始终写这三个键。schema 版本号由统筹按合并顺序分配，本次不自行抢号。
 - schema 8 新增 `badDebtOf` / `badDebtReason` / `badDebtAt`（坏账核销：损失行指向原垫付、
   原因原始值、原行的核销日）。三者都可选，旧备份按 `nil` 导入——旧文件里的垫付仍是待报销，
   不会凭空多出一条费用。

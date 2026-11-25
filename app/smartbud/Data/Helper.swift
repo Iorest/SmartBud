@@ -436,6 +436,11 @@ final class AccountModel {
     /// transaction, transfer and report still resolves their history.
     var archived: Bool = false
     var order: Int = 0
+    /// Credit-only terms. Nil for cash/debit accounts and for cards with no
+    /// configured limit or statement date. Stored in the account's currency.
+    var creditLimit: Double? = nil
+    var statementDay: Int? = nil
+    var dueDay: Int? = nil
     var dateCreated: Date = Date.now
     /// Ledger this account belongs to; see `TransactionModel.bookID`.
     var bookID: UUID? = BookModel.defaultID
@@ -452,7 +457,10 @@ final class AccountModel {
         currencyCode: String = "",
         openingBalance: Double = 0,
         order: Int = 0,
-        bookID: UUID? = BookModel.defaultID
+        bookID: UUID? = BookModel.defaultID,
+        creditLimit: Double? = nil,
+        statementDay: Int? = nil,
+        dueDay: Int? = nil
     ) {
         self.id = UUID()
         self.name = name
@@ -464,6 +472,9 @@ final class AccountModel {
         self.order = order
         self.dateCreated = .now
         self.bookID = bookID
+        self.creditLimit = creditLimit
+        self.statementDay = statementDay
+        self.dueDay = dueDay
     }
 }
 

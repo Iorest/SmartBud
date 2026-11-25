@@ -47,12 +47,31 @@ struct InsightsView: View {
                     header
                     dateRangeRow
 
+
+                    // Net worth is a balance-sheet figure, not a period
+                    // total, so it stays visible even in an empty period.
+                    if insightsVM.totalAssets != 0 || insightsVM.totalDebt != 0 {
+                        netWorthCard
+                            .padding(.horizontal, 30)
+                            .padding(.bottom, 13)
+                    }
                     // Claims are excluded from income and spend, so a period
                     // with nothing but claims would otherwise fall into the
                     // "no entries" state and hide the money the user is owed.
                     if insightsVM.pendingReimbursementTotal > 0 {
                         pendingReimbursementCard
                             .padding(.bottom, 13)
+                    }
+                    if insightsVM.budgetForecast != nil {
+                        forecastCard
+                            .padding(.bottom, 13)
+                    }
+                    // Suggestions come from the whole ledger, not this
+                    // period, so they stay visible even on an empty month.
+                    if !insightsVM.subscriptionSuggestions.isEmpty {
+                        subscriptionSuggestionsSection
+                            .padding(.horizontal, 30)
+                            .padding(.bottom, 18)
                     }
 
                     if insightsVM.periodTotalIncome == 0 && insightsVM.periodTotalSpent == 0 {
@@ -190,6 +209,35 @@ struct InsightsView: View {
         }
         .padding(.horizontal, 30)
         .padding(.bottom, 18)
+    }
+
+    private var netWorthCard: some View {
+        SBCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(String.appLocalized("Net Worth"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.SubtitleText)
+                Text(format(insightsVM.netWorth))
+                    .font(.title2.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(insightsVM.netWorth < 0 ? Color.AlertRed : Color.PrimaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                HStack(spacing: SBSpace.medium) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String.appLocalized("Total Assets"))
+                        Text(format(insightsVM.totalAssets)).monospacedDigit()
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String.appLocalized("Total Debt"))
+                        Text(format(insightsVM.totalDebt)).monospacedDigit()
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(Color.SubtitleText)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.insightsNetWorthCard)
     }
 
     // MARK: - Summary cards
@@ -333,6 +381,93 @@ struct InsightsView: View {
         return "\(sign)\(format(amount))"
     }
 
+
+    // MARK: - Forecast and subscription suggestions
+
+    private var forecastCard: some View {
+        Group {
+            if let forecast = insightsVM.budgetForecast {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: SBSpace.extraSmall) {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                            .foregroundStyle(forecast.overspend > 0 ? Color.AlertRed : Color.IncomeGreen)
+                            .accessibilityHidden(true)
+                        Text(String.appLocalized("Period-end forecast"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.SubtitleText)
+                        Spacer()
+                        Text("\(forecast.elapsedDays)/\(forecast.totalDays)")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                    Text(forecast.overspend > 0
+                         ? String.appFormatted("At this pace you will overspend by %@",
+                                               format(forecast.overspend))
+                         : String.appLocalized("On track for this period"))
+                        .font(.headline)
+                        .foregroundStyle(Color.PrimaryText)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
+                    if forecast.excludedOutlierCount > 0 {
+                        Text(String.appFormatted("%lld one-off entries excluded",
+                                                 forecast.excludedOutlierCount))
+                            .font(.caption)
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                }
+                .padding(SBSpace.small)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .padding(.horizontal, 30)
+    }
+
+    private var subscriptionSuggestionsSection: some View {
+        VStack(alignment: .leading, spacing: SBSpace.extraSmall) {
+            Text(String.appLocalized("Recurring payment detected"))
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color.SubtitleText)
+
+            ForEach(insightsVM.subscriptionSuggestions) { suggestion in
+                HStack(spacing: SBSpace.extraSmall) {
+                    Image(systemName: "repeat.circle.fill")
+                        .foregroundStyle(Color.orange)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(suggestion.merchantName)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color.PrimaryText)
+                            .lineLimit(1)
+                        Text("\(format(suggestion.amount)) · \(cadenceLabel(suggestion.cadence))")
+                            .font(.caption)
+                            .foregroundStyle(Color.SubtitleText)
+                    }
+                    Spacer(minLength: SBSpace.extraSmall)
+                    Button {
+                        insightsVM.adoptSubscription(suggestion)
+                    } label: {
+                        Text(String.appLocalized("Make recurring"))
+                            .font(.caption.weight(.semibold))
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityHint(Text(String.appLocalized("Create a repeating entry for this merchant")))
+                }
+                .padding(SBSpace.small)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .systemCard(in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous))
+            }
+        }
+    }
+
+    private func cadenceLabel(_ cadence: SubscriptionCadence) -> String {
+        switch cadence {
+        case .monthly: return String.appLocalized("Monthly")
+        case .quarterly: return String.appLocalized("Quarterly")
+        case .yearly: return String.appLocalized("Yearly")
+        }
+    }
 }
 
 // MARK: - InsightsDollarView

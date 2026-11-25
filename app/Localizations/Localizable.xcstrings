@@ -1,6 +1,125 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Period-end forecast" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Period-end forecast" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "周期末预测" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "週期末預測" } }
+      }
+    },
+    "At this pace you will overspend by %@" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "At this pace you will overspend by %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按当前速度将超支 %@" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "按當前速度將超支 %@" } }
+      }
+    },
+    "On track for this period" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "On track for this period" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本周期预计不超支" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本週期預計不超支" } }
+      }
+    },
+    "%lld one-off entries excluded" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%lld one-off entries excluded" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已剔除 %lld 笔偶发大额" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已剔除 %lld 筆偶發大額" } }
+      }
+    },
+    "Recurring payment detected" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recurring payment detected" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发现周期支出" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "發現週期支出" } }
+      }
+    },
+    "Make recurring" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Make recurring" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设为周期记账" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設為週期記帳" } }
+      }
+    },
+    "Create a repeating entry for this merchant" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create a repeating entry for this merchant" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "按此商户创建周期记账" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "按此商戶建立週期記帳" } }
+      }
+    },
+    "Quarterly" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quarterly" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每季度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "每季" } }
+      }
+    },
+    "Budget forecast" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Budget forecast" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预算预测" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "預算預測" } }
+      }
+    },
+    "Budget alerts" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Budget alerts" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预算预警" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "預算預警" } }
+      }
+    },
+    "Exclude one-off large entries" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exclude one-off large entries" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "忽略偶发大额" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "忽略偶發大額" } }
+      }
+    },
+    "Alert frequency" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Alert frequency" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提醒频次" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "提醒頻率" } }
+      }
+    },
+    "Once per budget period" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Once per budget period" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每个预算周期一次" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "每個預算週期一次" } }
+      }
+    },
+    "At most once a day" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "At most once a day" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每天最多一次" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "每天最多一次" } }
+      }
+    },
+    "Budget 80% used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Budget 80% used" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预算已用 80%" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "預算已用 80%" } }
+      }
+    },
+    "You have used 80% of this period's budget." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You have used 80% of this period's budget." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本周期预算已使用 80%。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本週期預算已使用 80%。" } }
+      }
+    },
+    "Budget overspend forecast" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Budget overspend forecast" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预算超支预测" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "預算超支預測" } }
+      }
+    },
     "smart.parse.source.history" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "From your history" } },
@@ -16884,6 +17003,76 @@
             "value" : "信用卡"
           }
         }
+      }
+    },
+    "Credit Limit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Credit Limit" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "信用额度" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "信用額度" } }
+      }
+    },
+    "Statement Day" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Statement Day" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "账单日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳單日" } }
+      }
+    },
+    "Due Day" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Due Day" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还款日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "還款日" } }
+      }
+    },
+    "Card debt is a liability. Repayments are transfers, not expenses." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Card debt is a liability. Repayments are transfers, not expenses." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "信用卡欠款属于负债；还款是转账，不是支出。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "信用卡欠款屬於負債；還款是轉帳，不是支出。" } }
+      }
+    },
+    "Net Worth" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Net Worth" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "净资产" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "淨資產" } }
+      }
+    },
+    "Total Assets" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Total Assets" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "总资产" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "總資產" } }
+      }
+    },
+    "Total Debt" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Total Debt" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "总负债" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "總負債" } }
+      }
+    },
+    "Used" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Used" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已用" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已用" } }
+      }
+    },
+    "Available" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Available" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "可用" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "可用" } }
+      }
+    },
+    "Due this cycle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Due this cycle" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本期应还" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本期應還" } }
       }
     },
     "Hide" : {

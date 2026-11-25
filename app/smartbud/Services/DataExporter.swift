@@ -150,7 +150,10 @@ enum DataExporter {
                     order: account.order, dateCreated: account.dateCreated,
                     currencyCode: account.currencyCode,
                     archived: account.archived,
-                    bookID: account.bookID
+                    bookID: account.bookID,
+                    creditLimit: account.creditLimit,
+                    statementDay: account.statementDay,
+                    dueDay: account.dueDay
                 )
             }
     }

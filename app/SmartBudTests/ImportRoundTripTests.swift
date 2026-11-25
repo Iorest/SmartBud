@@ -275,4 +275,35 @@ struct ImportRoundTripTests {
             $0.countsAsSpend && !$0.countsAsIncome
         })
     }
+
+    @Test("Credit card terms survive export and import; debit accounts drop them")
+    func creditCardTermsRoundTrip() throws {
+        var card = fixture.sampleAccount
+        card.id = UUID()
+        card.kind = 2
+        card.creditLimit = 5000
+        card.statementDay = 25
+        card.dueDay = 3
+        var debit = fixture.sampleAccount
+        debit.id = UUID()
+        debit.creditLimit = 5000
+        debit.statementDay = 25
+
+        let wire = try JSONSerialization.jsonObject(with: JSONEncoder().encode(card)) as? [String: Any]
+        #expect(wire?["creditLimit"] as? Double == 5000)
+        #expect(wire?["statementDay"] as? Int == 25)
+        #expect(wire?["dueDay"] as? Int == 3)
+
+        _ = try DataImporter.apply(fixture.payload(accounts: [card, debit]),
+                                   context: fixture.context)
+
+        let stored = try fixture.context.fetch(FetchDescriptor<AccountModel>())
+        let restoredCard = try #require(stored.first { $0.id == card.id })
+        let restoredDebit = try #require(stored.first { $0.id == debit.id })
+        #expect(restoredCard.creditLimit == 5000)
+        #expect(restoredCard.statementDay == 25)
+        #expect(restoredCard.dueDay == 3)
+        #expect(restoredDebit.creditLimit == nil)
+        #expect(restoredDebit.statementDay == nil)
+    }
 }

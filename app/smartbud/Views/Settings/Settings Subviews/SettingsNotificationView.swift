@@ -21,6 +21,14 @@ struct SettingsNotificationsView: View {
   var notificationsEnabled: Bool = true
   @AppStorage("notificationOption", store: .appGroup)
   var option: Int = 1
+  @AppStorage("budgetForecastEnabled", store: .appGroup)
+  var budgetForecastEnabled: Bool = true
+  @AppStorage("budgetAlertsEnabled", store: .appGroup)
+  var budgetAlertsEnabled: Bool = false
+  @AppStorage("forecastExcludeOutliers", store: .appGroup)
+  var excludeOutliers: Bool = true
+  @AppStorage("budgetAlertFrequency", store: .appGroup)
+  var alertFrequency: Int = 0
 
   @State var customTime = Date.now
   @State private var subscription = SubscriptionManager.shared
@@ -88,6 +96,46 @@ struct SettingsNotificationsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, SBSpace.xxs)
 
+
+      VStack(spacing: 0) {
+        Toggle(isOn: $budgetForecastEnabled) {
+          Text(String.appLocalized("Budget forecast"))
+            .font(.body)
+        }
+        .tint(.green)
+        .padding(.vertical, 4)
+
+        if budgetForecastEnabled {
+          Divider()
+          Toggle(isOn: $excludeOutliers) {
+            Text(String.appLocalized("Exclude one-off large entries"))
+              .font(.footnote)
+          }
+          .padding(.vertical, 4)
+
+          Divider()
+          Toggle(isOn: $budgetAlertsEnabled) {
+            Text(String.appLocalized("Budget alerts"))
+              .font(.body)
+          }
+          .tint(.green)
+          .padding(.vertical, 4)
+
+          if budgetAlertsEnabled {
+            Picker(String.appLocalized("Alert frequency"), selection: $alertFrequency) {
+              Text(String.appLocalized("Once per budget period")).tag(0)
+              Text(String.appLocalized("At most once a day")).tag(1)
+            }
+            .pickerStyle(.inline)
+          }
+        }
+      }
+      .padding(.horizontal, SBSpace.medium)
+      .padding(.vertical, SBSpace.extraSmall)
+      .background(
+        Color.SecondaryBackground,
+        in: RoundedRectangle(cornerRadius: SBRadius.card, style: .continuous)
+      )
       Spacer()
     }
     .animation(.easeInOut(duration: 0.2), value: showNotifications)
@@ -237,4 +285,95 @@ func newNotification() {
 
   // add our notification request
   UNUserNotificationCenter.current().add(request)
+}
+
+// MARK: - Budget alerts
+
+/// Evaluates the budget numbers against the persisted alert settings and posts
+/// at most one local notification per kind and budget. Called at launch, on
+/// return to the foreground and when the budget screen appears — never from a
+/// render loop, so a user cannot be bombarded while scrolling.
+@MainActor
+func refreshBudgetAlerts(now: Date = .now) {
+  let defaults = UserDefaults.appGroup
+  guard defaults.object(forKey: "budgetForecastEnabled") as? Bool ?? true,
+        defaults.object(forKey: "budgetAlertsEnabled") as? Bool ?? false,
+        defaults.object(forKey: "showNotifications") as? Bool ?? false
+  else { return }
+
+  let budgetVM = BudgetViewModel.shared
+  budgetVM.load()
+  let all = BookScope.scoped(DataRepository.shared.fetch(TransactionModel.self),
+                             \.bookID, selected: BookSelection.current())
+  let calendar = Calendar.current
+  let excludeOutliers = defaults.object(forKey: "forecastExcludeOutliers") as? Bool ?? true
+  var snapshots = [BudgetAlertSnapshot]()
+
+  for main in budgetVM.mainBudgets {
+    let start = BudgetRollover.roll(startDate: main.startDate, type: main.type) ?? main.startDate
+    let end = BudgetPeriod.endDate(from: start, type: main.type)
+    let entries = all.compactMap { txn -> BudgetForecastEntry? in
+      guard let date = txn.date, date >= start, date <= now else { return nil }
+      return BudgetForecastEntry(date: date, spend: txn.spendBaseAmount)
+    }
+    snapshots.append(BudgetAlertSnapshot(
+      budgetID: "main|\(main.bookID?.uuidString ?? "")",
+      periodKey: BudgetAlertEvaluator.periodKey(for: start, calendar: calendar),
+      budget: main.amount,
+      spent: main.amount - budgetVM.leftoverOverall(main),
+      forecast: BudgetForecast.estimate(entries: entries, budget: main.amount,
+                                        periodStart: start, periodEnd: end,
+                                        excludeOutliers: excludeOutliers,
+                                        now: now, calendar: calendar)))
+  }
+
+  for budget in budgetVM.budgets {
+    guard let categoryID = budget.category?.id else { continue }
+    let start = BudgetRollover.roll(startDate: budget.startDate, type: budget.type) ?? budget.startDate
+    let end = BudgetPeriod.endDate(from: start, type: budget.type)
+    let entries = all.compactMap { txn -> BudgetForecastEntry? in
+      guard txn.category?.id == categoryID, let date = txn.date,
+            date >= start, date <= now else { return nil }
+      return BudgetForecastEntry(date: date, spend: txn.spendBaseAmount)
+    }
+    snapshots.append(BudgetAlertSnapshot(
+      budgetID: budget.id.uuidString,
+      periodKey: BudgetAlertEvaluator.periodKey(for: start, calendar: calendar),
+      budget: budget.amount,
+      spent: budget.amount - budgetVM.leftover(budget),
+      forecast: BudgetForecast.estimate(entries: entries, budget: budget.amount,
+                                        periodStart: start, periodEnd: end,
+                                        excludeOutliers: excludeOutliers,
+                                        now: now, calendar: calendar)))
+  }
+
+  let frequency = BudgetAlertFrequency(rawValue: defaults.integer(forKey: "budgetAlertFrequency"))
+    ?? .oncePerPeriod
+  let history = defaults.dictionary(forKey: "budgetAlertHistory") as? [String: String] ?? [:]
+  let decision = BudgetAlertEvaluator.requests(for: snapshots, enabled: true,
+                                               now: now, frequency: frequency,
+                                               history: history, calendar: calendar)
+  defaults.set(decision.history, forKey: "budgetAlertHistory")
+
+  let center = UNUserNotificationCenter.current()
+  for request in decision.requests {
+    let content = UNMutableNotificationContent()
+    content.sound = .default
+    content.threadIdentifier = "smartbud.budget"
+    switch request.kind {
+    case .usage80:
+      content.title = String.appLocalized("Budget 80% used")
+      content.body = String.appLocalized("You have used 80% of this period's budget.")
+    case .projectedOverspend:
+      let overspend = snapshots.first { $0.budgetID == request.budgetID }?.forecast?.overspend ?? 0
+      let amount = Money.format(overspend,
+                                currencyCode: AppBaseCurrency.code(in: defaults),
+                                showsCents: defaults.object(forKey: "showCents") as? Bool ?? true,
+                                locale: .appLocale)
+      content.title = String.appLocalized("Budget overspend forecast")
+      content.body = String.appFormatted("At this pace you will overspend by %@", amount)
+    }
+    center.add(UNNotificationRequest(identifier: "budget-alert|\(request.dedupeKey)",
+                                     content: content, trigger: nil))
+  }
 }
