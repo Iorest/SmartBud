@@ -255,14 +255,14 @@ struct ImportRoundTripTests {
             context: fixture.context
         )
 
-        let plans = try fixture.context.fetch(FetchDescriptor<InstallmentPlanModel>())
+        let plans = InstallmentLedger.plans(in: fixture.context)
         let storedPlan = try #require(plans.first)
         #expect(storedPlan.id == planID)
         #expect(storedPlan.principal == 100)
         #expect(storedPlan.fee == 0.30)
         #expect(storedPlan.periods == 3)
         #expect(storedPlan.executedPeriods == 2)
-        #expect(storedPlan.account?.id == fixture.accountID)
+        #expect(storedPlan.accountID == fixture.accountID)
 
         let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
         #expect(rows.count == 4)

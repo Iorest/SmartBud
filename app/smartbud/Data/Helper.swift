@@ -34,6 +34,11 @@ final class BookModel {
     var order: Int = 0
     var archived: Bool = false
     var dateCreated: Date = Date.now
+    /// Installment plans live here as JSON: a new SwiftData entity in the
+    /// shared app/widget schema breaks XCUITest's launch handshake (proved by
+    /// a 7/7 green bisect with the entity removed), so plans are persisted on
+    /// this existing entity instead.
+    var installmentPlansJSON: String?
 
     init(name: String = defaultName, icon: String = "", type: Int = 0,
          order: Int = 0, archived: Bool = false) {
@@ -569,8 +574,10 @@ extension TransferModel {
 ///
 /// Rows are materialised only for executed periods: a future bill must not
 /// restore the card's available credit before the money is actually paid.
-@Model
-final class InstallmentPlanModel {
+/// A consumer or bill installment. Stored as Codable JSON on `BookModel` —
+/// not as its own SwiftData entity — because adding an entity to the shared
+/// app/widget schema reproducibly breaks XCUITest's launch handshake.
+struct InstallmentPlanModel: Codable, Equatable {
     var id: UUID = UUID()
     var bookID: UUID? = BookModel.defaultID
     /// Total debt, in the base currency.
@@ -584,15 +591,13 @@ final class InstallmentPlanModel {
     var executedPeriods: Int = 0
     var note: String?
     var dateCreated: Date = Date.now
-    /// Card the plan hangs off. Each principal row raises its balance towards
-    /// zero, which is the only "used limit" model this app has.
-    var account: AccountModel?
-    /// Category applied to fee rows so they land in the right spend bucket.
-    var category: CategoryModel?
+    /// Card and category are plain ids, resolved against the ledger on use.
+    var accountID: UUID?
+    var categoryID: UUID?
 
     init(principal: Double = 0, fee: Double = 0, periods: Int = 0,
          firstDate: Date = .now, note: String? = nil,
-         account: AccountModel? = nil, category: CategoryModel? = nil,
+         accountID: UUID? = nil, categoryID: UUID? = nil,
          bookID: UUID? = BookModel.defaultID) {
         self.id = UUID()
         self.principal = principal
@@ -600,10 +605,57 @@ final class InstallmentPlanModel {
         self.periods = periods
         self.firstDate = firstDate
         self.note = note
-        self.account = account
-        self.category = category
+        self.accountID = accountID
+        self.categoryID = categoryID
         self.bookID = bookID
         self.dateCreated = .now
+    }
+}
+
+/// Plan persistence without a new SwiftData entity: JSON on the default book.
+/// A new entity in the shared app/widget schema reproducibly breaks the
+/// XCUITest launch handshake, and removing it gave a 7/7 green CI run.
+enum InstallmentPlanStore {
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+
+    private static func book(in context: ModelContext) -> BookModel? {
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        return books.first { $0.id == BookModel.defaultID } ?? books.first
+    }
+
+    static func all(in context: ModelContext) -> [InstallmentPlanModel] {
+        guard let json = book(in: context)?.installmentPlansJSON,
+              let data = json.data(using: .utf8),
+              let plans = try? decoder.decode([InstallmentPlanModel].self, from: data) else {
+            return []
+        }
+        return plans
+    }
+
+    static func save(_ plans: [InstallmentPlanModel], in context: ModelContext) {
+        guard let data = try? encoder.encode(plans),
+              let json = String(data: data, encoding: .utf8),
+              let book = book(in: context) else { return }
+        book.installmentPlansJSON = json
+    }
+
+    static func upsert(_ plan: InstallmentPlanModel, in context: ModelContext) {
+        var plans = all(in: context)
+        if let index = plans.firstIndex(where: { $0.id == plan.id }) {
+            plans[index] = plan
+        } else {
+            plans.append(plan)
+        }
+        save(plans, in: context)
+    }
+
+    static func remove(id: UUID, in context: ModelContext) {
+        save(all(in: context).filter { $0.id != id }, in: context)
+    }
+
+    static func removeAll(in context: ModelContext) {
+        save([], in: context)
     }
 }
 

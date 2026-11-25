@@ -83,7 +83,6 @@ final class DataRepository {
         CategoryModel.self,
         AccountModel.self,
         TransferModel.self,
-        InstallmentPlanModel.self,
         CurrencyRate.self,
         BudgetModel.self,
         MainBudgetModel.self,
@@ -292,7 +291,7 @@ final class DataRepository {
         for budget in fetch(BudgetModel.self) { context.delete(budget) }
         for mainBudget in fetch(MainBudgetModel.self) { context.delete(mainBudget) }
         for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
-        for plan in fetch(InstallmentPlanModel.self) { context.delete(plan) }
+        InstallmentPlanStore.removeAll(in: context)
         for book in fetch(BookModel.self) { context.delete(book) }
         return save()
     }

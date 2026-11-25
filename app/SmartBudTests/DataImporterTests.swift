@@ -31,8 +31,7 @@ init() throws {
             CurrencyRate.self,
             BudgetModel.self,
             MainBudgetModel.self,
-            TemplateTransactionModel.self,
-            InstallmentPlanModel.self
+            TemplateTransactionModel.self
         ]),
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )

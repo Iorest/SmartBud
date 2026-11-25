@@ -50,6 +50,7 @@ enum InstallmentLedger {
         if plan.periods < plan.executedPeriods {
             plan.periods = plan.executedPeriods
         }
+        InstallmentPlanStore.upsert(plan, in: context)
         let schedule = InstallmentPolicy.schedule(principal: plan.principal, fee: plan.fee,
                                                   periods: plan.periods, firstDate: plan.firstDate)
         guard !schedule.isEmpty else { return SyncResult() }
@@ -70,7 +71,7 @@ enum InstallmentLedger {
                     result.kept += 1
                     continue
                 }
-                context.insert(makeRow(period: period, kind: kind, plan: plan))
+                context.insert(makeRow(period: period, kind: kind, plan: plan, in: context))
                 keys.insert(key)
                 result.created += 1
             }
@@ -87,9 +88,10 @@ enum InstallmentLedger {
         return sync(plan, in: context)
     }
 
-    /// Remove every generated row when the plan itself is deleted.
+    /// Remove every generated row and the plan itself.
     static func prepareForDeletion(_ plan: InstallmentPlanModel, in context: ModelContext) {
         for row in rows(for: plan, in: context) { context.delete(row) }
+        InstallmentPlanStore.remove(id: plan.id, in: context)
     }
 
     /// Credit restored on the linked account, capped at the plan principal.
@@ -99,16 +101,26 @@ enum InstallmentLedger {
                                         executed: plan.executedPeriods)
     }
 
+    /// Plans are Codable values on the default book, not a SwiftData entity.
+    static func plans(in context: ModelContext) -> [InstallmentPlanModel] {
+        InstallmentPlanStore.all(in: context)
+    }
+
     private static func makeRow(period: InstallmentPolicy.Period, kind: Int,
-                                plan: InstallmentPlanModel) -> TransactionModel {
+                                plan: InstallmentPlanModel,
+                                in context: ModelContext) -> TransactionModel {
         let isPrincipal = kind == 2
         let amount = isPrincipal ? period.principal : period.fee
+        let accounts = (try? context.fetch(FetchDescriptor<AccountModel>())) ?? []
+        let categories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
+        let account = accounts.first { $0.id == plan.accountID }
+        let category = categories.first { $0.id == plan.categoryID }
         let row = TransactionModel(
             note: isPrincipal
                 ? "分期本金 \(period.index)/\(plan.periods)"
                 : "分期手续费 \(period.index)/\(plan.periods)",
-            category: isPrincipal ? nil : plan.category,
-            account: plan.account,
+            category: isPrincipal ? nil : category,
+            account: account,
             baseAmount: amount,
             income: isPrincipal,
             amount: amount,

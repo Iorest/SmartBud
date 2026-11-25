@@ -234,7 +234,7 @@ enum DataExporter {
     }
 
     private static func installmentPlansDTOs(_ repo: DataRepository) -> [InstallmentPlanDTO] {
-        repo.fetch(InstallmentPlanModel.self)
+        InstallmentLedger.plans(in: repo.container.mainContext)
             .sorted { $0.dateCreated < $1.dateCreated }
             .map { plan in
                 InstallmentPlanDTO(
@@ -245,10 +245,10 @@ enum DataExporter {
                     periods: plan.periods,
                     firstDate: plan.firstDate,
                     executedPeriods: plan.executedPeriods,
-                    accountId: plan.account?.id,
-                    accountName: plan.account?.name,
-                    categoryId: plan.category?.id,
-                    categoryName: plan.category?.name,
+                    accountId: plan.accountID,
+                    accountName: nil,
+                    categoryId: plan.categoryID,
+                    categoryName: nil,
                     note: plan.note,
                     dateCreated: plan.dateCreated
                 )

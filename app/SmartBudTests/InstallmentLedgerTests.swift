@@ -29,11 +29,11 @@ struct InstallmentLedgerTests {
                 CurrencyRate.self,
                 BudgetModel.self,
                 MainBudgetModel.self,
-                TemplateTransactionModel.self,
-                InstallmentPlanModel.self
+                TemplateTransactionModel.self
             ]),
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
+        BookMigration.ensureDefaultBook(in: context)
     }
 
     @discardableResult
@@ -44,10 +44,9 @@ struct InstallmentLedgerTests {
         let result = InstallmentPlanModel(
             principal: principal, fee: fee, periods: periods,
             firstDate: Date(timeIntervalSince1970: 1_700_000_000),
-            account: card, bookID: BookModel.defaultID
+            accountID: card.id, bookID: BookModel.defaultID
         )
         result.executedPeriods = executed
-        context.insert(result)
         return result
     }
 

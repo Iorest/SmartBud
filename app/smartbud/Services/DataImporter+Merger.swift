@@ -58,7 +58,7 @@ struct BackupMerger {
     /// resolve. Generated bills are ordinary rows carrying `installmentOf`, so
     /// the plan-to-bill relation survives a round trip without a second store.
     mutating func importInstallmentPlans(_ dtos: [ExportSchema.InstallmentPlanDTO]) {
-        var existing = Set(fetch(InstallmentPlanModel.self).map(\.id))
+        var existing = Set(InstallmentPlanStore.all(in: context).map(\.id))
         for dto in dtos {
             guard existing.insert(dto.id).inserted else {
                 summary.skipped += 1
@@ -70,14 +70,14 @@ struct BackupMerger {
                 periods: max(0, dto.periods),
                 firstDate: dto.firstDate,
                 note: dto.note,
-                account: resolveAccount(id: dto.accountId, name: dto.accountName),
-                category: resolveCategory(id: dto.categoryId, name: dto.categoryName),
+                accountID: dto.accountId,
+                categoryID: dto.categoryID,
                 bookID: resolveBook(dto.bookID)
             )
             plan.id = dto.id
             plan.executedPeriods = max(0, min(dto.executedPeriods, plan.periods))
             if let created = dto.dateCreated { plan.dateCreated = created }
-            context.insert(plan)
+            InstallmentPlanStore.upsert(plan, in: context)
             summary.installmentPlans += 1
         }
     }
