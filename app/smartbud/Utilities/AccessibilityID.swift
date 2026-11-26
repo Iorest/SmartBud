@@ -82,6 +82,11 @@ enum AccessibilityID {
     static let entryCreditLimitWarning = "sb.entry.creditLimitWarning"
     static let entryDiscountChip = "sb.entry.discountChip"
     static let entryClaimChip = "sb.entry.claimChip"
+    /// Labels and receipt chips on the entry form.
+    static let entryTagChip = "sb.entry.tagChip"
+    static let entryTagToggle = "sb.entry.tagToggle"
+    static let entryReceiptChip = "sb.entry.receiptChip"
+    static let entryReceiptView = "sb.entry.receiptView"
     static let entryDateButton = "sb.entry.dateButton"
     /// Long-press alternative on the checkmark.
     static let entrySaveAndContinue = "sb.entry.saveAndContinue"

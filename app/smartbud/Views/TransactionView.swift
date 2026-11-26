@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import PhotosUI
+import SwiftData
 import SwiftUI
 
 struct TransactionView: View {
@@ -38,6 +40,21 @@ struct TransactionView: View {
 
     /// Claims the expense back; claims are excluded from spend statistics.
     @State var reimbursable = false
+
+    // MARK: - Tags and receipt attachments
+
+    @State var availableTags: [TagModel] = []
+    @State var selectedTagIDs: Set<UUID> = []
+    @State var showTagPicker = false
+    @State var showReceiptPicker = false
+    @State var newTagName = ""
+    /// Photos chosen in this form. `receiptsChanged` distinguishes "nothing
+    /// picked yet" (keep an edited row's files) from "user removed every
+    /// photo" (write an empty set and delete the old files).
+    @State var receiptItems: [PhotosPickerItem] = []
+    @State var receiptData: [Data] = []
+    @State var receiptsChanged = false
+    @State var showReceiptViewer = false
 
     @State var showCategoryPicker = false
     @State var showCategorySheet = false
@@ -250,7 +267,9 @@ struct TransactionView: View {
             repeatType: repeatType,
             repeatCoefficient: repeatCoefficient,
             discount: discount,
-            reimbursable: reimbursable && !income
+            reimbursable: reimbursable && !income,
+            tagIDs: Array(selectedTagIDs),
+            attachmentData: receiptsChanged ? receiptData : nil
         ))
         guard created != nil else {
             // The store rolled the insert back; keep the form so nothing the
@@ -293,7 +312,9 @@ struct TransactionView: View {
             repeatType: repeatType,
             repeatCoefficient: repeatCoefficient,
             discount: discount,
-            reimbursable: reimbursable && !income
+            reimbursable: reimbursable && !income,
+            tagIDs: Array(selectedTagIDs),
+            attachmentData: receiptsChanged ? receiptData : nil
         ))
         guard saved else {
             errorHaptic &+= 1
@@ -334,6 +355,10 @@ struct TransactionView: View {
         note = ""
         discount = 0
         reimbursable = false
+        selectedTagIDs.removeAll()
+        receiptItems.removeAll()
+        receiptData.removeAll()
+        receiptsChanged = false
         toastImage = "checkmark.circle.fill"
         toastTitle = String.appLocalized("Saved")
         toastSticks = false
@@ -357,6 +382,7 @@ struct TransactionView: View {
             _account = State(initialValue: transaction.account)
             _discount = State(initialValue: transaction.discount)
             _reimbursable = State(initialValue: transaction.reimbursable)
+            _selectedTagIDs = State(initialValue: Set(transaction.tagIDs))
         }
         self.toEdit = toEdit
     }

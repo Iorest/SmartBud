@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A30F00000000000000000001 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		A30F00000000000000000002 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		A30F00000000000000000003 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		A30F00000000000000000004 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		A30F00000000000000000011 /* ReceiptAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F2 /* ReceiptAttachment.swift */; };
+		A30F00000000000000000012 /* ReceiptAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F2 /* ReceiptAttachment.swift */; };
+		A30F00000000000000000013 /* ReceiptAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F2 /* ReceiptAttachment.swift */; };
+		A30F00000000000000000014 /* ReceiptAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F2 /* ReceiptAttachment.swift */; };
+		A30F00000000000000000021 /* ReceiptAttachmentSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */; };
+		A30F00000000000000000022 /* ReceiptAttachmentSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */; };
+		A30F00000000000000000023 /* ReceiptAttachmentSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */; };
 		A16B00B5000000000000B1E1 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
 		A16B00B5000000000000B1E2 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
 		A16B00B5000000000000B1E3 /* MerchantNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16B00B5000000000000F1A1 /* MerchantNormalizer.swift */; };
@@ -297,6 +308,8 @@
 		F29A00000000000000000024 /* InstallmentLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000022 /* InstallmentLedgerTests.swift */; };
 		E1A2B3C4000000000000F0F2 /* TransferFeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */; };
 		E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */; };
+		A30F00000000000000000031 /* TagFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F4 /* TagFilterTests.swift */; };
+		A30F00000000000000000032 /* ReceiptAttachmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F5 /* ReceiptAttachmentTests.swift */; };
 		E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F001 /* AppPeriod.swift */; };
 		E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A2B3C4000000000000F021 /* CurrencyRebase.swift */; };
 		B0A0F00000000000000000A4 /* BudgetLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A0F00000000000000000A1 /* BudgetLogic.swift */; };
@@ -738,12 +751,17 @@
 		F29A00000000000000000022 /* InstallmentLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/InstallmentLedgerTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F0F1 /* TransferFeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/TransferFeeTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F101 /* ImportRoundTripTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/ImportRoundTripTests.swift; sourceTree = SOURCE_ROOT; };
+		A30F000000000000000000F4 /* TagFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/TagFilterTests.swift; sourceTree = SOURCE_ROOT; };
+		A30F000000000000000000F5 /* ReceiptAttachmentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/ReceiptAttachmentTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000F091 /* LogPeriodTotals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "smartbud/Views/Log/LogPeriodTotals.swift"; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000A031 /* ExportSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/ExportSchema.swift; sourceTree = "<group>"; };
 		E1A2B3C4000000000000A041 /* CSVSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/CSVSupport.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C060 /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Utilities/ProAccess.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/WipeOutcome.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000001 /* BatchRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BatchRecognition.swift; sourceTree = SOURCE_ROOT; };
+		A30F000000000000000000F1 /* TagFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/TagFilter.swift; sourceTree = SOURCE_ROOT; };
+		A30F000000000000000000F2 /* ReceiptAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/ReceiptAttachment.swift; sourceTree = SOURCE_ROOT; };
+		A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/ReceiptAttachmentSync.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000002 /* BatchRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/BatchRecognitionView.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000003 /* BatchRecognitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BatchRecognitionTests.swift; sourceTree = SOURCE_ROOT; };
 		E1A2B3C4000000000000C0B0 /* SmartBud.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = SmartBud.storekit; sourceTree = "<group>"; };
@@ -945,6 +963,8 @@
 				E1A2B3C4000000000000F0B1 /* ReimbursementLedgerTests.swift */,
 				F29A00000000000000000021 /* InstallmentPolicyTests.swift */,
 				F29A00000000000000000022 /* InstallmentLedgerTests.swift */,
+				A30F000000000000000000F4 /* TagFilterTests.swift */,
+				A30F000000000000000000F5 /* ReceiptAttachmentTests.swift */,
 						E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */,
 						E1A2B3C40000000000001111 /* ReimbursementPolicyTests.swift */,
 				E1A2B3C4000000000000F241 /* BadDebtPolicyTests.swift */,
@@ -1070,6 +1090,9 @@
 						E1A2B3C4000000000000F141 /* RefundSheet.swift */,
 				E1A2B3C4000000000000F231 /* BadDebtSheet.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
+				A30F000000000000000000F1 /* TagFilter.swift */,
+				A30F000000000000000000F2 /* ReceiptAttachment.swift */,
+				A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
 				F23A00010000000000000001 /* BatchRecognition.swift */,
 				F23A00010000000000000002 /* BatchRecognitionView.swift */,
@@ -1830,6 +1853,9 @@
 				E1A2B3C40000000000001005 /* CurrencyRateStore.swift in Sources */,
 				E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */,
 				E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */,
+				A30F00000000000000000001 /* TagFilter.swift in Sources */,
+				A30F00000000000000000011 /* ReceiptAttachment.swift in Sources */,
+				A30F00000000000000000021 /* ReceiptAttachmentSync.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1878,6 +1904,9 @@
 				53B907A32AE81A080001F496 /* DonutSemicircle.swift in Sources */,
 				53B907A22AE81A080001F496 /* Ring.swift in Sources */,
 				E1A2B3C40000000000000451 /* WidgetFormatting.swift in Sources */,
+				A30F00000000000000000002 /* TagFilter.swift in Sources */,
+				A30F00000000000000000012 /* ReceiptAttachment.swift in Sources */,
+				A30F00000000000000000022 /* ReceiptAttachmentSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1921,6 +1950,8 @@
 				A16B00B5000000000000B1F4 /* MerchantAggregationTests.swift in Sources */,
 				A16B00B5000000000000B1F5 /* MerchantMigrationTests.swift in Sources */,
 				E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */,
+				A30F00000000000000000031 /* TagFilterTests.swift in Sources */,
+				A30F00000000000000000032 /* ReceiptAttachmentTests.swift in Sources */,
 				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
 				B0A0F00000000000000000D3 /* Money.swift in Sources */,
@@ -1962,6 +1993,8 @@
 				E1A2B3C4000000000000C091 /* WipeOutcomeTests.swift in Sources */,
 				E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */,
 				E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */,
+				A30F00000000000000000003 /* TagFilter.swift in Sources */,
+				A30F00000000000000000013 /* ReceiptAttachment.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2169,6 +2202,9 @@
 				E1A2B3C40000000000001006 /* CurrencyRateStore.swift in Sources */,
 				E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */,
 				E1A2B3C40000000000001042 /* ExchangeRateService.swift in Sources */,
+				A30F00000000000000000004 /* TagFilter.swift in Sources */,
+				A30F00000000000000000014 /* ReceiptAttachment.swift in Sources */,
+				A30F00000000000000000023 /* ReceiptAttachmentSync.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

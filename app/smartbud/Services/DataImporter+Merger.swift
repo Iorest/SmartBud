@@ -24,6 +24,8 @@ struct BackupMerger {
     var accountsByID: [UUID: AccountModel] = [:]
     var accountsByName: [String: AccountModel] = [:]
     var booksByID: [UUID: BookModel] = [:]
+    /// Tag ids already present per book, used to resolve a backup's row refs.
+    var knownTagIDs: Set<UUID> = []
 
     init(context: ModelContext) {
         self.context = context
@@ -36,6 +38,28 @@ struct BackupMerger {
             accountsByName[account.name] = account
         }
         for book in fetch(BookModel.self) { booksByID[book.id] = book }
+        knownTagIDs = Set(TagStore.allAcrossBooks(in: context).map(\.id))
+    }
+
+
+    /// Merge labels into their book. Ids are the identity, so importing the
+    /// same backup twice cannot duplicate a label or orphan a row's ref.
+    mutating func importTags(_ dtos: [ExportSchema.TagDTO]) {
+        var groups: [UUID?: [TagModel]] = [:]
+        for dto in dtos where knownTagIDs.insert(dto.id).inserted {
+            let bookID = resolveBook(dto.bookID)
+            let tag = TagModel(id: dto.id, name: dto.name, color: dto.color,
+                               order: dto.order, bookID: bookID)
+            groups[bookID, default: []].append(tag)
+            summary.tags += 1
+        }
+        for (bookID, incoming) in groups {
+            guard booksByID[bookID ?? BookModel.defaultID] != nil else { continue }
+            var merged = bookID.flatMap { TagStore.all(in: context, bookID: $0) } ?? []
+            let existing = Set(merged.map(\.id))
+            merged.append(contentsOf: incoming.filter { !existing.contains($0.id) })
+            TagStore.replace(in: context, bookID: bookID, with: merged)
+        }
     }
 
     mutating func importBooks(_ dtos: [ExportSchema.BookDTO]) {
@@ -202,6 +226,17 @@ struct BackupMerger {
             transaction.badDebtAt = dto.badDebtAt
             if let day = dto.day { transaction.day = day }
             if let month = dto.month { transaction.month = month }
+            // Labels: only ids that survived the tag merge are restored, so
+            // a hand-edited backup cannot create ghost references.
+            transaction.tagIDs = (dto.tagIds ?? []).filter { knownTagIDs.contains($0) }
+            let refs: [ReceiptAttachment] = (dto.attachments ?? []).map {
+                ReceiptAttachment(id: $0.id, fileName: $0.fileName,
+                                  byteCount: $0.byteCount, checksum: $0.checksum)
+            }
+            transaction.attachments = refs
+            summary.missingAttachments += refs.filter {
+                !ReceiptAttachmentStore.hasFile(for: $0, transactionID: transaction.id)
+            }.count
             context.insert(transaction)
             summary.transactions += 1
         }

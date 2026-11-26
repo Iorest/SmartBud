@@ -39,6 +39,10 @@ final class BookModel {
     /// a 7/7 green bisect with the entity removed), so plans are persisted on
     /// this existing entity instead.
     var installmentPlansJSON: String?
+    /// Labels for this ledger, as JSON (`[TagModel]`). Same reason as the
+    /// installment plans: a new SwiftData entity in the shared schema breaks
+    /// XCUITest's launch handshake. Old rows have no tags and need no backfill.
+    var tagsJSON: String?
 
     init(name: String = defaultName, icon: String = "", type: Int = 0,
          order: Int = 0, archived: Bool = false) {
@@ -187,6 +191,12 @@ final class TransactionModel {
     var installmentPeriod: Int = 0
     /// 1 = fee/interest (spend), 2 = principal (liability reduction).
     var installmentKind: Int = 0
+    /// Tag ids attached to this row (many-to-many through ids). JSON so no
+    /// new SwiftData entity is needed; nil means an untagged legacy row.
+    var tagIDsJSON: String?
+    /// Receipt photo references (`[ReceiptAttachment]` JSON). The bytes live
+    /// in the App Group sandbox; deleting the row must delete those files.
+    var attachmentJSON: String?
 
     init(
         note: String = "",
@@ -256,6 +266,25 @@ extension TransactionModel {
     @Transient var wrappedNote: String { note ?? "" }
     @Transient var wrappedCategoryName: String { category?.name ?? "" }
     @Transient var wrappedColour: String { category?.colour ?? "#FFFFFF" }
+
+    /// Tag ids are stored as JSON to avoid a new SwiftData entity. Corrupt
+    /// JSON decodes as "no tags" rather than taking the row down.
+    @Transient var tagIDs: [UUID] {
+        get {
+            guard let json = tagIDsJSON, let data = json.data(using: .utf8),
+                  let ids = try? JSONDecoder().decode([UUID].self, from: data) else { return [] }
+            return ids
+        }
+        set {
+            let data = (try? JSONEncoder().encode(newValue)) ?? Data()
+            tagIDsJSON = newValue.isEmpty ? nil : String(data: data, encoding: .utf8)
+        }
+    }
+
+    @Transient var attachments: [ReceiptAttachment] {
+        get { ReceiptAttachmentStore.decodeJSON(attachmentJSON) }
+        set { attachmentJSON = ReceiptAttachmentStore.encodeJSON(newValue) }
+    }
 
     /// Price before the discount, when one was recorded.
     @Transient var grossAmount: Double { amount + discount }
@@ -659,6 +688,88 @@ enum InstallmentPlanStore {
     }
 }
 
+// MARK: - Tags
+
+/// Label CRUD on the book's JSON field. A tag can be used by many rows and a
+/// row can carry many tags, so the relation is many-to-many without a join
+/// entity or a new CloudKit record type. See `InstallmentPlanStore` for why
+/// no new SwiftData entity is added to the shared app/widget schema.
+enum TagStore {
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+
+    private static func book(in context: ModelContext, id: UUID?) -> BookModel? {
+        let wanted = id ?? BookSelection.current()
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        return books.first { $0.id == wanted }
+    }
+
+    static func all(in context: ModelContext, bookID: UUID? = nil) -> [TagModel] {
+        guard let json = book(in: context, id: bookID)?.tagsJSON,
+              let data = json.data(using: .utf8),
+              let tags = try? decoder.decode([TagModel].self, from: data) else { return [] }
+        return TagFilter.normalize(tags)
+    }
+
+    /// Every tag in every ledger, used by the JSON backup. `TagDTO.bookID`
+    /// keeps the association; restoring puts each one back on its book.
+    static func allAcrossBooks(in context: ModelContext) -> [TagModel] {
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        var result: [TagModel] = []
+        for stored in books {
+            guard let json = stored.tagsJSON, let data = json.data(using: .utf8),
+                  let tags = try? decoder.decode([TagModel].self, from: data) else { continue }
+            for tag in tags {
+                var copy = tag
+                copy.bookID = stored.id
+                result.append(copy)
+            }
+        }
+        return result
+    }
+
+    @discardableResult
+    static func save(_ tags: [TagModel], in context: ModelContext,
+                     bookID: UUID? = nil) -> [TagModel] {
+        let normalized = TagFilter.normalize(tags)
+        guard let data = try? encoder.encode(normalized),
+              let json = String(data: data, encoding: .utf8),
+              let book = book(in: context, id: bookID) else { return [] }
+        book.tagsJSON = json
+        return normalized
+    }
+
+    @discardableResult
+    static func upsert(_ tag: TagModel, in context: ModelContext,
+                       bookID: UUID? = nil) -> [TagModel] {
+        var tags = all(in: context, bookID: bookID)
+        if let index = tags.firstIndex(where: { $0.id == tag.id }) {
+            tags[index] = tag
+        } else {
+            tags.append(tag)
+        }
+        return save(tags, in: context, bookID: bookID)
+    }
+
+    /// Removes one tag from this book. Callers strip the id from rows in the
+    /// same save so no transaction points at a deleted label.
+    @discardableResult
+    static func remove(id: UUID, in context: ModelContext,
+                       bookID: UUID? = nil) -> [TagModel] {
+        save(all(in: context, bookID: bookID).filter { $0.id != id },
+             in: context, bookID: bookID)
+    }
+
+    /// Import path: replaces one book's labels without touching the others.
+    static func replace(in context: ModelContext, bookID: UUID?, with tags: [TagModel]) {
+        guard book(in: context, id: bookID) != nil else { return }
+        _ = save(tags.map {
+            var copy = $0
+            copy.bookID = bookID
+            return copy
+        }, in: context, bookID: bookID)
+    }
+}
 // MARK: - Category Budget
 
 @Model

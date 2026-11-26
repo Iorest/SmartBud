@@ -133,7 +133,12 @@ enum DataExporter {
                 bookID: txn.bookID,
                 installmentOf: txn.installmentOf,
                 installmentPeriod: txn.installmentPeriod > 0 ? txn.installmentPeriod : nil,
-                installmentKind: txn.installmentKind > 0 ? txn.installmentKind : nil
+                installmentKind: txn.installmentKind > 0 ? txn.installmentKind : nil,
+                tagIds: txn.tagIDs.isEmpty ? nil : txn.tagIDs,
+                attachments: txn.attachments.isEmpty ? nil : txn.attachments.map {
+                    AttachmentRefDTO(id: $0.id, fileName: $0.fileName,
+                                     byteCount: $0.byteCount, checksum: $0.checksum)
+                }
             )
         }
 
@@ -255,6 +260,13 @@ enum DataExporter {
             }
     }
 
+    private static func tagsDTOs(_ repo: DataRepository) -> [TagDTO] {
+        TagStore.allAcrossBooks(in: repo.container.mainContext).map {
+            TagDTO(id: $0.id, name: $0.name, color: $0.color,
+                   order: $0.order, bookID: $0.bookID)
+        }
+    }
+
     private static func makePayload(repo: DataRepository) throws -> ExportPayload {
         let appVersion = Bundle.main.appVersion
         let exportDate = Date.now
@@ -276,6 +288,7 @@ enum DataExporter {
         let rates = ratesDTOs(repo)
         let books = booksDTOs(repo)
         let installmentPlans = installmentPlansDTOs(repo)
+        let tags = tagsDTOs(repo)
 
         return ExportPayload(
             exportDate: exportDate,
@@ -291,7 +304,8 @@ enum DataExporter {
             rates: rates,
             settings: ExportSchema.SettingsDTO.current(),
             books: books,
-            installmentPlans: installmentPlans
+            installmentPlans: installmentPlans,
+            tags: tags
         )
     }
 
@@ -321,4 +335,6 @@ extension DataExporter {
     typealias TemplateTransactionDTO = ExportSchema.TemplateTransactionDTO
     typealias BookDTO = ExportSchema.BookDTO
     typealias InstallmentPlanDTO = ExportSchema.InstallmentPlanDTO
+    typealias TagDTO = ExportSchema.TagDTO
+    typealias AttachmentRefDTO = ExportSchema.AttachmentRefDTO
 }

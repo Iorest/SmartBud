@@ -98,6 +98,19 @@ final class DataRepository {
         container = built.container
         fallbackReason = built.reason
         storageMode = built.mode
+
+        // Crash safety: a delete committed between the file removal and the
+        // row removal can leave a directory with no owner. CloudKit can
+        // restore any file whose row still exists (see downloadMissing).
+        // Never prune from a transient store: an in-memory fallback (or the
+        // -freshStore / -memoryStore QA hooks) sees zero rows while the real
+        // App Group store and its receipt files are still intact.
+        if built.mode != .memory {
+            let liveIDs = Set(
+                ((try? built.container.mainContext.fetch(FetchDescriptor<TransactionModel>())) ?? [])
+                    .map(\.id))
+            try? ReceiptAttachmentStore.pruneOrphans(valid: liveIDs)
+        }
     }
 
     /// Local-only store: works on simulators and devices without the App
@@ -319,6 +332,14 @@ final class DataRepository {
         //    the local store is in an unknown state is worse than
         //    failing the whole flow.
         guard deleteAll() else { return .localFailed }
+
+        // Receipt photos live outside the SwiftData store. Remove the local
+        // files and their CKAsset records so "Erase All Data" really erases
+        // everything (App Store Guideline 5.1.1(v)).
+        if let root = ReceiptAttachmentStore.root() {
+            try? FileManager.default.removeItem(at: root)
+        }
+        await ReceiptAttachmentSync.removeAll()
 
         // 2. CloudKit zone delete. Best effort — if the device is
         //    signed out of iCloud, the zone doesn't exist on this
