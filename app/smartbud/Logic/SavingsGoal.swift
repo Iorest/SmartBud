@@ -88,7 +88,9 @@ struct SavingsGoalModel: Codable, Equatable, Identifiable {
 enum SavingsGoalSchedule {
     static let calendar: Calendar = {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(secondsFromGMT: 0) ?? .gmt
+        // `.gmt` is unavailable on the SwiftPM macOS 12 target used by the
+        // Linux harness; a zero-offset zone is always constructible.
+        cal.timeZone = TimeZone(secondsFromGMT: 0) ?? TimeZone.current
         return cal
     }()
 
@@ -179,8 +181,7 @@ enum SavingsGoalPolicy {
     /// never twice, and only after the goal actually reached its target.
     static func shouldNotify(
         goal: SavingsGoalModel,
-        progress: SavingsProgress,
-        now: Date = .now
+        progress: SavingsProgress
     ) -> Bool {
         guard goal.notifyOnAchievement, goal.notifiedAt == nil,
               progress.state == .achieved else { return false }

@@ -54,6 +54,7 @@ final class SavingsGoalViewModel {
     /// later edit (for example reducing the target) is a real event.
     @discardableResult
     func upsert(_ goal: SavingsGoalModel, notificationsEnabled: Bool) async -> Bool {
+        message = nil
         guard SavingsGoalPolicy.isValid(goal) else {
             message = String.appLocalized("Enter a name and a target greater than zero.")
             return false
@@ -67,7 +68,10 @@ final class SavingsGoalViewModel {
         if isNew, result.state == .achieved { copy.notifiedAt = .now }
 
         SavingsGoalStore.upsert(copy, in: repo.context)
-        guard repo.save() else { return false }
+        guard repo.save() else {
+            message = String.appLocalized("无法保存更改，请稍后重试。")
+            return false
+        }
         load()
 
         if !isNew {
@@ -87,12 +91,24 @@ final class SavingsGoalViewModel {
         from source: AccountModel?,
         notificationsEnabled: Bool
     ) async -> Bool {
+        message = nil
         guard amount.isFinite, amount > 0, amount <= Money.maxAmount else {
             message = String.appLocalized("Enter an amount greater than zero.")
             return false
         }
         var copy = goal
-        if let source, let destination = account(for: goal) {
+        let destination = account(for: goal)
+        // A chosen source or balance tracking both require a real transfer
+        // into a real card. Without this guard the tap would be silently
+        // discarded and the sheet would still close.
+        if source != nil || copy.useAccountBalance {
+            guard source != nil, destination != nil else {
+                message = String.appLocalized(
+                    "A deposit needs a source account and a linked card.")
+                return false
+            }
+        }
+        if let source, let destination {
             guard source.id != destination.id else {
                 message = String.appLocalized("Pick two different accounts.")
                 return false
@@ -118,7 +134,10 @@ final class SavingsGoalViewModel {
             goal: copy, accountBalance: balance(for: copy))
         copy = SavingsGoalPolicy.markingAchieved(copy, progress: result)
         SavingsGoalStore.upsert(copy, in: repo.context)
-        guard repo.save() else { return false }
+        guard repo.save() else {
+            message = String.appLocalized("无法保存更改，请稍后重试。")
+            return false
+        }
         load()
 
         result = SavingsGoalProgress.evaluate(goal: copy, accountBalance: balance(for: copy))

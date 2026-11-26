@@ -67,17 +67,17 @@ struct SavingsGoalTests {
         #expect(Money.cents(progress.remaining) == 0)
 
         // A new goal that starts complete is stamped, not alerted.
-        #expect(!SavingsGoalPolicy.shouldNotify(goal: reduced, progress: progress, now: now))
+        #expect(!SavingsGoalPolicy.shouldNotify(goal: reduced, progress: progress))
         let marked = SavingsGoalPolicy.markingAchieved(reduced, progress: progress, now: now)
         #expect(marked.achievedAt == now)
-        #expect(SavingsGoalPolicy.shouldNotify(goal: marked, progress: progress, now: now))
+        #expect(SavingsGoalPolicy.shouldNotify(goal: marked, progress: progress))
 
         var notified = marked
         notified.notifiedAt = now
-        #expect(!SavingsGoalPolicy.shouldNotify(goal: notified, progress: progress, now: now))
+        #expect(!SavingsGoalPolicy.shouldNotify(goal: notified, progress: progress))
         notified.notifyOnAchievement = false
         notified.notifiedAt = nil
-        #expect(!SavingsGoalPolicy.shouldNotify(goal: notified, progress: progress, now: now))
+        #expect(!SavingsGoalPolicy.shouldNotify(goal: notified, progress: progress))
     }
 
     @Test("Fixed-amount mode derives the target and the deadline from the plan")

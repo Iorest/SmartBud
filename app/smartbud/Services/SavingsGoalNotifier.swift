@@ -23,11 +23,10 @@ enum SavingsGoalNotifier {
         goal: SavingsGoalModel,
         progress: SavingsProgress,
         notificationsEnabled: Bool,
-        now: Date = .now,
         center: UNUserNotificationCenter = .current()
     ) async -> Bool {
         guard notificationsEnabled,
-              SavingsGoalPolicy.shouldNotify(goal: goal, progress: progress, now: now)
+              SavingsGoalPolicy.shouldNotify(goal: goal, progress: progress)
         else { return false }
 
         let content = UNMutableNotificationContent()

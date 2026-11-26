@@ -80,6 +80,7 @@ struct AccountListView: View {
                 }
             }
         }
+        .navigationTitle(String.appLocalized("Accounts"))
         .environment(savingsVM)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

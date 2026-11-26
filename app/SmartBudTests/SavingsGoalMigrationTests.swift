@@ -70,10 +70,14 @@ struct SavingsGoalMigrationTests {
     @Test("A goal survives export to backup and import into an empty store")
     func backupRoundTrip() throws {
         let original = sampleGoal()
-        let summary = try DataImporter.apply(
-            fixture.payload(savingsGoals: [ExportSchema.SavingsGoalDTO(model: original)]),
-            context: fixture.context
-        )
+        // Go through the real on-disk shape, not just the DTO: encode the
+        // payload and read it back with the same decoder the import UI uses.
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let fileData = try encoder.encode(
+            fixture.payload(savingsGoals: [ExportSchema.SavingsGoalDTO(model: original)]))
+        let file = try DataImporter.decode(fileData)
+        let summary = try DataImporter.apply(file, context: fixture.context)
         #expect(summary.savingsGoals == 1)
         let restored = SavingsGoalStore.allAcrossBooks(in: fixture.context)
         #expect(restored.count == 1)

@@ -1,6 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "A deposit needs a source account and a linked card." : { "localizations" : { "en" : {"stringUnit":{"state":"translated","value":"A deposit needs a source account and a linked card."}}, "zh-Hans" : {"stringUnit":{"state":"translated","value":"存入需要选择转出账户和目标卡。"}}, "zh-Hant" : {"stringUnit":{"state":"translated","value":"存入需要選擇轉出帳戶和目標卡。"}} } },
     "%lld days left · %@ per day" : { "localizations" : { "en" : {"stringUnit":{"state":"translated","value":"%lld days left · %@ per day"}}, "zh-Hans" : {"stringUnit":{"state":"translated","value":"还剩 %lld 天 · 每天 %@"}}, "zh-Hant" : {"stringUnit":{"state":"translated","value":"還剩 %lld 天 · 每天 %@"}} } },
     "A savings deposit must use the same currency as the goal's card." : { "localizations" : { "en" : {"stringUnit":{"state":"translated","value":"A savings deposit must use the same currency as the goal's card."}}, "zh-Hans" : {"stringUnit":{"state":"translated","value":"存入币种必须与目标卡的币种一致。"}}, "zh-Hant" : {"stringUnit":{"state":"translated","value":"存入幣別必須與目標卡的幣別一致。"}} } },
     "Achieved" : { "localizations" : { "en" : {"stringUnit":{"state":"translated","value":"Achieved"}}, "zh-Hans" : {"stringUnit":{"state":"translated","value":"已达成"}}, "zh-Hant" : {"stringUnit":{"state":"translated","value":"已達成"}} } },
