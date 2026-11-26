@@ -1,7 +1,7 @@
 # 与 iCost 的能力对照
 
 > 复核：2026-11-26 · 基线：`main` @ `82ecf88`（TELE-28 合并后）
-> 来源：iCost 官方英文帮助站导航 56 页 + iOS 更新日志（最新 `4.7.1` / 2026-10-04）。
+> 来源：iCost 官方英文帮助站导航全部页面（见覆盖表）+ iOS 更新日志（最新 `4.7.2` / 2026-11-19，全部为修复项）。
 > 下表 `guide/...` 均为 `https://help.icostapp.com/en/` 下的页面；代码路径相对仓库根。
 > 状态口径：✅ 用户可用 · 🚧 未完成（括号内为任务号）· ⏸ 暂缓 · ❌ 不做。
 > ✅ 以**用户能用**为准：核心逻辑已合并但缺入口的仍记 🚧，并在现状栏注明。
@@ -10,9 +10,9 @@
 
 iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方帮助文档和 App 行为，
 社区里的第三方导入/MCP 工具逆向的是它的数据文件，不是实现。所以本文对标的是
-**能力与交互结果**，不涉及代码结构，也不复制界面。iCost 的截图识别走服务端并要求
-定位权限（`guide/ai/ai_android.html` / `ai_harmony.html`），我们坚持端侧 OCR、不取定位；
-这是项目非目标，不是待补的功能。
+**能力与交互结果**，不涉及代码结构，也不复制界面。iCost 开启自动识别时会把截图 OCR/文本交给
+第三方 AI 模型（`guide/law/privacy.html` §2「How We Use AI」第 1 节 1.2），快捷指令方案还要求开启定位权限
+（`guide/ai/ai_faq.html` 第 4/5 项）；我们坚持端侧 OCR、不取定位，这是项目非目标，不是待补的功能。
 
 ## 覆盖的 iCost 文档
 
@@ -20,7 +20,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 |---|---|---|
 | 首页、反馈、FAQ | `/en/`、`ask/ask.html`、`faq/net_price.html`、`faq/asset_price_wrong.html`、`faq/widget.html`、`faq/watch.html` | 统计、资产、Widget、平台行 |
 | 会员与账号 | `pro/pro.html`、`pro/recover.html`、`other/account.html`、`other/migrate_ios_purchase.html` | 平台与账号行、明确不跟 |
-| 同步与备份 | `cloud/sync.html`、`cloud/error.html`、`cloud/fix.html`、`cloud/backup.html`、`cloud/recover.html`、`cloud/recover_android.html` | 数据与同步行 |
+| 同步与备份 | `cloud/sync.html`、`cloud/error.html`、`cloud/fix.html`、`cloud/fix_mac.html`、`cloud/backup.html`、`cloud/recover.html`、`cloud/recover_android.html` | 数据与同步行 |
 | 导入/截图/导出 | `import/import.html`、`import/template.html`、`import/wechat.html`、`import/alibao.html`、`snapshot/snapshot.html`、`snapshot/screenshot.html`、`export/export.html` | 数据与同步行 |
 | 快捷记账 | `fast/quick.html`、`fast/loop.html`、`fast/template.html`、`fast/url.html` | 记账入口行 |
 | 智能记账 | `ai/ai_photo.html`、`ai/ai_text.html`、`ai/ai_audio.html`、`ai/ai_faq.html`、`ai/ai_android.html`、`ai/ai_harmony.html` | 智能记账行、明确不跟 |
@@ -49,7 +49,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | 规则/历史/LLM 三层候选（4.4.x–4.7.1 智能记账改进） | 不命中规则时用同商户历史与模型候选 | `app/smartbud/Services/Parsing/SmartEntryParsing.swift:247-315,336-365`；模型只出候选，金额由代码校验，密钥留 Keychain | ✅ TELE-18 |
 | 截图记账（`ai/ai_photo.html`、`snapshot/snapshot.html`） | 截图识别金额/商户/分类 | `app/smartbud/Services/Parsing/OCRService.swift:17-103` 端侧 Vision；`AlipayWechatParser.swift:12-72`；`SmartEntrySheet.swift:344-386` | ✅ — |
 | 批量票据识别（4.4.6 起） | 多张票据批量预览确认 | `app/smartbud/Logic/BatchRecognition.swift:87-155`（上限 10 张）；闸门 `SmartEntrySheet.swift:179-186,346-348`、`app/smartbud/Utilities/ProAccess.swift:23,42-45` | ✅ TELE-23（Pro） |
-| 批量编辑账单（`more/batch.html`、4.7.1） | 长按多选，批量改账户/账本/分类/备注/日期/标签/币种及预算收支标记；不支持报销/退款关联行 | `app/smartbud/Views/` 无批量编辑入口；`app/smartbud/Logic/BatchRecognition.swift` 是票据识别，不是账单编辑 | 🚧 TELE-83 |
+| 批量编辑账单（`more/batch.html`；4.3.0 导入时批量改账本、4.4.7 批量编辑面板、4.7.1 批量改分类） | 长按多选，批量改账户/账本/分类/备注/日期/标签/币种及预算收支标记；不支持报销/退款关联行 | `app/smartbud/Views/` 无批量编辑入口；`app/smartbud/Logic/BatchRecognition.swift` 是票据识别，不是账单编辑 | 🚧 TELE-83 |
 | 搜索条件保留（4.6.2） | 可开启缓存搜索条件 | `app/smartbud/Views/LogView.swift:53` 仅 `@State`，切账本即清空（`:187-194`） | ⏸ 低价值，未排期（主动差异） |
 
 ### 钱的身份与资产
@@ -60,7 +60,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | 退款（`claim/refund.html`） | 金额/到账时间/到账账户三要素；时间不早于原账单 | `app/smartbud/Logic/RefundPolicy.swift`；`app/smartbud/Services/RefundLedger.swift:30-125`；`app/smartbud/Views/Transaction/RefundSheet.swift:23` | ✅ TELE-32 |
 | 坏账核销 | 长期未回款垫付核销为带原因的费用 | `app/smartbud/Logic/BadDebtPolicy.swift:25-29`（90 天）；`app/smartbud/Services/BadDebtLedger.swift:41-86` | ✅ TELE-32 |
 | 分期基础（`loan/installment.html`、`loan/bill_installment.html`） | 账单日自动出账，已执行期数可补录，本金不算当期支出、额度随还款恢复 | 模型/政策/账本/备份已在 `app/smartbud/Data/Helper.swift:610-647`、`Logic/InstallmentPolicy.swift:17-55`、`Services/InstallmentLedger.swift:19-108`；`app/smartbud/Views/` 下无分期录入与计划管理界面 | 🚧 TELE-29 已合并逻辑层；入口未排期 |
-| 分期高级口径（同上，4.7.1 前后文档） | 利息按期/首期、未还负债逐期/创建时计入、尾差首期/末期可选 | 当前固定末期尾差 `app/smartbud/Logic/InstallmentPolicy.swift:42`，无利息/负债口径选项 | 🚧 TELE-84 |
+| 分期高级口径（同上，4.7.1 前后文档） | 利息按期/首期、未还负债逐期/创建时计入、尾差首期/末期可选 | 当前固定末期尾差（`app/smartbud/Logic/InstallmentPolicy.swift:47-63` 的 `shares(_:into:)`），无利息/负债口径选项 | 🚧 TELE-84 |
 | 贷款记录（`loan/loan.html`） | 独立贷款账户与还款计划 | 代码中无贷款实体或入口 | ⏸ 利率与合规文案成本高 |
 | 信用卡负债与净资产（`asset/...`、4.4.0 资产分组） | 账单日/额度/负债计入净资产，还款走转账 | `app/smartbud/Data/Helper.swift:481-484`；`app/smartbud/Logic/AccountBalance.swift:139-173`；`app/smartbud/Views/InsightsView.swift:214-240` | ✅ TELE-33 |
 | 资产隐藏/归档（`asset/hide.html`、`asset/archive.html`） | 隐藏留在列表分组，归档退出总资产，非零余额先提示 | `app/smartbud/ViewModels/AccountViewModel.swift:69-83`；`app/smartbud/Views/Accounts/AccountListView+Sections.swift:137-147` | ✅ — |
@@ -90,11 +90,13 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 |---|---|---|---|
 | iCloud 同步/备份恢复（`cloud/*.html`） | 私有云同步、自动备份与迁移 | `app/smartbud/Data/SwiftDataCore.swift:28-44,194-226`；`docs/cloudkit-schema.md`；macOS 目标无 CloudKit entitlement（`SwiftDataCore.swift:198-199`） | ✅ iPhone/iPad；Mac 本地库 |
 | JSON 备份与回导 | 带设置与账本的整包备份 | `app/smartbud/Services/ExportSchema.swift:16` 当前 `schemaVersion = 12`；导入兼容旧版本 | ✅ — |
-| Excel 导出（`export/export.html`） | 按时间/账本/账户导出 xlsx，图片内嵌 | `app/smartbud/Services/DataExporter+CSV.swift:17-25` 仅 CSV（13 列，不可整份导回）；JSON 才是备份格式 | ⏸ XLSX 与图片导出低价值 |
+| Excel 导出（`export/export.html`） | 按时间/账本/账户导出 xlsx，图片内嵌 | `app/smartbud/Services/DataExporter+CSV.swift:21-25` 的 `csvHeader` 为 14 列（含 `tags`），仅 CSV、不可整份导回；JSON 才是备份格式 | ⏸ XLSX 与图片导出低价值 |
 | 通用 CSV 导入（`import/import.html`） | 模板/预览/确认写库 | `app/smartbud/Views/ImportDataView+Importing.swift:36` | ✅ — |
 | 微信/支付宝账单导入（`import/wechat.html`、`import/alibao.html`） | 导出账单 CSV 后专用解析、去重、预览确认 | 专用解析/去重已实现并测试（`app/smartbud/Services/DataImporter.swift:337,453`；`app/SmartBudTests/DataImporterTests.swift:682-868`）；`DataImporter.swift:224-228` 明确通用 `ImportDataView` 不处理这类文件，`previewBill`/`applyBill` 仅测试调用，无 UI 入口 | 🚧 TELE-19 已合并解析；入口未排期 |
-| 模板导入/25+ 平台导入（`import/template.html`、4.5.0） | 更多来源与模板 | 无对应实现 | ⏸ 低价值，未排期 |
-| 账单列表截图导出/票据分享（`snapshot/screenshot.html`、4.4.3） | 把账目列表导出成图 | 无对应实现 | ⏸ 低价值，未排期 |
+| 模板导入（`import/template.html`） | 下载固定列模板（csv/xls/xlsx）填写后导入 | `app/smartbud/Views/ImportDataView+Importing.swift:36` 的通用 CSV 向导按列名映射并预览，覆盖同样的固定列导入；不提供模板下载与 50+ 币种符号表 | ✅ 固定列导入；模板下载 ⏸ |
+| 更多导入来源（4.5.0） | 官方持续增加可导入平台 | 仅微信/支付宝专用解析（见上）与通用 CSV，没有其他平台专用适配器 | ⏸ 低价值，未排期 |
+| 账单列表截图导入（`snapshot/snapshot.html`、`snapshot/screenshot.html`） | 截支付宝/微信/云闪付账单列表，一次导入多笔 | 有单张票据 OCR（`OCRService.swift:17-103`）与批量票据识别（`BatchRecognition.swift:87-155`），但没有「账单列表截图 → 多笔账」的专用解析流程 | 🚧 未排期 |
+| 票据分享（4.4.3） | 分享单张票据 | 票据附件可留存与同步（`ReceiptAttachment.swift:16-37`），无分享入口 | ⏸ 低价值，未排期 |
 | 主屏/锁屏小组件（`widget/main.html`、`widget/lock.html`） | 余额、预算、快捷记账 | `app/ExpenditureWidget/ExpenditureWidget.swift:20-27` 注册 6 类（源码 14 个 Swift 文件）；跟随当前账本 `app/ExpenditureWidget/InsightsWidget.swift:118-125` | ✅ — |
 | 本地认证、提醒、主题 | 锁屏、自定义提醒、多主题 | `app/smartbud/Utilities/Authentication.swift:81-99`；`AppLockGate.swift`；`ProAccess.swift:15-45` | ✅ — |
 
@@ -142,7 +144,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | 预算结转（4.5.0） | 不做 | 预算按信封法，周期结束不结转（`app/smartbud/Logic/BudgetLogic.swift:19-33`）；结转会改变支出口径 |
 | 年度总结（4.4.7） | ⏸ 低优先级 | 现有「年」统计周期可查累计；等有用户反馈再做独立总结页 |
 | 搜索条件保留（4.6.2） | ⏸ 低优先级 | 当前切账本清筛选，避免串账；若做需按账本存储 |
-| XLSX/图片导出、25+ 平台导入 | ⏸ 低优先级 | CSV + JSON 已覆盖数据进出；图片与多平台模板投入产出比低 |
+| XLSX/图片导出、模板下载与更多导入来源 | ⏸ 低优先级 | CSV + JSON 已覆盖数据进出与固定列导入；图片与多平台模板投入产出比低 |
 | 亲属卡账户、贷款记录 | ⏸ 低优先级 | 前者仅展示额度，后者有利率与合规文案成本 |
 | Apple Watch、Android/HarmonyOS | ⏸/❌ | 新 target 或第二个产品；与「Apple 平台单机账本」定位不符 |
 | 分期高级口径、批量编辑、账本日历、调整原因 | 🚧 已排期 | TELE-84 / TELE-83 / TELE-82 / TELE-81，按优先级推进 |
