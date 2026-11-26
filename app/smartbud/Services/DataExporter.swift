@@ -344,5 +344,6 @@ extension DataExporter {
     typealias BookDTO = ExportSchema.BookDTO
     typealias InstallmentPlanDTO = ExportSchema.InstallmentPlanDTO
     typealias TagDTO = ExportSchema.TagDTO
+    typealias SavingsGoalDTO = ExportSchema.SavingsGoalDTO
     typealias AttachmentRefDTO = ExportSchema.AttachmentRefDTO
 }
