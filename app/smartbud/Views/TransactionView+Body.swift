@@ -348,6 +348,39 @@ extension TransactionView {
     var entryOptionChips: some View {
         HStack(spacing: 6) {
             // A discount only means something on an expense.
+            TransactionOptionChip(
+                systemImage: "tag.circle",
+                title: selectedTagIDs.isEmpty
+                    ? String.appLocalized("Labels")
+                    : String(selectedTagIDs.count),
+                isOn: !selectedTagIDs.isEmpty
+            ) {
+                hideKeyboard()
+                showTagPicker = true
+            }
+            .accessibilityIdentifier(AccessibilityID.entryTagChip)
+
+            TransactionOptionChip(
+                systemImage: "paperclip",
+                title: receiptCount == 0
+                    ? String.appLocalized("Receipt")
+                    : String(receiptCount),
+                isOn: receiptCount > 0
+            ) {
+                showReceiptPicker = true
+            }
+            .accessibilityIdentifier(AccessibilityID.entryReceiptChip)
+            if receiptCount > 0 {
+                Button {
+                    showReceiptViewer = true
+                } label: {
+                    Image(systemName: "eye")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(String.appLocalized("View Receipts")))
+                .accessibilityIdentifier(AccessibilityID.entryReceiptView)
+            }
+
             if !income {
                 TransactionOptionChip(
                     systemImage: "tag",
@@ -379,6 +412,11 @@ extension TransactionView {
         }
     }
 
+    /// Photos shown by the receipt chip: picked bytes for a new selection,
+    /// the saved row's file count otherwise.
+    var receiptCount: Int {
+        receiptsChanged ? receiptData.count : (toEdit?.attachments.count ?? 0)
+    }
 }
 
 // MARK: - Draft detection
@@ -396,6 +434,8 @@ extension TransactionView {
                 || date != toEdit.wrappedDate
                 || discount != toEdit.discount
                 || reimbursable != toEdit.reimbursable
+                || selectedTagIDs != Set(toEdit.tagIDs)
+                || receiptsChanged
         }
         // A category alone is not a draft: continuous-entry keeps the last
         // category selected, so requiring it made every Cancel ask "discard?"
@@ -404,5 +444,7 @@ extension TransactionView {
             || !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             || discount > 0
             || reimbursable
+            || !selectedTagIDs.isEmpty
+            || receiptsChanged
     }
 }

@@ -38,6 +38,9 @@ enum ExportSchema {
         /// Backups written before that section decode with no plans; no data
         /// migration is needed.
         var installmentPlans: [InstallmentPlanDTO]
+        /// Labels per ledger. Optional in the file so older backups (and
+        /// exports from before TELE-30) decode with no tags.
+        var tags: [TagDTO]
         /// App settings that decide how the numbers are read. Optional so
         /// files written before this field still decode.
         var settings: SettingsDTO?
@@ -56,7 +59,8 @@ enum ExportSchema {
             rates: [RateDTO],
             settings: SettingsDTO? = nil,
             books: [BookDTO] = [],
-            installmentPlans: [InstallmentPlanDTO] = []
+            installmentPlans: [InstallmentPlanDTO] = [],
+            tags: [TagDTO] = []
         ) {
             self.exportDate = exportDate
             self.appVersion = appVersion
@@ -72,6 +76,7 @@ enum ExportSchema {
             self.settings = settings
             self.books = books
             self.installmentPlans = installmentPlans
+            self.tags = tags
         }
 
         /// Lenient on purpose: a file written by an older build can be missing
@@ -92,6 +97,7 @@ enum ExportSchema {
             rates = try container.decodeIfPresent([RateDTO].self, forKey: .rates) ?? []
             books = try container.decodeIfPresent([BookDTO].self, forKey: .books) ?? []
             installmentPlans = try container.decodeIfPresent([InstallmentPlanDTO].self, forKey: .installmentPlans) ?? []
+            tags = try container.decodeIfPresent([TagDTO].self, forKey: .tags) ?? []
             settings = try container.decodeIfPresent(SettingsDTO.self, forKey: .settings)
         }
 
@@ -173,6 +179,11 @@ enum ExportSchema {
         var installmentPeriod: Int? = nil
         /// 1 = fee/interest, 2 = principal. Nil on ordinary rows.
         var installmentKind: Int? = nil
+        /// Labels on this row. Optional: v10 backups have no labels.
+        var tagIds: [UUID]? = nil
+        /// Receipt file references. The bytes stay in the local sandbox /
+        /// CKAsset; the backup only remembers what should be there.
+        var attachments: [AttachmentRefDTO]? = nil
     }
 
     struct AccountDTO: Codable {
@@ -280,6 +291,25 @@ enum ExportSchema {
         var archived: Bool
         /// Optional so backups written before books existed still decode.
         var dateCreated: Date?
+    }
+
+    /// One label. `bookID` keeps the ledger association through a backup;
+    /// old files have no tags section and decode as an empty list.
+    struct TagDTO: Codable {
+        var id: UUID
+        var name: String
+        var color: String
+        var order: Int
+        var bookID: UUID? = nil
+    }
+
+    /// A receipt reference, not the image bytes. On restore the importer
+    /// checks the local file and reports a readable warning if it is absent.
+    struct AttachmentRefDTO: Codable {
+        var id: UUID
+        var fileName: String
+        var byteCount: Int
+        var checksum: String
     }
 
     /// One installment plan. Amounts are base-currency; the generated rows

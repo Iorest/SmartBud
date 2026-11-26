@@ -21,7 +21,7 @@ extension DataExporter {
     static let csvHeader = [
         "date", "type", "amount", "currency", "base_amount",
         "category", "account", "note", "reimbursable", "reimbursed", "fee",
-        "merchant", "merchant_key"
+        "merchant", "merchant_key", "tags"
     ]
 
     /// Spreadsheet-friendly export: one flat row per ledger entry, transfers
@@ -54,6 +54,7 @@ extension DataExporter {
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
 
         var rows = [csvRow(csvHeader)]
+        let allTags = TagStore.allAcrossBooks(in: repo.container.mainContext)
 
         let transactions = repo.fetch(TransactionModel.self)
             .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
@@ -84,7 +85,9 @@ extension DataExporter {
                 txn.reimbursedAt.map { formatter.string(from: $0) } ?? "",
                 "",
                 txn.merchant ?? "",
-                txn.merchantKey ?? ""
+                txn.merchantKey ?? "",
+                allTags.filter { txn.tagIDs.contains($0.id) }
+                    .map(\.name).joined(separator: ";")
             ]))
         }
 
@@ -104,6 +107,7 @@ extension DataExporter {
                 "false",
                 "",
                 amountField(transfer.fee),
+                "",
                 "",
                 ""
             ]))

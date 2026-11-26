@@ -306,4 +306,53 @@ struct ImportRoundTripTests {
         #expect(restoredDebit.creditLimit == nil)
         #expect(restoredDebit.statementDay == nil)
     }
+
+    @Test("Labels and receipt references survive a backup round trip")
+    func tagAndAttachmentRoundTrip() throws {
+        let tagID = UUID()
+        let attachmentID = UUID()
+        let tag = ExportSchema.TagDTO(
+            id: tagID, name: "Food", color: "#5E9EFF", order: 0,
+            bookID: BookModel.defaultID)
+        let row = ExportSchema.TransactionDTO(
+            id: UUID(), amount: 12.5, date: .now, day: nil, month: nil,
+            note: "lunch", income: false, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: nil, categoryName: nil,
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 12.5,
+            accountCurrency: "CNY", discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil,
+            transferFeeOf: nil, adjustment: false,
+            tagIds: [tagID],
+            attachments: [ExportSchema.AttachmentRefDTO(
+                id: attachmentID, fileName: "0-abc.jpg", byteCount: 4, checksum: "abc")])
+
+        let summary = try DataImporter.apply(
+            fixture.payload(tags: [tag], transactions: [row]),
+            context: fixture.context)
+
+        #expect(summary.tags == 1)
+        let storedRows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        let restored = try #require(storedRows.first)
+        #expect(restored.tagIDs == [tagID])
+        #expect(restored.attachments.first?.id == attachmentID)
+        // The referenced photo is not on this device: the row still imports
+        // and the importer reports it for a readable warning.
+        #expect(summary.missingAttachments == 1)
+        #expect(TagStore.all(in: fixture.context, bookID: BookModel.defaultID).map(\.id) == [tagID])
+    }
+
+    @Test("A backup with no labels or attachment keys still imports")
+    func legacyBackupWithoutTags() throws {
+        let legacyJSON = """
+        {"exportDate":"2026-01-01T00:00:00Z","appVersion":"test","schemaVersion":9,
+         "transactions":[],"categories":[],"accounts":[],"settings":{"baseCurrency":"CNY"}}
+        """.data(using: .utf8)!
+        let payload = try DataImporter.decode(legacyJSON)
+        #expect(payload.tags.isEmpty)
+        #expect(payload.transactions.isEmpty)
+
+        let summary = try DataImporter.apply(payload, context: fixture.context)
+        #expect(summary.tags == 0)
+        #expect(summary.missingAttachments == 0)
+    }
 }

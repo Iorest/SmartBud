@@ -42,6 +42,11 @@ enum DataImporter {
         var books = 0
         /// Installment plans restored from the file.
         var installmentPlans = 0
+        /// Labels restored from the file.
+        var tags = 0
+        /// Receipt references whose local file is not on this device yet.
+        /// The row still imports; the UI shows a readable warning.
+        var missingAttachments = 0
         /// Rows already on this device (same id) that were left alone.
         var skipped = 0
         /// Settings from the backup that still have to be written to the app
@@ -51,7 +56,7 @@ enum DataImporter {
         /// Records the user thinks of as "data". Rates are configuration and
         /// stay out of the count.
         var imported: Int {
-            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books + installmentPlans
+            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books + installmentPlans + tags
         }
 
         var isEmpty: Bool { imported == 0 }
@@ -113,6 +118,7 @@ enum DataImporter {
         summary.rates = payload.rates.count
         summary.books = payload.books.count
         summary.installmentPlans = payload.installmentPlans.count
+        summary.tags = payload.tags.count
         return summary
     }
 
@@ -150,6 +156,8 @@ enum DataImporter {
         BookMigration.ensureDefaultBook(in: context)
         var merger = BackupMerger(context: context)
         merger.importBooks(payload.books)
+        // Tags before transactions: rows carry label ids resolved here.
+        merger.importTags(payload.tags)
 
         merger.importCategories(payload.categories)
         merger.importAccounts(payload.accounts)

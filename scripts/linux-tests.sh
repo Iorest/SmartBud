@@ -65,7 +65,8 @@ app_sources=(
     Logic/MerchantNormalizer.swift
     Logic/RefundPolicy.swift
     Logic/ReimbursementPolicy.swift
-    Logic/InstallmentPolicy.swift
+    Logic/ReceiptAttachment.swift
+    Logic/TagFilter.swift
     Logic/Money.swift
     Logic/TransactionValidation.swift
     Models/BudgetTimeFrame.swift
@@ -96,7 +97,8 @@ test_sources=(
     InstallmentPolicyTests.swift
     ReimbursementPolicyTests.swift
     ProAccessTests.swift
-    TransactionValidationTests.swift
+    ReceiptAttachmentTests.swift
+    TagFilterTests.swift
     SmartEntryParsingTests.swift
 )
 

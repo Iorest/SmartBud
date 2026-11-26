@@ -19,7 +19,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 {
   "exportDate": "2026-10-22T05:00:00Z",
   "appVersion": "4.0",
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "transactions": [ ... ],
   "categories": [ ... ],
   "budgets": [ ... ],
@@ -28,6 +28,9 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   "accounts": [ ... ],
   "transfers": [ ... ],
   "rates": [ ... ],
+  "books": [ ... ],
+  "installmentPlans": [ ... ],
+  "tags": [ ... ],
   "settings": {
     "baseCurrency": "CNY",
     "firstDayOfMonth": 1,
@@ -48,6 +51,12 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   有 `reimbursedAt` 的整笔报销按全额推导、没有日期的按 0 导入，升级前后统计不变。
   导出端始终写该键；多次回款只合并累计额与各自的回款行，不会重复写入。
 
+- 标签与票据（本轮）：`tags` 是账本级标签数组（`id` / `name` / `color` / `order` / `bookID`），
+  交易行带 `tagIds`，`attachments` 只带文件引用（`id` / `fileName` / `byteCount` / `checksum`），
+  **不带图片字节**——字节在 App Group 沙盒里，跨设备由 CloudKit `CKAsset` 同步。
+  旧备份缺这些键时按空数组导入，标签关系与票据引用不会凭空产生。
+  恢复时若本机缺图，导入结果卡片给出「N 张票据照片尚未下载」的可读警告，交易本身照常写入；
+  `schemaVersion` 仍由统筹按合并顺序分配，本轮不自行抢号。
 - `accounts` 可携带 `creditLimit` / `statementDay` / `dueDay`（credit 账户的额度、账单日、
   还款日）；三者可选，导入端按账户类型收敛：非 credit 或非法值一律按 nil 读入。
   导出端始终写这三个键。schema 版本号由统筹按合并顺序分配，本次不自行抢号。
@@ -140,10 +149,11 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 ## CSV 列
 
 ```
-date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbursed,fee,merchant,merchant_key
+date,type,amount,currency,base_amount,category,account,note,reimbursable,reimbursed,fee,merchant,merchant_key,tags
 ```
 
 - `merchant` / `merchant_key` 是追加在末尾的两列，已有列位置不变
+- `tags` 追加在末尾，多个标签名用 `;` 分隔；CSV 仅供表格核对，票据图片不会写进 CSV
 - `type`：`expense` / `income` / `refund` / `adjustment` / `transfer`；`refund` 行的金额为正，
   按支出侧的负向冲减来读（不要把 `expense` 与 `refund` 都当支出累加）
 - `transfer` 行的 `account` 写成 `转出账户 → 转入账户`，`fee` 只在这一行有值

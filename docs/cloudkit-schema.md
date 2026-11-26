@@ -74,6 +74,24 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 
 备份 schema 已升到 10；v9 备份没有这些字段，仍可导入（见 `docs/ledger-rules.md`）。
 
+### 标签与票据附件（同样需要部署）
+
+标签不新增 SwiftData 实体（新实体会破坏 XCUITest 的启动握手），存为账本上的 JSON；
+交易只存标签 id 数组与票据引用 JSON。票据**字节**不进 SwiftData：本地写在 App Group
+容器的 `ReceiptAttachments/<transactionID>/`，云端由 `ReceiptAttachmentSync` 用显式的
+`CKAsset` 记录同步，记录名就是附件 id（上传/删除幂等）。
+
+| Record Type / 实体 | 字段 | 说明 |
+|---|---|---|
+| `CD_BookModel` | `tagsJSON`（String，可空） | 账本标签的 JSON 数组；必须先部署，否则标签不跨设备 |
+| `CD_TransactionModel` | `tagIDsJSON`（String，可空） | 该行标签 id 数组；旧行 nil 即无标签，不需要回填 |
+| `CD_TransactionModel` | `attachmentJSON`（String，可空） | 票据引用数组（id / 文件名 / 字节数 / 校验和），不含字节 |
+| `ReceiptAttachment`（新 record type） | `transactionID`、`checksum`、`asset`（CKAsset） | 在数据库默认 zone，不在 SwiftData 的 `MainModel` zone；`Erase All Data` 会单独删掉它们 |
+
+回退客户端到旧版本时：旧版本忽略三个新字段和未知 record type，金额、分类与统计不变；
+标签与票据在旧版本里不可见。重新升级后数据由备份/CloudKit 恢复，不需要迁移脚本。
+生产环境必须先 Deploy `ReceiptAttachment` record type 与三个字段，再放出客户端。
+
 ## 每次改 schema 后要做的四步
 
 1. **本机跑一遍真实写入**
@@ -140,8 +158,9 @@ Development 环境只要在本机跑一遍写入就会自动建表；**Productio
 
    | Record Type | 必须存在的字段 |
    |---|---|
-   | `CD_BookModel` | 整个实体、`bookID`、`installmentPlansJSON` |
-   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey`、`bookID`、`installmentOf`、`installmentPeriod`、`installmentKind` |
+   | `CD_BookModel` | 整个实体、`bookID`、`installmentPlansJSON`、`tagsJSON` |
+   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey`、`bookID`、`installmentOf`、`installmentPeriod`、`installmentKind`、`tagIDsJSON`、`attachmentJSON` |
+   | `ReceiptAttachment` | 整个 record type、`transactionID`、`checksum`、`asset`（CKAsset） |
    | `CD_AccountModel` | `currencyCode`、`archived`、`bookID` |
    | `CD_TransferModel` | `destinationAmount`、`fee` |
    | `CD_CurrencyRate` | `code`、`rate`、`updatedAt` |

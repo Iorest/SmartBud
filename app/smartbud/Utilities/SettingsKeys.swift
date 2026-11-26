@@ -94,6 +94,7 @@ enum SettingsKey {
     static let importAllSkipped = "settings.import.allSkipped"
     static let importDone = "settings.import.done"
     static let importSettingsApplied = "settings.import.settingsApplied"
+    static let importMissingAttachments = "settings.import.missingAttachments"
     static let importConfirmTitle = "settings.import.confirm.title"
     static let importConfirmMessage = "settings.import.confirm.message"
     static let importConfirmAction = "settings.import.confirm.action"

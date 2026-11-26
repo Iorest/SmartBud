@@ -18,6 +18,12 @@ struct TransactionEdit {
     var discount: Double = 0
     /// Expense the user will claim back.
     var reimbursable: Bool = false
+    /// Labels to attach. Empty on callers that do not offer a tag picker
+    /// (templates, shortcuts, deep links, batch import).
+    var tagIDs: [UUID] = []
+    /// Receipt photos picked in the form. `nil` leaves an edited row's
+    /// existing photos untouched; an empty array removes them all.
+    var attachmentData: [Data]? = nil
 }
 
 /// Values written when saving a quick-add template.
@@ -59,9 +65,11 @@ final class TransactionViewModel {
                                    merchant: merchant?.name,
                                    merchantKey: merchant?.key,
                                    bookID: BookState.shared.currentID)
+        txn.tagIDs = edit.tagIDs
         repo.insert(txn)
         if edit.repeatType > 0 { processRecurring(txn) }
         guard repo.save() else { return nil }
+        applyAttachments(edit.attachmentData, to: txn, replacing: [])
         // Fire-in-app review prompt at the 3rd, 10th, and 25th
         // transaction. Apple's StoreKit caps the prompt itself at
         // 3x/year; `ReviewRequester` adds a per-version dedup so
@@ -102,6 +110,8 @@ final class TransactionViewModel {
         txn.date = edit.date
         txn.income = edit.income
         txn.discount = edit.discount
+        txn.tagIDs = edit.tagIDs
+        let previousAttachments = txn.attachments
         // Only expenses can be claimed back; switching to income drops the flag.
         // Balance adjustments are corrections, never claims.
         txn.reimbursable = edit.reimbursable && !edit.income && !txn.adjustment
@@ -136,7 +146,35 @@ final class TransactionViewModel {
             txn.recurringType = edit.repeatType
             txn.recurringCoefficient = edit.repeatCoefficient
         }
-        return repo.save()
+        guard repo.save() else { return false }
+        applyAttachments(edit.attachmentData, to: txn, replacing: previousAttachments)
+        return true
+    }
+
+    /// Writes receipt files for an already-saved row and keeps CKAssets in
+    /// step. Called only after `repo.save()` succeeded: a rolled-back insert
+    /// must never leave an orphan photo on disk.
+    private func applyAttachments(_ data: [Data]?, to txn: TransactionModel,
+                                  replacing old: [ReceiptAttachment]) {
+        guard let data else { return }
+        let refs = (try? ReceiptAttachmentStore.replaceAll(data, for: txn.id)) ?? []
+        txn.attachments = refs
+        if !old.isEmpty {
+            Task { await ReceiptAttachmentSync.remove(attachmentIDs: old.map(\.id)) }
+        }
+        _ = repo.save()
+        if !refs.isEmpty {
+            Task { await ReceiptAttachmentSync.upload(refs, transactionID: txn.id) }
+        }
+    }
+
+    /// Removes a deleted row's files and CKAssets. Staged deletes call this
+    /// only on commit, so "Undo" still brings the photos back with the row.
+    private func removeAttachments(of txn: TransactionModel) {
+        let refs = txn.attachments
+        guard !refs.isEmpty else { return }
+        try? ReceiptAttachmentStore.removeAll(for: txn.id)
+        Task { await ReceiptAttachmentSync.remove(attachmentIDs: refs.map(\.id)) }
     }
 
     /// Marks a transaction as no longer recurring (idempotent).
@@ -351,6 +389,7 @@ final class TransactionViewModel {
         RefundLedger.prepareForDeletion(of: txn, in: repo.context)
         BadDebtLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
+        removeAttachments(of: txn)
         repo.delete(txn)
         repo.save()
     }
@@ -364,6 +403,7 @@ final class TransactionViewModel {
             ReimbursementLedger.prepareForDeletion(of: txn, in: repo.context)
             RefundLedger.prepareForDeletion(of: txn, in: repo.context)
             TransferFeeLedger.detachFeeRow(txn, in: repo.context)
+            removeAttachments(of: txn)
             repo.delete(txn)
         }
         repo.save()
@@ -420,6 +460,9 @@ final class TransactionViewModel {
 
     private(set) var pendingDelete: PendingDelete?
     private var pendingDeleteTask: Task<Void, Never>?
+    /// Attachment ids of a staged delete. Kept until the delete commits so
+    /// "Undo" can still show the receipt photos.
+    private var pendingAttachmentIDs: [UUID] = []
     private static let undoWindow: Duration = .seconds(6)
 
     /// Deletes without saving so the row can be restored, and owns the
@@ -438,6 +481,7 @@ final class TransactionViewModel {
         RefundLedger.prepareForDeletion(of: txn, in: repo.context)
         BadDebtLedger.prepareForDeletion(of: txn, in: repo.context)
         TransferFeeLedger.detachFeeRow(txn, in: repo.context)
+        pendingAttachmentIDs = txn.attachments.map(\.id)
         repo.delete(txn)
         pendingDelete = PendingDelete(snapshot: snapshot)
 
@@ -452,8 +496,14 @@ final class TransactionViewModel {
     func commitPendingDelete() {
         pendingDeleteTask?.cancel()
         pendingDeleteTask = nil
-        guard pendingDelete != nil else { return }
+        guard let pending = pendingDelete else { return }
         pendingDelete = nil
+        if !pendingAttachmentIDs.isEmpty {
+            try? ReceiptAttachmentStore.removeAll(for: pending.id)
+            let ids = pendingAttachmentIDs
+            pendingAttachmentIDs = []
+            Task { await ReceiptAttachmentSync.remove(attachmentIDs: ids) }
+        }
         repo.save()
     }
 
@@ -465,6 +515,7 @@ final class TransactionViewModel {
         pendingDeleteTask?.cancel()
         pendingDeleteTask = nil
         pendingDelete = nil
+        pendingAttachmentIDs = []
         repo.rollback()
     }
 
@@ -476,6 +527,7 @@ final class TransactionViewModel {
         pendingDeleteTask = nil
         guard let pending = pendingDelete else { return }
         pendingDelete = nil
+        pendingAttachmentIDs = []
 
         repo.rollback()
         let pendingID = pending.id

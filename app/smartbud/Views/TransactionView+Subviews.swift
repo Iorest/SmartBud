@@ -109,6 +109,9 @@ extension TransactionView {
             // moment the view first appears. Subsequent changes are picked up
             // by the `.onChange(of: numberEntryType)` modifier above.
             padVM.numberEntryType = numberEntryType
+            availableTags = TagStore.all(
+                in: DataRepository.shared.container.mainContext,
+                bookID: BookState.shared.currentID)
             smartHistory = transactionVM.parseHistory()
             DispatchQueue.main.async {
                 if let transaction = toEdit {
@@ -122,6 +125,13 @@ extension TransactionView {
 
                     if transaction.wrappedDate > Date.now {
                         animateIcon = true
+                    }
+                    // A restored backup carries references but not bytes.
+                    // Fetch any missing CKAsset when the row is opened.
+                    if !transaction.attachments.isEmpty {
+                        let refs = transaction.attachments
+                        let id = transaction.id
+                        Task { await ReceiptAttachmentSync.downloadMissing(refs, transactionID: id) }
                     }
                 }
             }
@@ -143,6 +153,26 @@ extension TransactionView {
                 history: smartHistory
             ) { parsed in
                 applyParsed(parsed)
+            }
+        }
+        .sheet(isPresented: $showTagPicker) { tagPickerSheet }
+        .sheet(isPresented: $showReceiptViewer) { receiptViewerSheet }
+        .photosPicker(
+            isPresented: $showReceiptPicker,
+            selection: $receiptItems,
+            maxSelectionCount: ReceiptAttachmentPolicy.maxCount,
+            matching: .images
+        )
+        .onChange(of: receiptItems) { _, items in
+            receiptsChanged = true
+            Task {
+                var loaded: [Data] = []
+                for item in items.prefix(ReceiptAttachmentPolicy.maxCount) {
+                    if let data = try? await item.loadTransferable(type: Data.self) {
+                        loaded.append(data)
+                    }
+                }
+                receiptData = loaded
             }
         }
         .alert(String.appLocalized("Discard this entry?"), isPresented: $showDiscardConfirmation) {
@@ -209,5 +239,132 @@ extension TransactionView {
         let value = Double(cleaned) ?? 0
         discount = value.isFinite ? max(0, min(value, Money.maxAmount)) : 0
         discountInput = ""
+    }
+}
+
+// MARK: - Label picker
+
+extension TransactionView {
+    /// Multi-select labels plus inline CRUD. Deleting a label strips its id
+    /// from every row in the same save, so no transaction points at a ghost.
+    var tagPickerSheet: some View {
+        NavigationStack {
+            List {
+                Section(String.appLocalized("Labels")) {
+                    ForEach(availableTags) { tag in
+                        Button {
+                            if selectedTagIDs.contains(tag.id) {
+                                selectedTagIDs.remove(tag.id)
+                            } else {
+                                selectedTagIDs.insert(tag.id)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: selectedTagIDs.contains(tag.id)
+                                      ? "checkmark.circle.fill" : "circle")
+                                Text(tag.name)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier(AccessibilityID.entryTagToggle)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) { deleteTag(tag) } label: {
+                                Label(String.appLocalized("Delete"), systemImage: "trash")
+                            }
+                        }
+                    }
+                }
+                Section(String.appLocalized("New Label")) {
+                    HStack {
+                        TextField(String.appLocalized("Label name"), text: $newTagName)
+                        Button(String.appLocalized("Add")) { addTag() }
+                            .disabled(newTagName.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }
+            }
+            .navigationTitle(String.appLocalized("Labels"))
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String.appLocalized("Done")) { showTagPicker = false }
+                }
+            }
+        }
+    }
+
+    private func addTag() {
+        let name = newTagName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        let tag = TagModel(name: name, color: Color.blue.toHex() ?? "#5E9EFF")
+        availableTags = TagStore.upsert(
+            tag, in: DataRepository.shared.container.mainContext,
+            bookID: BookState.shared.currentID)
+        selectedTagIDs.insert(tag.id)
+        newTagName = ""
+        _ = DataRepository.shared.save()
+    }
+
+    private func deleteTag(_ tag: TagModel) {
+        let context = DataRepository.shared.container.mainContext
+        _ = TagStore.remove(
+            id: tag.id, in: context, bookID: BookState.shared.currentID)
+        for row in DataRepository.shared.fetch(TransactionModel.self)
+            where row.tagIDs.contains(tag.id) {
+            row.tagIDs.removeAll { $0 == tag.id }
+        }
+        selectedTagIDs.remove(tag.id)
+        availableTags = TagStore.all(in: context, bookID: BookState.shared.currentID)
+        _ = DataRepository.shared.save()
+    }
+}
+
+// MARK: - Receipt viewer
+
+extension TransactionView {
+    /// Bytes for the viewer: freshly picked photos, or files already on disk
+    /// for an edited row. Missing files are skipped, not shown as blank tiles.
+    private var receiptPreviewData: [Data] {
+        if receiptsChanged { return receiptData }
+        guard let transaction = toEdit else { return [] }
+        return transaction.attachments.compactMap { ref in
+            guard let url = ReceiptAttachmentStore.fileURL(
+                for: ref, transactionID: transaction.id) else { return nil }
+            return try? Data(contentsOf: url)
+        }
+    }
+
+    @ViewBuilder
+    private func receiptImage(_ data: Data) -> some View {
+        if let image = UIImage(data: data) {
+            #if os(macOS)
+            Image(nsImage: image)
+            #else
+            Image(uiImage: image)
+            #endif
+        }
+    }
+
+    var receiptViewerSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(Array(receiptPreviewData.enumerated()), id: \.offset) { _, data in
+                        receiptImage(data)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: SBRadius.card))
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle(String.appLocalized("View Receipts"))
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String.appLocalized("Done")) { showReceiptViewer = false }
+                }
+            }
+        }
     }
 }

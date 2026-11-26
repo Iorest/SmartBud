@@ -246,6 +246,48 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "只匯入了前 %lld 個檔案。" } }
       }
     },
+    "Labels" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Labels" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "标签" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標籤" } }
+      }
+    },
+    "New Label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New Label" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新建标签" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "新增標籤" } }
+      }
+    },
+    "Label name" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Label name" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "标签名称" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "標籤名稱" } }
+      }
+    },
+    "Manage Labels" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manage Labels" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "管理标签" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "管理標籤" } }
+      }
+    },
+    "Clear Labels" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear Labels" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "清除标签筛选" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "清除標籤篩選" } }
+      }
+    },
+    "View Receipts" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View Receipts" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "查看票据" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "查看票據" } }
+      }
+    },
     "Receipt" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Receipt" } },
@@ -2080,6 +2122,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已匯入 %lld 筆記錄。"
+          }
+        }
+      }
+    },
+    "settings.import.missingAttachments" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some receipt photos (%lld) are not on this device yet. They appear when iCloud sync completes."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有 %lld 张票据照片尚未下载到本机，iCloud 同步完成后会出现。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有 %lld 張票據照片尚未下載到本機，iCloud 同步完成後會出現。"
           }
         }
       }

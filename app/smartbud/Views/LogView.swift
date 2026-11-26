@@ -22,6 +22,7 @@ struct LogView: View {
     @Environment(TransactionViewModel.self) var transactionVM
     @Environment(CategoryViewModel.self) private var categoryVM
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.modelContext) private var modelContext
 
     // The queries cover the whole store; these computed arrays are the only
     // rows the log (and its extensions) are allowed to render or mutate.
@@ -64,6 +65,14 @@ struct LogView: View {
     @State var weekFilter = Date.now
     @State var monthFilter = Date.now
     @State var income = false
+    /// Labels stack with the period/type/category filter and with search.
+    /// Multi-select uses AND semantics (a row must carry every label).
+    @State var selectedTagIDs: Set<UUID> = []
+    @State var showTagManager = false
+
+    private var availableTags: [TagModel] {
+        TagStore.all(in: modelContext, bookID: bookState.currentID)
+    }
 
     private var currencySymbol: String {
         Locale.appCurrencySymbol(forCurrencyCode: currency)
@@ -182,6 +191,10 @@ struct LogView: View {
             selectedIDs.removeAll()
             isSelecting = false
             categoryFilter = nil
+            selectedTagIDs.removeAll()
+        }
+        .sheet(isPresented: $showTagManager) {
+            TagManagementView(bookID: bookState.currentID)
         }
     }
 
@@ -246,6 +259,7 @@ struct LogView: View {
                     filter = .all
                     categoryFilter = nil
                     searchText = ""
+                    selectedTagIDs.removeAll()
                 }
                 .buttonStyle(.bordered)
             }
@@ -328,6 +342,10 @@ struct LogView: View {
             items = items.filter(matchesSearch)
         }
 
+        // Labels narrow the same array as search, so every existing filter
+        // (period / type / category) composes with them.
+        items = items.filter { TagFilter.matches(tagIDs: $0.tagIDs, selected: selectedTagIDs) }
+
         return items.sorted { $0.wrappedDate > $1.wrappedDate }
     }
 
@@ -382,6 +400,35 @@ extension LogView {
                 }
             }
 
+            if !availableTags.isEmpty {
+                Divider()
+                Menu(String.appLocalized("Labels")) {
+                    ForEach(availableTags) { tag in
+                        Button {
+                            if selectedTagIDs.contains(tag.id) {
+                                selectedTagIDs.remove(tag.id)
+                            } else {
+                                selectedTagIDs.insert(tag.id)
+                            }
+                        } label: {
+                            Label(
+                                tag.name,
+                                systemImage: selectedTagIDs.contains(tag.id)
+                                    ? "checkmark.circle.fill" : "circle")
+                        }
+                    }
+                    Divider()
+                    Button(String.appLocalized("Manage Labels"), systemImage: "pencil") {
+                        showTagManager = true
+                    }
+                }
+            }
+            if !selectedTagIDs.isEmpty {
+                Button(String.appLocalized("Clear Labels"), systemImage: "xmark.circle") {
+                    selectedTagIDs.removeAll()
+                }
+            }
+
             if filter != .all {
                 Divider()
                 Button(String.appLocalized("Clear Filter"), systemImage: "xmark.circle") {
@@ -404,5 +451,82 @@ extension LogView {
         #else
         content
         #endif
+    }
+}
+
+// MARK: - Label management
+
+/// CRUD for labels. Rename keeps the id, so every transaction carrying the
+/// label sees the new name immediately; delete strips the id from rows in
+/// the same save.
+struct TagManagementView: View {
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    let bookID: UUID
+    @State private var tags: [TagModel] = []
+    @State private var draftName = ""
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(Array(tags.enumerated()), id: \.element.id) { index, tag in
+                    HStack {
+                        TextField(String.appLocalized("Label name"), text: Binding(
+                            get: { tags[index].name },
+                            set: { tags[index].name = $0 }))
+                        ColorPicker("", selection: Binding(
+                            get: { Color(hex: tags[index].color) },
+                            set: { tags[index].color = $0.toHex() ?? "#5E9EFF" }))
+                            .labelsHidden()
+                            .frame(width: 44)
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) { delete(tag) } label: {
+                            Label(String.appLocalized("Delete"), systemImage: "trash")
+                        }
+                    }
+                }
+                Section(String.appLocalized("New Label")) {
+                    HStack {
+                        TextField(String.appLocalized("Label name"), text: $draftName)
+                        Button(String.appLocalized("Add")) { add() }
+                            .disabled(draftName.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }
+            }
+            .navigationTitle(String.appLocalized("Manage Labels"))
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String.appLocalized("Done")) {
+                        commit()
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear { tags = TagStore.all(in: context, bookID: bookID) }
+        }
+    }
+
+    private func commit() {
+        tags = TagStore.save(tags, in: context, bookID: bookID)
+        _ = DataRepository.shared.save()
+    }
+
+    private func add() {
+        let name = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        tags.append(TagModel(name: name, color: Color.blue.toHex() ?? "#5E9EFF"))
+        draftName = ""
+        commit()
+    }
+
+    private func delete(_ tag: TagModel) {
+        tags.removeAll { $0.id == tag.id }
+        _ = TagStore.remove(id: tag.id, in: context, bookID: bookID)
+        for row in DataRepository.shared.fetch(TransactionModel.self)
+            where row.tagIDs.contains(tag.id) {
+            row.tagIDs.removeAll { $0 == tag.id }
+        }
+        commit()
     }
 }

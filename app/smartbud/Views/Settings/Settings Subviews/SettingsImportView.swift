@@ -138,6 +138,13 @@ struct SettingsImportView: View {
                     .foregroundStyle(Color.SubtitleText)
             }
 
+            if summary.missingAttachments > 0 {
+                Text(String.appFormatted(
+                    SettingsKey.importMissingAttachments, summary.missingAttachments))
+                    .font(.footnote)
+                    .foregroundStyle(Color.AlertRed)
+            }
+
             if let settings = summary.settingsToApply, let code = settings.baseCurrency {
                 Text(String.appFormatted(SettingsKey.importSettingsApplied, code))
                     .font(.footnote)
