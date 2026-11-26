@@ -334,15 +334,13 @@ extension TransactionView {
         }
     }
 
-    @ViewBuilder
-    private func receiptImage(_ data: Data) -> some View {
-        if let image = UIImage(data: data) {
-            #if os(macOS)
-            Image(nsImage: image)
-            #else
-            Image(uiImage: image)
-            #endif
-        }
+    private func receiptImage(_ data: Data) -> Image? {
+        guard let image = UIImage(data: data) else { return nil }
+        #if os(macOS)
+        return Image(nsImage: image)
+        #else
+        return Image(uiImage: image)
+        #endif
     }
 
     var receiptViewerSheet: some View {
@@ -350,11 +348,13 @@ extension TransactionView {
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(Array(receiptPreviewData.enumerated()), id: \.offset) { _, data in
-                        receiptImage(data)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: .infinity)
-                            .clipShape(RoundedRectangle(cornerRadius: SBRadius.card))
+                        if let image = receiptImage(data) {
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
+                                .clipShape(RoundedRectangle(cornerRadius: SBRadius.card))
+                        }
                     }
                 }
                 .padding()

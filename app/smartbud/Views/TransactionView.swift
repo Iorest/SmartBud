@@ -46,6 +46,7 @@ struct TransactionView: View {
     @State var availableTags: [TagModel] = []
     @State var selectedTagIDs: Set<UUID> = []
     @State var showTagPicker = false
+    @State var showReceiptPicker = false
     @State var newTagName = ""
     /// Photos chosen in this form. `receiptsChanged` distinguishes "nothing
     /// picked yet" (keep an edited row's files) from "user removed every
