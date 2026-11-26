@@ -715,11 +715,17 @@ enum TagStore {
     /// keeps the association; restoring puts each one back on its book.
     static func allAcrossBooks(in context: ModelContext) -> [TagModel] {
         let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
-        return books.flatMap { stored in
+        var result: [TagModel] = []
+        for stored in books {
             guard let json = stored.tagsJSON, let data = json.data(using: .utf8),
-                  let tags = try? decoder.decode([TagModel].self, from: data) else { return [] }
-            return tags.map { var copy = $0; copy.bookID = stored.id; return copy }
+                  let tags = try? decoder.decode([TagModel].self, from: data) else { continue }
+            for tag in tags {
+                var copy = tag
+                copy.bookID = stored.id
+                result.append(copy)
+            }
         }
+        return result
     }
 
     @discardableResult
