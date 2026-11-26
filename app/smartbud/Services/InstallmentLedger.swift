@@ -43,8 +43,7 @@ enum InstallmentLedger {
     /// removes generated bills, and it runs when the plan itself is deleted.
     /// Calling this twice never creates a second row for the same period.
     @discardableResult
-    static func sync(_ plan: InstallmentPlanModel, in context: ModelContext) -> SyncResult {
-        var plan = plan
+    static func sync(_ plan: inout InstallmentPlanModel, in context: ModelContext) -> SyncResult {
         // A plan cannot have fewer periods than it has already booked. An
         // imported or hand-edited value otherwise leaves an out-of-range
         // counter that changes on the next export/import round trip.
@@ -83,11 +82,10 @@ enum InstallmentLedger {
     /// Book the next period: advance the counter and create its two rows.
     /// Returns nil when every period is already booked.
     @discardableResult
-    static func bookNext(_ plan: InstallmentPlanModel, in context: ModelContext) -> SyncResult? {
-        var plan = plan
+    static func bookNext(_ plan: inout InstallmentPlanModel, in context: ModelContext) -> SyncResult? {
         guard plan.executedPeriods < plan.periods else { return nil }
         plan.executedPeriods += 1
-        return sync(plan, in: context)
+        return sync(&plan, in: context)
     }
 
     /// Remove every generated row and the plan itself.
