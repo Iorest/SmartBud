@@ -40,6 +40,8 @@ enum DataImporter {
         /// Ledgers restored from the file. The structural default book is
         /// not counted here — it is created locally, not imported.
         var books = 0
+        /// Installment plans restored from the file.
+        var installmentPlans = 0
         /// Rows already on this device (same id) that were left alone.
         var skipped = 0
         /// Settings from the backup that still have to be written to the app
@@ -49,7 +51,7 @@ enum DataImporter {
         /// Records the user thinks of as "data". Rates are configuration and
         /// stay out of the count.
         var imported: Int {
-            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books
+            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books + installmentPlans
         }
 
         var isEmpty: Bool { imported == 0 }
@@ -110,6 +112,7 @@ enum DataImporter {
         summary.templates = payload.templates.count
         summary.rates = payload.rates.count
         summary.books = payload.books.count
+        summary.installmentPlans = payload.installmentPlans.count
         return summary
     }
 
@@ -156,6 +159,7 @@ enum DataImporter {
         merger.importBudgets(payload.budgets)
         merger.importMainBudgets(payload.mainBudgets)
         merger.importTemplates(payload.templates)
+        merger.importInstallmentPlans(payload.installmentPlans)
 
         do {
             try context.save()

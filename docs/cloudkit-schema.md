@@ -59,6 +59,21 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
 
 `AccountModel.currencyCode`、`TransactionModel.baseAmount`、`TransferModel.destinationAmount` 都是普通字段（非关系），CloudKit 可直接兼容。
 
+### 4.x 新增的分期字段（同样需要部署）
+
+分期计划不作为 CloudKit 实体：`InstallmentPlanModel` 是 Codable 值，存为默认账本上的
+`installmentPlansJSON` 字段。这项改动**没有新增 record type，但给 `CD_BookModel` 新增了属性**，
+同样必须部署；生成账单另需三个普通交易字段：
+
+| 实体 | 字段 | 说明 |
+|---|---|---|
+| `BookModel` | `installmentPlansJSON`（String，可空） | 全部分期计划的 JSON 数组，写入 `CD_BookModel` 同一属性；必须先部署，否则计划不同步 |
+| `TransactionModel` | `installmentOf`（UUID，可空） | 生成账单指回分期计划的 id；与期号、kind 组成幂等键 |
+| `TransactionModel` | `installmentPeriod`（Int，默认 0） | 1 起的期号 |
+| `TransactionModel` | `installmentKind`（Int，默认 0） | 1 = 手续费（支出），2 = 本金（只减负债，不计收支） |
+
+备份 schema 已升到 10；v9 备份没有这些字段，仍可导入（见 `docs/ledger-rules.md`）。
+
 ## 每次改 schema 后要做的四步
 
 1. **本机跑一遍真实写入**
@@ -66,7 +81,9 @@ SmartBud 用 SwiftData + CloudKit 私有库同步。**代码里的 schema 变了
    在 Development 环境把新表/新字段建出来。
 2. **CloudKit Dashboard → Schema → Deploy Schema Changes**
    多账本这一轮要**先 Deploy `CD_BookModel` 实体，再 Deploy 六个实体的 `CD_*bookID` 字段**；
-   顺序反了会让新客户端写入带 `bookID` 的行时找不到字段。然后逐条确认 `AccountModel`、`TransferModel`
+   分期这一轮要 Deploy `CD_BookModel` 的 `installmentPlansJSON` 字段，以及
+   `CD_TransactionModel` 的 `installmentOf` / `installmentPeriod` / `installmentKind` 三个字段。
+   顺序反了会让新客户端写入带这些字段的行时找不到字段。然后逐条确认 `AccountModel`、`TransferModel`
    及其 `CD_*` 字段、关系都被列出，再 Deploy 到 Production。
 3. **验证生产环境**
    用 TestFlight 包（不是 Debug 包）在已登录 iCloud 的设备上记一笔，确认 Dashboard → Data →
@@ -83,7 +100,15 @@ CloudKit 的 schema 只增不减：不要试图删除 `CD_BookModel` 或 `bookID
 其交易会混进默认账本视图。重新升级后 `BookMigration` 只会确认默认账本存在、把残留 `nil` 补齐；
 若 3.x 客户端期间写过数据，非默认账本的归属无法从库里推断，必须用回退前带 `books` 的备份恢复。
 
+分期新增字段同样只增不减：不要删除 `CD_BookModel.installmentPlansJSON` 或 `CD_*installment*`。
+回退到旧客户端时，旧版本看不到分期计划，生成账单会退化成普通的 `income = true` 收入行，
+必须先用 schema 10 备份恢复，再让旧客户端导入。
+
 ## 已知限制
+
+- 全部分期计划共用 `BookModel.installmentPlansJSON` 一个属性，写入是「读全量 → 改 → 写全量」。
+  多设备离线并发编辑计划时后写会整块覆盖先写：另一台设备新建的计划可能在两端一起消失，
+  而已生成的账单行仍留库里成为孤儿。owner 已明确接受此风险；**不承诺多设备并发编辑分期计划**。
 
 - 本地降级路径：`SwiftDataCore` 在 CloudKit 初始化失败时会退回本地库并显示"离线模式"横幅
   （截图里橙色横幅）。这是设计内行为，不是崩溃。
@@ -115,8 +140,8 @@ Development 环境只要在本机跑一遍写入就会自动建表；**Productio
 
    | Record Type | 必须存在的字段 |
    |---|---|
-   | `CD_BookModel` | 整个实体（先于其它账本字段部署） |
-   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey`、`bookID` |
+   | `CD_BookModel` | 整个实体、`bookID`、`installmentPlansJSON` |
+   | `CD_TransactionModel` | `baseAmount`、`discount`、`reimbursable`、`reimbursedAt`、`reimbursementOf`、`transferFeeOf`、`adjustment`、`merchant`、`merchantKey`、`bookID`、`installmentOf`、`installmentPeriod`、`installmentKind` |
    | `CD_AccountModel` | `currencyCode`、`archived`、`bookID` |
    | `CD_TransferModel` | `destinationAmount`、`fee` |
    | `CD_CurrencyRate` | `code`、`rate`、`updatedAt` |

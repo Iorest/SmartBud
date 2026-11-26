@@ -12,11 +12,11 @@ import Foundation
 
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
-    /// Old values are never reused.
-    static let version: Int = 9
-    /// Book fields added for multi-ledger support are optional, so old
-    /// backups still decode. The next version number is allocated by the
-    /// coordinator when the multi-ledger PR merges; do not take one here.
+    /// Old values are never reused. Schema 10 adds `installmentPlans` and the
+    /// three `installment*` fields on a transaction; v9 files have none of
+    /// them and still decode with an empty plan list. Number allocated by the
+    /// coordinator — do not take one here.
+    static let version: Int = 10
 
     struct Payload: Codable {
         var exportDate: Date
@@ -34,6 +34,10 @@ enum ExportSchema {
         /// support; their rows decode with a nil `bookID` and land in the
         /// default book.
         var books: [BookDTO]
+        /// Installment plans and their generated bills, added in schema 10.
+        /// Backups written before that section decode with no plans; no data
+        /// migration is needed.
+        var installmentPlans: [InstallmentPlanDTO]
         /// App settings that decide how the numbers are read. Optional so
         /// files written before this field still decode.
         var settings: SettingsDTO?
@@ -51,7 +55,8 @@ enum ExportSchema {
             transfers: [TransferDTO],
             rates: [RateDTO],
             settings: SettingsDTO? = nil,
-            books: [BookDTO] = []
+            books: [BookDTO] = [],
+            installmentPlans: [InstallmentPlanDTO] = []
         ) {
             self.exportDate = exportDate
             self.appVersion = appVersion
@@ -66,6 +71,7 @@ enum ExportSchema {
             self.rates = rates
             self.settings = settings
             self.books = books
+            self.installmentPlans = installmentPlans
         }
 
         /// Lenient on purpose: a file written by an older build can be missing
@@ -85,6 +91,7 @@ enum ExportSchema {
             transfers = try container.decodeIfPresent([TransferDTO].self, forKey: .transfers) ?? []
             rates = try container.decodeIfPresent([RateDTO].self, forKey: .rates) ?? []
             books = try container.decodeIfPresent([BookDTO].self, forKey: .books) ?? []
+            installmentPlans = try container.decodeIfPresent([InstallmentPlanDTO].self, forKey: .installmentPlans) ?? []
             settings = try container.decodeIfPresent(SettingsDTO.self, forKey: .settings)
         }
 
@@ -159,6 +166,13 @@ enum ExportSchema {
         var badDebtAt: Date?
         /// Ledger this row belongs to. Nil in pre-book backups.
         var bookID: UUID? = nil
+        /// On an installment bill: the plan that generated it. Optional so
+        /// older backups (and ordinary rows) still decode.
+        var installmentOf: UUID? = nil
+        /// 1-based period of a generated bill.
+        var installmentPeriod: Int? = nil
+        /// 1 = fee/interest, 2 = principal. Nil on ordinary rows.
+        var installmentKind: Int? = nil
     }
 
     struct AccountDTO: Codable {
@@ -265,6 +279,24 @@ enum ExportSchema {
         var order: Int
         var archived: Bool
         /// Optional so backups written before books existed still decode.
+        var dateCreated: Date?
+    }
+
+    /// One installment plan. Amounts are base-currency; the generated rows
+    /// carry their own frozen base amount, so restoring keeps both sides.
+    struct InstallmentPlanDTO: Codable {
+        var id: UUID
+        var bookID: UUID? = nil
+        var principal: Double
+        var fee: Double
+        var periods: Int
+        var firstDate: Date
+        var executedPeriods: Int
+        var accountId: UUID?
+        var accountName: String?
+        var categoryId: UUID?
+        var categoryName: String?
+        var note: String?
         var dateCreated: Date?
     }
 }

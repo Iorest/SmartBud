@@ -47,13 +47,15 @@ func payload(
     templates: [ExportSchema.TemplateTransactionDTO] = [],
     rates: [ExportSchema.RateDTO] = [],
     books: [ExportSchema.BookDTO] = [],
+    installmentPlans: [ExportSchema.InstallmentPlanDTO] = [],
     settings: ExportSchema.SettingsDTO? = nil
 ) -> ExportSchema.Payload {
     ExportSchema.Payload(
         exportDate: .now, appVersion: "test", schemaVersion: ExportSchema.version,
         transactions: transactions, categories: categories, budgets: budgets,
         mainBudgets: mainBudgets, templates: templates, accounts: accounts,
-        transfers: transfers, rates: rates, settings: settings, books: books
+        transfers: transfers, rates: rates, settings: settings, books: books,
+        installmentPlans: installmentPlans
     )
 }
 
@@ -237,6 +239,42 @@ struct DataImporterTests {
         #expect(file.schemaVersion == 3)
         #expect(file.transfers.isEmpty)
         #expect(file.rates.isEmpty)
+    }
+
+    @Test("A schema 9 backup without plans still imports on schema 10")
+    func importsV9BackupWithoutInstallments() throws {
+        let json = """
+        {
+          "exportDate": "2026-01-02T03:04:05Z",
+          "appVersion": "9.0",
+          "schemaVersion": 9,
+          "transactions": [{
+            "id": "11111111-1111-1111-1111-111111111111",
+            "amount": 12.5,
+            "date": "2026-01-02T03:04:05Z",
+            "note": "lunch",
+            "income": false,
+            "recurringType": 0,
+            "recurringCoefficient": 0,
+            "onceRecurring": false
+          }],
+          "categories": [], "budgets": [], "mainBudgets": [],
+          "templates": [], "accounts": []
+        }
+        """
+        let file = try DataImporter.decode(Data(json.utf8))
+        #expect(file.schemaVersion == 9)
+        #expect(file.installmentPlans.isEmpty)
+
+        let summary = try DataImporter.apply(file, context: fixture.context)
+        #expect(summary.transactions == 1)
+        #expect(summary.installmentPlans == 0)
+
+        let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        #expect(rows.count == 1)
+        #expect(rows.first?.installmentOf == nil)
+        let plans = InstallmentPlanStore.all(in: fixture.context)
+        #expect(plans.isEmpty)
     }
 
     @Test("An empty device adopts the backup's settings")

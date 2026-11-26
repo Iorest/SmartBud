@@ -130,7 +130,10 @@ enum DataExporter {
                 badDebtOf: txn.badDebtOf,
                 badDebtReason: txn.badDebtReason,
                 badDebtAt: txn.badDebtAt,
-                bookID: txn.bookID
+                bookID: txn.bookID,
+                installmentOf: txn.installmentOf,
+                installmentPeriod: txn.installmentPeriod > 0 ? txn.installmentPeriod : nil,
+                installmentKind: txn.installmentKind > 0 ? txn.installmentKind : nil
             )
         }
 
@@ -230,6 +233,28 @@ enum DataExporter {
 
     }
 
+    private static func installmentPlansDTOs(_ repo: DataRepository) -> [InstallmentPlanDTO] {
+        InstallmentLedger.plans(in: repo.container.mainContext)
+            .sorted { $0.dateCreated < $1.dateCreated }
+            .map { plan in
+                InstallmentPlanDTO(
+                    id: plan.id,
+                    bookID: plan.bookID,
+                    principal: plan.principal,
+                    fee: plan.fee,
+                    periods: plan.periods,
+                    firstDate: plan.firstDate,
+                    executedPeriods: plan.executedPeriods,
+                    accountId: plan.accountID,
+                    accountName: nil,
+                    categoryId: plan.categoryID,
+                    categoryName: nil,
+                    note: plan.note,
+                    dateCreated: plan.dateCreated
+                )
+            }
+    }
+
     private static func makePayload(repo: DataRepository) throws -> ExportPayload {
         let appVersion = Bundle.main.appVersion
         let exportDate = Date.now
@@ -250,6 +275,7 @@ enum DataExporter {
 
         let rates = ratesDTOs(repo)
         let books = booksDTOs(repo)
+        let installmentPlans = installmentPlansDTOs(repo)
 
         return ExportPayload(
             exportDate: exportDate,
@@ -264,7 +290,8 @@ enum DataExporter {
             transfers: transfers,
             rates: rates,
             settings: ExportSchema.SettingsDTO.current(),
-            books: books
+            books: books,
+            installmentPlans: installmentPlans
         )
     }
 
@@ -293,4 +320,5 @@ extension DataExporter {
     typealias MainBudgetDTO = ExportSchema.MainBudgetDTO
     typealias TemplateTransactionDTO = ExportSchema.TemplateTransactionDTO
     typealias BookDTO = ExportSchema.BookDTO
+    typealias InstallmentPlanDTO = ExportSchema.InstallmentPlanDTO
 }

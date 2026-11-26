@@ -291,6 +291,7 @@ final class DataRepository {
         for budget in fetch(BudgetModel.self) { context.delete(budget) }
         for mainBudget in fetch(MainBudgetModel.self) { context.delete(mainBudget) }
         for tpl in fetch(TemplateTransactionModel.self) { context.delete(tpl) }
+        InstallmentPlanStore.removeAll(in: context)
         for book in fetch(BookModel.self) { context.delete(book) }
         return save()
     }

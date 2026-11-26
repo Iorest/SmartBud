@@ -54,6 +54,34 @@ struct BackupMerger {
         }
     }
 
+    /// Plans are restored after categories and accounts so their relationships
+    /// resolve. Generated bills are ordinary rows carrying `installmentOf`, so
+    /// the plan-to-bill relation survives a round trip without a second store.
+    mutating func importInstallmentPlans(_ dtos: [ExportSchema.InstallmentPlanDTO]) {
+        var existing = Set(InstallmentPlanStore.all(in: context).map(\.id))
+        for dto in dtos {
+            guard existing.insert(dto.id).inserted else {
+                summary.skipped += 1
+                continue
+            }
+            var plan = InstallmentPlanModel(
+                principal: amount(dto.principal),
+                fee: amount(dto.fee),
+                periods: max(0, dto.periods),
+                firstDate: dto.firstDate,
+                note: dto.note,
+                accountID: dto.accountId,
+                categoryID: dto.categoryId,
+                bookID: resolveBook(dto.bookID)
+            )
+            plan.id = dto.id
+            plan.executedPeriods = max(0, min(dto.executedPeriods, plan.periods))
+            if let created = dto.dateCreated { plan.dateCreated = created }
+            InstallmentPlanStore.upsert(plan, in: context)
+            summary.installmentPlans += 1
+        }
+    }
+
     // MARK: Categories and accounts
 
     mutating func importCategories(_ dtos: [ExportSchema.CategoryDTO]) {
@@ -154,6 +182,9 @@ struct BackupMerger {
                 refundOf: dto.refundOf,
                 badDebtOf: dto.badDebtOf,
                 badDebtReason: dto.badDebtReason,
+                installmentOf: dto.installmentOf,
+                installmentPeriod: dto.installmentPeriod ?? 0,
+                installmentKind: dto.installmentKind ?? 0,
                 transferFeeOf: dto.transferFeeOf,
                 adjustment: dto.adjustment ?? false
             )
