@@ -273,7 +273,7 @@ struct DataImporterTests {
         let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
         #expect(rows.count == 1)
         #expect(rows.first?.installmentOf == nil)
-        let plans = try fixture.context.fetch(FetchDescriptor<InstallmentPlanModel>())
+        let plans = InstallmentPlanStore.all(in: fixture.context)
         #expect(plans.isEmpty)
     }
 

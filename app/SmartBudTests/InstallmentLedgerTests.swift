@@ -52,7 +52,7 @@ struct InstallmentLedgerTests {
 
     @Test("Syncing twice never creates a second bill")
     func idempotent() throws {
-        let result = plan(executed: 3)
+        var result = plan(executed: 3)
         let first = InstallmentLedger.sync(result, in: context)
         #expect(first.created == 6)
         #expect(InstallmentLedger.rows(for: result, in: context).count == 6)
@@ -65,7 +65,7 @@ struct InstallmentLedgerTests {
 
     @Test("Shrinking the term never deletes a booked bill")
     func shrinkingTermKeepsBookedBills() throws {
-        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
         #expect(InstallmentLedger.sync(result, in: context).created == 6)
 
         result.periods = 2
@@ -77,7 +77,7 @@ struct InstallmentLedgerTests {
 
     @Test("Rewinding the counter never deletes a booked bill")
     func rewindingCounterKeepsBookedBills() throws {
-        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 3)
         #expect(InstallmentLedger.sync(result, in: context).created == 6)
 
         result.executedPeriods = 2
@@ -87,7 +87,7 @@ struct InstallmentLedgerTests {
 
     @Test("An interest-free plan writes no zero-yuan fee rows")
     func interestFreePlanHasNoFeeRows() throws {
-        let result = plan(principal: 100, fee: 0, periods: 3, executed: 3)
+        var result = plan(principal: 100, fee: 0, periods: 3, executed: 3)
         #expect(InstallmentLedger.sync(result, in: context).created == 3)
         let rows = InstallmentLedger.rows(for: result, in: context)
         #expect(rows.count == 3)
@@ -96,7 +96,7 @@ struct InstallmentLedgerTests {
 
     @Test("A cent-scale plan writes no zero-yuan principal rows")
     func tinyPlanSkipsZeroRows() throws {
-        let result = plan(principal: 0.02, fee: 0, periods: 3, executed: 3)
+        var result = plan(principal: 0.02, fee: 0, periods: 3, executed: 3)
         #expect(InstallmentLedger.sync(result, in: context).created == 1)
         let rows = InstallmentLedger.rows(for: result, in: context)
         #expect(rows.count == 1)
@@ -106,7 +106,7 @@ struct InstallmentLedgerTests {
 
     @Test("Editing a plan re-prices only unbooked periods")
     func bookedRowsImmutable() throws {
-        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
         InstallmentLedger.sync(result, in: context)
         let firstFee = try #require(InstallmentLedger.rows(for: result, in: context)
             .first { $0.installmentKind == 1 })
@@ -125,7 +125,7 @@ struct InstallmentLedgerTests {
 
     @Test("Principal restores the card but is neither spend nor income")
     func accountingIdentity() throws {
-        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
         InstallmentLedger.sync(result, in: context)
         let rows = InstallmentLedger.rows(for: result, in: context)
         let fee = try #require(rows.first { $0.installmentKind == 1 })
@@ -149,7 +149,7 @@ struct InstallmentLedgerTests {
 
     @Test("Deleting a plan removes every generated row")
     func cascade() throws {
-        let result = plan(executed: 2)
+        var result = plan(executed: 2)
         InstallmentLedger.sync(result, in: context)
         #expect(InstallmentLedger.rows(for: result, in: context).count == 4)
         InstallmentLedger.prepareForDeletion(result, in: context)
@@ -158,7 +158,7 @@ struct InstallmentLedgerTests {
 
     @Test("Credit restoration is capped at the plan principal")
     func restoreCap() throws {
-        let result = plan(principal: 100, fee: 0.30, periods: 3, executed: 99)
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 99)
         #expect(InstallmentLedger.restoredPrincipal(result) == 100)
     }
 }

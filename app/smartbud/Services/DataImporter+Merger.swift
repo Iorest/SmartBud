@@ -71,7 +71,7 @@ struct BackupMerger {
                 firstDate: dto.firstDate,
                 note: dto.note,
                 accountID: dto.accountId,
-                categoryID: dto.categoryID,
+                categoryID: dto.categoryId,
                 bookID: resolveBook(dto.bookID)
             )
             plan.id = dto.id
