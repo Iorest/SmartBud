@@ -90,6 +90,61 @@ enum AppPeriod {
         return max(1, days)
     }
 
+    /// One ledger row's contribution to a calendar day. Values are base
+    /// currency amounts at the model boundary: `spend` is signed (a refund
+    /// is negative), `income` is non-zero only for income rows.
+    struct Entry {
+        let date: Date
+        let spend: Double
+        let income: Double
+    }
+
+    /// A cell in the period calendar. `hasEntries` distinguishes a day with
+    /// only zero-valued rows from a day with no rows at all; both use the same
+    /// zero totals so the day sums equal the period totals.
+    struct DayTotals: Identifiable, Equatable {
+        let date: Date
+        let spend: Decimal
+        let income: Decimal
+        let hasEntries: Bool
+
+        var id: Date { date }
+    }
+
+    /// Buckets entries by day across a period, including the empty days
+    /// between them. One pass over the entries and one over the days, so a
+    /// large ledger costs O(entries + days) rather than O(entries × days).
+    static func dayTotals(
+        in range: (start: Date, end: Date),
+        entries: [Entry],
+        calendar: Calendar
+    ) -> [DayTotals] {
+        var byDay: [Date: (spend: Decimal, income: Decimal, hasEntries: Bool)] = [:]
+        for entry in entries {
+            guard entry.date >= range.start, entry.date < range.end else { continue }
+            let key = calendar.startOfDay(for: entry.date)
+            var bucket = byDay[key] ?? (0, 0, false)
+            bucket.spend += Money.cents(entry.spend)
+            bucket.income += Money.cents(entry.income)
+            bucket.hasEntries = true
+            byDay[key] = bucket
+        }
+
+        var result = [DayTotals]()
+        var cursor = calendar.startOfDay(for: range.start)
+        while cursor < range.end {
+            let bucket = byDay[cursor] ?? (0, 0, false)
+            result.append(DayTotals(date: cursor, spend: bucket.spend,
+                                    income: bucket.income, hasEntries: bucket.hasEntries))
+            // Guard against a calendar that refuses to advance (it would
+            // otherwise spin forever building the grid).
+            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor),
+                  next > cursor else { break }
+            cursor = next
+        }
+        return result
+    }
+
     /// Calendar with the user's first-weekday preference applied.
     static func configuredCalendar(firstWeekday: Int) -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
