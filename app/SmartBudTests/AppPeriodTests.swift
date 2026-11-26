@@ -112,4 +112,83 @@ struct AppPeriodTests {
         #expect(covered == 365)
         #expect(cursor == start(2027, 1, 15))
     }
+
+    @Test("Calendar days cover the month bucket and sum to the period totals")
+    func calendarDaysMatchPeriod() {
+        let range = AppPeriod.monthRange(containing: date(2026, 10, 20),
+                                         startDay: 1, calendar: calendar)
+        let entries = [
+            AppPeriod.Entry(date: date(2026, 10, 1), spend: 12.5, income: 0),
+            AppPeriod.Entry(date: date(2026, 10, 1, hour: 20), spend: 0, income: 100),
+            AppPeriod.Entry(date: date(2026, 10, 31, hour: 23), spend: 7.25, income: 0),
+            AppPeriod.Entry(date: date(2026, 9, 30), spend: 999, income: 0),
+            AppPeriod.Entry(date: date(2026, 11, 1), spend: 999, income: 0)
+        ]
+
+        let days = AppPeriod.dayTotals(in: range, entries: entries, calendar: calendar)
+        #expect(days.count == 31)
+        #expect(days.first?.date == start(2026, 10, 1))
+        #expect(days.last?.date == start(2026, 10, 31))
+        #expect(days[0].spend == Decimal(string: "12.5")!)
+        #expect(days[0].income == 100)
+        #expect(days[0].hasEntries)
+        #expect(days[1].spend == 0)
+        #expect(days[1].income == 0)
+        #expect(!days[1].hasEntries)
+        #expect(days[30].spend == Decimal(string: "7.25")!)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.spend } == Decimal(string: "19.75")!)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.income } == 100)
+    }
+
+    @Test("A shifted month calendar crosses the calendar-month line")
+    func calendarDaysAcrossMonths() {
+        let range = AppPeriod.monthRange(containing: date(2026, 10, 10),
+                                         startDay: 15, calendar: calendar)
+        let entries = [
+            AppPeriod.Entry(date: date(2026, 9, 14), spend: 500, income: 0),
+            AppPeriod.Entry(date: date(2026, 9, 15), spend: 4, income: 0),
+            AppPeriod.Entry(date: date(2026, 10, 14), spend: 0, income: 6),
+            AppPeriod.Entry(date: date(2026, 10, 15), spend: 500, income: 0)
+        ]
+
+        let days = AppPeriod.dayTotals(in: range, entries: entries, calendar: calendar)
+        #expect(days.count == 30)
+        #expect(days.first?.date == start(2026, 9, 15))
+        #expect(days.last?.date == start(2026, 10, 14))
+        #expect(days[0].spend == 4)
+        #expect(days[29].income == 6)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.spend } == 4)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.income } == 6)
+    }
+
+    @Test("Refunds reduce the day's spend, never its income")
+    func calendarRefundIsNegativeSpend() {
+        let range = AppPeriod.monthRange(containing: date(2026, 10, 20),
+                                         startDay: 1, calendar: calendar)
+        let entries = [
+            AppPeriod.Entry(date: date(2026, 10, 5), spend: 20, income: 0),
+            AppPeriod.Entry(date: date(2026, 10, 5, hour: 15), spend: -8.5, income: 0)
+        ]
+        let days = AppPeriod.dayTotals(in: range, entries: entries, calendar: calendar)
+        #expect(days[4].spend == Decimal(string: "11.5")!)
+        #expect(days[4].income == 0)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.spend } == Decimal(string: "11.5")!)
+    }
+
+    @Test("A thousand entries keep their day buckets and exact total")
+    func calendarThousandEntries() {
+        let range = AppPeriod.monthRange(containing: date(2026, 10, 20),
+                                         startDay: 1, calendar: calendar)
+        let entries = (0..<1000).map { index -> AppPeriod.Entry in
+            AppPeriod.Entry(date: date(2026, 10, 1 + index % 30, hour: 8 + index % 12),
+                            spend: Double(index % 7) + 0.1,
+                            income: index % 50 == 0 ? 3 : 0)
+        }
+
+        let days = AppPeriod.dayTotals(in: range, entries: entries, calendar: calendar)
+        #expect(days.count == 31)
+        #expect(days.filter(\.hasEntries).count == 30)
+        #expect(days.reduce(Decimal.zero) { $0 + $1.spend } == Money.sum(entries.map(\.spend)))
+        #expect(days.reduce(Decimal.zero) { $0 + $1.income } == Money.sum(entries.map(\.income)))
+    }
 }

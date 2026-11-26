@@ -10,6 +10,18 @@ struct SummaryData: Equatable {
     let average: Double
 }
 
+/// One rendered month of the statistics calendar. Derived from the same
+/// book-scoped rows and the same `AppPeriod` bucket as the period totals, so
+/// the day cells cannot disagree with the cards above them.
+struct CalendarSnapshot: Equatable {
+    let title: String
+    let weekdaySymbols: [String]
+    let leadingBlanks: Int
+    let days: [AppPeriod.DayTotals]
+    let totalSpend: Double
+    let totalIncome: Double
+}
+
 @MainActor
 @Observable
 final class InsightsViewModel {
@@ -31,6 +43,10 @@ final class InsightsViewModel {
     /// number as soon as the period has income.
     var periodAverageSpend: Double = 0
     var barChartData: [BarChartPoint] = []
+    /// The month shown by the calendar section. Navigation changes only this
+    /// anchor; the period picker above keeps its own selection.
+    var calendarMonth = Date.now
+    var calendarSnapshot: CalendarSnapshot?
     var categoryBreakdown: [PowerCategory] = []
     /// Spend by merchant, largest first. Grouped on `merchantKey`, so the
     /// three spellings of one shop are one row.
@@ -148,6 +164,7 @@ final class InsightsViewModel {
         periodDateRangeText = getDateRangeText(for: selectedPeriod)
 
         barChartData = getBarChartData(for: selectedPeriod)
+        refreshCalendar(all, now: now)
         categoryBreakdown = getCategoryBreakdown(for: selectedPeriod)
         // Same window as the totals above: `inPeriod` already drops future
         // rows, so a planned purchase never enters the merchant ranking.
@@ -293,31 +310,66 @@ final class InsightsViewModel {
     /// the small header. Branch the template per locale so CJK users see the
     /// natural "M月d日 - M月d日" order instead.
     func getDateRangeText(for period: Int) -> String {
-        let cal = configuredCalendar
         let (start, end) = getPeriodDateRange(for: period)
+        guard period != 3 else {
+            let yearOnly = DateFormatter()
+            yearOnly.locale = Locale.appLocale
+            yearOnly.dateFormat = "yyyy"
+            yearOnly.calendar = configuredCalendar
+            return yearOnly.string(from: start)
+        }
+        return rangeText(start: start, end: end)
+    }
+
+    /// Same header formatting for an arbitrary period range (the calendar can
+    /// show a different month from the period picker).
+    private func rangeText(start: Date, end: Date) -> String {
+        let cal = configuredCalendar
         let isCJK = Locale.appLocale.identifier.hasPrefix("zh")
         let dayMonth = DateFormatter()
         dayMonth.locale = Locale.appLocale
         dayMonth.dateFormat = isCJK ? "M月d日" : "d MMM"
         dayMonth.calendar = cal
-        let yearOnly = DateFormatter()
-        yearOnly.locale = Locale.appLocale
-        yearOnly.dateFormat = "yyyy"
-        yearOnly.calendar = cal
         let formatRange: (Date) -> String = { date in
             let label = dayMonth.string(from: date)
             return isCJK ? label : label.uppercased()
         }
-        switch period {
-        case 1:
-            let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
-            return "\(formatRange(start)) - \(formatRange(endInclusive))"
-        case 3:
-            return yearOnly.string(from: start)
-        default:
-            let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
-            return "\(formatRange(start)) - \(formatRange(endInclusive))"
+        let endInclusive = cal.date(byAdding: .day, value: -1, to: end) ?? end
+        return "\(formatRange(start)) - \(formatRange(endInclusive))"
+    }
+
+    /// Moves only the calendar's month; the period picker keeps its selection.
+    func shiftCalendarMonth(by months: Int) {
+        guard let next = configuredCalendar.date(byAdding: .month, value: months, to: calendarMonth)
+        else { return }
+        calendarMonth = next
+        refreshCalendar(bookScopedTransactions(), now: .now)
+    }
+
+    /// One aggregation pass for the grid. Same spend / income rules and the
+    /// same future-row cutoff as the period cards above it.
+    private func refreshCalendar(_ all: [TransactionModel], now: Date) {
+        let cal = configuredCalendar
+        let range = AppPeriod.monthRange(containing: calendarMonth,
+                                         startDay: configuredStartDay, calendar: cal)
+        let entries = all.compactMap { txn -> AppPeriod.Entry? in
+            guard let date = txn.date, date >= range.start, date < range.end, date <= now else {
+                return nil
+            }
+            return AppPeriod.Entry(date: date, spend: txn.spendBaseAmount,
+                                   income: txn.countsAsIncome ? txn.wrappedBaseAmount : 0)
         }
+        let days = AppPeriod.dayTotals(in: range, entries: entries, calendar: cal)
+        let symbols = cal.shortWeekdaySymbols
+        let orderedSymbols = (0..<7).map { symbols[($0 + cal.firstWeekday - 1) % symbols.count] }
+        let firstWeekday = cal.component(.weekday, from: range.start)
+        calendarSnapshot = CalendarSnapshot(
+            title: rangeText(start: range.start, end: range.end),
+            weekdaySymbols: orderedSymbols,
+            leadingBlanks: (firstWeekday - cal.firstWeekday + 7) % 7,
+            days: days,
+            totalSpend: Money.double(days.reduce(Decimal.zero) { $0 + $1.spend }),
+            totalIncome: Money.double(days.reduce(Decimal.zero) { $0 + $1.income }))
     }
 
     /// Forecasts and subscription suggestions share one switch and one ledger

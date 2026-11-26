@@ -11,6 +11,13 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+/// A one-shot request from another tab to focus a day in the log. The token
+/// makes two taps on the same day distinct so the log always re-applies it.
+struct LogDayRequest: Equatable {
+    let date: Date
+    let token: Int
+}
+
 struct LogView: View {
     @Query(sort: [SortDescriptor(\TransactionModel.date, order: .reverse)])
     private var fetchedTransactions: [TransactionModel]
@@ -43,6 +50,9 @@ struct LogView: View {
     /// Query carried by `smartbud://search?q=…`. Applied when it arrives, so a
     /// deep link does not just focus an empty field.
     var launchSearchQuery: String?
+    /// Set by the statistics calendar. Only the date filter changes; search,
+    /// category, type and label filters keep their current values.
+    var dayRequest: LogDayRequest?
 
     /// Compact layouts own the book picker in this toolbar; the wide layout
     /// puts it in the sidebar instead, so it appears exactly once.
@@ -162,6 +172,11 @@ struct LogView: View {
             filter = .all
             searchText = query
             searchPresented = true
+        }
+        .onChange(of: dayRequest) { _, request in
+            guard let request else { return }
+            filter = .day
+            dateFilter = request.date
         }
         .focusedSceneValue(\.searchLog, { searchPresented = true })
         .onOpenURL { url in

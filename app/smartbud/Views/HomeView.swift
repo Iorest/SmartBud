@@ -66,6 +66,17 @@ struct HomeView: View {
     @Environment(\.openURL) var openURL
 
     @State var currentTab = "Log"
+    /// One-shot day focus from the statistics calendar. The token makes two
+    /// taps on the same day separate requests.
+    @State private var logDayRequest: LogDayRequest?
+    @State private var logDayRequestToken = 0
+
+    private func focusLogDay(_ date: Date) {
+        logDayRequestToken += 1
+        logDayRequest = LogDayRequest(date: date, token: logDayRequestToken)
+        currentTab = "Log"
+    }
+
     var topEdge: CGFloat
 
     @State var fromURL1: Bool = false
@@ -152,7 +163,8 @@ struct HomeView: View {
         Group {
             switch currentTab {
             case "Insights":
-                InsightsView(onAdd: { addTransaction = true })
+                InsightsView(onAdd: { addTransaction = true },
+                             onSelectDay: focusLogDay)
             case "Budget":
                 BudgetView()
             case "Settings":
@@ -160,6 +172,7 @@ struct HomeView: View {
             default:
                 LogView(launchSearch: launchSearch,
                         launchSearchQuery: launchSearchQuery,
+                        dayRequest: logDayRequest,
                         showsBookSwitcher: !isWideLayout && !appLockVisible,
                         onAdd: { addTransaction = true })
             }
@@ -220,6 +233,7 @@ extension HomeView {
         TabView(selection: $currentTab) {
                 LogView(launchSearch: launchSearch,
                         launchSearchQuery: launchSearchQuery,
+                        dayRequest: logDayRequest,
                         showsBookSwitcher: !isWideLayout && !appLockVisible,
                         onAdd: { addTransaction = true })
                     .frame(maxWidth: 760)
@@ -230,7 +244,8 @@ extension HomeView {
                             .accessibilityIdentifier(AccessibilityID.tabLog)
                     }
 
-                InsightsView(onAdd: { addTransaction = true })
+                InsightsView(onAdd: { addTransaction = true },
+                             onSelectDay: focusLogDay)
                     .frame(maxWidth: 760)
                     .frame(maxWidth: .infinity)
                     .tag("Insights")
