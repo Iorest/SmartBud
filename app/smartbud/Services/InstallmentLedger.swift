@@ -50,10 +50,10 @@ enum InstallmentLedger {
         if plan.periods < plan.executedPeriods {
             plan.periods = plan.executedPeriods
         }
-        InstallmentPlanStore.upsert(plan, in: context)
         let schedule = InstallmentPolicy.schedule(principal: plan.principal, fee: plan.fee,
                                                   periods: plan.periods, firstDate: plan.firstDate)
         guard !schedule.isEmpty else { return SyncResult() }
+        InstallmentPlanStore.upsert(plan, in: context)
 
         let existing = rows(for: plan, in: context)
         var keys = Set(existing.map { "\($0.installmentPeriod)-\($0.installmentKind)" })

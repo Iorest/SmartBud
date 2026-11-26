@@ -34,9 +34,9 @@ enum ExportSchema {
         /// support; their rows decode with a nil `bookID` and land in the
         /// default book.
         var books: [BookDTO]
-        /// Installment plans and their generated bills. Additive: a backup
-        /// written before this section simply decodes with no plans, so no
-        /// schema version bump or data migration is needed.
+        /// Installment plans and their generated bills, added in schema 10.
+        /// Backups written before that section decode with no plans; no data
+        /// migration is needed.
         var installmentPlans: [InstallmentPlanDTO]
         /// App settings that decide how the numbers are read. Optional so
         /// files written before this field still decode.

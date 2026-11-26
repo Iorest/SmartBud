@@ -154,6 +154,33 @@ struct InstallmentLedgerTests {
         #expect(InstallmentLedger.rows(for: result, in: context).count == 4)
         InstallmentLedger.prepareForDeletion(result, in: context)
         #expect(InstallmentLedger.rows(for: result, in: context).isEmpty)
+        #expect(InstallmentPlanStore.all(in: context).isEmpty)
+    }
+
+    @Test("Plan store round-trips JSON and upserts/removes by id")
+    func planStoreRoundTrip() throws {
+        let first = InstallmentPlanModel(principal: 100, fee: 0.30, periods: 12,
+                                         firstDate: Date(timeIntervalSince1970: 1_700_000_000))
+        InstallmentPlanStore.upsert(first, in: context)
+        #expect(InstallmentPlanStore.all(in: context) == [first])
+
+        var second = InstallmentPlanModel(principal: 60, fee: 0, periods: 6,
+                                          firstDate: Date(timeIntervalSince1970: 1_700_000_000))
+        second.id = UUID()
+        InstallmentPlanStore.upsert(second, in: context)
+        #expect(Set(InstallmentPlanStore.all(in: context).map(\.id)) == [first.id, second.id])
+
+        var edited = first
+        edited.executedPeriods = 3
+        InstallmentPlanStore.upsert(edited, in: context)
+        #expect(InstallmentPlanStore.all(in: context).first { $0.id == first.id }?.executedPeriods == 3)
+        #expect(InstallmentPlanStore.all(in: context).count == 2)
+
+        InstallmentPlanStore.remove(id: second.id, in: context)
+        #expect(InstallmentPlanStore.all(in: context).map(\.id) == [first.id])
+
+        InstallmentPlanStore.removeAll(in: context)
+        #expect(InstallmentPlanStore.all(in: context).isEmpty)
     }
 
     @Test("Credit restoration is capped at the plan principal")

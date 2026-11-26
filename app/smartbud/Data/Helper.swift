@@ -621,7 +621,7 @@ enum InstallmentPlanStore {
 
     private static func book(in context: ModelContext) -> BookModel? {
         let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
-        return books.first { $0.id == BookModel.defaultID } ?? books.first
+        return books.first { $0.id == BookModel.defaultID }
     }
 
     static func all(in context: ModelContext) -> [InstallmentPlanModel] {
