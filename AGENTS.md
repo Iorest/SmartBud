@@ -27,7 +27,7 @@ SmartBud is an open-source personal finance app for iPhone, iPad and Mac, plus h
 - A row has one identity: expense, income, transfer, refund, bad debt, reimbursement, adjustment or future record. See `docs/ledger-rules.md` §一行的身份 before adding a new one.
 - Keep the cash-flow / expense / net-worth split intact. `baseAmount` and the wrapped account amount are different layers; do not sum them interchangeably.
 - Refunds are negative spend against the original expense (`refundOf`) and **never income**. Reimbursements use `reimbursedAmount`; unreimbursed claims follow the documented self-pay rule. Bad debt writes a reason-bearing expense row and does not move money.
-- Installment principal is not spend; only fees are. Rounding is to cents and the last period absorbs the tail difference (`app/smartbud/Logic/InstallmentPolicy.swift:42`).
+- Installment principal is not spend; only fees are. Rounding is to cents and the last period absorbs the tail difference (`app/smartbud/Logic/InstallmentPolicy.swift:47-63`, `shares(_:into:)`).
 - Export `schemaVersion` is currently **12** (`app/smartbud/Services/ExportSchema.swift:16`; schema 10 added installment plans, schema 12 added savings goals). Do not invent the next number; the coordinator allocates it. Old backups must decode without loss.
 - `CurrencyConversion.needsRate` (`app/smartbud/Logic/CurrencyConversion.swift:38`) is the single missing-rate decision; `CurrencyRateStore.needsRate` delegates to it (`app/smartbud/ViewModels/CurrencyRateStore.swift:43-45`). Do not silently fall back to 1:1 for writes.
 - Add compatibility and round-trip tests with every model or migration change; never delete or weaken tests to make CI green.
