@@ -293,7 +293,8 @@ final class AccountViewModel {
     /// Corrects the account to `target` with a dedicated adjustment row, so
     /// the opening balance (and the history behind it) is never rewritten.
     @discardableResult
-    func adjustBalance(_ account: AccountModel, to target: Double, date: Date = .now) -> TransactionModel? {
+    func adjustBalance(_ account: AccountModel, to target: Double,
+                       date: Date = .now, reason: AdjustmentReason = .other) -> TransactionModel? {
         guard target.isFinite else { return nil }
         // The correction row stores a base-currency amount too. Without a rate
         // that number would be a 1:1 guess, so the adjustment is refused — the
@@ -313,6 +314,7 @@ final class AccountViewModel {
             amount: abs(delta),
             date: date,
             adjustment: true,
+            adjustmentReason: reason.rawValue,
             bookID: BookState.shared.currentID
         )
         repo.insert(transaction)

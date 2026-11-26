@@ -154,6 +154,10 @@ final class TransactionModel {
     /// A balance correction written by "调整余额". It moves the account
     /// balance but is neither income nor spend.
     var adjustment: Bool = false
+    /// Why this correction was made (`AdjustmentReason` raw value). Nil on
+    /// rows written before the field existed; read as `.other` so old ledgers
+    /// and backups stay readable. Ordinary rows ignore it.
+    var adjustmentReason: String?
     /// Merchant as the user sees it, derived from the note by
     /// `MerchantNormalizer` ("美团-张亮麻辣烫" → "美团").
     ///
@@ -226,6 +230,7 @@ final class TransactionModel {
         installmentKind: Int = 0,
         transferFeeOf: UUID? = nil,
         adjustment: Bool = false,
+        adjustmentReason: String? = nil,
         merchant: String? = nil,
         merchantKey: String? = nil,
         bookID: UUID? = BookModel.defaultID
@@ -247,6 +252,7 @@ final class TransactionModel {
         self.installmentKind = installmentKind
         self.transferFeeOf = transferFeeOf
         self.adjustment = adjustment
+        self.adjustmentReason = adjustmentReason
         self.merchant = merchant
         self.merchantKey = merchantKey
         self.bookID = bookID
