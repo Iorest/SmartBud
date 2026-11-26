@@ -374,7 +374,12 @@ struct ImportRoundTripTests {
         legacyRow.id = legacyID
         legacyRow.adjustmentReason = nil
 
-        let encoded = try JSONEncoder().encode(
+        // Match DataExporter: backups carry ISO-8601 dates, which is what
+        // DataImporter.decode expects. A plain JSONEncoder writes numbers and
+        // the file is (correctly) rejected as notABackup.
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let encoded = try encoder.encode(
             fixture.payload(accounts: [fixture.sampleAccount],
                             transactions: [reasonRow, legacyRow]))
         let decoded = try DataImporter.decode(encoded)
