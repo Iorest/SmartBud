@@ -12,11 +12,10 @@ import Foundation
 
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
-    /// Old values are never reused. Schema 10 adds `installmentPlans` and the
-    /// three `installment*` fields on a transaction; v9 files have none of
-    /// them and still decode with an empty plan list. Number allocated by the
-    /// coordinator — do not take one here.
-    static let version: Int = 10
+    /// Old values are never reused. Schema 10 added installment plans;
+    /// schema 12 adds `savingsGoals`. Older files have no goals section and
+    /// still decode with an empty list. Number allocated by the coordinator.
+    static let version: Int = 12
 
     struct Payload: Codable {
         var exportDate: Date
@@ -41,6 +40,9 @@ enum ExportSchema {
         /// Labels per ledger. Optional in the file so older backups (and
         /// exports from before TELE-30) decode with no tags.
         var tags: [TagDTO]
+        /// Savings goals added in schema 12. Absent in older files, which
+        /// decode as an empty list without touching any balance.
+        var savingsGoals: [SavingsGoalDTO]
         /// App settings that decide how the numbers are read. Optional so
         /// files written before this field still decode.
         var settings: SettingsDTO?
@@ -60,7 +62,8 @@ enum ExportSchema {
             settings: SettingsDTO? = nil,
             books: [BookDTO] = [],
             installmentPlans: [InstallmentPlanDTO] = [],
-            tags: [TagDTO] = []
+            tags: [TagDTO] = [],
+            savingsGoals: [SavingsGoalDTO] = []
         ) {
             self.exportDate = exportDate
             self.appVersion = appVersion
@@ -77,6 +80,7 @@ enum ExportSchema {
             self.books = books
             self.installmentPlans = installmentPlans
             self.tags = tags
+            self.savingsGoals = savingsGoals
         }
 
         /// Lenient on purpose: a file written by an older build can be missing
@@ -98,6 +102,7 @@ enum ExportSchema {
             books = try container.decodeIfPresent([BookDTO].self, forKey: .books) ?? []
             installmentPlans = try container.decodeIfPresent([InstallmentPlanDTO].self, forKey: .installmentPlans) ?? []
             tags = try container.decodeIfPresent([TagDTO].self, forKey: .tags) ?? []
+            savingsGoals = try container.decodeIfPresent([SavingsGoalDTO].self, forKey: .savingsGoals) ?? []
             settings = try container.decodeIfPresent(SettingsDTO.self, forKey: .settings)
         }
 
@@ -328,5 +333,73 @@ enum ExportSchema {
         var categoryName: String?
         var note: String?
         var dateCreated: Date?
+    }
+
+    /// One savings goal (schema 12). Every field except id/name is optional
+    /// so a partially written future file still restores what it carries.
+    /// Amounts are base-currency; the goal never changes an account balance.
+    struct SavingsGoalDTO: Codable {
+        var id: UUID
+        var bookID: UUID? = nil
+        var name: String
+        var icon: String? = nil
+        var mode: Int? = nil
+        var targetAmount: Double? = nil
+        var startDate: Date? = nil
+        var deadline: Date? = nil
+        var periodMonths: Int? = nil
+        var periods: Int? = nil
+        var amountPerPeriod: Double? = nil
+        var savedAmount: Double? = nil
+        var linkedAccountID: UUID? = nil
+        var useAccountBalance: Bool? = nil
+        var notifyOnAchievement: Bool? = nil
+        var notifiedAt: Date? = nil
+        var achievedAt: Date? = nil
+        var dateCreated: Date? = nil
+
+        init(model: SavingsGoalModel) {
+            id = model.id
+            bookID = model.bookID
+            name = model.name
+            icon = model.icon
+            mode = model.mode.rawValue
+            targetAmount = model.targetAmount
+            startDate = model.startDate
+            deadline = model.deadline
+            periodMonths = model.periodMonths
+            periods = model.periods
+            amountPerPeriod = model.amountPerPeriod
+            savedAmount = model.savedAmount
+            linkedAccountID = model.linkedAccountID
+            useAccountBalance = model.useAccountBalance
+            notifyOnAchievement = model.notifyOnAchievement
+            notifiedAt = model.notifiedAt
+            achievedAt = model.achievedAt
+            dateCreated = model.dateCreated
+        }
+
+        var model: SavingsGoalModel {
+            var goal = SavingsGoalModel()
+            goal.id = id
+            goal.bookID = bookID
+            goal.name = name
+            if let icon { goal.icon = icon }
+            if let mode, let parsed = SavingsGoalMode(rawValue: mode) { goal.mode = parsed }
+            if let targetAmount { goal.targetAmount = targetAmount }
+            if let startDate { goal.startDate = startDate }
+            if let deadline { goal.deadline = deadline }
+            if let periodMonths { goal.periodMonths = periodMonths }
+            if let periods { goal.periods = periods }
+            if let amountPerPeriod { goal.amountPerPeriod = amountPerPeriod }
+            if let savedAmount { goal.savedAmount = savedAmount }
+            goal.linkedAccountID = linkedAccountID
+            if let useAccountBalance { goal.useAccountBalance = useAccountBalance }
+            if let notifyOnAchievement { goal.notifyOnAchievement = notifyOnAchievement }
+            goal.notifiedAt = notifiedAt
+            goal.achievedAt = achievedAt
+            if let dateCreated { goal.dateCreated = dateCreated }
+            return goal
+        }
     }
 }

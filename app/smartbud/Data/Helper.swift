@@ -44,6 +44,12 @@ final class BookModel {
     /// XCUITest's launch handshake. Old rows have no tags and need no backfill.
     var tagsJSON: String?
 
+    /// Savings goals for this ledger, as JSON (`[SavingsGoalModel]`). Same
+    /// reason as plans and tags: a new SwiftData entity in the shared
+    /// app/widget schema breaks XCUITest's launch handshake. Old rows have
+    /// no goals and decode as an empty list — no backfill needed.
+    var savingsGoalsJSON: String?
+
     init(name: String = defaultName, icon: String = "", type: Int = 0,
          order: Int = 0, archived: Bool = false) {
         self.id = UUID()
@@ -764,6 +770,89 @@ enum TagStore {
     static func replace(in context: ModelContext, bookID: UUID?, with tags: [TagModel]) {
         guard book(in: context, id: bookID) != nil else { return }
         _ = save(tags.map {
+            var copy = $0
+            copy.bookID = bookID
+            return copy
+        }, in: context, bookID: bookID)
+    }
+}
+
+// MARK: - Savings goals
+
+/// Goal CRUD on the book's JSON field. Goals are a Codable struct rather than
+/// a new SwiftData entity: adding one to the shared app/widget schema
+/// reproducibly breaks XCUITest's launch handshake (see InstallmentPlanStore).
+enum SavingsGoalStore {
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+
+    private static func book(in context: ModelContext, id: UUID?) -> BookModel? {
+        let wanted = id ?? BookSelection.current()
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        return books.first { $0.id == wanted }
+    }
+
+    static func all(in context: ModelContext, bookID: UUID? = nil) -> [SavingsGoalModel] {
+        guard let json = book(in: context, id: bookID)?.savingsGoalsJSON,
+              let data = json.data(using: .utf8),
+              let goals = try? decoder.decode([SavingsGoalModel].self, from: data) else {
+            return []
+        }
+        return goals
+    }
+
+    /// Every goal in every ledger, used by the JSON backup.
+    static func allAcrossBooks(in context: ModelContext) -> [SavingsGoalModel] {
+        let books = (try? context.fetch(FetchDescriptor<BookModel>())) ?? []
+        var result: [SavingsGoalModel] = []
+        for stored in books {
+            guard let json = stored.savingsGoalsJSON, let data = json.data(using: .utf8),
+                  let goals = try? decoder.decode([SavingsGoalModel].self, from: data) else {
+                continue
+            }
+            for goal in goals {
+                var copy = goal
+                copy.bookID = stored.id
+                result.append(copy)
+            }
+        }
+        return result
+    }
+
+    @discardableResult
+    static func save(_ goals: [SavingsGoalModel], in context: ModelContext,
+                     bookID: UUID? = nil) -> [SavingsGoalModel] {
+        guard let data = try? encoder.encode(goals),
+              let json = String(data: data, encoding: .utf8),
+              let book = book(in: context, id: bookID) else { return [] }
+        book.savingsGoalsJSON = json
+        return goals
+    }
+
+    @discardableResult
+    static func upsert(_ goal: SavingsGoalModel, in context: ModelContext,
+                       bookID: UUID? = nil) -> [SavingsGoalModel] {
+        var goals = all(in: context, bookID: bookID)
+        if let index = goals.firstIndex(where: { $0.id == goal.id }) {
+            goals[index] = goal
+        } else {
+            goals.append(goal)
+        }
+        return save(goals, in: context, bookID: bookID)
+    }
+
+    @discardableResult
+    static func remove(id: UUID, in context: ModelContext,
+                       bookID: UUID? = nil) -> [SavingsGoalModel] {
+        save(all(in: context, bookID: bookID).filter { $0.id != id },
+             in: context, bookID: bookID)
+    }
+
+    /// Import path: replaces one book's goals without touching the others.
+    static func replace(in context: ModelContext, bookID: UUID?,
+                        with goals: [SavingsGoalModel]) {
+        guard book(in: context, id: bookID) != nil else { return }
+        _ = save(goals.map {
             var copy = $0
             copy.bookID = bookID
             return copy

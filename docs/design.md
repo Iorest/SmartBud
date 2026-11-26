@@ -43,6 +43,7 @@ AccountModel 1 ──< TransferModel >── 1 AccountModel   (source / destinat
 CurrencyRate (code, rate, updatedAt)     基准货币 = AppStorage "currency"（首次启动落盘）
 MainBudgetModel                          全局预算
 TemplateTransactionModel                 快捷记账模板
+SavingsGoalModel (JSON on BookModel)     存钱目标：两种模式、期限与进度
 ```
 
 字段与不变量：
@@ -53,6 +54,7 @@ TemplateTransactionModel                 快捷记账模板
 | `CategoryModel` | `name`, `emoji`, `colour`, `income`, `order` | `income` 决定它能挂在哪类记录上 |
 | `AccountModel` | `kind`, `currencyCode`, `openingBalance`, `hidden`, `archived`, `order` | `archived ⇒ 不出现在默认列表/总资产/转账端点` |
 | `TransferModel` | `amount`, `destinationAmount`, `fee`, `source`, `destination` | `amount > 0`；`fee >= 0`；跨币种时 `destinationAmount > 0`；`source != destination` |
+| `SavingsGoalModel` | `mode`（定额周期 / 灵活起止）、`targetAmount`, `amountPerPeriod`, `periods`, `periodMonths`, `deadline`, `savedAmount`, `linkedAccountID?`, `icon`, `notifyOnAchievement`, `achievedAt?`, `notifiedAt?` | 目标本身不写交易、不改余额或统计；定额模式 `effectiveTarget = amountPerPeriod × periods`、截止日 = 起始日 + `periodMonths × periods` 月；`saved >= target` 即达成，逾期时剩余额当日到期；每个目标至多一次达成通知；存储在账本 JSON 字段（不新增 SwiftData 实体） |
 | `BudgetModel` | `amount`, `startDate`, `type`, `category` | 无分类的预算是脏数据，统计时按"不匹配任何交易"处理 |
 | `MainBudgetModel` | `amount`, `startDate`, `type` | 同上，全局 |
 | `CurrencyRate` | `code`, `rate` | `rate > 0`；基准货币本身不需要行 |
@@ -406,7 +408,7 @@ iCloud 同步。导出属于数据可携性（GDPR 20 条），付费会被审�
 | 功能 | 模型改动 | 影响面 |
 |---|---|---|
 | 多账本 | ✅ 模型和迁移已实现（TELE-20）：`BookModel` + 六处 `bookID` + 固定默认账本 + 备份带账本 | 查询/统计/小组件过滤与切换 UI 待 TELE-21；跨账本转账不做 |
-| 存钱目标 | 新实体 `SavingsGoalModel`（目标额、截止日、关联账户或独立余额） | 账户页/统计页新增区块；不影响现有口径 |
+| 存钱目标 | ✅ 已实现（TELE-28）：`SavingsGoalModel` 以 JSON 存在 `BookModel.savingsGoalsJSON`，不新增 SwiftData 实体；两种模式（定额周期 / 灵活起止）、进度环与日均需求、达成与逾期、一次性本地通知、账本级备份（schema 12） | 账户页「存钱目标」入口；「再次存入」在有卡时写普通转账（只动余额、不改支出口径），无卡时只推进目标计数；自定义图标为可选 SF Symbol，不做自定义图片上传 |
 | 分期 | 新实体 `InstallmentPlanModel` + 生成计划交易（本金/手续费拆分） | 与报销类似，需要"计划支出"这种新身份，先改口径表 |
 | Apple Watch | 新 target + App Group 只读 + 极简记账 Intent | 不改变模型，但要同步 schema 与本地化 |
 

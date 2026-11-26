@@ -44,6 +44,8 @@ enum DataImporter {
         var installmentPlans = 0
         /// Labels restored from the file.
         var tags = 0
+        /// Savings goals restored from the file.
+        var savingsGoals = 0
         /// Receipt references whose local file is not on this device yet.
         /// The row still imports; the UI shows a readable warning.
         var missingAttachments = 0
@@ -56,7 +58,7 @@ enum DataImporter {
         /// Records the user thinks of as "data". Rates are configuration and
         /// stay out of the count.
         var imported: Int {
-            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books + installmentPlans + tags
+            categories + accounts + transactions + transfers + budgets + mainBudgets + templates + books + installmentPlans + tags + savingsGoals
         }
 
         var isEmpty: Bool { imported == 0 }
@@ -119,6 +121,7 @@ enum DataImporter {
         summary.books = payload.books.count
         summary.installmentPlans = payload.installmentPlans.count
         summary.tags = payload.tags.count
+        summary.savingsGoals = payload.savingsGoals.count
         return summary
     }
 
@@ -168,6 +171,7 @@ enum DataImporter {
         merger.importMainBudgets(payload.mainBudgets)
         merger.importTemplates(payload.templates)
         merger.importInstallmentPlans(payload.installmentPlans)
+        merger.importSavingsGoals(payload.savingsGoals)
 
         do {
             try context.save()

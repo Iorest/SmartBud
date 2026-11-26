@@ -10,7 +10,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 | 从备份恢复 | 选择 JSON 备份，合并进本机 | — |
 | 清除数据 | 删除本机全部记录并尝试清空 iCloud 区域 | — |
 
-## JSON 备份格式（schemaVersion 9）
+## JSON 备份格式（schemaVersion 12）
 
 文件形状见 `smartbud/Services/ExportSchema.swift`，字段名就是磁盘上的契约，
 改名前要同时改导出和导入，并且**必须**升 `schemaVersion`。
@@ -19,7 +19,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 {
   "exportDate": "2026-10-22T05:00:00Z",
   "appVersion": "4.0",
-  "schemaVersion": 10,
+  "schemaVersion": 12,
   "transactions": [ ... ],
   "categories": [ ... ],
   "budgets": [ ... ],
@@ -31,6 +31,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   "books": [ ... ],
   "installmentPlans": [ ... ],
   "tags": [ ... ],
+  "savingsGoals": [ ... ],
   "settings": {
     "baseCurrency": "CNY",
     "firstDayOfMonth": 1,
@@ -57,6 +58,9 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   旧备份缺这些键时按空数组导入，标签关系与票据引用不会凭空产生。
   恢复时若本机缺图，导入结果卡片给出「N 张票据照片尚未下载」的可读警告，交易本身照常写入；
   `schemaVersion` 仍由统筹按合并顺序分配，本轮不自行抢号。
+- schema 12 新增 `savingsGoals`（账本级存钱目标：两种模式、金额、期限、已存额、关联卡、
+  自定义图标与通知状态）。旧备份缺该键时按空数组导入，余额与支出不变；同一 id 重复导入只保留一份。
+  目标本身不写交易；「再次存入」写的是普通转账，备份里的目标不会重复记账。
 - `accounts` 可携带 `creditLimit` / `statementDay` / `dueDay`（credit 账户的额度、账单日、
   还款日）；三者可选，导入端按账户类型收敛：非 credit 或非法值一律按 nil 读入。
   导出端始终写这三个键。schema 版本号由统筹按合并顺序分配，本次不自行抢号。

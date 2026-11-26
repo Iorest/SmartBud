@@ -8,6 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		A30F00000000000000000001 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		B28A00000000000000000011 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
+		B28A00000000000000000012 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
+		B28A00000000000000000013 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
+		B28A00000000000000000014 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
+		B28A00000000000000000015 /* SavingsGoalNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000002 /* SavingsGoalNotifier.swift */; };
+		B28A00000000000000000016 /* SavingsGoalNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000002 /* SavingsGoalNotifier.swift */; };
+		B28A00000000000000000017 /* SavingsGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000003 /* SavingsGoalViewModel.swift */; };
+		B28A00000000000000000018 /* SavingsGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000003 /* SavingsGoalViewModel.swift */; };
+		B28A00000000000000000019 /* SavingsGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000004 /* SavingsGoalView.swift */; };
+		B28A0000000000000000001A /* SavingsGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000004 /* SavingsGoalView.swift */; };
+		B28A0000000000000000001B /* SavingsGoalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000005 /* SavingsGoalTests.swift */; };
+		B28A0000000000000000001C /* SavingsGoalMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000006 /* SavingsGoalMigrationTests.swift */; };
 		A30F00000000000000000002 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
 		A30F00000000000000000003 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
 		A30F00000000000000000004 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
@@ -760,6 +772,12 @@
 		E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/WipeOutcome.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000001 /* BatchRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BatchRecognition.swift; sourceTree = SOURCE_ROOT; };
 		A30F000000000000000000F1 /* TagFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/TagFilter.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000001 /* SavingsGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/SavingsGoal.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000002 /* SavingsGoalNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/SavingsGoalNotifier.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000003 /* SavingsGoalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/ViewModels/SavingsGoalViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000004 /* SavingsGoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/SavingsGoalView.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000005 /* SavingsGoalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/SavingsGoalTests.swift; sourceTree = SOURCE_ROOT; };
+		B28A00000000000000000006 /* SavingsGoalMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/SavingsGoalMigrationTests.swift; sourceTree = SOURCE_ROOT; };
 		A30F000000000000000000F2 /* ReceiptAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/ReceiptAttachment.swift; sourceTree = SOURCE_ROOT; };
 		A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/ReceiptAttachmentSync.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000002 /* BatchRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Views/Transaction/BatchRecognitionView.swift; sourceTree = SOURCE_ROOT; };
@@ -982,6 +1000,8 @@
 				E1A2B3C40000000000000274 /* UndoRestoresRecurrenceTests.swift */,
 				E1A2B3C400000000000002A4 /* TransactionValidationTests.swift */,
 				E1A2B3C400000000000002A7 /* AccountBalanceTests.swift */,
+				B28A00000000000000000005 /* SavingsGoalTests.swift */,
+				B28A00000000000000000006 /* SavingsGoalMigrationTests.swift */,
 				E1A2B3C40000000000000260 /* BudgetEditPreservesAnchorTests.swift */,
 			);
 			path = SmartBudTests;
@@ -1092,6 +1112,10 @@
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				A30F000000000000000000F1 /* TagFilter.swift */,
 				A30F000000000000000000F2 /* ReceiptAttachment.swift */,
+				B28A00000000000000000001 /* SavingsGoal.swift */,
+				B28A00000000000000000002 /* SavingsGoalNotifier.swift */,
+				B28A00000000000000000003 /* SavingsGoalViewModel.swift */,
+				B28A00000000000000000004 /* SavingsGoalView.swift */,
 				A30F000000000000000000F3 /* ReceiptAttachmentSync.swift */,
 				E1A2B3C4000000000000C060 /* ProAccess.swift */,
 				F23A00010000000000000001 /* BatchRecognition.swift */,
@@ -1854,6 +1878,10 @@
 				E1A2B3C40000000000001008 /* SettingsRatesView.swift in Sources */,
 				E1A2B3C40000000000001041 /* ExchangeRateService.swift in Sources */,
 				A30F00000000000000000001 /* TagFilter.swift in Sources */,
+				B28A00000000000000000011 /* SavingsGoal.swift in Sources */,
+				B28A00000000000000000015 /* SavingsGoalNotifier.swift in Sources */,
+				B28A00000000000000000017 /* SavingsGoalViewModel.swift in Sources */,
+				B28A00000000000000000019 /* SavingsGoalView.swift in Sources */,
 				A30F00000000000000000011 /* ReceiptAttachment.swift in Sources */,
 				A30F00000000000000000021 /* ReceiptAttachmentSync.swift in Sources */,
 );
@@ -1905,6 +1933,7 @@
 				53B907A22AE81A080001F496 /* Ring.swift in Sources */,
 				E1A2B3C40000000000000451 /* WidgetFormatting.swift in Sources */,
 				A30F00000000000000000002 /* TagFilter.swift in Sources */,
+				B28A00000000000000000012 /* SavingsGoal.swift in Sources */,
 				A30F00000000000000000012 /* ReceiptAttachment.swift in Sources */,
 				A30F00000000000000000022 /* ReceiptAttachmentSync.swift in Sources */,
 			);
@@ -1994,6 +2023,9 @@
 				E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */,
 				E1A2B3C4000000000000A034 /* ExportSchema.swift in Sources */,
 				A30F00000000000000000003 /* TagFilter.swift in Sources */,
+				B28A00000000000000000013 /* SavingsGoal.swift in Sources */,
+				B28A0000000000000000001B /* SavingsGoalTests.swift in Sources */,
+				B28A0000000000000000001C /* SavingsGoalMigrationTests.swift in Sources */,
 				A30F00000000000000000013 /* ReceiptAttachment.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2203,6 +2235,10 @@
 				E1A2B3C40000000000001009 /* SettingsRatesView.swift in Sources */,
 				E1A2B3C40000000000001042 /* ExchangeRateService.swift in Sources */,
 				A30F00000000000000000004 /* TagFilter.swift in Sources */,
+				B28A00000000000000000014 /* SavingsGoal.swift in Sources */,
+				B28A00000000000000000016 /* SavingsGoalNotifier.swift in Sources */,
+				B28A00000000000000000018 /* SavingsGoalViewModel.swift in Sources */,
+				B28A0000000000000000001A /* SavingsGoalView.swift in Sources */,
 				A30F00000000000000000014 /* ReceiptAttachment.swift in Sources */,
 				A30F00000000000000000023 /* ReceiptAttachmentSync.swift in Sources */,
 );
