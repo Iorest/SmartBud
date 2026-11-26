@@ -62,6 +62,21 @@ struct ReceiptAttachmentTests {
             atPath: ReceiptAttachmentStore.directory(for: orphan, base: base)!.path))
     }
 
+    @Test("A finished replace leaves no staging directory and names the real container")
+    func stagingAndExtension() throws {
+        let base = FileManager.default.temporaryDirectory
+            .appendingPathComponent("sb-receipts-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: base) }
+        let id = UUID()
+        let png = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) + Data("bytes".utf8)
+        let refs = try ReceiptAttachmentStore.replaceAll([png], for: id, base: base)
+
+        #expect(refs.first?.fileName.hasSuffix(".png") == true)
+        let staging = ReceiptAttachmentStore.root(base: base)!
+            .appendingPathComponent(".\(id.uuidString)-staging")
+        #expect(!FileManager.default.fileExists(atPath: staging.path))
+    }
+
     @Test("Reference JSON round-trips and corrupt text decodes empty")
     func references() throws {
         let base = FileManager.default.temporaryDirectory

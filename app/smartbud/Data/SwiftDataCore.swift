@@ -102,10 +102,15 @@ final class DataRepository {
         // Crash safety: a delete committed between the file removal and the
         // row removal can leave a directory with no owner. CloudKit can
         // restore any file whose row still exists (see downloadMissing).
-        let liveIDs = Set(
-            ((try? built.container.mainContext.fetch(FetchDescriptor<TransactionModel>())) ?? [])
-                .map(\.id))
-        try? ReceiptAttachmentStore.pruneOrphans(valid: liveIDs)
+        // Never prune from a transient store: an in-memory fallback (or the
+        // -freshStore / -memoryStore QA hooks) sees zero rows while the real
+        // App Group store and its receipt files are still intact.
+        if built.mode != .memory {
+            let liveIDs = Set(
+                ((try? built.container.mainContext.fetch(FetchDescriptor<TransactionModel>())) ?? [])
+                    .map(\.id))
+            try? ReceiptAttachmentStore.pruneOrphans(valid: liveIDs)
+        }
     }
 
     /// Local-only store: works on simulators and devices without the App

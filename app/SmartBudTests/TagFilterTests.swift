@@ -25,6 +25,28 @@ struct TagFilterTests {
         #expect(TagFilter.matches(tagIDs: nil, selected: []))
     }
 
+    @Test("Tag selection composes with expense and day criteria")
+    func stacksWithOtherFilters() {
+        struct Row {
+            let tags: [UUID]
+            let expense: Bool
+            let day: Int
+        }
+        let food = UUID(), travel = UUID()
+        let rows = [
+            Row(tags: [food, travel], expense: true, day: 1),
+            Row(tags: [food], expense: false, day: 1),
+            Row(tags: [food, travel], expense: true, day: 2),
+            Row(tags: [travel], expense: true, day: 1)
+        ]
+        // The same successive-filter chain LogView.visibleTransactions uses.
+        let matched = rows.filter {
+            $0.expense && $0.day == 1
+                && TagFilter.matches(tagIDs: $0.tags, selected: [food, travel])
+        }
+        #expect(matched.count == 1)
+    }
+
     @Test("Normalisation trims, deduplicates case-insensitively and keeps order")
     func normalise() {
         let tags = TagFilter.normalize([

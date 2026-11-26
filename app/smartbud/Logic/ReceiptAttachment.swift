@@ -35,10 +35,6 @@ enum ReceiptAttachmentPolicy {
     /// The task asks for "up to N (3 suggested)". Three keeps the CKAsset
     /// upload bounded and the picker row compact on a phone.
     static let maxCount = 3
-
-    static func count(for data: [Data]) -> Int {
-        min(data.count, maxCount)
-    }
 }
 
 enum ReceiptAttachmentStore {
@@ -97,32 +93,46 @@ enum ReceiptAttachmentStore {
             .appendingPathComponent(attachment.fileName)
     }
 
-    /// Replaces the whole set for one transaction. Writing into a fresh
-    /// directory makes "replace" atomic from the user's point of view: a
-    /// failed write leaves no mixture of old and new files.
+    /// Replaces the whole set for one transaction. New bytes are written to
+    /// a staging directory first; only a complete write replaces the old
+    /// files, so a disk-full error cannot destroy the user's existing receipt.
     @discardableResult
     static func replaceAll(_ data: [Data], for transactionID: UUID,
                            base: URL? = nil) throws -> [ReceiptAttachment] {
-        guard root(base: base) != nil, let dir = directory(for: transactionID, base: base) else {
+        guard let root = root(base: base), let dir = directory(for: transactionID, base: base) else {
             return []
         }
+        let staging = root.appendingPathComponent(".\(transactionID.uuidString)-staging", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: staging) }
+
+        let kept = Array(data.prefix(ReceiptAttachmentPolicy.maxCount))
+        guard !kept.isEmpty else {
+            if FileManager.default.fileExists(atPath: dir.path) {
+                try FileManager.default.removeItem(at: dir)
+            }
+            return []
+        }
+
+        if FileManager.default.fileExists(atPath: staging.path) {
+            try FileManager.default.removeItem(at: staging)
+        }
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        var refs: [ReceiptAttachment] = []
+        for (index, bytes) in kept.enumerated() {
+            let sum = checksum(bytes)
+            let ref = ReceiptAttachment(
+                fileName: "\(index)-\(sum).\(fileExtension(for: bytes))",
+                byteCount: bytes.count,
+                checksum: sum
+            )
+            try bytes.write(to: staging.appendingPathComponent(ref.fileName), options: .atomic)
+            refs.append(ref)
+        }
+
         if FileManager.default.fileExists(atPath: dir.path) {
             try FileManager.default.removeItem(at: dir)
         }
-        let kept = Array(data.prefix(ReceiptAttachmentPolicy.maxCount))
-        guard !kept.isEmpty else { return [] } // directory already removed
-
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        var refs: [ReceiptAttachment] = []
-        for (index, bytes) in kept.enumerated() {
-            let ref = ReceiptAttachment(
-                fileName: "\(index)-\(checksum(bytes)).jpg",
-                byteCount: bytes.count,
-                checksum: checksum(bytes)
-            )
-            try bytes.write(to: dir.appendingPathComponent(ref.fileName), options: .atomic)
-            refs.append(ref)
-        }
+        try FileManager.default.moveItem(at: staging, to: dir)
         return refs
     }
 
@@ -173,5 +183,16 @@ enum ReceiptAttachmentStore {
             hash &*= 0x100000001b3
         }
         return String(format: "%016llx", hash)
+    }
+
+    /// Picked bytes keep their original container (PhotosPicker returns the
+    /// source data, not a JPEG re-encode), so name the file after its magic
+    /// bytes instead of always claiming `.jpg`.
+    private static func fileExtension(for bytes: Data) -> String {
+        let head = Array(bytes.prefix(12))
+        if head.starts(with: [0x89, 0x50, 0x4E, 0x47]) { return "png" }
+        if head.count >= 8, Array(head[4..<8]) == Array("ftyp".utf8) { return "heic" }
+        if head.starts(with: [0xFF, 0xD8]) { return "jpg" }
+        return "img"
     }
 }
