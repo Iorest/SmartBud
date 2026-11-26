@@ -30,6 +30,7 @@ SmartBud does not have its own App Store listing yet, so build it from source (s
 - Create recurring expenses with custom time frames.
 - Track accounts and transfers, including cross-currency moves with a per-transfer rate and fee.
 - Mark an expense as reimbursable: it stays in the ledger but out of your spending totals until it is paid back.
+- Organise entries into multiple books (archive/copy), tag them, attach receipt photos, and track savings goals, card liability and net worth.
 - Restore everything from the JSON backup, or export a CSV for a spreadsheet.
 - Automate entries with `smartbud://` URLs and x-callback-url from Shortcuts or any launcher.
 - Sync your expenses, categories and budgets across iPhone and iPad via iCloud.
@@ -38,7 +39,7 @@ SmartBud does not have its own App Store listing yet, so build it from source (s
 - Home screen quick actions make capturing new expenses a breeze.
 - A gorgeous night theme for dark mode fanatics.
 - Informative home and lock screen widgets keep you updated at a glance.
-- **SmartBud Pro** unlocks Advanced Insights, Exclusive Themes (six additional app icons) and Smart Reminders (a custom time for the daily reminder). Pick a monthly, half-yearly, or yearly auto-renewing subscription, or unlock everything forever with a one-time lifetime purchase. iCloud sync is free for all users, and the launch period unlocks all three Pro features at no charge.
+- **SmartBud Pro** unlocks four features: Advanced Insights, Exclusive Themes (six additional app icons), Smart Reminders (a custom time for the daily reminder) and Batch Recognition. Pick a monthly, half-yearly, or yearly auto-renewing subscription, or unlock everything forever with a one-time lifetime purchase. iCloud sync is free for all users, and the launch period unlocks all four Pro features at no charge.
 
 ## How to help
 
@@ -82,7 +83,7 @@ For the command-line build and test commands, see [Engineering and verification]
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
 - [QA and interaction checklist](docs/qa-checklist.md) — what the automated UI flows cover, and the manual list to run before a release.
-- [Engineering and verification](docs/engineering.md) — how to clone, build, run the 263 tests, and what CI does.
+- [Engineering and verification](docs/engineering.md) — how to clone, build, run the logic test suite (382 tests in 61 suites on `main` at 2026-11-26; [CI run](https://github.com/Iorest/SmartBud/actions/runs/45783960136)), and what CI does.
 - [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
 - [SmartBud Pro](docs/storekit.md) — product IDs, StoreKit testing, and App Store Connect setup.
 - [Consistency audit](docs/consistency-audit.md) — every doc claim checked against the code, with evidence and the remaining gaps.
