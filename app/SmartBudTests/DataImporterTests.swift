@@ -47,6 +47,7 @@ func payload(
     templates: [ExportSchema.TemplateTransactionDTO] = [],
     rates: [ExportSchema.RateDTO] = [],
     books: [ExportSchema.BookDTO] = [],
+    installmentPlans: [ExportSchema.InstallmentPlanDTO] = [],
     tags: [ExportSchema.TagDTO] = [],
     settings: ExportSchema.SettingsDTO? = nil
 ) -> ExportSchema.Payload {

@@ -327,7 +327,7 @@ struct ImportRoundTripTests {
                 id: attachmentID, fileName: "0-abc.jpg", byteCount: 4, checksum: "abc")])
 
         let summary = try DataImporter.apply(
-            fixture.payload(tags: [tag], transactions: [row]),
+            fixture.payload(transactions: [row], tags: [tag]),
             context: fixture.context)
 
         #expect(summary.tags == 1)
