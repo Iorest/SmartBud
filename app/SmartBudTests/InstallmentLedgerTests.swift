@@ -41,7 +41,7 @@ struct InstallmentLedgerTests {
                       executed: Int = 0) -> InstallmentPlanModel {
         let card = AccountModel(name: "Card", kind: 2, bookID: BookModel.defaultID)
         context.insert(card)
-        let result = InstallmentPlanModel(
+        var result = InstallmentPlanModel(
             principal: principal, fee: fee, periods: periods,
             firstDate: Date(timeIntervalSince1970: 1_700_000_000),
             accountID: card.id, bookID: BookModel.defaultID

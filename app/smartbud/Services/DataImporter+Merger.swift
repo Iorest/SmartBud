@@ -64,7 +64,7 @@ struct BackupMerger {
                 summary.skipped += 1
                 continue
             }
-            let plan = InstallmentPlanModel(
+            var plan = InstallmentPlanModel(
                 principal: amount(dto.principal),
                 fee: amount(dto.fee),
                 periods: max(0, dto.periods),
