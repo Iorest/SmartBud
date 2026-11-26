@@ -27,15 +27,15 @@ SmartBud is an open-source personal finance app for iPhone, iPad and Mac, plus h
 - A row has one identity: expense, income, transfer, refund, bad debt, reimbursement, adjustment or future record. See `docs/ledger-rules.md` §一行的身份 before adding a new one.
 - Keep the cash-flow / expense / net-worth split intact. `baseAmount` and the wrapped account amount are different layers; do not sum them interchangeably.
 - Refunds are negative spend against the original expense (`refundOf`) and **never income**. Reimbursements use `reimbursedAmount`; unreimbursed claims follow the documented self-pay rule. Bad debt writes a reason-bearing expense row and does not move money.
-- Installment principal is not spend when implemented; only fees are. Rounding is to cents and the last period absorbs the tail difference.
-- Export `schemaVersion` is currently **9** (`app/smartbud/Services/ExportSchema.swift:16`). Do not invent the next number; the coordinator allocates it. Old backups must decode without loss.
+- Installment principal is not spend; only fees are. Rounding is to cents and the last period absorbs the tail difference (`app/smartbud/Logic/InstallmentPolicy.swift:42`).
+- Export `schemaVersion` is currently **12** (`app/smartbud/Services/ExportSchema.swift:16`; schema 10 added installment plans, schema 12 added savings goals). Do not invent the next number; the coordinator allocates it. Old backups must decode without loss.
 - `CurrencyConversion.needsRate` (`app/smartbud/Logic/CurrencyConversion.swift:38`) is the single missing-rate decision; `CurrencyRateStore.needsRate` delegates to it (`app/smartbud/ViewModels/CurrencyRateStore.swift:43-45`). Do not silently fall back to 1:1 for writes.
 - Add compatibility and round-trip tests with every model or migration change; never delete or weaken tests to make CI green.
 
-## Implementation Boundaries (verified on main `aa22bfc`, 2026-11-24)
+## Implementation Boundaries (verified on main `82ecf88`, 2026-11-26)
 
-- Present in code: multi-book **data layer** (`BookModel`, `bookID`, migration, backup) but no switching UI; partial reimbursement; refund and bad debt; Alipay/WeChat bill CSV import; three-layer smart parsing with user-supplied LLM candidates only; batch receipt recognition behind `ProFeature.batchRecognition`; deep links, widgets, CloudKit sync, speech/OCR entry, local authentication, recurring templates.
-- Absent in code: tags, receipt attachments / `CKAsset`, installments, savings goals, calendar/map views, credit limit and net worth, budget forecast and subscription detection, base-currency rebase audit. Verify again before relying on this list; it is a snapshot, not a contract.
+- Present in code: multi-book data layer **and** switching/archiving/copying UI (`Views/Settings/SettingsView.swift`, `Views/HomeView.swift`); partial reimbursement; refund and bad debt; Alipay/WeChat bill CSV parser and dedupe (`Services/DataImporter.swift`) but no UI entry; three-layer smart parsing with user-supplied LLM candidates only; batch receipt recognition behind `ProFeature.batchRecognition`; tags and `CKAsset` receipt attachments; savings goals (two modes, deposit-as-transfer); installment policy/ledger/backup for consumer and bill installments but no management UI; credit limit and net worth; budget forecast, overspend alerts and subscription detection; deep links, widgets, CloudKit sync, speech/OCR entry, local authentication, recurring templates.
+- Absent or unfinished: calendar/map views; bill CSV import UI; installment entry UI and advanced interest/debt/tail policy options; balance-adjustment reason field; batch bill editing; annual summary and budget carry-over; base-currency rebase audit; loans, add-on-pay/family accounts, Apple Watch and non-Apple platforms. Verify again before relying on this list; it is a snapshot, not a contract.
 
 ## Development and Verification
 
