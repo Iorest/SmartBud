@@ -267,6 +267,12 @@ enum DataExporter {
         }
     }
 
+    private static func savingsGoalsDTOs(_ repo: DataRepository) -> [SavingsGoalDTO] {
+        SavingsGoalStore.allAcrossBooks(in: repo.container.mainContext)
+            .sorted { ($0.dateCreated, $0.id.uuidString) < ($1.dateCreated, $1.id.uuidString) }
+            .map(SavingsGoalDTO.init(model:))
+    }
+
     private static func makePayload(repo: DataRepository) throws -> ExportPayload {
         let appVersion = Bundle.main.appVersion
         let exportDate = Date.now
@@ -289,6 +295,7 @@ enum DataExporter {
         let books = booksDTOs(repo)
         let installmentPlans = installmentPlansDTOs(repo)
         let tags = tagsDTOs(repo)
+        let savingsGoals = savingsGoalsDTOs(repo)
 
         return ExportPayload(
             exportDate: exportDate,
@@ -305,7 +312,8 @@ enum DataExporter {
             settings: ExportSchema.SettingsDTO.current(),
             books: books,
             installmentPlans: installmentPlans,
-            tags: tags
+            tags: tags,
+            savingsGoals: savingsGoals
         )
     }
 
@@ -336,5 +344,6 @@ extension DataExporter {
     typealias BookDTO = ExportSchema.BookDTO
     typealias InstallmentPlanDTO = ExportSchema.InstallmentPlanDTO
     typealias TagDTO = ExportSchema.TagDTO
+    typealias SavingsGoalDTO = ExportSchema.SavingsGoalDTO
     typealias AttachmentRefDTO = ExportSchema.AttachmentRefDTO
 }

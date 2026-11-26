@@ -13,6 +13,7 @@ import SwiftUI
 struct AccountListView: View {
     @Environment(AccountViewModel.self) var accountVM
 
+    @State private var savingsVM = SavingsGoalViewModel()
     @AppStorage("currency", store: .appGroup) var currency: String =
         Locale.current.currency?.identifier ?? "USD"
     @AppStorage("showCents", store: .appGroup) var showCents: Bool = true
@@ -32,6 +33,15 @@ struct AccountListView: View {
         List {
             Section {
                 totalRow
+            }
+
+            Section {
+                NavigationLink {
+                    SavingsGoalListView()
+                        .environment(savingsVM)
+                } label: {
+                    Label(String.appLocalized("Savings Goals"), systemImage: "target")
+                }
             }
 
             if accountVM.accounts.isEmpty {
@@ -71,6 +81,7 @@ struct AccountListView: View {
             }
         }
         .navigationTitle(String.appLocalized("Accounts"))
+        .environment(savingsVM)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

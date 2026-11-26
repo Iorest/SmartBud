@@ -106,6 +106,31 @@ struct BackupMerger {
         }
     }
 
+    /// Goals are restored per ledger. Ids are the identity, so importing the
+    /// same backup twice cannot duplicate a goal or re-arm its notification.
+    mutating func importSavingsGoals(_ dtos: [ExportSchema.SavingsGoalDTO]) {
+        var groups: [UUID?: [SavingsGoalModel]] = [:]
+        var existing = Set(SavingsGoalStore.allAcrossBooks(in: context).map(\.id))
+        for dto in dtos {
+            guard existing.insert(dto.id).inserted else {
+                summary.skipped += 1
+                continue
+            }
+            let bookID = resolveBook(dto.bookID)
+            var goal = dto.model
+            goal.bookID = bookID
+            groups[bookID, default: []].append(goal)
+            summary.savingsGoals += 1
+        }
+        for (bookID, incoming) in groups {
+            guard booksByID[bookID ?? BookModel.defaultID] != nil else { continue }
+            var merged = SavingsGoalStore.all(in: context, bookID: bookID)
+            let known = Set(merged.map(\.id))
+            merged.append(contentsOf: incoming.filter { !known.contains($0.id) })
+            SavingsGoalStore.replace(in: context, bookID: bookID, with: merged)
+        }
+    }
+
     // MARK: Categories and accounts
 
     mutating func importCategories(_ dtos: [ExportSchema.CategoryDTO]) {

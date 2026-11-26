@@ -66,6 +66,7 @@ app_sources=(
     Logic/RefundPolicy.swift
     Logic/ReimbursementPolicy.swift
     Logic/InstallmentPolicy.swift
+    Logic/SavingsGoal.swift
     Logic/ReceiptAttachment.swift
     Logic/TagFilter.swift
     Logic/Money.swift
@@ -102,6 +103,7 @@ test_sources=(
     ReceiptAttachmentTests.swift
     TagFilterTests.swift
     SmartEntryParsingTests.swift
+    SavingsGoalTests.swift
 )
 
 rm -rf "$out"
