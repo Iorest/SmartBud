@@ -112,10 +112,10 @@ struct TransactionSnapshot {
             badDebtReason: badDebtReason,
             transferFeeOf: transferFeeOf,
             adjustment: adjustment,
+            adjustmentReason: adjustmentReason,
             merchant: merchant,
             merchantKey: merchantKey,
-            bookID: bookID,
-            adjustmentReason: adjustmentReason
+            bookID: bookID
         )
         txn.id = id
         txn.onceRecurring = onceRecurring
