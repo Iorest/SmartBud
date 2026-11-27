@@ -126,4 +126,14 @@ struct BatchEditPolicyTests {
         #expect(BatchEditPolicy.rejection(for: BatchEditRow(id: UUID()), field: .book,
                                           targetBookID: target) == nil)
     }
+
+    @Test("Moving within the same ledger keeps labels; only a real move drops them")
+    func sameBookMoveKeepsTags() {
+        let book = UUID()
+        let tag = UUID()
+        #expect(BatchEditPolicy.tagsAfterMove(originalBookID: book, movingTo: book,
+                                              current: [tag]) == [tag])
+        #expect(BatchEditPolicy.tagsAfterMove(originalBookID: book, movingTo: UUID(),
+                                              current: [tag]).isEmpty)
+    }
 }

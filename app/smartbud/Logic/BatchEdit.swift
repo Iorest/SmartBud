@@ -149,6 +149,17 @@ enum BatchEditPolicy {
         return categoryBookID == bookID
     }
 
+    /// Labels are stored per ledger. Drop their ids only on a real move;
+    /// choosing the row's current ledger must leave them untouched.
+    static func keepsTags(originalBookID: UUID, movingTo bookID: UUID) -> Bool {
+        originalBookID == bookID
+    }
+
+    static func tagsAfterMove(originalBookID: UUID, movingTo bookID: UUID,
+                              current: [UUID]) -> [UUID] {
+        keepsTags(originalBookID: originalBookID, movingTo: bookID) ? current : []
+    }
+
     /// Applies `mutate` row by row: a rejected or throwing row is skipped and
     /// reported, never rolling back the rows that already succeeded.
     static func apply(_ rows: [BatchEditRow], field: BatchEditField,

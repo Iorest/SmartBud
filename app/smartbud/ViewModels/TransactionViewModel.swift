@@ -418,16 +418,20 @@ final class TransactionViewModel {
 
     /// A row can only move to a ledger that already owns its account. Linked
     /// refunds, repayments, write-offs and transfer fees stay in the old
-    /// ledger, so those rows are skipped with a reason. Labels are stored per
-    /// ledger too, so old-book tag ids are dropped with the old category.
+    /// ledger, so those rows are skipped with a reason. Labels are per ledger:
+    /// only a real move drops their ids; choosing the current ledger keeps
+    /// both labels and in-ledger categories.
     func batchEdit(bookID: UUID, for transactions: [TransactionModel]) -> BatchEditOutcome {
         applyBatch(.book, to: transactions, targetBookID: bookID) { txn in
+            let oldBookID = txn.bookID ?? BookModel.defaultID
             txn.bookID = bookID
             if let categoryBookID = txn.category?.bookID,
                !BatchEditPolicy.keepsCategory(categoryBookID: categoryBookID, movingTo: bookID) {
                 txn.category = nil
             }
-            txn.tagIDs = []
+            // Labels are per ledger: only a real move drops old-book ids.
+            txn.tagIDs = BatchEditPolicy.tagsAfterMove(
+                originalBookID: oldBookID, movingTo: bookID, current: txn.tagIDs)
         }
     }
 
