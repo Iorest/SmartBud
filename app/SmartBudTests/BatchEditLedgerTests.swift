@@ -96,7 +96,7 @@ struct BatchEditLedgerTests {
         // Pending claim: a claim with repayments would be intentionally skipped.
 
         let selected = [purchase, refund, claim, repayment]
-        let outcome = BatchEditPolicy.apply(selected.map(snapshot), field: .note) { item in
+        let outcome = BatchEditPolicy.apply(selected.map { snapshot($0) }, field: .note) { item in
             // The view-model closure edits by id; mirror that here so the
             // assertion covers the same routing a real batch action uses.
             guard let txn = selected.first(where: { $0.id == item.id }) else { return }
@@ -122,7 +122,7 @@ struct BatchEditLedgerTests {
         loss.badDebtOf = claim.id
         claim.badDebtAt = Date(timeIntervalSince1970: 1_700_010_000)
 
-        let outcome = BatchEditPolicy.apply([claim, loss].map(snapshot), field: .note) { item in
+        let outcome = BatchEditPolicy.apply([claim, loss].map { snapshot($0) }, field: .note) { item in
             Issue.record("No row in this pair may be edited, got \(item.id)")
         }
         #expect(outcome.applied == 0)
