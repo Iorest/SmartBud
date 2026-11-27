@@ -2039,22 +2039,14 @@ final class SmartBudUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label == %@", "Save")).firstMatch.tap()
 
         select(.log, in: app)
-        // Creating a book switches into it; its log is empty. Go back to the
-        // default book, which owns the bundled sample rows we batch-edit.
-        // The switcher's label can be stale right after creating a book, so
-        // address it by its fixed position in the Log navigation bar.
-        let switcher = app.navigationBars["Log"].buttons.element(boundBy: 0)
-        XCTAssertTrue(switcher.waitForExistence(timeout: 5),
-                      "Log must expose the book switcher.\n\(app.debugDescription)")
-        switcher.tap()
-        let defaultBook = app.buttons.matching(NSPredicate(format: "label == %@", "Default Book")).firstMatch
-        XCTAssertTrue(defaultBook.waitForExistence(timeout: 5),
-                      "Book switcher must offer the default book.\n\(app.debugDescription)")
-        defaultBook.tap()
+        // `-freshStore` starts empty and `-importSample` only opens the
+        // preview, so book two rows ourselves before exercising selection.
+        addExpense(app, amount: "12.50", note: "TELE83-A")
+        addExpense(app, amount: "20.00", note: "TELE83-B")
         require(app, AccessibilityID.logSelectionToggle).tap()
         let rows = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
         XCTAssertGreaterThanOrEqual(rows.count, 2,
-                                    "The sample log must offer at least two rows.\n\(app.debugDescription)")
+                                    "The two new rows must be selectable.\n\(app.debugDescription)")
         rows.element(boundBy: 0).tap()
         rows.element(boundBy: 1).tap()
 
