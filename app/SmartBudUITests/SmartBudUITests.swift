@@ -2027,7 +2027,7 @@ final class SmartBudUITests: XCTestCase {
 
         // A second book is required to prove a batch move actually happened.
         select(.settings, in: app)
-        require(app, AccessibilityID.settingsRow("books")).tap()
+        scrollIntoView(AccessibilityID.settingsRow("books"), in: app).tap()
         let newBook = app.buttons.matching(NSPredicate(format: "label == %@", "New Book")).firstMatch
         XCTAssertTrue(newBook.waitForExistence(timeout: 10),
                       "Books screen must offer New Book.\n\(app.debugDescription)")
