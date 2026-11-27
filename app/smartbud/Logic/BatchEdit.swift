@@ -28,6 +28,8 @@ enum BatchEditRejection: String, Sendable, Equatable {
     case planGenerated
     case balanceAdjustment
     case currencyMismatch
+    case accountBookMismatch
+    case saveFailed
     case invalidValue
 
     var messageKey: String {
@@ -40,6 +42,10 @@ enum BatchEditRejection: String, Sendable, Equatable {
             return "Balance adjustments cannot be batch edited"
         case .currencyMismatch:
             return "Account currency differs; edit the amount instead"
+        case .accountBookMismatch:
+            return "Account belongs to another ledger"
+        case .saveFailed:
+            return "The changes could not be saved"
         case .invalidValue:
             return "Invalid value"
         }
@@ -57,6 +63,12 @@ struct BatchEditRow: Equatable, Sendable {
     let isSettledClaim: Bool
     let isBadDebt: Bool
     let isPlanGenerated: Bool
+    /// Set when a refund, repayment, write-off or fee row points at this row.
+    /// Moving only the row would split the pair across ledgers.
+    let isReferencedByOtherRows: Bool
+    let isTransferFee: Bool
+    /// Ledger the row's account belongs to. Nil means the row has no account.
+    let accountBookID: UUID?
     /// A genuine balance correction carries a reason. An ordinary row merely
     /// excluded from totals has none and can be included again.
     let hasAdjustmentReason: Bool
@@ -67,6 +79,9 @@ struct BatchEditRow: Equatable, Sendable {
          isSettledClaim: Bool = false,
          isBadDebt: Bool = false,
          isPlanGenerated: Bool = false,
+         isReferencedByOtherRows: Bool = false,
+         isTransferFee: Bool = false,
+         accountBookID: UUID? = nil,
          hasAdjustmentReason: Bool = false) {
         self.id = id
         self.isRefund = isRefund
@@ -74,6 +89,9 @@ struct BatchEditRow: Equatable, Sendable {
         self.isSettledClaim = isSettledClaim
         self.isBadDebt = isBadDebt
         self.isPlanGenerated = isPlanGenerated
+        self.isReferencedByOtherRows = isReferencedByOtherRows
+        self.isTransferFee = isTransferFee
+        self.accountBookID = accountBookID
         self.hasAdjustmentReason = hasAdjustmentReason
     }
 }
@@ -104,13 +122,22 @@ struct BatchEditError: Error, Sendable {
 }
 
 enum BatchEditPolicy {
-    static func rejection(for row: BatchEditRow, field: BatchEditField) -> BatchEditRejection? {
+    static func rejection(for row: BatchEditRow, field: BatchEditField,
+                          targetBookID: UUID? = nil) -> BatchEditRejection? {
         if row.isRefund { return .linkedRefund }
         if row.isReimbursementIncome { return .linkedClaim }
         if row.isSettledClaim { return .settledClaim }
         if row.isBadDebt { return .linkedBadDebt }
         if row.isPlanGenerated { return .planGenerated }
         if row.hasAdjustmentReason { return .balanceAdjustment }
+        // A book move cannot take half of a linked pair, a transfer's fee row,
+        // or a row whose account is owned by the old book: neither ledger's
+        // account balance would then include the money.
+        if field == .book {
+            if row.isReferencedByOtherRows || row.isTransferFee { return .linkedRefund }
+            if let targetBookID, let accountBookID = row.accountBookID,
+               accountBookID != targetBookID { return .accountBookMismatch }
+        }
         return nil
     }
 
@@ -125,11 +152,12 @@ enum BatchEditPolicy {
     /// Applies `mutate` row by row: a rejected or throwing row is skipped and
     /// reported, never rolling back the rows that already succeeded.
     static func apply(_ rows: [BatchEditRow], field: BatchEditField,
+                      targetBookID: UUID? = nil,
                       mutate: (BatchEditRow) throws -> Void) -> BatchEditOutcome {
         var applied = 0
         var rejections: [BatchEditFailure] = []
         for row in rows {
-            if let reason = rejection(for: row, field: field) {
+            if let reason = rejection(for: row, field: field, targetBookID: targetBookID) {
                 rejections.append(BatchEditFailure(id: row.id, reason: reason))
                 continue
             }

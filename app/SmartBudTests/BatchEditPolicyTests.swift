@@ -101,4 +101,29 @@ struct BatchEditPolicyTests {
         let outcome = BatchEditPolicy.apply(rows, field: .book) { _ in }
         #expect(outcome.messageKeys == ["Linked records cannot be batch edited"])
     }
+
+    @Test("A book move refuses rows whose account lives in another ledger")
+    func crossBookAccountIsRejected() {
+        let target = UUID()
+        let foreign = BatchEditRow(id: UUID(), accountBookID: UUID())
+        let matching = BatchEditRow(id: UUID(), accountBookID: target)
+        #expect(BatchEditPolicy.rejection(for: foreign, field: .book,
+                                          targetBookID: target) == .accountBookMismatch)
+        #expect(BatchEditPolicy.rejection(for: matching, field: .book,
+                                          targetBookID: target) == nil)
+        #expect(BatchEditPolicy.rejection(for: foreign, field: .note) == nil)
+    }
+
+    @Test("A book move refuses rows that other rows point at, or that are transfer fees")
+    func bookMoveKeepsLinkedRowsTogether() {
+        let target = UUID()
+        let refunded = BatchEditRow(id: UUID(), isReferencedByOtherRows: true)
+        let fee = BatchEditRow(id: UUID(), isTransferFee: true)
+        #expect(BatchEditPolicy.rejection(for: refunded, field: .book,
+                                          targetBookID: target) == .linkedRefund)
+        #expect(BatchEditPolicy.rejection(for: fee, field: .book,
+                                          targetBookID: target) == .linkedRefund)
+        #expect(BatchEditPolicy.rejection(for: BatchEditRow(id: UUID()), field: .book,
+                                          targetBookID: target) == nil)
+    }
 }

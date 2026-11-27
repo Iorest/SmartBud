@@ -409,17 +409,6 @@ final class TransactionViewModel {
         repo.save()
     }
 
-    /// Moves several transactions to `category` in one save. The income flag
-    /// follows the category so a batch can't leave income rows on an expense
-    /// category (the form enforces the same rule).
-    func setCategory(_ category: CategoryModel?, for transactions: [TransactionModel]) {
-        guard !transactions.isEmpty else { return }
-        for txn in transactions where !txn.isRefund {
-            applyCategory(category, to: txn)
-        }
-        repo.save()
-    }
-
     /// Batch edit of the same field, with per-row accounting. Linked rows are
     /// skipped instead of aborting the batch, and every skip comes back with
     /// an id and reason for the result alert.
@@ -427,16 +416,18 @@ final class TransactionViewModel {
         applyBatch(.category, to: transactions) { applyCategory(category, to: $0) }
     }
 
+    /// A row can only move to a ledger that already owns its account. Linked
+    /// refunds, repayments, write-offs and transfer fees stay in the old
+    /// ledger, so those rows are skipped with a reason. Labels are stored per
+    /// ledger too, so old-book tag ids are dropped with the old category.
     func batchEdit(bookID: UUID, for transactions: [TransactionModel]) -> BatchEditOutcome {
-        applyBatch(.book, to: transactions) { txn in
+        applyBatch(.book, to: transactions, targetBookID: bookID) { txn in
             txn.bookID = bookID
             if let categoryBookID = txn.category?.bookID,
                !BatchEditPolicy.keepsCategory(categoryBookID: categoryBookID, movingTo: bookID) {
-                // A category from the old book has no counterpart in the new
-                // one; keeping it would make the row look categorised in the
-                // log but uncategorised in the target book's statistics.
                 txn.category = nil
             }
+            txn.tagIDs = []
         }
     }
 
@@ -476,7 +467,10 @@ final class TransactionViewModel {
 
     func batchEdit(reimbursable: Bool, for transactions: [TransactionModel]) -> BatchEditOutcome {
         applyBatch(.reimbursable, to: transactions) { txn in
-            txn.reimbursable = reimbursable && !txn.income && !txn.adjustment
+            // Only ordinary expenses can be claims. Refuse instead of
+            // reporting "Updated" for a row whose value never changed.
+            guard !txn.income && !txn.adjustment else { throw BatchEditError(.invalidValue) }
+            txn.reimbursable = reimbursable
             if !txn.reimbursable && (txn.reimbursedAmount > 0 || txn.reimbursedAt != nil) {
                 ReimbursementLedger.unsettle(txn, in: repo.context)
             }
@@ -498,27 +492,49 @@ final class TransactionViewModel {
     }
 
     /// One save for the whole batch; a rejected row never rolls back the
-    /// rows that already succeeded.
+    /// rows that already succeeded. A failed save is reported as a whole
+    /// batch failure: the context has already been rolled back by the repo.
     private func applyBatch(_ field: BatchEditField,
                             to transactions: [TransactionModel],
+                            targetBookID: UUID? = nil,
                             mutate: (TransactionModel) throws -> Void) -> BatchEditOutcome {
         guard !transactions.isEmpty else {
             return BatchEditOutcome(applied: 0, rejections: [])
         }
         let byID = Dictionary(transactions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        let rows = transactions.map(BatchEditRow.init)
-        let outcome = BatchEditPolicy.apply(rows, field: field) { row in
+        // Rows pointed at by a refund / repayment / write-off cannot move
+        // alone: that would split the pair across ledgers.
+        let referencedIDs = Set(repo.fetch(TransactionModel.self).compactMap {
+            $0.refundOf ?? $0.reimbursementOf ?? $0.badDebtOf
+        })
+        let rows = transactions.map { BatchEditRow($0, referencedIDs: referencedIDs) }
+        var editedIDs: [UUID] = []
+        let outcome = BatchEditPolicy.apply(rows, field: field, targetBookID: targetBookID) { row in
             guard let txn = byID[row.id] else { throw BatchEditError(.invalidValue) }
             try mutate(txn)
+            editedIDs.append(row.id)
         }
-        if outcome.applied > 0 { repo.save() }
+        guard outcome.applied == 0 || repo.save() else {
+            return BatchEditOutcome(
+                applied: 0,
+                rejections: editedIDs.map { BatchEditFailure(id: $0, reason: .saveFailed) }
+            )
+        }
         return outcome
     }
 
     /// Count shown before a batch action is confirmed. Linked rows are not
     /// counted: they will be skipped with a reason when the action runs.
-    func batchEligibleCount(for transactions: [TransactionModel]) -> Int {
-        transactions.filter { BatchEditPolicy.rejection(for: BatchEditRow($0), field: .note) == nil }.count
+    func batchEligibleCount(for transactions: [TransactionModel],
+                            field: BatchEditField = .note,
+                            targetBookID: UUID? = nil) -> Int {
+        let referencedIDs = Set(repo.fetch(TransactionModel.self).compactMap {
+            $0.refundOf ?? $0.reimbursementOf ?? $0.badDebtOf
+        })
+        return transactions.filter {
+            BatchEditPolicy.rejection(for: BatchEditRow($0, referencedIDs: referencedIDs),
+                                      field: field, targetBookID: targetBookID) == nil
+        }.count
     }
 
     private func applyCategory(_ category: CategoryModel?, to txn: TransactionModel) {
@@ -640,11 +656,12 @@ final class TransactionViewModel {
 
 }
 
+
 extension BatchEditRow {
     /// Copies only the identity flags. `hasAdjustmentReason` marks a real
     /// balance correction; a row merely excluded from totals has no reason
     /// and can be included again by a batch action.
-    init(_ txn: TransactionModel) {
+    init(_ txn: TransactionModel, referencedIDs: Set<UUID> = []) {
         self.init(
             id: txn.id,
             isRefund: txn.isRefund,
@@ -654,6 +671,9 @@ extension BatchEditRow {
                     || txn.badDebtAt != nil),
             isBadDebt: txn.badDebtOf != nil,
             isPlanGenerated: txn.installmentOf != nil,
+            isReferencedByOtherRows: referencedIDs.contains(txn.id),
+            isTransferFee: txn.transferFeeOf != nil,
+            accountBookID: txn.account?.bookID,
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }

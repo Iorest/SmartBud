@@ -58,6 +58,8 @@ struct BatchEditLedgerTests {
                     || txn.badDebtAt != nil),
             isBadDebt: txn.badDebtOf != nil,
             isPlanGenerated: txn.installmentOf != nil,
+            isTransferFee: txn.transferFeeOf != nil,
+            accountBookID: txn.account?.bookID,
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }
@@ -126,5 +128,34 @@ struct BatchEditLedgerTests {
         #expect(outcome.skipped == 2)
         #expect(loss.badDebtOf == claim.id)
         #expect(claim.badDebtAt != nil)
+    }
+
+    @Test("A refused book move keeps the purchase, its account and its refund in one ledger")
+    func bookMoveDoesNotSplitRefundPair() {
+        let original = row(note: "Purchase")
+        let refund = row(note: "Refund")
+        refund.refundOf = original.id
+        let originalBook = original.bookID
+        let accountID = original.account?.id
+        let referenced = Set([refund.refundOf].compactMap { $0 })
+        let target = UUID()
+
+        let outcome = BatchEditPolicy.apply(
+            [original, refund].map { txn in
+                var snap = snapshot(txn)
+                snap.isReferencedByOtherRows = referenced.contains(txn.id)
+                return snap
+            },
+            field: .book, targetBookID: target
+        ) { item in
+            Issue.record("A linked row was moved across ledgers: \(item.id)")
+        }
+
+        #expect(outcome.applied == 0)
+        #expect(outcome.skipped == 2)
+        #expect(original.bookID == originalBook)
+        #expect(refund.bookID == originalBook)
+        #expect(original.account?.id == accountID)
+        #expect(refund.refundOf == original.id)
     }
 }

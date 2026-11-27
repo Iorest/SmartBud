@@ -4639,6 +4639,20 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳戶幣種不同，請改為編輯金額" } }
       }
     },
+    "Account belongs to another ledger" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Account belongs to another ledger" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "账户属于其他账本" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳戶屬於其他帳本" } }
+      }
+    },
+    "The changes could not be saved" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The changes could not be saved" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更改未能保存" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "變更未能儲存" } }
+      }
+    },
     "Invalid value" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid value" } },

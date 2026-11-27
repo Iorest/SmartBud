@@ -35,6 +35,11 @@ struct LogView: View {
     private var fetchedBooks: [BookModel]
     @Query(sort: [SortDescriptor(\AccountModel.order)])
     private var fetchedAccounts: [AccountModel]
+    /// Batch account edits must offer only accounts owned by the current
+    /// ledger; a foreign account would strand the row between two ledgers.
+    private var currentAccounts: [AccountModel] {
+        BookScope.scoped(fetchedAccounts, \.bookID, selected: bookState.currentID)
+    }
 
     // The queries cover the whole store; these computed arrays are the only
     // rows the log (and its extensions) are allowed to render or mutate.
@@ -168,6 +173,7 @@ struct LogView: View {
             case .delete:
                 Alert(
                     title: Text(String.appFormatted("Delete %lld transactions?", selectedIDs.count)),
+                    message: Text(String.appLocalized("This action cannot be undone.")),
                     primaryButton: .destructive(Text(String.appLocalized("Delete"))) {
                         transactionVM.delete(selectedTransactions)
                         withAnimation(.easeInOut(duration: 0.2)) {
@@ -181,7 +187,10 @@ struct LogView: View {
                 Alert(
                     title: Text(String.appFormatted(
                         "Edit %lld transactions?",
-                        transactionVM.batchEligibleCount(for: selectedTransactions))),
+                        transactionVM.batchEligibleCount(
+                            for: selectedTransactions,
+                            field: batchActionSpec(action).0,
+                            targetBookID: batchActionSpec(action).1))),
                     primaryButton: .default(Text(String.appLocalized("Save"))) {
                         commitBatch(action)
                     },
@@ -295,7 +304,7 @@ struct LogView: View {
                     expenseCategories: categoryVM.expenseCategories,
                     incomeCategories: categoryVM.incomeCategories,
                     books: fetchedBooks.filter { !$0.archived },
-                    accounts: fetchedAccounts,
+                    accounts: currentAccounts,
                     labels: availableTags,
                     onPick: { commitBatch(.category($0)) },
                     onBook: { activeAlert = .confirm(.book($0)) },
@@ -456,6 +465,21 @@ extension LogView {
         case excluded(Bool)
     }
 
+    /// Field and target ledger used to preview how many rows an action can
+    /// actually change, before the user confirms it.
+    private func batchActionSpec(_ action: BatchAction) -> (BatchEditField, UUID?) {
+        switch action {
+        case .category: return (.category, nil)
+        case .book(let id): return (.book, id)
+        case .note: return (.note, nil)
+        case .date: return (.date, nil)
+        case .account: return (.account, nil)
+        case .label: return (.labels, nil)
+        case .reimbursable: return (.reimbursable, nil)
+        case .excluded: return (.excludeFromTotals, nil)
+        }
+    }
+
     private enum ActiveAlert: Identifiable {
         case delete
         case confirm(BatchAction)
@@ -493,7 +517,7 @@ extension LogView {
         case .date(let date):
             outcome = transactionVM.batchEdit(date: date, for: rows)
         case .account(let id):
-            let account = id.flatMap { wanted in fetchedAccounts.first { $0.id == wanted } }
+            let account = id.flatMap { wanted in currentAccounts.first { $0.id == wanted } }
             outcome = transactionVM.batchEdit(account: account, for: rows)
         case .label(let id):
             outcome = transactionVM.batchEdit(addLabel: id, to: rows)
