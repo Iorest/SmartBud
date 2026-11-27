@@ -128,10 +128,12 @@ SmartBud 是个人记账，采用**收付实现制（cash basis）**：钱动了
 
 ## 7. 对账与调整
 
-- `adjustment` 是"账面修正"，不是消费。**每次调整应带原因**（记错、漏记、银行手续费、
-  其他），否则无法复盘；当前只有调整行、没有原因字段。
+- `adjustment` 是"账面修正"，不是消费。**每次调整应带原因**，固定四类：记错 / 漏记 /
+  银行手续费 / 其他（默认其他）。原因以 `AdjustmentReason` 的原始值写在修正行的
+  `adjustmentReason` 上，调整弹窗里选，流水行上显示。旧行该字段为 nil，展示时按
+  「其他」读，不回写历史。
 - 调整金额 = 用户看到的实际余额 − 系统算出的余额；调整后两者必须相等
-  （实现见 `AccountViewModel.adjustBalance`；当前没有覆盖这一不变量的测试）。
+  （实现见 `AccountViewModel.adjustBalance`；不变量由 `BalanceAdjustmentInvariantTests` 覆盖）。
 - 期初余额不可被调整改写；调账永远新增一行，可删除、可追溯。
 
 ## 8. 一致性测试要求
@@ -144,6 +146,8 @@ SmartBud 是个人记账，采用**收付实现制（cash basis）**：钱动了
   支出 +base、账户余额不变、撤销后回到待报销"。
 - 净资产：`CreditCardLedgerTests` 钉刷卡 −100、转账还款 +100 后余额归零且支出只记一次，
   隐藏/归档账户不计，并钉溢缴款卡按资产计入（现金 1000 + 卡 +100 → 净资产 1100、负债 0）。
+- 调整：`BalanceAdjustmentInvariantTests` 钉差额写一行后余额等于目标；`AdjustmentReasonTests`
+  钉四类原因的原始值与旧数据按「其他」兼容；`ImportRoundTripTests` 钉备份往返保留原因。
 - 舍入：跨币种合计的尾差归属稳定；同一笔数据重复计算结果一致。
 - 重述：切换基准币后，历史统计与导出金额可解释（有审计记录）。
 

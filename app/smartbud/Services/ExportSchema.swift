@@ -12,10 +12,13 @@ import Foundation
 
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
-    /// Old values are never reused. Schema 10 added installment plans;
-    /// schema 12 adds `savingsGoals`. Older files have no goals section and
-    /// still decode with an empty list. Number allocated by the coordinator.
-    static let version: Int = 12
+    /// Old values are never reused. Schema 10 added installment plans,
+    /// schema 12 added `savingsGoals`, schema 13 adds `adjustmentReason` on
+    /// adjustment rows. Older files have no reason key and still decode with
+    /// a nil value, which reads as `.other`. Next free number: 11 was never
+    /// shipped and main already carries 12, so reusing 11 would reject v12
+    /// backups. Coordinator to reassign the later allocation if needed.
+    static let version: Int = 13
 
     struct Payload: Codable {
         var exportDate: Date
@@ -167,6 +170,10 @@ enum ExportSchema {
         /// On the expense row that pays a transfer's fee: the id of the transfer.
         var transferFeeOf: UUID?
         var adjustment: Bool?
+        /// Why a balance correction was made (`AdjustmentReason` raw value).
+        /// Optional so backups written before schema 13 still decode; a nil
+        /// value is displayed as `.other`.
+        var adjustmentReason: String? = nil
         /// On the expense row that writes off a claim (schema 8): the id of the
         /// claim. Optional so files written before 8 still decode — their
         /// unwritten-off claims simply stay claims.

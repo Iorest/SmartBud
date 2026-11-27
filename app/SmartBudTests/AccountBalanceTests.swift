@@ -192,3 +192,52 @@ struct CreditCardLedgerTests {
         #expect(debit.dueDay == nil)
     }
 }
+
+// MARK: - Adjustment reason
+
+@Suite("Balance adjustment reason")
+struct AdjustmentReasonTests {
+    @Test("The four reasons have stable stored values")
+    func stableCases() {
+        #expect(AdjustmentReason.allCases.map(\.rawValue) ==
+                ["misrecorded", "missed", "bankFee", "other"])
+    }
+
+    @Test("A legacy or unknown reason reads as other")
+    func legacyFallsBackToOther() {
+        #expect(AdjustmentReason(stored: nil) == .other)
+        #expect(AdjustmentReason(stored: "unknown") == .other)
+        #expect(AdjustmentReason(stored: "bankFee") == .bankFee)
+    }
+
+    @Test("The export DTO keeps the reason through a JSON round trip")
+    func dtoRoundTrip() throws {
+        let wire = """
+        {"id":"00000000-0000-0000-0000-000000000001","amount":10,
+         "income":true,"recurringType":0,"recurringCoefficient":0,
+         "onceRecurring":false,"adjustment":true,"adjustmentReason":"bankFee"}
+        """
+        let dto = try JSONDecoder().decode(ExportSchema.TransactionDTO.self,
+                                           from: Data(wire.utf8))
+        #expect(dto.adjustmentReason == "bankFee")
+
+        let restored = try JSONDecoder().decode(
+            ExportSchema.TransactionDTO.self,
+            from: try JSONEncoder().encode(dto))
+        #expect(restored.adjustmentReason == "bankFee")
+        #expect(AdjustmentReason(stored: restored.adjustmentReason) == .bankFee)
+    }
+
+    @Test("A backup written before the reason field still decodes")
+    func legacyBackupDecodes() throws {
+        let wire = """
+        {"id":"00000000-0000-0000-0000-000000000002","amount":5,
+         "income":false,"recurringType":0,"recurringCoefficient":0,
+         "onceRecurring":false,"adjustment":true}
+        """
+        let dto = try JSONDecoder().decode(ExportSchema.TransactionDTO.self,
+                                           from: Data(wire.utf8))
+        #expect(dto.adjustmentReason == nil)
+        #expect(AdjustmentReason(stored: dto.adjustmentReason) == .other)
+    }
+}

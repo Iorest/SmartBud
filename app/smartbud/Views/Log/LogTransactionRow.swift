@@ -97,6 +97,8 @@ struct LogTransactionRow: View {
             HStack(spacing: 4) {
                 if transaction.adjustment {
                     badge(String.appLocalized("Balance Adjustment"), tint: Color.SubtitleText)
+                    badge(AdjustmentReason(stored: transaction.adjustmentReason).label,
+                          tint: Color.SubtitleText)
                 }
                 if transaction.reimbursable {
                     if writtenOff {

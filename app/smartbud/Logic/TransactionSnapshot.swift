@@ -50,6 +50,9 @@ struct TransactionSnapshot {
     let badDebtAt: Date?
     let transferFeeOf: UUID?
     let adjustment: Bool
+    /// Correction reason; dropping it on undo would silently turn a
+    /// "bank fee" adjustment back into an unlabelled "other".
+    let adjustmentReason: String?
     /// Merchant is a projection of the note, but a restore has to bring back
     /// exactly what was deleted — a note edited between delete and undo would
     /// otherwise re-derive a different key.
@@ -81,6 +84,7 @@ struct TransactionSnapshot {
         badDebtAt = txn.badDebtAt
         transferFeeOf = txn.transferFeeOf
         adjustment = txn.adjustment
+        adjustmentReason = txn.adjustmentReason
         merchant = txn.merchant
         merchantKey = txn.merchantKey
     }
@@ -108,6 +112,7 @@ struct TransactionSnapshot {
             badDebtReason: badDebtReason,
             transferFeeOf: transferFeeOf,
             adjustment: adjustment,
+            adjustmentReason: adjustmentReason,
             merchant: merchant,
             merchantKey: merchantKey,
             bookID: bookID

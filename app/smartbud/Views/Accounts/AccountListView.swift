@@ -27,6 +27,7 @@ struct AccountListView: View {
     @State var showHidden = false
     @State var adjusting: AccountModel?
     @State var adjustmentInput = ""
+    @State var adjustmentReason: AdjustmentReason = .other
     @State var archivingAccount: AccountModel?
 
     var body: some View {
@@ -155,25 +156,47 @@ struct AccountListView: View {
         } message: { _ in
             Text(String.appLocalized("Transactions in this account are kept and become unassigned."))
         }
-        .alert(
-            String.appLocalized("Adjust Balance"),
+        .sheet(
             isPresented: Binding(
                 get: { adjusting != nil },
                 set: { if !$0 { adjusting = nil } }
             )
         ) {
-            TextField("0", text: $adjustmentInput)
+            NavigationStack {
+                Form {
+                    Section {
+                        TextField("0", text: $adjustmentInput)
+                            #if os(iOS)
+                            .keyboardType(.decimalPad)
+                            #endif
+                    } footer: {
+                        Text(adjustmentMessage)
+                    }
+                    Section {
+                        Picker(String.appLocalized("Reason"), selection: $adjustmentReason) {
+                            ForEach(AdjustmentReason.allCases, id: \.self) { reason in
+                                Text(reason.label).tag(reason)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle(String.appLocalized("Adjust Balance"))
                 #if os(iOS)
-                .keyboardType(.decimalPad)
+                .navigationBarTitleDisplayMode(.inline)
                 #endif
-            Button(String.appLocalized("Cancel"), role: .cancel) {
-                adjusting = nil
-                adjustmentInput = ""
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(String.appLocalized("Cancel")) {
+                            adjusting = nil
+                            adjustmentInput = ""
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(String.appLocalized("Done")) { applyAdjustment() }
+                            .disabled(adjustingNeedsRate)
+                    }
+                }
             }
-            Button(String.appLocalized("Done")) { applyAdjustment() }
-                .disabled(adjustingNeedsRate)
-        } message: {
-            Text(adjustmentMessage)
         }
         .alert(
             String.appLocalized("Archive this account?"),
@@ -287,6 +310,7 @@ struct AccountListView: View {
         adjusting = account
         let current = Money.double(Money.cents(accountVM.balance(for: account)))
         adjustmentInput = String(format: "%.2f", current)
+        adjustmentReason = .other
     }
 
     func applyAdjustment() {
@@ -299,6 +323,19 @@ struct AccountListView: View {
             .trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: ",", with: ".")
         guard let target = Double(cleaned), target.isFinite else { return }
-        accountVM.adjustBalance(account, to: target)
+        accountVM.adjustBalance(account, to: target, reason: adjustmentReason)
+    }
+}
+
+extension AdjustmentReason {
+    /// Wording for the sheet picker and the ledger badge. Lives in the view
+    /// layer so the pure logic file stays free of the localisation helper.
+    var label: String {
+        switch self {
+        case .misrecorded: return String.appLocalized("Recorded Wrong")
+        case .missed: return String.appLocalized("Not Recorded")
+        case .bankFee: return String.appLocalized("Bank Fee")
+        case .other: return String.appLocalized("Other")
+        }
     }
 }

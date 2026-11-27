@@ -65,7 +65,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | 信用卡负债与净资产（`asset/...`、4.4.0 资产分组） | 账单日/额度/负债计入净资产，还款走转账 | `app/smartbud/Data/Helper.swift:481-484`；`app/smartbud/Logic/AccountBalance.swift:139-173`；`app/smartbud/Views/InsightsView.swift:214-240` | ✅ TELE-33 |
 | 资产隐藏/归档（`asset/hide.html`、`asset/archive.html`） | 隐藏留在列表分组，归档退出总资产，非零余额先提示 | `app/smartbud/ViewModels/AccountViewModel.swift:69-83`；`app/smartbud/Views/Accounts/AccountListView+Sections.swift:137-147` | ✅ — |
 | 亲属卡/附加支付账户（`asset/family.html`） | 只显示剩余/总额度，不进默认资产，月账单日重置额度 | 账户模型只有 `kind: Int`（`app/smartbud/Data/Helper.swift:467`），无该账户类型和重置规则 | ⏸ 低价值，未排期 |
-| 余额调整原因（`faq/asset_price_wrong.html`、4.7.0 批量改账户） | 调整可追溯并带原因 | `app/smartbud/ViewModels/AccountViewModel.swift:304-317` 只写固定文案 `"Balance Adjustment"`，无原因字段 | 🚧 TELE-81 |
+| 余额调整原因（`faq/asset_price_wrong.html`、4.7.0 批量改账户） | 调整可追溯并带原因 | `app/smartbud/Logic/AccountBalance.swift:38-53`（四类原因）；`app/smartbud/Views/Accounts/AccountListView.swift:330-341`（弹窗选项）；`app/smartbud/Views/Log/LogTransactionRow.swift:100-101`（流水显示）；备份 schema 13 往返保留 | ✅ TELE-81 |
 | 存钱目标（`save/save.html`、4.7.1） | 定额周期/灵活起止两种模式，点卡片「再次存入」记转账，图标支持自定义图片 | 两种模式与进度/通知见 `app/smartbud/Logic/SavingsGoal.swift:19-83`、`app/smartbud/Views/SavingsGoalView.swift:13-22`；再次存入写转账见 `app/smartbud/ViewModels/SavingsGoalViewModel.swift:121-128`；图标为 SF Symbol，不上传图片 | ✅ TELE-28；自定义图片 ⏸ |
 
 ### 账本、看账与组织
@@ -145,13 +145,13 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | XLSX/图片导出、25+ 平台导入 | ⏸ 低优先级 | CSV + JSON 已覆盖数据进出；图片与多平台模板投入产出比低 |
 | 亲属卡账户、贷款记录 | ⏸ 低优先级 | 前者仅展示额度，后者有利率与合规文案成本 |
 | Apple Watch、Android/HarmonyOS | ⏸/❌ | 新 target 或第二个产品；与「Apple 平台单机账本」定位不符 |
-| 分期高级口径、批量编辑、账本日历、调整原因 | 🚧 已排期 | TELE-84 / TELE-83 / TELE-82 / TELE-81，按优先级推进 |
+| 分期高级口径、批量编辑、账本日历 | 🚧 已排期 | TELE-84 / TELE-83 / TELE-82，按优先级推进 |
 | 账单 CSV 导入入口、分期录入 UI | 🚧 未排期 | 解析/政策已合并，缺入口属于交付缺口；应先补入口再算完成 |
 | 账户归属多账本（4.6.1）、分类归档（4.3.0） | 🚧 未排期 | `AccountModel.bookID` 是单值，分类无归档字段；需要模型/迁移改动，当前复制账本能满足主要使用场景 |
 
 ## 演进顺序（与任务表一致）
 
-1. **钱的身份**：退款/坏账/部分报销/存钱/净资产信用卡已 ✅；分期逻辑 ✅ 但入口与高级口径仍 🚧（TELE-84），调整原因 🚧（TELE-81）。
+1. **钱的身份**：退款/坏账/部分报销/存钱/净资产信用卡/调整原因已 ✅；分期逻辑 ✅ 但入口与高级口径仍 🚧（TELE-84）。
 2. **看账入口**：标签/票据附件/多账本已 ✅；账本日历 🚧（TELE-82），批量编辑 🚧（TELE-83）；地图/定位 ❌。
 3. **最后才是跨端与可穿戴**：⏸/❌，见主动差异。
 
@@ -160,6 +160,6 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 ## 结论
 
 能力矩阵的 ✅ 集中在基础记账、钱的身份、多账本、端侧智能录入、Widget 与数据进出；
-剩余差距是**看账入口**（日历、批量编辑）、**分期高级口径与录入入口**、**调整原因**、
+剩余差距是**看账入口**（日历、批量编辑）、**分期高级口径与录入入口**、
 **账单 CSV 导入入口**，以及几项明确不做的平台能力。AI 录入比 iCost 更靠前（自带 Key
 的三层候选），但准确率基线仍低（见 [ai-eval.md](ai-eval.md)），不能当卖点吹。

@@ -35,6 +35,23 @@ enum AccountBalance {
     }
 }
 
+// MARK: - Adjustment reason
+
+/// Why an account balance was corrected. Stored on the adjustment row as its
+/// raw value so the wording stays in the view layer. A nil stored value means
+/// a row written before this field existed; it reads as `.other` so old
+/// ledgers and backups remain readable.
+enum AdjustmentReason: String, CaseIterable, Sendable {
+    case misrecorded
+    case missed
+    case bankFee
+    case other
+
+    init(stored rawValue: String?) {
+        self = rawValue.flatMap(AdjustmentReason.init(rawValue:)) ?? .other
+    }
+}
+
 // MARK: - Credit cards
 
 /// The card terms stored on an account. All three are optional: a card without

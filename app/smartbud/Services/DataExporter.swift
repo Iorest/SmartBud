@@ -127,6 +127,7 @@ enum DataExporter {
                 refundOf: txn.refundOf,
                 transferFeeOf: txn.transferFeeOf,
                 adjustment: txn.adjustment,
+                adjustmentReason: txn.adjustmentReason,
                 badDebtOf: txn.badDebtOf,
                 badDebtReason: txn.badDebtReason,
                 badDebtAt: txn.badDebtAt,
