@@ -57,9 +57,8 @@ struct BatchEditRow: Equatable, Sendable {
     let isSettledClaim: Bool
     let isBadDebt: Bool
     let isPlanGenerated: Bool
-    /// A genuine balance correction (has a reason), as opposed to an ordinary
-    /// row the user excluded from totals via batch edit (no reason).
-    let isBalanceAdjustment: Bool
+    /// A genuine balance correction carries a reason. An ordinary row merely
+    /// excluded from totals has none and can be included again.
     let hasAdjustmentReason: Bool
 
     init(id: UUID,
@@ -68,7 +67,6 @@ struct BatchEditRow: Equatable, Sendable {
          isSettledClaim: Bool = false,
          isBadDebt: Bool = false,
          isPlanGenerated: Bool = false,
-         isBalanceAdjustment: Bool = false,
          hasAdjustmentReason: Bool = false) {
         self.id = id
         self.isRefund = isRefund
@@ -76,7 +74,6 @@ struct BatchEditRow: Equatable, Sendable {
         self.isSettledClaim = isSettledClaim
         self.isBadDebt = isBadDebt
         self.isPlanGenerated = isPlanGenerated
-        self.isBalanceAdjustment = isBalanceAdjustment
         self.hasAdjustmentReason = hasAdjustmentReason
     }
 }
@@ -113,7 +110,7 @@ enum BatchEditPolicy {
         if row.isSettledClaim { return .settledClaim }
         if row.isBadDebt { return .linkedBadDebt }
         if row.isPlanGenerated { return .planGenerated }
-        if row.isBalanceAdjustment || row.hasAdjustmentReason { return .balanceAdjustment }
+        if row.hasAdjustmentReason { return .balanceAdjustment }
         return nil
     }
 

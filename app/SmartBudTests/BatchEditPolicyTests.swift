@@ -30,8 +30,7 @@ struct BatchEditPolicyTests {
             isSettledClaim: settledClaim,
             isBadDebt: badDebt,
             isPlanGenerated: plan,
-            isBalanceAdjustment: adjustment,
-            hasAdjustmentReason: adjustmentReason
+            hasAdjustmentReason: adjustment || adjustmentReason
         )
     }
 

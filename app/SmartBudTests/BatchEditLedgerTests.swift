@@ -58,7 +58,6 @@ struct BatchEditLedgerTests {
                     || txn.badDebtAt != nil),
             isBadDebt: txn.badDebtOf != nil,
             isPlanGenerated: txn.installmentOf != nil,
-            isBalanceAdjustment: txn.adjustment && txn.adjustmentReason != nil,
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }
@@ -91,7 +90,7 @@ struct BatchEditLedgerTests {
         let repayment = row(note: "Repayment")
         repayment.income = true
         repayment.reimbursementOf = claim.id
-        claim.reimbursedAmount = 20
+        // Pending claim: a claim with repayments would be intentionally skipped.
 
         let selected = [purchase, refund, claim, repayment]
         let outcome = BatchEditPolicy.apply(selected.map(snapshot), field: .note) { item in
@@ -109,7 +108,7 @@ struct BatchEditLedgerTests {
         #expect(repayment.note == "Repayment")
         #expect(refund.refundOf == purchase.id)
         #expect(repayment.reimbursementOf == claim.id)
-        #expect(claim.reimbursedAmount == 20)
+        #expect(claim.reimbursable == true)
     }
 
     @Test("A write-off pair cannot be split by a batch note edit")

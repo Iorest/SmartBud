@@ -654,7 +654,6 @@ extension BatchEditRow {
                     || txn.badDebtAt != nil),
             isBadDebt: txn.badDebtOf != nil,
             isPlanGenerated: txn.installmentOf != nil,
-            isBalanceAdjustment: txn.adjustment && txn.adjustmentReason != nil,
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }
