@@ -19,8 +19,6 @@ struct BatchEditPolicyTests {
         repayment: Bool = false,
         settledClaim: Bool = false,
         badDebt: Bool = false,
-        plan: Bool = false,
-        adjustment: Bool = false,
         adjustmentReason: Bool = false
     ) -> BatchEditRow {
         BatchEditRow(
@@ -30,7 +28,7 @@ struct BatchEditPolicyTests {
             isSettledClaim: settledClaim,
             isBadDebt: badDebt,
             isPlanGenerated: plan,
-            hasAdjustmentReason: adjustment || adjustmentReason
+            hasAdjustmentReason: adjustmentReason
         )
     }
 
@@ -42,7 +40,7 @@ struct BatchEditPolicyTests {
             row(3, settledClaim: true),
             row(4, badDebt: true),
             row(5, plan: true),
-            row(6, adjustment: true, adjustmentReason: true)
+            row(6, adjustmentReason: true)
         ]
         for field in BatchEditField.allCases {
             for item in linked {
@@ -82,9 +80,9 @@ struct BatchEditPolicyTests {
 
     @Test("An ordinary row excluded from totals can be included again")
     func exclusionRoundTrip() {
-        let excluded = row(1, adjustment: true) // no adjustment reason
+        let excluded = row(1) // excluded rows carry no adjustment reason
         #expect(BatchEditPolicy.rejection(for: excluded, field: .excludeFromTotals) == nil)
-        #expect(BatchEditPolicy.rejection(for: row(2, adjustment: true, adjustmentReason: true),
+        #expect(BatchEditPolicy.rejection(for: row(2, adjustmentReason: true),
                                           field: .excludeFromTotals) == .balanceAdjustment)
     }
 
