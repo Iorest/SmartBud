@@ -19,6 +19,7 @@ struct BatchEditPolicyTests {
         repayment: Bool = false,
         settledClaim: Bool = false,
         badDebt: Bool = false,
+        plan: Bool = false,
         adjustmentReason: Bool = false
     ) -> BatchEditRow {
         BatchEditRow(
