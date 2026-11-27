@@ -393,4 +393,32 @@ struct ImportRoundTripTests {
         #expect(old.adjustmentReason == nil)
         #expect(AdjustmentReason(stored: old.adjustmentReason) == .other)
     }
+
+    @Test("Installment options survive a backup round trip; old plans stay on defaults")
+    func installmentOptionsRoundTrip() throws {
+        let options = InstallmentPolicy.Options(interestTiming: .firstPeriod,
+                                                liabilityTiming: .perPeriod,
+                                                remainderPlacement: .first)
+        let configured = ExportSchema.InstallmentPlanDTO(
+            id: UUID(), bookID: BookModel.defaultID, principal: 100, fee: 0.30,
+            periods: 3, firstDate: .now, executedPeriods: 0,
+            accountId: fixture.accountID, accountName: nil, categoryId: nil,
+            categoryName: nil, note: nil, dateCreated: .now, options: options)
+        let legacy = ExportSchema.InstallmentPlanDTO(
+            id: UUID(), bookID: BookModel.defaultID, principal: 50, fee: 0,
+            periods: 2, firstDate: .now, executedPeriods: 0,
+            accountId: nil, accountName: nil, categoryId: nil, categoryName: nil,
+            note: nil, dateCreated: .now)
+
+        _ = try DataImporter.apply(
+            fixture.payload(installmentPlans: [configured, legacy]),
+            context: fixture.context)
+
+        let plans = InstallmentLedger.plans(in: fixture.context)
+        let stored = try #require(plans.first { $0.id == configured.id })
+        #expect(stored.policy == options)
+        let restoredLegacy = try #require(plans.first { $0.id == legacy.id })
+        #expect(restoredLegacy.options == nil)
+        #expect(restoredLegacy.policy == .default)
+    }
 }

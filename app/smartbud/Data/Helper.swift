@@ -634,7 +634,9 @@ struct InstallmentPlanModel: Codable, Equatable {
     var dateCreated: Date = Date.now
     /// Card and category are plain ids, resolved against the ledger on use.
     var accountID: UUID?
-    var categoryID: UUID?
+    /// Advanced iCost choices, nil in plans written before TELE-84. Kept
+    /// optional so the Codable plan store can still decode old JSON.
+    var options: InstallmentPolicy.Options?
 
     init(principal: Double = 0, fee: Double = 0, periods: Int = 0,
          firstDate: Date = .now, note: String? = nil,
@@ -650,6 +652,13 @@ struct InstallmentPlanModel: Codable, Equatable {
         self.categoryID = categoryID
         self.bookID = bookID
         self.dateCreated = .now
+    }
+
+    /// Resolved choices. `default` keeps old plans and old backups on the
+    /// historical per-period / at-creation / last-period schedule.
+    var policy: InstallmentPolicy.Options {
+        get { options ?? .default }
+        set { options = newValue }
     }
 }
 

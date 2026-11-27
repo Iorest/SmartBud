@@ -50,8 +50,9 @@ enum InstallmentLedger {
         if plan.periods < plan.executedPeriods {
             plan.periods = plan.executedPeriods
         }
-        let schedule = InstallmentPolicy.schedule(principal: plan.principal, fee: plan.fee,
-                                                  periods: plan.periods, firstDate: plan.firstDate)
+        let schedule = InstallmentPolicy.schedule(
+            principal: plan.principal, fee: plan.fee, periods: plan.periods,
+            firstDate: plan.firstDate, options: plan.policy)
         guard !schedule.isEmpty else { return SyncResult() }
         InstallmentPlanStore.upsert(plan, in: context)
 
@@ -96,9 +97,13 @@ enum InstallmentLedger {
 
     /// Credit restored on the linked account, capped at the plan principal.
     static func restoredPrincipal(_ plan: InstallmentPlanModel) -> Double {
-        InstallmentPolicy.restoredLimit(principal: plan.principal,
-                                        periods: plan.periods,
-                                        executed: plan.executedPeriods)
+        // Per-period liability means the debt has not been booked yet, so
+        // the generated bills restore no credit.
+        guard plan.policy.liabilityTiming == .atCreation else { return 0 }
+        return InstallmentPolicy.restoredLimit(principal: plan.principal,
+                                                periods: plan.periods,
+                                                executed: plan.executedPeriods,
+                                                remainderAt: plan.policy.remainderPlacement)
     }
 
     /// Plans are Codable values on the default book, not a SwiftData entity.
@@ -111,6 +116,11 @@ enum InstallmentLedger {
                                 in context: ModelContext) -> TransactionModel {
         let isPrincipal = kind == 2
         let amount = isPrincipal ? period.principal : period.fee
+        // Liability timing decides the direction of the principal row's
+        // effect on the card balance. Both directions stay out of spend and
+        // income through `isInstallmentPrincipal`, so the spend figures never
+        // change with this option.
+        let creditRestoring = !isPrincipal || plan.policy.liabilityTiming == .atCreation
         let accounts = (try? context.fetch(FetchDescriptor<AccountModel>())) ?? []
         let categories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
         let account = accounts.first { $0.id == plan.accountID }
@@ -122,7 +132,7 @@ enum InstallmentLedger {
             category: isPrincipal ? nil : category,
             account: account,
             baseAmount: amount,
-            income: isPrincipal,
+            income: creditRestoring,
             amount: amount,
             date: period.date,
             installmentOf: plan.id,
