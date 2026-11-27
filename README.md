@@ -83,7 +83,7 @@ For the command-line build and test commands, see [Engineering and verification]
 - [URL scheme](docs/url-scheme.md) — `smartbud://` routes and x-callback-url.
 - [CloudKit checklist](docs/cloudkit-schema.md) — what to deploy before shipping a schema change.
 - [QA and interaction checklist](docs/qa-checklist.md) — what the automated UI flows cover, and the manual list to run before a release.
-- [Engineering and verification](docs/engineering.md) — how to clone, build, run the logic test suite (382 tests in 61 suites on `main` at 2026-11-26; [CI run](https://github.com/Iorest/SmartBud/actions/runs/45783960136)), and what CI does.
+- [Engineering and verification](docs/engineering.md) — how to clone, build, run the logic test suite (382 tests in 61 suites at 2026-11-26; [CI run](https://github.com/Iorest/SmartBud/actions/runs/45803273593)), and what CI does.
 - [Parsing metrics and regression gates](docs/ai-eval.md) — the corpus metrics CI gates on, the current baseline, and how to update the corpus.
 - [SmartBud Pro](docs/storekit.md) — product IDs, StoreKit testing, and App Store Connect setup.
 - [Consistency audit](docs/consistency-audit.md) — every doc claim checked against the code, with evidence and the remaining gaps.
