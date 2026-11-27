@@ -2016,6 +2016,65 @@ final class SmartBudUITests: XCTestCase {
                           "Tapping a settings row must open its detail.")
         }
     }
+
+    // MARK: - TELE-83 multi-select editing
+
+    /// Two selected rows must be edited together, and a book move must show
+    /// the affected count before writing. Assertions land on the result
+    /// count and on the rows' rendered labels, not on the menus alone.
+    func testBatchEditCategoryAndBook() throws {
+        let app = launch()
+
+        // A second book is required to prove a batch move actually happened.
+        select(.settings, in: app)
+        require(app, AccessibilityID.settingsRow("books")).tap()
+        let newBook = app.buttons.matching(NSPredicate(format: "label == %@", "New Book")).firstMatch
+        XCTAssertTrue(newBook.waitForExistence(timeout: 10),
+                      "Books screen must offer New Book.\n\(app.debugDescription)")
+        newBook.tap()
+        let name = app.textFields.firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.tap()
+        name.typeText("Trip")
+        app.buttons.matching(NSPredicate(format: "label == %@", "Save")).firstMatch.tap()
+
+        select(.log, in: app)
+        require(app, AccessibilityID.logSelectionToggle).tap()
+        let rows = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
+        XCTAssertGreaterThanOrEqual(rows.count, 2,
+                                    "The sample log must offer at least two rows.\n\(app.debugDescription)")
+        rows.element(boundBy: 0).tap()
+        rows.element(boundBy: 1).tap()
+
+        require(app, AccessibilityID.logBatchCategoryMenu).tap()
+        let category = element(app, AccessibilityID.logBatchCategory)
+        XCTAssertTrue(category.waitForExistence(timeout: 5))
+        category.tap()
+        let categoryResult = element(app, AccessibilityID.logBatchResult)
+        XCTAssertTrue(categoryResult.waitForExistence(timeout: 10))
+        XCTAssertTrue(categoryResult.label.contains("2"),
+                      "Both selected rows must be counted.\n\(categoryResult.label)")
+        app.alerts.firstMatch.buttons["Done"].tap()
+
+        require(app, AccessibilityID.logSelectionToggle).tap()
+        let rowsAgain = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
+        rowsAgain.element(boundBy: 0).tap()
+        rowsAgain.element(boundBy: 1).tap()
+        require(app, AccessibilityID.logBatchEditMenu).tap()
+        let trip = app.buttons.matching(identifier: AccessibilityID.logBatchBook)
+            .matching(NSPredicate(format: "label CONTAINS %@", "Trip")).firstMatch
+        XCTAssertTrue(trip.waitForExistence(timeout: 5),
+                      "The new book must be offered to a batch action.\n\(app.debugDescription)")
+        trip.tap()
+        let confirm = app.alerts.firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(confirm.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "2")).count, 0,
+            "The confirmation must preview the number of affected rows.")
+        confirm.buttons["Save"].tap()
+        XCTAssertTrue(element(app, AccessibilityID.logBatchResult).waitForExistence(timeout: 10),
+                      "A book move must report its result.")
+    }
 }
 
 // MARK: - Audit policy

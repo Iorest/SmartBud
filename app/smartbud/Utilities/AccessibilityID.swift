@@ -57,6 +57,22 @@ enum AccessibilityID {
     static let logRowDelete = "sb.log.row.delete"
     /// Section header above future/repeating rows.
     static let logUpcomingHeader = "sb.log.upcomingHeader"
+    /// Multi-select entry point in the log toolbar.
+    static let logSelectionToggle = "sb.log.selectionToggle"
+    /// A row while multi-select is active; the label carries the row content.
+    static let logBatchRow = "sb.log.batchRow"
+    static let logBatchEditMenu = "sb.log.batchEditMenu"
+    static let logBatchCategoryMenu = "sb.log.batchCategoryMenu"
+    static let logBatchCategory = "sb.log.batchCategory"
+    static let logBatchBook = "sb.log.batchBook"
+    static let logBatchNote = "sb.log.batchNote"
+    static let logBatchDate = "sb.log.batchDate"
+    static let logBatchAccount = "sb.log.batchAccount"
+    static let logBatchLabel = "sb.log.batchLabel"
+    static let logBatchReimbursable = "sb.log.batchReimbursable"
+    static let logBatchExclude = "sb.log.batchExclude"
+    static let logBatchApply = "sb.log.batchApply"
+    static let logBatchResult = "sb.log.batchResult"
 
     // MARK: - Entry form
 

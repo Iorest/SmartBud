@@ -49,7 +49,7 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | 规则/历史/LLM 三层候选（4.4.x–4.7.1 智能记账改进） | 不命中规则时用同商户历史与模型候选 | `app/smartbud/Services/Parsing/SmartEntryParsing.swift:247-315,336-365`；模型只出候选，金额由代码校验，密钥留 Keychain | ✅ TELE-18 |
 | 截图记账（`ai/ai_photo.html`、`snapshot/snapshot.html`） | 截图识别金额/商户/分类 | `app/smartbud/Services/Parsing/OCRService.swift:17-103` 端侧 Vision；`AlipayWechatParser.swift:12-72`；`SmartEntrySheet.swift:344-386` | ✅ — |
 | 批量票据识别（4.4.6 起） | 多张票据批量预览确认 | `app/smartbud/Logic/BatchRecognition.swift:87-155`（上限 10 张）；闸门 `SmartEntrySheet.swift:179-186,346-348`、`app/smartbud/Utilities/ProAccess.swift:23,42-45` | ✅ TELE-23（Pro） |
-| 批量编辑账单（`more/batch.html`；4.3.0 导入时批量改账本、4.4.7 批量编辑面板、4.7.1 批量改分类） | 长按多选，批量改账户/账本/分类/备注/日期/标签/币种及预算收支标记；不支持报销/退款关联行 | `app/smartbud/Views/` 无批量编辑入口；`app/smartbud/Logic/BatchRecognition.swift` 是票据识别，不是账单编辑 | 🚧 TELE-83 |
+| 批量编辑账单（`more/batch.html`；4.3.0 导入时批量改账本、4.4.7 批量编辑面板、4.7.1 批量改分类） | 长按多选，批量改账户/账本/分类/备注/日期/标签/币种及预算收支标记；不支持报销/退款关联行 | `app/smartbud/Views/LogView.swift:303-325` 多选面板；`app/smartbud/ViewModels/TransactionViewModel.swift:415-522` 逐行应用与结果；`app/smartbud/Logic/BatchEdit.swift` 保护关联行；退款/报销/坏账/计划生成/真实余额调整行按原因跳过。币种不同时拒绝改账户（金额与冻结汇率不能静默改写）；两种「排除」标记在 SmartBud 共用一个 `adjustment` 身份，不新增 schema | ✅ TELE-83（币种批量转换与两种独立排除标记不做） |
 | 搜索条件保留（4.6.2） | 可开启缓存搜索条件 | `app/smartbud/Views/LogView.swift:63` 仅 `@State`，切账本即清空（`:203-211`） | ⏸ 低价值，未排期（主动差异） |
 
 ### 钱的身份与资产
@@ -147,14 +147,14 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 | XLSX/图片导出、模板下载与更多导入来源 | ⏸ 低优先级 | CSV + JSON 已覆盖数据进出与固定列导入；图片与多平台模板投入产出比低 |
 | 亲属卡账户、贷款记录 | ⏸ 低优先级 | 前者仅展示额度，后者有利率与合规文案成本 |
 | Apple Watch、Android/HarmonyOS | ⏸/❌ | 新 target 或第二个产品；与「Apple 平台单机账本」定位不符 |
-| 分期高级口径、批量编辑 | 🚧 已排期 | TELE-84 / TELE-83，按优先级推进 |
+| 分期高级口径、批量编辑 | 🚧 仅剩 TELE-84 分期高级口径 | TELE-83 批量编辑已上线；见上方能力矩阵 |
 | 账单 CSV 导入入口、分期录入 UI | 🚧 未排期 | 解析/政策已合并，缺入口属于交付缺口；应先补入口再算完成 |
 | 账户归属多账本（4.6.1）、分类归档（4.3.0） | 🚧 未排期 | `AccountModel.bookID` 是单值，分类无归档字段；需要模型/迁移改动，当前复制账本能满足主要使用场景 |
 
 ## 演进顺序（与任务表一致）
 
 1. **钱的身份**：退款/坏账/部分报销/存钱/净资产信用卡/调整原因已 ✅；分期逻辑 ✅ 但入口与高级口径仍 🚧（TELE-84）。
-2. **看账入口**：标签/票据附件/多账本/收支日历已 ✅；批量编辑 🚧（TELE-83）；地图/定位 ❌。
+2. **看账入口**：标签/票据附件/多账本/收支日历/批量编辑已 ✅；地图/定位 ❌。
 3. **最后才是跨端与可穿戴**：⏸/❌，见主动差异。
 
 理由：身份不全会让统计长期不可信，入口只是便利性；先修账，再加窗。
@@ -162,6 +162,6 @@ iCost 是**闭源**产品，没有公开代码仓库。能参考的只有官方�
 ## 结论
 
 能力矩阵的 ✅ 集中在基础记账、钱的身份、多账本、端侧智能录入、Widget 与数据进出；
-剩余差距是**批量编辑**、**分期高级口径与录入入口**、
+剩余差距是**分期高级口径与录入入口**、
 **账单 CSV 导入入口**，以及几项明确不做的平台能力。AI 录入比 iCost 更靠前（自带 Key
 的三层候选），但准确率基线仍低（见 [ai-eval.md](ai-eval.md)），不能当卖点吹。

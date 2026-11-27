@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		A30F00000000000000000001 /* TagFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30F000000000000000000F1 /* TagFilter.swift */; };
+		B83E00000000000000000001 /* BatchEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E000000000000000000F1 /* BatchEdit.swift */; };
+		B83E00000000000000000002 /* BatchEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E000000000000000000F1 /* BatchEdit.swift */; };
+		B83E00000000000000000003 /* BatchEditPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E000000000000000000F2 /* BatchEditPolicyTests.swift */; };
+		B83E00000000000000000004 /* BatchEditLedgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E000000000000000000F3 /* BatchEditLedgerTests.swift */; };
 		B28A00000000000000000011 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
 		B28A00000000000000000012 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
 		B28A00000000000000000013 /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28A00000000000000000001 /* SavingsGoal.swift */; };
@@ -772,6 +776,9 @@
 		E1A2B3C4000000000000C0A0 /* WipeOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/WipeOutcome.swift; sourceTree = SOURCE_ROOT; };
 		F23A00010000000000000001 /* BatchRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BatchRecognition.swift; sourceTree = SOURCE_ROOT; };
 		A30F000000000000000000F1 /* TagFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/TagFilter.swift; sourceTree = SOURCE_ROOT; };
+		B83E000000000000000000F1 /* BatchEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/BatchEdit.swift; sourceTree = SOURCE_ROOT; };
+		B83E000000000000000000F2 /* BatchEditPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BatchEditPolicyTests.swift; sourceTree = SOURCE_ROOT; };
+		B83E000000000000000000F3 /* BatchEditLedgerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartBudTests/BatchEditLedgerTests.swift; sourceTree = SOURCE_ROOT; };
 		B28A00000000000000000001 /* SavingsGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Logic/SavingsGoal.swift; sourceTree = SOURCE_ROOT; };
 		B28A00000000000000000002 /* SavingsGoalNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/Services/SavingsGoalNotifier.swift; sourceTree = SOURCE_ROOT; };
 		B28A00000000000000000003 /* SavingsGoalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smartbud/ViewModels/SavingsGoalViewModel.swift; sourceTree = SOURCE_ROOT; };
@@ -982,6 +989,8 @@
 				F29A00000000000000000021 /* InstallmentPolicyTests.swift */,
 				F29A00000000000000000022 /* InstallmentLedgerTests.swift */,
 				A30F000000000000000000F4 /* TagFilterTests.swift */,
+				B83E000000000000000000F2 /* BatchEditPolicyTests.swift */,
+				B83E000000000000000000F3 /* BatchEditLedgerTests.swift */,
 				A30F000000000000000000F5 /* ReceiptAttachmentTests.swift */,
 						E1A2B3C4000000000000F151 /* RefundPolicyTests.swift */,
 						E1A2B3C40000000000001111 /* ReimbursementPolicyTests.swift */,
@@ -1111,6 +1120,7 @@
 				E1A2B3C4000000000000F231 /* BadDebtSheet.swift */,
 				E1A2B3C4000000000000A041 /* CSVSupport.swift */,
 				A30F000000000000000000F1 /* TagFilter.swift */,
+				B83E000000000000000000F1 /* BatchEdit.swift */,
 				A30F000000000000000000F2 /* ReceiptAttachment.swift */,
 				B28A00000000000000000001 /* SavingsGoal.swift */,
 				B28A00000000000000000002 /* SavingsGoalNotifier.swift */,
@@ -1751,6 +1761,7 @@
 				B0A0F0000000000000000208 /* SpeechService.swift in Sources */,
 				B0A0F000000000000000020A /* SmartEntrySheet.swift in Sources */,
 				F23A00020000000000000001 /* BatchRecognition.swift in Sources */,
+				B83E00000000000000000001 /* BatchEdit.swift in Sources */,
 				F23A00020000000000000004 /* BatchRecognitionView.swift in Sources */,
 				B0A0F0000000000000000301 /* CategoryListViews.swift in Sources */,
 				E1A2B3C4000000000000061B /* CategoryListView+Body.swift in Sources */,
@@ -1980,6 +1991,8 @@
 				A16B00B5000000000000B1F5 /* MerchantMigrationTests.swift in Sources */,
 				E1A2B3C4000000000000F102 /* ImportRoundTripTests.swift in Sources */,
 				A30F00000000000000000031 /* TagFilterTests.swift in Sources */,
+				B83E00000000000000000003 /* BatchEditPolicyTests.swift in Sources */,
+				B83E00000000000000000004 /* BatchEditLedgerTests.swift in Sources */,
 				A30F00000000000000000032 /* ReceiptAttachmentTests.swift in Sources */,
 				E1A2B3C4000000000000F005 /* AppPeriod.swift in Sources */,
 				E1A2B3C4000000000000F025 /* CurrencyRebase.swift in Sources */,
@@ -2018,6 +2031,7 @@
 				E1A2B3C4000000000000C0A3 /* WipeOutcome.swift in Sources */,
 				E1A2B3C4000000000000C065 /* ProAccessTests.swift in Sources */,
 				F23A00020000000000000002 /* BatchRecognition.swift in Sources */,
+				B83E00000000000000000002 /* BatchEdit.swift in Sources */,
 				F23A00020000000000000006 /* BatchRecognitionTests.swift in Sources */,
 				E1A2B3C4000000000000C091 /* WipeOutcomeTests.swift in Sources */,
 				E1A2B3C4000000000000C053 /* ImportAmount.swift in Sources */,

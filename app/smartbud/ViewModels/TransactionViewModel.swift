@@ -414,41 +414,142 @@ final class TransactionViewModel {
     /// category (the form enforces the same rule).
     func setCategory(_ category: CategoryModel?, for transactions: [TransactionModel]) {
         guard !transactions.isEmpty else { return }
-        for txn in transactions {
-            // A refund belongs to the purchase it gives back; moving it to
-            // another category would detach it from the spend it is meant to
-            // reduce and leave the new category showing a negative purchase.
-            guard !txn.isRefund else { continue }
-            // Rows created without a note fall back to the category name, so
-            // move that auto-derived note along with the category; a real
-            // user-written note is left alone.
-            let noteWasCategoryName = txn.note?.isEmpty ?? true
-                || txn.note == txn.category?.wrappedName
-
-            txn.category = category
-            if let category {
-                txn.income = category.income
-                // An income row cannot be a reimbursement claim: moving a
-                // claim into an income category would otherwise leave it in
-                // the pending list and count it as earned money at the same
-                // time. Balance adjustments are never claims either.
-                if category.income || txn.adjustment {
-                    // Clearing the claim without removing its repayment row
-                    // would leave the money on the account twice: once as this
-                    // row's new income and once as the untouched repayment.
-                    if txn.reimbursedAmount > 0 || txn.reimbursedAt != nil {
-                        ReimbursementLedger.unsettle(txn, in: repo.context)
-                    }
-                    txn.reimbursable = false
-                    txn.reimbursedAt = nil
-                    BadDebtLedger.clearWriteOff(of: txn, in: repo.context)
-                }
-                if noteWasCategoryName {
-                    txn.note = category.wrappedName
-                }
-            }
+        for txn in transactions where !txn.isRefund {
+            applyCategory(category, to: txn)
         }
         repo.save()
+    }
+
+    /// Batch edit of the same field, with per-row accounting. Linked rows are
+    /// skipped instead of aborting the batch, and every skip comes back with
+    /// an id and reason for the result alert.
+    func batchEdit(category: CategoryModel?, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        applyBatch(.category, to: transactions) { applyCategory(category, to: $0) }
+    }
+
+    func batchEdit(bookID: UUID, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        applyBatch(.book, to: transactions) { txn in
+            txn.bookID = bookID
+            if let categoryBookID = txn.category?.bookID,
+               !BatchEditPolicy.keepsCategory(categoryBookID: categoryBookID, movingTo: bookID) {
+                // A category from the old book has no counterpart in the new
+                // one; keeping it would make the row look categorised in the
+                // log but uncategorised in the target book's statistics.
+                txn.category = nil
+            }
+        }
+    }
+
+    func batchEdit(note: String, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        return applyBatch(.note, to: transactions) { $0.note = trimmed.isEmpty ? nil : trimmed }
+    }
+
+    func batchEdit(date: Date, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        let calendar = Calendar(identifier: .gregorian)
+        let day = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: date) ?? date
+        let month = calendar.date(from: calendar.dateComponents([.month, .year], from: date)) ?? date
+        return applyBatch(.date, to: transactions) { txn in
+            txn.date = date
+            txn.day = day
+            txn.month = month
+        }
+    }
+
+    func batchEdit(account: AccountModel?, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        let currency = account?.resolvedCurrencyCode ?? ""
+        return applyBatch(.account, to: transactions) { txn in
+            // `baseAmount` is frozen at entry time. Silently reusing it after
+            // changing to a different currency would corrupt every total.
+            guard currency.isEmpty || currency == (txn.account?.resolvedCurrencyCode ?? "") else {
+                throw BatchEditError(.currencyMismatch)
+            }
+            txn.account = account
+        }
+    }
+
+    func batchEdit(addLabel tagID: UUID, to transactions: [TransactionModel]) -> BatchEditOutcome {
+        applyBatch(.labels, to: transactions) { txn in
+            if !txn.tagIDs.contains(tagID) { txn.tagIDs.append(tagID) }
+        }
+    }
+
+    func batchEdit(reimbursable: Bool, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        applyBatch(.reimbursable, to: transactions) { txn in
+            txn.reimbursable = reimbursable && !txn.income && !txn.adjustment
+            if !txn.reimbursable && (txn.reimbursedAmount > 0 || txn.reimbursedAt != nil) {
+                ReimbursementLedger.unsettle(txn, in: repo.context)
+            }
+        }
+    }
+
+    /// SmartBud has no separate "exclude" flags: an ordinary row excluded
+    /// from budget and income/expense is an adjustment row with no reason.
+    /// Genuine balance corrections carry a reason and are never toggled here.
+    func batchEdit(excludedFromTotals: Bool, for transactions: [TransactionModel]) -> BatchEditOutcome {
+        applyBatch(.excludeFromTotals, to: transactions) { txn in
+            txn.adjustment = excludedFromTotals
+            if excludedFromTotals {
+                txn.reimbursable = false
+            } else {
+                txn.adjustmentReason = nil
+            }
+        }
+    }
+
+    /// One save for the whole batch; a rejected row never rolls back the
+    /// rows that already succeeded.
+    private func applyBatch(_ field: BatchEditField,
+                            to transactions: [TransactionModel],
+                            mutate: (TransactionModel) throws -> Void) -> BatchEditOutcome {
+        guard !transactions.isEmpty else {
+            return BatchEditOutcome(applied: 0, rejections: [])
+        }
+        let byID = Dictionary(transactions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let rows = transactions.map(BatchEditRow.init)
+        let outcome = BatchEditPolicy.apply(rows, field: field) { row in
+            guard let txn = byID[row.id] else { throw BatchEditError(.invalidValue) }
+            try mutate(txn)
+        }
+        if outcome.applied > 0 { repo.save() }
+        return outcome
+    }
+
+    /// Count shown before a batch action is confirmed. Linked rows are not
+    /// counted: they will be skipped with a reason when the action runs.
+    func batchEligibleCount(for transactions: [TransactionModel]) -> Int {
+        transactions.filter { BatchEditPolicy.rejection(for: BatchEditRow($0), field: .note) == nil }.count
+    }
+
+    private func applyCategory(_ category: CategoryModel?, to txn: TransactionModel) {
+        // Rows created without a note fall back to the category name, so
+        // move that auto-derived note along with the category; a real
+        // user-written note is left alone.
+        let noteWasCategoryName = txn.note?.isEmpty ?? true
+            || txn.note == txn.category?.wrappedName
+
+        txn.category = category
+        if let category {
+            txn.income = category.income
+            // An income row cannot be a reimbursement claim: moving a
+            // claim into an income category would otherwise leave it in
+            // the pending list and count it as earned money at the same
+            // time. Balance adjustments are never claims either.
+            if category.income || txn.adjustment {
+                // Clearing the claim without removing its repayment row
+                // would leave the money on the account twice: once as this
+                // row's new income and once as the untouched repayment.
+                if txn.reimbursedAmount > 0 || txn.reimbursedAt != nil {
+                    ReimbursementLedger.unsettle(txn, in: repo.context)
+                }
+                txn.reimbursable = false
+                txn.reimbursedAt = nil
+                BadDebtLedger.clearWriteOff(of: txn, in: repo.context)
+            }
+            if noteWasCategoryName {
+                txn.note = category.wrappedName
+            }
+        }
     }
 
     // MARK: Staged delete (supports "undo" before the delete is committed)
@@ -537,4 +638,24 @@ final class TransactionViewModel {
         }
     }
 
+}
+
+extension BatchEditRow {
+    /// Copies only the identity flags. `hasAdjustmentReason` marks a real
+    /// balance correction; a row merely excluded from totals has no reason
+    /// and can be included again by a batch action.
+    init(_ txn: TransactionModel) {
+        self.init(
+            id: txn.id,
+            isRefund: txn.isRefund,
+            isReimbursementIncome: txn.isReimbursementIncome,
+            isSettledClaim: txn.reimbursable
+                && (txn.reimbursedAmount > 0 || txn.reimbursedAt != nil
+                    || txn.badDebtAt != nil),
+            isBadDebt: txn.badDebtOf != nil,
+            isPlanGenerated: txn.installmentOf != nil,
+            isBalanceAdjustment: txn.adjustment && txn.adjustmentReason != nil,
+            hasAdjustmentReason: txn.adjustmentReason != nil
+        )
+    }
 }
