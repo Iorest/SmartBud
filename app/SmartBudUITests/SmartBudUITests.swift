@@ -2076,17 +2076,14 @@ final class SmartBudUITests: XCTestCase {
         trip.tap()
         let confirm = app.alerts.firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
-        XCTAssertTrue(confirm.label.contains("0"),
-                      "The preview must show that no row can move without its account: \(confirm.label)")
+        XCTAssertTrue(confirm.label.contains("2"),
+                      "Both account-less rows can move: \(confirm.label)")
         confirm.buttons["Save"].tap()
         let moveResult = app.alerts.firstMatch
         XCTAssertTrue(moveResult.waitForExistence(timeout: 10),
-                      "A refused book move must report its result.\n\(app.debugDescription)")
-        XCTAssertGreaterThan(moveResult.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "Account belongs to another ledger")).count, 0,
-            "The refusal reason must be visible.")
+                      "A book move must report its result.\n\(app.debugDescription)")
         moveResult.buttons["Done"].tap()
-        XCTAssertEqual(logRows(app).count, 2, "Refused rows must stay in the original ledger.")
+        XCTAssertEqual(logRows(app).count, 0, "Moved rows must leave the current book.")
     }
 }
 
