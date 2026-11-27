@@ -72,16 +72,16 @@ struct LogView: View {
     // Batch selection
     @State private var isSelecting = false
     @State private var selectedIDs: Set<UUID> = []
-    @State private var showBatchDelete = false
+    /// One alert slot for the whole screen. SwiftUI only presents one alert
+    /// attached to a view, so delete / confirm / result share this state.
+    @State private var activeAlert: ActiveAlert?
 
     // Batch edit: value-based actions are confirmed before writing; note and
     // date use sheets because they need input first.
-    @State private var pendingBatch: BatchAction?
     @State private var showBatchNote = false
     @State private var showBatchDate = false
     @State private var batchNoteDraft = ""
     @State private var batchDateDraft = Date.now
-    @State private var batchResult: BatchEditOutcome?
 
     @State var filter = FilterType.all
     @State var categoryFilter: CategoryModel?
@@ -163,47 +163,36 @@ struct LogView: View {
                 .accessibilityIdentifier(AccessibilityID.logAddButton)
             }
         }
-        .alert(
-            String.appFormatted("Delete %lld transactions?", selectedIDs.count),
-            isPresented: $showBatchDelete
-        ) {
-            Button(String.appLocalized("Delete"), role: .destructive) {
-                transactionVM.delete(selectedTransactions)
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    selectedIDs.removeAll()
-                    isSelecting = false
-                }
-            }
-            Button(String.appLocalized("Cancel"), role: .cancel) {}
-        } message: {
-            Text(String.appLocalized("This action cannot be undone."))
-        }
-        .alert(
-            String.appFormatted("Edit %lld transactions?",
-                                transactionVM.batchEligibleCount(for: selectedTransactions)),
-            isPresented: Binding(
-                get: { pendingBatch != nil },
-                set: { if !$0 { pendingBatch = nil } })
-        ) {
-            Button(String.appLocalized("Cancel"), role: .cancel) { pendingBatch = nil }
-            Button(String.appLocalized("Save")) {
-                if let action = pendingBatch { commitBatch(action) }
-                pendingBatch = nil
-            }
-        }
-        .alert(String.appLocalized("Batch Edit"), isPresented: Binding(
-            get: { batchResult != nil },
-            set: { if !$0 { batchResult = nil } }
-        )) {
-            Button(String.appLocalized("Done"), role: .cancel) { batchResult = nil }
-        } message: {
-            if let batchResult {
-                Text(String.appFormatted("Updated %lld, skipped %lld",
-                                         batchResult.applied, batchResult.skipped))
-                    .accessibilityIdentifier(AccessibilityID.logBatchResult)
-                ForEach(batchResult.messageKeys, id: \.self) { key in
-                    Text(String.appLocalized(key))
-                }
+        .alert(item: $activeAlert) { alert in
+            switch alert {
+            case .delete:
+                Alert(
+                    title: Text(String.appFormatted("Delete %lld transactions?", selectedIDs.count)),
+                    primaryButton: .destructive(Text(String.appLocalized("Delete"))) {
+                        transactionVM.delete(selectedTransactions)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedIDs.removeAll()
+                            isSelecting = false
+                        }
+                    },
+                    secondaryButton: .cancel(Text(String.appLocalized("Cancel")))
+                )
+            case .confirm(let action):
+                Alert(
+                    title: Text(String.appFormatted(
+                        "Edit %lld transactions?",
+                        transactionVM.batchEligibleCount(for: selectedTransactions))),
+                    primaryButton: .default(Text(String.appLocalized("Save"))) {
+                        commitBatch(action)
+                    },
+                    secondaryButton: .cancel(Text(String.appLocalized("Cancel")))
+                )
+            case .result(let outcome):
+                Alert(
+                    title: Text(String.appLocalized("Batch Edit")),
+                    message: Text(message(for: outcome)),
+                    dismissButton: .default(Text(String.appLocalized("Done")))
+                )
             }
         }
         .sheet(isPresented: $showBatchNote) {
@@ -309,7 +298,7 @@ struct LogView: View {
                     accounts: fetchedAccounts,
                     labels: availableTags,
                     onPick: moveSelection,
-                    onBook: { pendingBatch = .book($0) },
+                    onBook: { activeAlert = .confirm(.book($0)) },
                     onNote: {
                         batchNoteDraft = ""
                         showBatchNote = true
@@ -318,11 +307,11 @@ struct LogView: View {
                         batchDateDraft = .now
                         showBatchDate = true
                     },
-                    onAccount: { pendingBatch = .account($0) },
-                    onLabel: { pendingBatch = .label($0) },
-                    onReimbursable: { pendingBatch = .reimbursable($0) },
-                    onExcluded: { pendingBatch = .excluded($0) },
-                    onDelete: { showBatchDelete = true }
+                    onAccount: { activeAlert = .confirm(.account($0)) },
+                    onLabel: { activeAlert = .confirm(.label($0)) },
+                    onReimbursable: { activeAlert = .confirm(.reimbursable($0)) },
+                    onExcluded: { activeAlert = .confirm(.excluded($0)) },
+                    onDelete: { activeAlert = .delete }
                 )
             }
         }
@@ -473,6 +462,28 @@ extension LogView {
         case excluded(Bool)
     }
 
+    private enum ActiveAlert: Identifiable {
+        case delete
+        case confirm(BatchAction)
+        case result(BatchEditOutcome)
+
+        var id: String {
+            switch self {
+            case .delete: return "delete"
+            case .confirm: return "confirm"
+            case .result: return "result"
+            }
+        }
+    }
+
+    private func message(for outcome: BatchEditOutcome) -> String {
+        let base = String.appFormatted("Updated %lld, skipped %lld",
+                                       outcome.applied, outcome.skipped)
+        guard !outcome.messageKeys.isEmpty else { return base }
+        return base + "\n" + outcome.messageKeys.map { String.appLocalized($0) }
+            .joined(separator: "\n")
+    }
+
     /// Applies one action to every selected row, then reports both sides of
     /// the result. Selection is cleared only after the outcome is visible.
     private func commitBatch(_ action: BatchAction) {
@@ -495,7 +506,10 @@ extension LogView {
         case .excluded(let value):
             outcome = transactionVM.batchEdit(excludedFromTotals: value, for: rows)
         }
-        batchResult = outcome
+        // Let the confirmation alert dismiss before presenting the result;
+        // replacing an item while it is still up can be ignored by SwiftUI.
+        activeAlert = nil
+        Task { @MainActor in activeAlert = .result(outcome) }
         withAnimation(.easeInOut(duration: 0.2)) {
             selectedIDs.removeAll()
             isSelecting = false

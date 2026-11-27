@@ -72,7 +72,6 @@ enum AccessibilityID {
     static let logBatchReimbursable = "sb.log.batchReimbursable"
     static let logBatchExclude = "sb.log.batchExclude"
     static let logBatchApply = "sb.log.batchApply"
-    static let logBatchResult = "sb.log.batchResult"
 
     // MARK: - Entry form
 
