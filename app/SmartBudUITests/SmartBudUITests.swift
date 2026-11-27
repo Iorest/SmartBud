@@ -2076,9 +2076,8 @@ final class SmartBudUITests: XCTestCase {
         trip.tap()
         let confirm = app.alerts.firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
-        XCTAssertGreaterThan(confirm.staticTexts.matching(
-            NSPredicate(format: "label CONTAINS %@", "0")).count, 0,
-            "The preview must show that no row can move without its account.")
+        XCTAssertTrue(confirm.label.contains("0"),
+                      "The preview must show that no row can move without its account: \(confirm.label)")
         confirm.buttons["Save"].tap()
         let moveResult = app.alerts.firstMatch
         XCTAssertTrue(moveResult.waitForExistence(timeout: 10),
