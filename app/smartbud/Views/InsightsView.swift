@@ -23,6 +23,9 @@ import WidgetKit
 struct InsightsView: View {
     /// Opens the new-transaction sheet; the empty state offers it as a CTA.
     var onAdd: (() -> Void)?
+    /// Opens the log on the tapped calendar day. The log owns all other
+    /// filters, so this only sets the date filter.
+    var onSelectDay: ((Date) -> Void)?
 
     @Environment(InsightsViewModel.self) var insightsVM
     @Environment(AppLockViewModel.self) private var appLockVM
@@ -47,6 +50,8 @@ struct InsightsView: View {
                     header
                     dateRangeRow
 
+                    calendarSection
+                        .padding(.bottom, 18)
 
                     // Net worth is a balance-sheet figure, not a period
                     // total, so it stays visible even in an empty period.
@@ -209,6 +214,150 @@ struct InsightsView: View {
         }
         .padding(.horizontal, 30)
         .padding(.bottom, 18)
+    }
+
+    // MARK: - Period calendar
+
+    private var calendarSection: some View {
+        Group {
+            if let snapshot = insightsVM.calendarSnapshot {
+                let maxSpend = snapshot.days.map { Money.double($0.spend) }.max() ?? 0
+                SBCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 4) {
+                            Text(snapshot.title)
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(Color.SubtitleText)
+                            Spacer(minLength: 4)
+                            calendarMonthButton(systemImage: "chevron.left",
+                                                label: String.appLocalized("Previous")) {
+                                insightsVM.shiftCalendarMonth(by: -1)
+                            }
+                            calendarMonthButton(systemImage: "chevron.right",
+                                                label: String.appLocalized("Next")) {
+                                insightsVM.shiftCalendarMonth(by: 1)
+                            }
+                        }
+                        LazyVGrid(
+                            columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: 7),
+                            spacing: 2
+                        ) {
+                            ForEach(snapshot.weekdaySymbols, id: \.self) { symbol in
+                                Text(symbol)
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(Color.SubtitleText)
+                                    .frame(maxWidth: .infinity)
+                                    .accessibilityHidden(true)
+                            }
+                            ForEach(0..<snapshot.leadingBlanks, id: \.self) { _ in
+                                Color.clear.frame(height: 48)
+                            }
+                            ForEach(snapshot.days) { day in
+                                calendarCell(day, maxSpend: maxSpend)
+                            }
+                        }
+                        HStack(spacing: 14) {
+                            calendarTotal(String.appLocalized("Expense"),
+                                          value: snapshot.totalSpend,
+                                          color: Color.AlertRed, plus: false)
+                            calendarTotal(String.appLocalized("Income"),
+                                          value: snapshot.totalIncome,
+                                          color: Color.IncomeGreen, plus: true)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 30)
+    }
+
+    private func calendarMonthButton(systemImage: String, label: String,
+                                     action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(label))
+    }
+
+    private func calendarCell(_ day: AppPeriod.DayTotals, maxSpend: Double) -> some View {
+        let spend = Money.double(day.spend)
+        let income = Money.double(day.income)
+        let intensity = maxSpend > 0 ? min(1, max(0, spend / maxSpend)) : 0
+        return Button {
+            onSelectDay?(day.date)
+        } label: {
+            VStack(spacing: 1) {
+                Text("\(gregorian.component(.day, from: day.date))")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.PrimaryText)
+                if income != 0 {
+                    Text(Money.format(income, currencyCode: currency,
+                                      showsCents: false, plus: true))
+                        .font(.system(size: 8))
+                        .foregroundStyle(Color.IncomeGreen)
+                }
+                if spend != 0 {
+                    Text(Money.format(spend, currencyCode: currency,
+                                      showsCents: false, plus: false))
+                        .font(.system(size: 8))
+                        .foregroundStyle(Color.AlertRed)
+                }
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(day.hasEntries
+                        ? Color.AlertRed.opacity(0.08 + 0.28 * intensity)
+                        : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .frame(minHeight: 48)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(calendarAccessibilityLabel(day)))
+    }
+
+    private func calendarTotal(_ title: String, value: Double,
+                               color: Color, plus: Bool) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+                .accessibilityHidden(true)
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(Color.SubtitleText)
+            Text(Money.format(value, currencyCode: currency, showsCents: showCents,
+                              plus: value == 0 ? nil : plus))
+                .font(.caption2.weight(.semibold).monospacedDigit())
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+    }
+
+    private var gregorian: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale.appLocale
+        return calendar
+    }
+
+    private func calendarAccessibilityLabel(_ day: AppPeriod.DayTotals) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.appLocale
+        formatter.calendar = gregorian
+        formatter.dateStyle = .medium
+        let spend = Money.format(Money.double(day.spend), currencyCode: currency,
+                                 showsCents: showCents, plus: day.spend == 0 ? nil : false)
+        let income = Money.format(Money.double(day.income), currencyCode: currency,
+                                  showsCents: showCents, plus: day.income == 0 ? nil : true)
+        return "\(formatter.string(from: day.date)), "
+            + "\(String.appLocalized("Expense")) \(spend), "
+            + "\(String.appLocalized("Income")) \(income)"
     }
 
     private var netWorthCard: some View {

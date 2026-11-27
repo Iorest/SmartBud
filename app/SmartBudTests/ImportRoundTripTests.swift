@@ -355,4 +355,42 @@ struct ImportRoundTripTests {
         #expect(summary.tags == 0)
         #expect(summary.missingAttachments == 0)
     }
+
+    @Test("Adjustment reasons survive a full JSON backup round trip")
+    func adjustmentReasonRoundTrip() throws {
+        let reasonID = UUID()
+        let legacyID = UUID()
+        var reasonRow = ExportSchema.TransactionDTO(
+            id: reasonID, amount: 20, date: .now, day: nil, month: nil,
+            note: "", income: true, recurringType: 0, recurringCoefficient: 0,
+            onceRecurring: false, categoryId: nil, categoryName: nil,
+            accountId: fixture.accountID, accountName: "招行", baseAmount: 20,
+            accountCurrency: "CNY", discount: 0, reimbursable: false,
+            reimbursedAt: nil, reimbursementOf: nil, refundOf: nil,
+            transferFeeOf: nil, adjustment: true)
+        reasonRow.adjustmentReason = "bankFee"
+        // A backup written before schema 13 carries no reason key at all.
+        var legacyRow = reasonRow
+        legacyRow.id = legacyID
+        legacyRow.adjustmentReason = nil
+
+        // Match DataExporter: backups carry ISO-8601 dates, which is what
+        // DataImporter.decode expects. A plain JSONEncoder writes numbers and
+        // the file is (correctly) rejected as notABackup.
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let encoded = try encoder.encode(
+            fixture.payload(accounts: [fixture.sampleAccount],
+                            transactions: [reasonRow, legacyRow]))
+        let decoded = try DataImporter.decode(encoded)
+        #expect(decoded.schemaVersion == ExportSchema.version)
+        _ = try DataImporter.apply(decoded, context: fixture.context)
+
+        let rows = try fixture.context.fetch(FetchDescriptor<TransactionModel>())
+        let restored = try #require(rows.first { $0.id == reasonID })
+        let old = try #require(rows.first { $0.id == legacyID })
+        #expect(AdjustmentReason(stored: restored.adjustmentReason) == .bankFee)
+        #expect(old.adjustmentReason == nil)
+        #expect(AdjustmentReason(stored: old.adjustmentReason) == .other)
+    }
 }

@@ -235,7 +235,8 @@ struct BackupMerger {
                 installmentPeriod: dto.installmentPeriod ?? 0,
                 installmentKind: dto.installmentKind ?? 0,
                 transferFeeOf: dto.transferFeeOf,
-                adjustment: dto.adjustment ?? false
+                adjustment: dto.adjustment ?? false,
+                adjustmentReason: dto.adjustmentReason
             )
             transaction.bookID = resolveBook(dto.bookID)
             transaction.id = dto.id

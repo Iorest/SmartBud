@@ -19368,6 +19368,27 @@
         }
       }
     },
+    "Recorded Wrong" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recorded Wrong" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "记错" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "記錯" } }
+      }
+    },
+    "Not Recorded" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Recorded" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "漏记" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "漏記" } }
+      }
+    },
+    "Bank Fee" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bank Fee" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "银行手续费" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "銀行手續費" } }
+      }
+    },
     "Claim Rejected" : {
       "localizations" : {
         "en" : {
