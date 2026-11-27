@@ -13,12 +13,14 @@ import Foundation
 enum ExportSchema {
     /// Bumped when the format changes in a way importers must distinguish.
     /// Old values are never reused. Schema 10 added installment plans,
-    /// schema 12 added `savingsGoals`, schema 13 adds `adjustmentReason` on
-    /// adjustment rows. Older files have no reason key and still decode with
-    /// a nil value, which reads as `.other`. Next free number: 11 was never
-    /// shipped and main already carries 12, so reusing 11 would reject v12
-    /// backups. Coordinator to reassign the later allocation if needed.
-    static let version: Int = 13
+    /// schema 12 added `savingsGoals`, schema 13 added `adjustmentReason`,
+    /// schema 14 adds `options` on installment plans (interest timing,
+    /// liability timing, remainder placement). Older files omit the key and
+    /// decode to the historical defaults. 11 was never shipped and main
+    /// already carries 13, so 14 is the next free number; the task's earlier
+    /// "13" allocation was taken by TELE-81 first. Coordinator to reassign
+    /// if needed.
+    static let version: Int = 14
 
     struct Payload: Codable {
         var exportDate: Date
@@ -340,6 +342,7 @@ enum ExportSchema {
         var categoryName: String?
         var note: String?
         var dateCreated: Date?
+        var options: InstallmentPolicy.Options?
     }
 
     /// One savings goal (schema 12). Every field except id/name is optional

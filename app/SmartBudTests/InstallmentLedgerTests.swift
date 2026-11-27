@@ -188,4 +188,69 @@ struct InstallmentLedgerTests {
         var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 99)
         #expect(InstallmentLedger.restoredPrincipal(result) == 100)
     }
+
+    @Test("Per-period liability adds the principal to the card debt")
+    func liabilityPerPeriod() throws {
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        result.policy.liabilityTiming = .perPeriod
+        InstallmentLedger.sync(&result, in: context)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        let principal = try #require(rows.first { $0.installmentKind == 2 })
+        let fee = try #require(rows.first { $0.installmentKind == 1 })
+        // The bill has not restored credit yet, so the principal increases
+        // the debt. Neither direction is spend or income.
+        #expect(!principal.income)
+        #expect(!principal.countsAsSpend && !principal.countsAsIncome)
+        #expect(principal.spendBaseAmount == 0)
+        #expect(principal.signedBaseAmount == 0)
+        #expect(Money.cents(principal.amount) == Money.cents(33.33))
+        #expect(fee.countsAsSpend)
+        #expect(InstallmentLedger.restoredPrincipal(result) == 0)
+    }
+
+    @Test("A legacy plan keeps restoring credit and the last-period remainder")
+    func legacyPlanKeepsHistoricalBehaviour() throws {
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        #expect(result.options == nil)
+        InstallmentLedger.sync(&result, in: context)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        let principal = try #require(rows.first { $0.installmentKind == 2 })
+        #expect(principal.income)
+        #expect(!principal.countsAsSpend && !principal.countsAsIncome)
+        #expect(Money.cents(principal.amount) == Money.cents(33.33))
+        #expect(Money.cents(InstallmentLedger.restoredPrincipal(result)) == Money.cents(33.33))
+    }
+
+    @Test("First-period interest and remainder reach the generated rows")
+    func generatedRowsFollowOptions() throws {
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        result.policy.interestTiming = .firstPeriod
+        result.policy.remainderPlacement = .first
+        InstallmentLedger.sync(&result, in: context)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        let principal = try #require(rows.first { $0.installmentKind == 2 })
+        let fee = try #require(rows.first { $0.installmentKind == 1 })
+        #expect(Money.cents(principal.amount) == Money.cents(33.34))
+        #expect(Money.cents(fee.amount) == Money.cents(0.30))
+        #expect(fee.countsAsSpend)
+        #expect(!principal.countsAsSpend)
+    }
+
+    @Test("Changing options never duplicates an already booked bill")
+    func optionChangeIsIdempotent() throws {
+        var result = plan(principal: 100, fee: 0.30, periods: 3, executed: 1)
+        InstallmentLedger.sync(&result, in: context)
+        result.policy.interestTiming = .firstPeriod
+        result.policy.remainderPlacement = .first
+        result.policy.liabilityTiming = .perPeriod
+        let resync = InstallmentLedger.sync(&result, in: context)
+        #expect(resync.created == 0)
+        #expect(InstallmentLedger.rows(for: result, in: context).count == 2)
+        InstallmentLedger.bookNext(&result, in: context)
+        let rows = InstallmentLedger.rows(for: result, in: context)
+        // No second-period fee row: first-period billing put the whole fee
+        // in period 1, and zero-yuan rows are never materialised.
+        #expect(rows.count == 3)
+        #expect(rows.allSatisfy { $0.installmentPeriod != 2 || $0.installmentKind == 2 })
+    }
 }

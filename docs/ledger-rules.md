@@ -83,20 +83,32 @@ isInstallmentPrincipal // installmentKind == 2；本金行不计费用、不计�
 
 ## 分期账单
 
-`InstallmentPlanModel` 存本金、手续费、期数、首期日与已执行期数；`InstallmentPolicy`
-把两者逐分拆到各期，余数全部归最后一期，保证 Σ本金 = 计划本金、Σ手续费 = 计划手续费。
+`InstallmentPlanModel` 存本金、手续费、期数、首期日与已执行期数，以及三项可选口径；
+`InstallmentPolicy` 把两者逐分拆到各期，保证 Σ本金 = 计划本金、Σ手续费 = 计划手续费。
 `InstallmentLedger.sync` 只为 `index <= executedPeriods` 的期生成两行：
 
 | 生成的行 | `income` | 费用 / 分类占比 / 预算 | 收入 | 账户余额 |
 |---|---|---|---|---|
 | 手续费 `installmentKind = 1` | false | 计入当期 | 不计 | 减少 |
-| 本金 `installmentKind = 2` | true | 不计 | 不计 | 增加（额度恢复） |
+| 本金 `installmentKind = 2` | 默认 true，`perPeriod` 负债口径下 false | 不计 | 不计 | 默认增加（额度恢复）/ 该口径下减少（负债逐期计入） |
 
-本金行的 `income = true` 只是把信用卡余额从负数往 0 推，不是新赚的钱：
+本金行的 `income` 只决定它推卡余额的方向，不是"赚到的钱"：
 `countsAsSpend`、`countsAsIncome`、`spendBaseAmount`、`signedBaseAmount` 都把它排除。
 生成行带 `installmentOf` + `installmentPeriod` + `installmentKind`，三者构成幂等键；
 改计划只影响还没入账的期，已入账的期不重写。未来期不预生成——`AccountBalance`
 会把未来日期的行算进余额，预生成的本金会提前恢复额度。
+
+三项可选口径（`InstallmentPolicy.Options`，默认值就是历史行为；老计划与旧备份按默认导入）：
+
+| 选项 | 取值 | 效果 |
+|---|---|---|
+| 利息计入 `interestTiming` | `perPeriod`（默认）/ `firstPeriod` | 手续费按期摊分 / 全部进首期；Σ手续费不变 |
+| 未还负债计入 `liabilityTiming` | `atCreation`（默认）/ `perPeriod` | 本金已在创建时计入卡负债、每期账单恢复额度（`income = true`）/ 负债随每期账单产生、不恢复额度（`income = false`） |
+| 尾差归入 `remainderPlacement` | `last`（默认）/ `first` | 逐分拆分的舍入差额归末期 / 首期；Σ金额逐分相等 |
+
+两种负债口径把同样的本金总额计入卡负债，区别只在计入时点：前者是消费时已经在卡上，
+后者是账单出账时才计入。不论哪个方向，`installmentKind = 2` 都把本金行排除在支出与收入之外；
+0 元份额不落账，改动选项只影响未入账期，已入账行不重写。
 
 旧数据兼容：`reimbursedAmount` 是新字段，旧行默认 0。启动迁移
 （`ReimbursementLedger.migrate`）把旧备份里只有 `reimbursedAt` 的整笔报销补成全额，

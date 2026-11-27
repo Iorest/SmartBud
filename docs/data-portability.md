@@ -10,7 +10,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 | 从备份恢复 | 选择 JSON 备份，合并进本机 | — |
 | 清除数据 | 删除本机全部记录并尝试清空 iCloud 区域 | — |
 
-## JSON 备份格式（schemaVersion 13）
+## JSON 备份格式（schemaVersion 14）
 
 文件形状见 `smartbud/Services/ExportSchema.swift`，字段名就是磁盘上的契约，
 改名前要同时改导出和导入，并且**必须**升 `schemaVersion`。
@@ -19,7 +19,7 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
 {
   "exportDate": "2026-10-22T05:00:00Z",
   "appVersion": "4.0",
-  "schemaVersion": 13,
+  "schemaVersion": 14,
   "transactions": [ ... ],
   "categories": [ ... ],
   "budgets": [ ... ],
@@ -65,6 +65,11 @@ SmartBud 的本地库是唯一的真相来源，iCloud 只负责同步。要换�
   `bankFee` / `other`）。旧备份缺该键时按 nil 导入，流水展示为「其他」，金额与余额不变；
   导出端始终写该键（普通行为 nil）。版本号按合并顺序分配：schema 11 从未发布，主干已带
   12 的存钱目标备份，故本轮直接用 13，避免把已发布的 12 备份判成未来格式而拒绝导入。
+- schema 14 新增 `installmentPlans[].options`（`interestTiming` / `liabilityTiming` /
+  `remainderPlacement`，取值为 `perPeriod`|`firstPeriod`、`atCreation`|`perPeriod`、
+  `last`|`first`）。旧备份缺 `options` 时按历史默认（按期计息、创建时计入、末期尾差）
+  导入，金额与支出口径不变；导出端总写入解析后的选项。13 已被 TELE-81 的调整原因占用，
+  本轮按合并顺序顺延到 14，避免把已发布的 13 备份判成未来格式而拒绝导入。
 - `accounts` 可携带 `creditLimit` / `statementDay` / `dueDay`（credit 账户的额度、账单日、
   还款日）；三者可选，导入端按账户类型收敛：非 credit 或非法值一律按 nil 读入。
   导出端始终写这三个键。schema 版本号由统筹按合并顺序分配，本次不自行抢号。
