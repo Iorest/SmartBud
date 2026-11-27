@@ -60,7 +60,7 @@ struct BatchEditLedgerTests {
             isPlanGenerated: txn.installmentOf != nil,
             isReferencedByOtherRows: referencedIDs.contains(txn.id),
             isTransferFee: txn.transferFeeOf != nil,
-            accountBookID: txn.account?.bookID,
+            accountBookID: txn.account == nil ? nil : (txn.account?.bookID ?? BookModel.defaultID),
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }
@@ -154,5 +154,12 @@ struct BatchEditLedgerTests {
         #expect(refund.bookID == originalBook)
         #expect(original.account?.id == accountID)
         #expect(refund.refundOf == original.id)
+    }
+
+    @Test("A legacy account without a book id counts as the default ledger")
+    func legacyAccountBookID() {
+        let txn = row(note: "Legacy")
+        txn.account?.bookID = nil
+        #expect(snapshot(txn).accountBookID == BookModel.defaultID)
     }
 }

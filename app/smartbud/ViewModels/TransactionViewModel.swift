@@ -673,7 +673,9 @@ extension BatchEditRow {
             isPlanGenerated: txn.installmentOf != nil,
             isReferencedByOtherRows: referencedIDs.contains(txn.id),
             isTransferFee: txn.transferFeeOf != nil,
-            accountBookID: txn.account?.bookID,
+            // Legacy accounts carry no book id; BookScope reads that as the
+            // default book, so normalise here before comparing ledgers.
+            accountBookID: txn.account == nil ? nil : (txn.account?.bookID ?? BookModel.defaultID),
             hasAdjustmentReason: txn.adjustmentReason != nil
         )
     }
