@@ -2041,9 +2041,12 @@ final class SmartBudUITests: XCTestCase {
         select(.log, in: app)
         // Creating a book switches into it; its log is empty. Go back to the
         // default book, which owns the bundled sample rows we batch-edit.
-        let currentBook = app.buttons.matching(NSPredicate(format: "label == %@", "Trip")).firstMatch
-        XCTAssertTrue(currentBook.waitForExistence(timeout: 5))
-        currentBook.tap()
+        // The switcher's label can be stale right after creating a book, so
+        // address it by its fixed position in the Log navigation bar.
+        let switcher = app.navigationBars["Log"].buttons.element(boundBy: 0)
+        XCTAssertTrue(switcher.waitForExistence(timeout: 5),
+                      "Log must expose the book switcher.\n\(app.debugDescription)")
+        switcher.tap()
         let defaultBook = app.buttons.matching(NSPredicate(format: "label == %@", "Default Book")).firstMatch
         XCTAssertTrue(defaultBook.waitForExistence(timeout: 5),
                       "Book switcher must offer the default book.\n\(app.debugDescription)")
