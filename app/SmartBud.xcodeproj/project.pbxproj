@@ -317,6 +317,7 @@
 		F29A00000000000000000002 /* InstallmentPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000001 /* InstallmentPolicy.swift */; };
 		F29A00000000000000000003 /* InstallmentPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000001 /* InstallmentPolicy.swift */; };
 		F29A00000000000000000004 /* InstallmentPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000001 /* InstallmentPolicy.swift */; };
+		F29A00000000000000000005 /* InstallmentPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000001 /* InstallmentPolicy.swift */; };
 		F29A00000000000000000012 /* InstallmentLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000011 /* InstallmentLedger.swift */; };
 		F29A00000000000000000013 /* InstallmentLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000011 /* InstallmentLedger.swift */; };
 		F29A00000000000000000014 /* InstallmentLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29A00000000000000000011 /* InstallmentLedger.swift */; };
@@ -1924,6 +1925,7 @@
 				7AC1901BBB8747D699DA97BB /* WidgetConfigurationIntents.swift in Sources */,
 				5321E1DE291FE2CE00D5A931 /* CategoryCreationErrors.swift in Sources */,
 				53980E5D28A77B62009CC4E2 /* Helper.swift in Sources */,
+				F29A00000000000000000005 /* InstallmentPolicy.swift in Sources */,
 				E1A2B3C40000000000001105 /* ReimbursementPolicy.swift in Sources */,
 				C10000000000000000000003 /* SharedSupport.swift in Sources */,
 				E1A2B3C4000000000000F004 /* AppPeriod.swift in Sources */,

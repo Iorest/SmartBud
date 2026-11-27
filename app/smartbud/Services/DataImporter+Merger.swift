@@ -101,6 +101,7 @@ struct BackupMerger {
             plan.id = dto.id
             plan.executedPeriods = max(0, min(dto.executedPeriods, plan.periods))
             if let created = dto.dateCreated { plan.dateCreated = created }
+            plan.options = dto.options ?? .default
             InstallmentPlanStore.upsert(plan, in: context)
             summary.installmentPlans += 1
         }

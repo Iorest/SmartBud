@@ -256,8 +256,8 @@ enum DataExporter {
                     categoryId: plan.categoryID,
                     categoryName: nil,
                     note: plan.note,
-                    dateCreated: plan.dateCreated
-                )
+                    dateCreated: plan.dateCreated,
+                    options: plan.policy)
             }
     }
 
