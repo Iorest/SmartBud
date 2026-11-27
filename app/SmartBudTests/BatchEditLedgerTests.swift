@@ -48,7 +48,7 @@ struct BatchEditLedgerTests {
     /// Mirrors the view-model's identity snapshot. A test target does not see
     /// the app target's extension initialiser, so build it from the real row
     /// fields here instead.
-    private func snapshot(_ txn: TransactionModel) -> BatchEditRow {
+    private func snapshot(_ txn: TransactionModel, referencedIDs: Set<UUID> = []) -> BatchEditRow {
         BatchEditRow(
             id: txn.id,
             isRefund: txn.isRefund,
@@ -58,6 +58,7 @@ struct BatchEditLedgerTests {
                     || txn.badDebtAt != nil),
             isBadDebt: txn.badDebtOf != nil,
             isPlanGenerated: txn.installmentOf != nil,
+            isReferencedByOtherRows: referencedIDs.contains(txn.id),
             isTransferFee: txn.transferFeeOf != nil,
             accountBookID: txn.account?.bookID,
             hasAdjustmentReason: txn.adjustmentReason != nil
@@ -141,11 +142,7 @@ struct BatchEditLedgerTests {
         let target = UUID()
 
         let outcome = BatchEditPolicy.apply(
-            [original, refund].map { txn in
-                var snap = snapshot(txn)
-                snap.isReferencedByOtherRows = referenced.contains(txn.id)
-                return snap
-            },
+            [original, refund].map { snapshot($0, referencedIDs: referenced) },
             field: .book, targetBookID: target
         ) { item in
             Issue.record("A linked row was moved across ledgers: \(item.id)")
