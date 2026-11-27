@@ -116,11 +116,12 @@ enum InstallmentLedger {
                                 in context: ModelContext) -> TransactionModel {
         let isPrincipal = kind == 2
         let amount = isPrincipal ? period.principal : period.fee
-        // Liability timing decides the direction of the principal row's
-        // effect on the card balance. Both directions stay out of spend and
-        // income through `isInstallmentPrincipal`, so the spend figures never
-        // change with this option.
-        let creditRestoring = !isPrincipal || plan.policy.liabilityTiming == .atCreation
+        // Liability timing only flips the *principal* row: at creation the
+        // debt is already on the card so repayment restores credit (income);
+        // per-period it adds to the debt instead. Fee rows stay expenses in
+        // every mode, and `isInstallmentPrincipal` keeps principal out of
+        // both spend and income regardless of the direction.
+        let rowIsIncome = isPrincipal && plan.policy.liabilityTiming == .atCreation
         let accounts = (try? context.fetch(FetchDescriptor<AccountModel>())) ?? []
         let categories = (try? context.fetch(FetchDescriptor<CategoryModel>())) ?? []
         let account = accounts.first { $0.id == plan.accountID }
@@ -132,7 +133,7 @@ enum InstallmentLedger {
             category: isPrincipal ? nil : category,
             account: account,
             baseAmount: amount,
-            income: creditRestoring,
+            income: rowIsIncome,
             amount: amount,
             date: period.date,
             installmentOf: plan.id,

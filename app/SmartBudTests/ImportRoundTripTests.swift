@@ -418,7 +418,9 @@ struct ImportRoundTripTests {
         let stored = try #require(plans.first { $0.id == configured.id })
         #expect(stored.policy == options)
         let restoredLegacy = try #require(plans.first { $0.id == legacy.id })
-        #expect(restoredLegacy.options == nil)
+        // The importer normalises a missing key to the historical defaults,
+        // so the stored plan carries them explicitly rather than nil.
+        #expect(restoredLegacy.options == .default)
         #expect(restoredLegacy.policy == .default)
     }
 }
