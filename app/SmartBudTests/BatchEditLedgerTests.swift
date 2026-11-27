@@ -45,6 +45,24 @@ struct BatchEditLedgerTests {
         return txn
     }
 
+    /// Mirrors the view-model's identity snapshot. A test target does not see
+    /// the app target's extension initialiser, so build it from the real row
+    /// fields here instead.
+    private func snapshot(_ txn: TransactionModel) -> BatchEditRow {
+        BatchEditRow(
+            id: txn.id,
+            isRefund: txn.isRefund,
+            isReimbursementIncome: txn.isReimbursementIncome,
+            isSettledClaim: txn.reimbursable
+                && (txn.reimbursedAmount > 0 || txn.reimbursedAt != nil
+                    || txn.badDebtAt != nil),
+            isBadDebt: txn.badDebtOf != nil,
+            isPlanGenerated: txn.installmentOf != nil,
+            isBalanceAdjustment: txn.adjustment && txn.adjustmentReason != nil,
+            hasAdjustmentReason: txn.adjustmentReason != nil
+        )
+    }
+
     @Test("A refund and a repayment row are recognised as linked from their real fields")
     func linkedRowsAreClassified() {
         let original = row(note: "Purchase")
@@ -57,10 +75,10 @@ struct BatchEditLedgerTests {
         repayment.income = true
         repayment.reimbursementOf = claim.id
 
-        #expect(BatchEditPolicy.rejection(for: BatchEditRow(refund), field: .note) == .linkedRefund)
-        #expect(BatchEditPolicy.rejection(for: BatchEditRow(claim), field: .note) == .settledClaim)
-        #expect(BatchEditPolicy.rejection(for: BatchEditRow(repayment), field: .note) == .linkedClaim)
-        #expect(BatchEditPolicy.rejection(for: BatchEditRow(original), field: .note) == nil)
+        #expect(BatchEditPolicy.rejection(for: snapshot(refund), field: .note) == .linkedRefund)
+        #expect(BatchEditPolicy.rejection(for: snapshot(claim), field: .note) == .settledClaim)
+        #expect(BatchEditPolicy.rejection(for: snapshot(repayment), field: .note) == .linkedClaim)
+        #expect(BatchEditPolicy.rejection(for: snapshot(original), field: .note) == nil)
     }
 
     @Test("A batch edits ordinary rows and leaves refund and claim links untouched")
@@ -76,7 +94,7 @@ struct BatchEditLedgerTests {
         claim.reimbursedAmount = 20
 
         let selected = [purchase, refund, claim, repayment]
-        let outcome = BatchEditPolicy.apply(selected.map(BatchEditRow.init), field: .note) { item in
+        let outcome = BatchEditPolicy.apply(selected.map(snapshot), field: .note) { item in
             // The view-model closure edits by id; mirror that here so the
             // assertion covers the same routing a real batch action uses.
             guard let txn = selected.first(where: { $0.id == item.id }) else { return }
@@ -102,7 +120,7 @@ struct BatchEditLedgerTests {
         loss.badDebtOf = claim.id
         claim.badDebtAt = Date(timeIntervalSince1970: 1_700_010_000)
 
-        let outcome = BatchEditPolicy.apply([claim, loss].map(BatchEditRow.init), field: .note) { item in
+        let outcome = BatchEditPolicy.apply([claim, loss].map(snapshot), field: .note) { item in
             Issue.record("No row in this pair may be edited, got \(item.id)")
         }
         #expect(outcome.applied == 0)
