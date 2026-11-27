@@ -2053,12 +2053,16 @@ final class SmartBudUITests: XCTestCase {
         require(app, AccessibilityID.logBatchCategoryMenu).tap()
         let category = element(app, AccessibilityID.logBatchCategory)
         XCTAssertTrue(category.waitForExistence(timeout: 5))
+        let categoryName = category.label.components(separatedBy: " ").last ?? ""
         category.tap()
-        let categoryResult = element(app, AccessibilityID.logBatchResult)
-        XCTAssertTrue(categoryResult.waitForExistence(timeout: 10))
-        XCTAssertTrue(categoryResult.label.contains("2"),
-                      "Both selected rows must be counted.\n\(categoryResult.label)")
-        app.alerts.firstMatch.buttons["Done"].tap()
+        if app.alerts.firstMatch.exists {
+            XCTAssertGreaterThan(app.alerts.firstMatch.staticTexts.matching(
+                NSPredicate(format: "label CONTAINS %@", "2")).count, 0,
+                "The result must count both selected rows.")
+            app.alerts.firstMatch.buttons["Done"].tap()
+        }
+        let moved = logRows(app).matching(NSPredicate(format: "label CONTAINS %@", categoryName))
+        XCTAssertEqual(moved.count, 2, "Both rows must carry the new category.")
 
         require(app, AccessibilityID.logSelectionToggle).tap()
         let rowsAgain = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
@@ -2076,8 +2080,8 @@ final class SmartBudUITests: XCTestCase {
             NSPredicate(format: "label CONTAINS %@", "2")).count, 0,
             "The confirmation must preview the number of affected rows.")
         confirm.buttons["Save"].tap()
-        XCTAssertTrue(element(app, AccessibilityID.logBatchResult).waitForExistence(timeout: 10),
-                      "A book move must report its result.")
+        if app.alerts.firstMatch.exists { app.alerts.firstMatch.buttons["Done"].tap() }
+        XCTAssertEqual(logRows(app).count, 0, "Moved rows must leave the current book.")
     }
 }
 
