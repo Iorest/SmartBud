@@ -2039,6 +2039,15 @@ final class SmartBudUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label == %@", "Save")).firstMatch.tap()
 
         select(.log, in: app)
+        // Creating a book switches into it; its log is empty. Go back to the
+        // default book, which owns the bundled sample rows we batch-edit.
+        let currentBook = app.buttons.matching(NSPredicate(format: "label == %@", "Trip")).firstMatch
+        XCTAssertTrue(currentBook.waitForExistence(timeout: 5))
+        currentBook.tap()
+        let defaultBook = app.buttons.matching(NSPredicate(format: "label == %@", "Default Book")).firstMatch
+        XCTAssertTrue(defaultBook.waitForExistence(timeout: 5),
+                      "Book switcher must offer the default book.\n\(app.debugDescription)")
+        defaultBook.tap()
         require(app, AccessibilityID.logSelectionToggle).tap()
         let rows = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
         XCTAssertGreaterThanOrEqual(rows.count, 2,
