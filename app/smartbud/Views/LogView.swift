@@ -297,7 +297,7 @@ struct LogView: View {
                     books: fetchedBooks.filter { !$0.archived },
                     accounts: fetchedAccounts,
                     labels: availableTags,
-                    onPick: moveSelection,
+                    onPick: { commitBatch(.category($0)) },
                     onBook: { activeAlert = .confirm(.book($0)) },
                     onNote: {
                         batchNoteDraft = ""
@@ -444,15 +444,9 @@ extension LogView {
         .accessibilityIdentifier(AccessibilityID.logSelectionToggle)
     }
 
-    private func moveSelection(to category: CategoryModel) {
-        transactionVM.setCategory(category, for: selectedTransactions)
-        withAnimation(.easeInOut(duration: 0.2)) {
-            selectedIDs.removeAll()
-            isSelecting = false
-        }
-    }
 
     private enum BatchAction {
+        case category(CategoryModel)
         case book(UUID)
         case note(String)
         case date(Date)
@@ -490,6 +484,8 @@ extension LogView {
         let rows = selectedTransactions
         let outcome: BatchEditOutcome
         switch action {
+        case .category(let category):
+            outcome = transactionVM.batchEdit(category: category, for: rows)
         case .book(let id):
             outcome = transactionVM.batchEdit(bookID: id, for: rows)
         case .note(let text):
