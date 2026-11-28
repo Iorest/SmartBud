@@ -4583,6 +4583,83 @@
         }
       }
     },
+    "Batch Edit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Batch Edit" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "批量编辑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "批量編輯" } }
+      }
+    },
+    "Edit %lld transactions?" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit %lld transactions?" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑 %lld 笔账？" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯 %lld 筆帳？" } }
+      }
+    },
+    "Exclude from Budget & Income/Expense" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exclude from Budget & Income/Expense" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "不计入预算与收支" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "不計入預算與收支" } }
+      }
+    },
+    "Updated %lld, skipped %lld" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Updated %lld, skipped %lld" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已更新 %lld 条，跳过 %lld 条" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已更新 %lld 筆，跳過 %lld 筆" } }
+      }
+    },
+    "Linked records cannot be batch edited" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Linked records cannot be batch edited" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关联记录不能批量编辑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關聯記錄不能批量編輯" } }
+      }
+    },
+    "Plan-generated rows cannot be batch edited" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Plan-generated rows cannot be batch edited" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "计划生成的记录不能批量编辑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "計畫生成的記錄不能批量編輯" } }
+      }
+    },
+    "Balance adjustments cannot be batch edited" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Balance adjustments cannot be batch edited" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "余额调整不能批量编辑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "餘額調整不能批量編輯" } }
+      }
+    },
+    "Account currency differs; edit the amount instead" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Account currency differs; edit the amount instead" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "账户币种不同，请改为编辑金额" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳戶幣種不同，請改為編輯金額" } }
+      }
+    },
+    "Account belongs to another ledger" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Account belongs to another ledger" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "账户属于其他账本" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "帳戶屬於其他帳本" } }
+      }
+    },
+    "The changes could not be saved" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The changes could not be saved" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更改未能保存" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "變更未能儲存" } }
+      }
+    },
+    "Invalid value" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid value" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无效值" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無效值" } }
+      }
+    },
     "Cancel" : {
       "extractionState" : "stale",
       "localizations" : {

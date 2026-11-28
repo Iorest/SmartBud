@@ -31,6 +31,16 @@ struct LogView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
 
+    @Query(sort: [SortDescriptor(\BookModel.order)])
+    private var fetchedBooks: [BookModel]
+    @Query(sort: [SortDescriptor(\AccountModel.order)])
+    private var fetchedAccounts: [AccountModel]
+    /// Batch account edits must offer only accounts owned by the current
+    /// ledger; a foreign account would strand the row between two ledgers.
+    private var currentAccounts: [AccountModel] {
+        BookScope.scoped(fetchedAccounts, \.bookID, selected: bookState.currentID)
+    }
+
     // The queries cover the whole store; these computed arrays are the only
     // rows the log (and its extensions) are allowed to render or mutate.
     private var allTransactions: [TransactionModel] {
@@ -67,7 +77,16 @@ struct LogView: View {
     // Batch selection
     @State private var isSelecting = false
     @State private var selectedIDs: Set<UUID> = []
-    @State private var showBatchDelete = false
+    /// One alert slot for the whole screen. SwiftUI only presents one alert
+    /// attached to a view, so delete / confirm / result share this state.
+    @State private var activeAlert: ActiveAlert?
+
+    // Batch edit: value-based actions are confirmed before writing; note and
+    // date use sheets because they need input first.
+    @State private var showBatchNote = false
+    @State private var showBatchDate = false
+    @State private var batchNoteDraft = ""
+    @State private var batchDateDraft = Date.now
 
     @State var filter = FilterType.all
     @State var categoryFilter: CategoryModel?
@@ -149,20 +168,51 @@ struct LogView: View {
                 .accessibilityIdentifier(AccessibilityID.logAddButton)
             }
         }
-        .alert(
-            String.appFormatted("Delete %lld transactions?", selectedIDs.count),
-            isPresented: $showBatchDelete
-        ) {
-            Button(String.appLocalized("Delete"), role: .destructive) {
-                transactionVM.delete(selectedTransactions)
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    selectedIDs.removeAll()
-                    isSelecting = false
-                }
+        .alert(item: $activeAlert) { alert in
+            switch alert {
+            case .delete:
+                Alert(
+                    title: Text(String.appFormatted("Delete %lld transactions?", selectedIDs.count)),
+                    message: Text(String.appLocalized("This action cannot be undone.")),
+                    primaryButton: .destructive(Text(String.appLocalized("Delete"))) {
+                        transactionVM.delete(selectedTransactions)
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedIDs.removeAll()
+                            isSelecting = false
+                        }
+                    },
+                    secondaryButton: .cancel(Text(String.appLocalized("Cancel")))
+                )
+            case .confirm(let action):
+                Alert(
+                    title: Text(String.appFormatted(
+                        "Edit %lld transactions?",
+                        transactionVM.batchEligibleCount(
+                            for: selectedTransactions,
+                            field: batchActionSpec(action).0,
+                            targetBookID: batchActionSpec(action).1))),
+                    primaryButton: .default(Text(String.appLocalized("Save"))) {
+                        commitBatch(action)
+                    },
+                    secondaryButton: .cancel(Text(String.appLocalized("Cancel")))
+                )
+            case .result(let outcome):
+                Alert(
+                    title: Text(String.appLocalized("Batch Edit")),
+                    message: Text(message(for: outcome)),
+                    dismissButton: .default(Text(String.appLocalized("Done")))
+                )
             }
-            Button(String.appLocalized("Cancel"), role: .cancel) {}
-        } message: {
-            Text(String.appLocalized("This action cannot be undone."))
+        }
+        .sheet(isPresented: $showBatchNote) {
+            BatchTextSheet(title: String.appLocalized("Note"), text: $batchNoteDraft) {
+                commitBatch(.note(batchNoteDraft))
+            }
+        }
+        .sheet(isPresented: $showBatchDate) {
+            BatchDateSheet(date: $batchDateDraft) {
+                commitBatch(.date(batchDateDraft))
+            }
         }
         .onChange(of: launchSearch) { _, newValue in
             if newValue { searchPresented = true }
@@ -253,8 +303,24 @@ struct LogView: View {
                     count: selectedIDs.count,
                     expenseCategories: categoryVM.expenseCategories,
                     incomeCategories: categoryVM.incomeCategories,
-                    onPick: moveSelection,
-                    onDelete: { showBatchDelete = true }
+                    books: fetchedBooks.filter { !$0.archived },
+                    accounts: currentAccounts,
+                    labels: availableTags,
+                    onPick: { commitBatch(.category($0)) },
+                    onBook: { activeAlert = .confirm(.book($0)) },
+                    onNote: {
+                        batchNoteDraft = ""
+                        showBatchNote = true
+                    },
+                    onDate: {
+                        batchDateDraft = .now
+                        showBatchDate = true
+                    },
+                    onAccount: { activeAlert = .confirm(.account($0)) },
+                    onLabel: { activeAlert = .confirm(.label($0)) },
+                    onReimbursable: { activeAlert = .confirm(.reimbursable($0)) },
+                    onExcluded: { activeAlert = .confirm(.excluded($0)) },
+                    onDelete: { activeAlert = .delete }
                 )
             }
         }
@@ -384,10 +450,86 @@ extension LogView {
                 selectedIDs.removeAll()
             }
         }
+        .accessibilityIdentifier(AccessibilityID.logSelectionToggle)
     }
 
-    private func moveSelection(to category: CategoryModel) {
-        transactionVM.setCategory(category, for: selectedTransactions)
+
+    private enum BatchAction {
+        case category(CategoryModel)
+        case book(UUID)
+        case note(String)
+        case date(Date)
+        case account(UUID?)
+        case label(UUID)
+        case reimbursable(Bool)
+        case excluded(Bool)
+    }
+
+    /// Field and target ledger used to preview how many rows an action can
+    /// actually change, before the user confirms it.
+    private func batchActionSpec(_ action: BatchAction) -> (BatchEditField, UUID?) {
+        switch action {
+        case .category: return (.category, nil)
+        case .book(let id): return (.book, id)
+        case .note: return (.note, nil)
+        case .date: return (.date, nil)
+        case .account: return (.account, nil)
+        case .label: return (.labels, nil)
+        case .reimbursable: return (.reimbursable, nil)
+        case .excluded: return (.excludeFromTotals, nil)
+        }
+    }
+
+    private enum ActiveAlert: Identifiable {
+        case delete
+        case confirm(BatchAction)
+        case result(BatchEditOutcome)
+
+        var id: String {
+            switch self {
+            case .delete: return "delete"
+            case .confirm: return "confirm"
+            case .result: return "result"
+            }
+        }
+    }
+
+    private func message(for outcome: BatchEditOutcome) -> String {
+        let base = String.appFormatted("Updated %lld, skipped %lld",
+                                       outcome.applied, outcome.skipped)
+        guard !outcome.messageKeys.isEmpty else { return base }
+        return base + "\n" + outcome.messageKeys.map { String.appLocalized($0) }
+            .joined(separator: "\n")
+    }
+
+    /// Applies one action to every selected row, then reports both sides of
+    /// the result. Selection is cleared only after the outcome is visible.
+    private func commitBatch(_ action: BatchAction) {
+        let rows = selectedTransactions
+        let outcome: BatchEditOutcome
+        switch action {
+        case .category(let category):
+            outcome = transactionVM.batchEdit(category: category, for: rows)
+        case .book(let id):
+            outcome = transactionVM.batchEdit(bookID: id, for: rows)
+        case .note(let text):
+            outcome = transactionVM.batchEdit(note: text, for: rows)
+        case .date(let date):
+            outcome = transactionVM.batchEdit(date: date, for: rows)
+        case .account(let id):
+            let account = id.flatMap { wanted in currentAccounts.first { $0.id == wanted } }
+            outcome = transactionVM.batchEdit(account: account, for: rows)
+        case .label(let id):
+            outcome = transactionVM.batchEdit(addLabel: id, to: rows)
+        case .reimbursable(let value):
+            outcome = transactionVM.batchEdit(reimbursable: value, for: rows)
+        case .excluded(let value):
+            outcome = transactionVM.batchEdit(excludedFromTotals: value, for: rows)
+        }
+        // Let the confirmation alert dismiss before presenting the result;
+        // replacing an item while it is still up can be ignored by SwiftUI.
+        activeAlert = nil
+        Task { @MainActor in activeAlert = .result(outcome) }
         withAnimation(.easeInOut(duration: 0.2)) {
             selectedIDs.removeAll()
             isSelecting = false
@@ -543,5 +685,70 @@ struct TagManagementView: View {
             row.tagIDs.removeAll { $0 == tag.id }
         }
         commit()
+    }
+}
+
+// MARK: - Batch edit value sheets
+
+/// Small shared input surfaces so note/date batch edits show the value before
+/// writing it, rather than applying directly from a menu tap.
+struct BatchTextSheet: View {
+    let title: String
+    @Binding var text: String
+    let apply: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField(title, text: $text)
+            }
+            .navigationTitle(title)
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String.appLocalized("Cancel")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String.appLocalized("Save")) {
+                        apply()
+                        dismiss()
+                    }
+                    .accessibilityIdentifier(AccessibilityID.logBatchApply)
+                }
+            }
+        }
+    }
+}
+
+struct BatchDateSheet: View {
+    @Binding var date: Date
+    let apply: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                DatePicker(String.appLocalized("Date"), selection: $date, displayedComponents: .date)
+            }
+            .navigationTitle(String.appLocalized("Date"))
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String.appLocalized("Cancel")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String.appLocalized("Save")) {
+                        apply()
+                        dismiss()
+                    }
+                    .accessibilityIdentifier(AccessibilityID.logBatchApply)
+                }
+            }
+        }
     }
 }

@@ -65,6 +65,7 @@ extension LogTransactionList {
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier(AccessibilityID.logBatchRow)
     }
 
     func editableRow(_ transaction: TransactionModel, isFuture: Bool) -> some View {

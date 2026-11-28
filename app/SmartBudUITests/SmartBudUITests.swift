@@ -2016,6 +2016,75 @@ final class SmartBudUITests: XCTestCase {
                           "Tapping a settings row must open its detail.")
         }
     }
+
+    // MARK: - TELE-83 multi-select editing
+
+    /// Two selected rows must be edited together, and a book move must show
+    /// the affected count before writing. Assertions land on the result
+    /// count and on the rows' rendered labels, not on the menus alone.
+    func testBatchEditCategoryAndBook() throws {
+        let app = launch()
+
+        // A second book is required to prove a batch move actually happened.
+        select(.settings, in: app)
+        scrollIntoView(AccessibilityID.settingsRow("books"), in: app).tap()
+        let newBook = app.buttons.matching(NSPredicate(format: "label == %@", "New Book")).firstMatch
+        XCTAssertTrue(newBook.waitForExistence(timeout: 10),
+                      "Books screen must offer New Book.\n\(app.debugDescription)")
+        newBook.tap()
+        let name = app.textFields.firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.tap()
+        name.typeText("Trip")
+        app.buttons.matching(NSPredicate(format: "label == %@", "Save")).firstMatch.tap()
+
+        select(.log, in: app)
+        // `-freshStore` starts empty and `-importSample` only opens the
+        // preview, so book two rows ourselves before exercising selection.
+        addExpense(app, amount: "12.50", note: "TELE83-A")
+        addExpense(app, amount: "20.00", note: "TELE83-B")
+        require(app, AccessibilityID.logSelectionToggle).tap()
+        let rows = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
+        XCTAssertGreaterThanOrEqual(rows.count, 2,
+                                    "The two new rows must be selectable.\n\(app.debugDescription)")
+        rows.element(boundBy: 0).tap()
+        rows.element(boundBy: 1).tap()
+
+        require(app, AccessibilityID.logBatchCategoryMenu).tap()
+        let category = element(app, AccessibilityID.logBatchCategory)
+        XCTAssertTrue(category.waitForExistence(timeout: 5))
+        category.tap()
+        // Result alerts are system-rendered: query by alert + text, and wait
+        // for the presentation animation instead of checking `exists` once.
+        let categoryResult = app.alerts.firstMatch
+        XCTAssertTrue(categoryResult.waitForExistence(timeout: 10),
+                      "A batch edit must report its result.\n\(app.debugDescription)")
+        XCTAssertGreaterThan(categoryResult.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "2")).count, 0,
+            "The result must count both selected rows.")
+        categoryResult.buttons["Done"].tap()
+
+        require(app, AccessibilityID.logSelectionToggle).tap()
+        let rowsAgain = app.descendants(matching: .any).matching(identifier: AccessibilityID.logBatchRow)
+        rowsAgain.element(boundBy: 0).tap()
+        rowsAgain.element(boundBy: 1).tap()
+        require(app, AccessibilityID.logBatchEditMenu).tap()
+        let trip = app.buttons.matching(identifier: AccessibilityID.logBatchBook)
+            .matching(NSPredicate(format: "label CONTAINS %@", "Trip")).firstMatch
+        XCTAssertTrue(trip.waitForExistence(timeout: 5),
+                      "The new book must be offered to a batch action.\n\(app.debugDescription)")
+        trip.tap()
+        let confirm = app.alerts.firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        XCTAssertTrue(confirm.label.contains("2"),
+                      "Both account-less rows can move: \(confirm.label)")
+        confirm.buttons["Save"].tap()
+        let moveResult = app.alerts.firstMatch
+        XCTAssertTrue(moveResult.waitForExistence(timeout: 10),
+                      "A book move must report its result.\n\(app.debugDescription)")
+        moveResult.buttons["Done"].tap()
+        XCTAssertEqual(logRows(app).count, 0, "Moved rows must leave the current book.")
+    }
 }
 
 // MARK: - Audit policy

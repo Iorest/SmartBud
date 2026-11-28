@@ -12,7 +12,17 @@ struct LogSelectionBar: View {
     let count: Int
     let expenseCategories: [CategoryModel]
     let incomeCategories: [CategoryModel]
+    let books: [BookModel]
+    let accounts: [AccountModel]
+    let labels: [TagModel]
     let onPick: (CategoryModel) -> Void
+    let onBook: (UUID) -> Void
+    let onNote: () -> Void
+    let onDate: () -> Void
+    let onAccount: (UUID?) -> Void
+    let onLabel: (UUID) -> Void
+    let onReimbursable: (Bool) -> Void
+    let onExcluded: (Bool) -> Void
     let onDelete: () -> Void
 
     var body: some View {
@@ -33,7 +43,50 @@ struct LogSelectionBar: View {
             } label: {
                 Label(String.appLocalized("Move to Category"), systemImage: "folder")
                     .font(.body.weight(.medium))
+                    .accessibilityIdentifier(AccessibilityID.logBatchCategoryMenu)
             }
+
+            Menu {
+                Section(String.appLocalized("settings.row.books")) {
+                    ForEach(books) { book in
+                        Button(book.name) { onBook(book.id) }
+                            .accessibilityIdentifier(AccessibilityID.logBatchBook)
+                    }
+                }
+                Button(String.appLocalized("Note"), systemImage: "pencil") { onNote() }
+                    .accessibilityIdentifier(AccessibilityID.logBatchNote)
+                Button(String.appLocalized("Date"), systemImage: "calendar") { onDate() }
+                    .accessibilityIdentifier(AccessibilityID.logBatchDate)
+                Section(String.appLocalized("Account")) {
+                    ForEach(accounts) { account in
+                        Button("\(account.wrappedEmoji) \(account.wrappedName)") {
+                            onAccount(account.id)
+                        }
+                    }
+                }
+                if !labels.isEmpty {
+                    Section(String.appLocalized("Labels")) {
+                        ForEach(labels) { tag in
+                            Button(tag.name) { onLabel(tag.id) }
+                        }
+                    }
+                }
+                Section(String.appLocalized("Batch Edit")) {
+                    Button(String.appLocalized("Mark as Reimbursable"), systemImage: "checkmark.circle") {
+                        onReimbursable(true)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.logBatchReimbursable)
+                    Button(String.appLocalized("Exclude from Budget & Income/Expense"),
+                           systemImage: "slash.circle") {
+                        onExcluded(true)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.logBatchExclude)
+                }
+            } label: {
+                Label(String.appLocalized("Batch Edit"), systemImage: "slider.horizontal.3")
+                    .font(.body.weight(.medium))
+            }
+            .accessibilityIdentifier(AccessibilityID.logBatchEditMenu)
 
             Spacer(minLength: 0)
 
@@ -57,6 +110,7 @@ struct LogSelectionBar: View {
         Button("\(category.wrappedEmoji) \(category.wrappedName)") {
             onPick(category)
         }
+        .accessibilityIdentifier(AccessibilityID.logBatchCategory)
     }
 }
 

@@ -54,6 +54,7 @@ fi
 # fail to compile and belongs to the macOS job.
 app_sources=(
     Logic/AccountBalance.swift
+    Logic/BatchEdit.swift
     Logic/BatchRecognition.swift
     Logic/AppPeriod.swift
     Logic/BadDebtPolicy.swift
@@ -87,6 +88,7 @@ app_sources=(
 
 test_sources=(
     AccountBalanceTests.swift
+    BatchEditPolicyTests.swift
     BatchRecognitionTests.swift
     AppPeriodTests.swift
     BadDebtPolicyTests.swift
