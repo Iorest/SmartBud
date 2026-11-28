@@ -24,9 +24,9 @@ Seen: 2026-11-26、2026-11-27
 
 为审查阻塞项打补丁前，先看全函数再改：补丁替换/删除相邻行，下一轮 CI 立刻暴露。TELE-21 修 `TransactionSnapshot` 漏 `bookID` 时把 `let id: UUID` 整行替换掉，`01cc389` 引入编译错误、`cd3a248` 再修（PR #40）；TELE-33 修净资产口径时把记账页「超额提示」阈值弄宽，被明镜二次打回后 `e36ca66` 重修（PR #44）。
 
-证据：TELE-21 评论「01cc389 加 bookID 时误把 `let id: UUID` 那一行替换掉了」；TELE-33 评论「新 head 的改动把记账页『超额提示』的阈值弄宽了，这一条阻塞」（01a21207）。
+证据：TELE-21 评论「01cc389 加 bookID 时误把 `let id: UUID` 那一行替换掉了」；TELE-33 评论「新 head 的改动把记账页『超额提示』的阈值弄宽了，这一条阻塞」（01a21207）；TELE-84 给 `InstallmentPlanModel` 加 `options` 属性时误删相邻的 `categoryID` 存储属性、初始化器仍在赋值，下一轮 CI 报 `Helper.swift:652: no member 'categoryID'`（PR #53，run `45936292112`）——同类模式（编辑波及相邻行）又一日再现。
 
-Seen: 2026-11-26
+Seen: 2026-11-26、2026-11-27
 
 ### L3 CI 红灯先读 job 注解分类：runner 容量失败不派代码修复
 
@@ -45,6 +45,30 @@ PR #48（TELE-75，docs-only）于 2026-11-26 11:45:27Z 被合并，而明镜的
 证据：TELE-75 评审评论 01a217aa（11:42:30Z，4 项阻塞）vs PR #48 mergedAt 11:45:27Z；PR #49 正文「main 目前仍含这 4 处错误」；TELE-75 评论 01a217ae（修复推到原分支时 PR 已 MERGED）。
 
 Seen: 2026-11-27
+
+### L5 回放全绿只证明「与录制品一致」；录制品自身有效性要独立检查（aria2-rs）
+
+回放闸门 185/185 全绿不证明行为正确——录制品把失败录成基线、normalizer/通配悄悄放宽、夹具被本地测试污染，全绿都拦不住。规则：重录后与旧录制品逐行 diff；正向用例断言 exit 0 与产物存在；normalizer/通配变更一律变异复红，证明只收紧不放宽。
+
+原因：aria2-rs TELE-97（阶段 1）自首次提审起被明镜连续退回三次，三次都不是回放失败，而是闸门有效性：B1–B4 正向 HTTPS/FTP 用例被录成失败仍 185/185「全绿」；B5/B6 重录加工具化把校验通知与 `.cc` 文件名从逐字断言退成整行通配；B7 重录把结果表行、Status Legend、完成行 NOTICE 级别整行通配；且本地手工测试把 `downloads/1kib.bin` 泄漏进 fresh 快照，11 例误判「未写入」。每轮都靠人工复审发现，闸门自身不报。
+
+证据：TELE-97 timeline 三次 `in_review → in_progress`（2026-11-27T16:01Z、17:16Z、17:52Z）；PR https://github.com/Iorest/aria2-rs/pull/2（审退 head `858ef11`/`e7685d4`/`0c5fec5`，修复 head `5852f2e`/`4ce3167`/`989f928`）；审退结论见 TELE-97 评论（16:01:25Z、17:16:23Z、17:50:55Z）。
+
+Seen: 2026-11-28
+
+升级提议：CI 固化「正向用例 exit 0 + 产物存在」断言（B1–B4 已落地一部分）；重录后自动 diff 旧录制品并把新增通配标红。
+
+### L6 main push run 单次测试红而同 diff 的 PR run 绿：先查复现再定性
+
+main push run 红而同 diff 的 PR merge-ref run 绿时，先看下一轮同内容 run 是否复现（或重跑一次），再决定是否派修复；docs-only 合并后的测试红默认可疑为 flake/crash 类——不默认真失败，也不默认 runner 容量（与 L3 的注解分类互补：那类看注解，这类看输出加复现性）。
+
+原因：docs-only 合并后的 main push run 在 11-26~27 三次红：run `45928522847`（PR #52 合并提交）UI smoke `testCancelDiscardsDraft` 断言失败 `No element with identifier "sb.pad.digit.7"`（SmartBudUITests.swift:356）；run `45933500420`（PR #49 合并提交）Build and test「Restarting after unexpected exit, crash, or test timeout」exit 65；前一日 run `45813437889`（见 L3）同为 docs-only 合并。三次的同 diff PR run 均绿（`45913058701`、`45927397947`），且 06:10 下一轮 main run `45950164089` 全绿——未复现、无人认领、未派修复（已建认领任务 TELE-106 交统筹分诊）。
+
+证据：run `45928522847`（2026-11-27T02:28Z）与 `45933500420`（03:19Z）失败日志；同 diff PR run `45913058701`（23:48Z）、`45927397947`（02:16Z）全绿；run `45950164089`（06:10Z）main 全绿；认领任务 TELE-106。
+
+Seen: 2026-11-27
+
+升级提议：main push run 红 → 自动同 commit 重跑一次再报警；连续两次红才建认领任务。
 
 ## 归档
 
